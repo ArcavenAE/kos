@@ -22,6 +22,12 @@ One node per file. Filename = node id.
 Moving a file between confidence directories IS the promotion.
 Always accompany a move with a commit message explaining the evidence.
 
+### Probe and Finding Files
+Exploration briefs live in /probes/[brief-slug].yaml
+Probe work products (decomposed nodes, test artifacts) live in /probes/[probe-slug]-nodes/
+Findings live in /findings/finding-NNN-[slug].yaml (numbered sequentially)
+These are separate from /nodes/ — probe artifacts are evidence, not graph nodes.
+
 ### Session Protocol
 1. Read KOS-charter.md
 2. Identify the highest-value open question
