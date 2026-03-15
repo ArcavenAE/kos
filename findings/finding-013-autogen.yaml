@@ -1,0 +1,80 @@
+id: finding-013-autogen
+type: finding
+confidence: frontier
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+  summary: >
+    AutoGen's v0.2-to-v0.4 architectural transition creates document seams,
+    but the project handled the macro transition better than expected. The
+    primary seam is NOT between old and new architecture docs (those are
+    well-separated). Instead, the seams are within the v0.4 design docs
+    themselves and between design docs and implementation.
+  detail: >
+    Documents examined: README.md, FAQ.md, CONTRIBUTING.md, dotnet/README.md,
+    docs/design/ (5 design docs), python/docs/src/ core and agentchat user
+    guides, migration guide, autogen-core and autogen-agentchat READMEs,
+    and the AgentId/TopicId Python source.
+
+    THE MACRO SEAM (v0.2 conversation vs v0.4 event-driven):
+    The Python side handles this well. The v0.2 code (pyautogen package) is
+    reduced to a proxy that redirects to v0.4's autogen-agentchat. A thorough
+    migration guide maps every v0.2 concept to its v0.4 equivalent. The top-level
+    README presents only v0.4 patterns. The FAQ explicitly addresses the version
+    split. The old "conversation-based" architecture is not actively promoted in
+    any Python-facing doc.
+
+    The .NET side is worse: dotnet/README.md presents v0.2 ConversableAgent code
+    as the getting-started example while noting the old packages "will gradually
+    be deprecated." There is no .NET migration guide.
+
+    THE MICRO SEAMS (within v0.4 docs):
+    More interesting inconsistencies exist within the v0.4 docs themselves:
+    (1) Agent Worker Protocol doc uses (namespace, name) terminology for agent
+    IDs while everything else uses (type, key) -- a stale draft that was never
+    harmonized.
+    (2) Three documents state three different character constraints for agent
+    keys, and the code validates none of them. The user doc's own examples
+    violate its own stated constraints.
+    (3) Agent type allowed characters differ between prose and regex across
+    multiple documents.
+    (4) Design docs claim CloudEvents compliance; the implementation is
+    CloudEvents-inspired but not compliant.
+
+    ASSESSMENT:
+    AutoGen demonstrates that major version transitions do create document seams,
+    but the most consequential seams are not always at the version boundary.
+    The project invested heavily in the Python migration guide, which reduced
+    the macro seam to nearly zero for Python users. The .NET side received less
+    attention. The within-v0.4 specification inconsistencies (agent ID constraints)
+    are a more actionable class of seam -- they can cause bugs when someone
+    implements against the docs rather than the code.
+
+  nodes_created:
+    - ag-agentid-terminology-seam
+    - ag-agentkey-validation-contradiction
+    - ag-agent-type-regex-inconsistency
+    - ag-dotnet-readme-v02-steering
+    - ag-cloudevents-claim-divergence
+  documents_examined:
+    - README.md
+    - FAQ.md
+    - CONTRIBUTING.md
+    - dotnet/README.md
+    - docs/design/01 - Programming Model.md
+    - docs/design/02 - Topics.md
+    - docs/design/03 - Agent Worker Protocol.md
+    - docs/design/04 - Agent and Topic ID Specs.md
+    - docs/design/05 - Services.md
+    - python/docs/src/user-guide/agentchat-user-guide/migration-guide.md
+    - python/docs/src/user-guide/agentchat-user-guide/index.md
+    - python/docs/src/user-guide/core-user-guide/index.md
+    - python/docs/src/user-guide/core-user-guide/core-concepts/architecture.md
+    - python/docs/src/user-guide/core-user-guide/core-concepts/agent-identity-and-lifecycle.md
+    - python/docs/src/user-guide/core-user-guide/core-concepts/topic-and-subscription.md
+    - python/packages/autogen-core/src/autogen_core/_agent_id.py
+    - python/packages/autogen-core/src/autogen_core/_topic.py
+    - python/packages/autogen-core/README.md
+    - python/packages/autogen-agentchat/README.md
+    - python/packages/pyautogen/README.md
+tags: [seam-test, version-transition, autogen, microsoft]

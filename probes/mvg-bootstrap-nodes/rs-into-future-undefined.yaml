@@ -1,0 +1,47 @@
+id: rs-into-future-undefined
+type: element
+confidence: frontier
+title: "RFC 2394 await expansion uses IntoFuture, which RFC 2592 does not define"
+content: |
+  RFC 2394 (async/await) specifies the expansion of await! as:
+
+    let mut future = IntoFuture::into_future($expression);
+    let mut pin = unsafe { Pin::new_unchecked(&mut future) };
+    loop {
+        match Future::poll(Pin::borrow(&mut pin), &mut ctx) {
+              Poll::Ready(item) => break item,
+              Poll::Pending     => yield,
+        }
+    }
+
+  This expansion depends on an IntoFuture trait. RFC 2592 (the futures
+  stabilization RFC) does not define or mention IntoFuture. The trait
+  was not stabilized until Rust 1.64 (September 2022), four years after
+  these RFCs.
+
+  In practice, the initial stabilization of async/await (Rust 1.39,
+  November 2019) did NOT use IntoFuture — await required an expression
+  that directly implemented Future. The IntoFuture expansion described
+  in RFC 2394 was aspirational, and the RFC even notes it is showing
+  a "rough" expansion, not a literal one.
+
+  From a KOS perspective: this is a case where an RFC references an
+  abstraction that doesn't exist in the companion RFC and wasn't
+  available at stabilization time. The gap was eventually filled, but
+  the timeline shows the RFC described a design that wouldn't fully
+  materialize for years.
+edges:
+  - target: rs-future-trait-signature-drift
+    type: derives
+    note: "Part of the cross-RFC API consistency question"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "rust-rfcs/text/2394-async_await.md"
+    - "rust-rfcs/text/2592-futures.md"
+  reviewed_by: null
+tags:
+  - gap
+  - async-ecosystem

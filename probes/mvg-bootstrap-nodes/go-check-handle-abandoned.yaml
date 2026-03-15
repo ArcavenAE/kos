@@ -1,0 +1,62 @@
+id: go-check-handle-abandoned
+type: element
+confidence: frontier
+title: "check/handle error handling abandoned; error values shipped without its companion"
+content: |
+  The Go 2 draft designs (Aug 2018) presented three pillars as a coordinated
+  set: generics, error handling (check/handle), and error values. The error
+  handling overview (go2draft-error-handling-overview.md) and the error values
+  overview (go2draft-error-values-overview.md) both cross-reference each
+  other as "separate concerns" being addressed in parallel:
+
+    Error handling overview: "As part of Go 2, we are also considering,
+    as a separate concern, changes to the semantics of error values."
+
+    Error values overview: "As part of Go 2, we are also considering,
+    as a separate concern, more convenient syntax for error checks and
+    handling."
+
+  The error inspection draft (go2draft-error-inspection.md) goes further,
+  predicting that wrapping "will become more common if Go adopts the
+  suggested new error-handling control flow features to make it more
+  convenient." This implies the error values design was partly motivated
+  by an anticipated increase in wrapping driven by check/handle.
+
+  What happened: error values (errors.Is, errors.As, Unwrap, fmt.Errorf
+  with %w) shipped in Go 1.13 (Sep 2019). check/handle was abandoned
+  after community feedback. The error values design lost the companion
+  feature that was expected to drive increased wrapping adoption.
+
+  The formal error values proposal (29934-error-values.md, Jan 2019) does
+  NOT reference check/handle at all — the dependency was dropped silently
+  between the draft and the formal proposal. The error values design stands
+  on its own merits regardless, but the motivational argument in the draft
+  ("wrapping will become more common if...") was never revisited.
+
+  This is a genuine seam: the draft documents describe a coordinated effort
+  where error handling and error values reinforce each other. The formal
+  proposal decouples them without acknowledging the decoupling. The error
+  values design proved valuable independently, but the rhetorical structure
+  of the drafts still references a companion that was abandoned.
+edges:
+  - target: go-errors-as-generics-dependency
+    type: derives
+    note: "Both are Go 2 error proposals from the same coordinated release"
+  - target: go-formatter-method-rename
+    type: derives
+    note: "Formatter interface also changed between draft and proposal"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "go-proposals/design/go2draft-error-handling-overview.md"
+    - "go-proposals/design/go2draft-error-handling.md"
+    - "go-proposals/design/go2draft-error-values-overview.md"
+    - "go-proposals/design/go2draft-error-inspection.md"
+    - "go-proposals/design/29934-error-values.md"
+  reviewed_by: null
+tags:
+  - seam-unacknowledged
+  - error-handling
+  - abandoned-feature

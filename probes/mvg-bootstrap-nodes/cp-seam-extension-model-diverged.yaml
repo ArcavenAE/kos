@@ -1,0 +1,42 @@
+id: cp-seam-extension-model-diverged
+type: finding
+confidence: frontier
+title: "Composition extension model evolved away from original proposal without acknowledgment"
+content: |
+  Category 2 (Gap): Design evolution undocumented at seam
+
+  The original design-doc-composition.md proposed extension via alternate
+  Composition TYPES — HelmComposition, KustomizeComposition — as separate
+  resource kinds, each with their own schema and controller:
+
+    "alternate kinds such as a HelmComposition or a KustomizeComposition
+     would help"
+
+  The beta functions design takes a fundamentally different approach: a
+  single Composition type with a `mode: Pipeline` that dispatches to
+  external Functions. Helm, Kustomize, Go templates, etc. become generic
+  Functions, not alternate resource types.
+
+  This is arguably a better design — it avoids CRD proliferation and
+  decouples composition logic from the core release cycle. But the beta
+  functions document never explicitly addresses why the alternate-types
+  approach was abandoned. It references the original design doc's goals
+  via a link but does not discuss the structural divergence.
+
+  The original design's "Extension Points" section remains as a kind of
+  vestigial prediction that was superseded by a different mechanism.
+  A reader of both documents gets no signal about this change.
+edges:
+  - target: cp-composition-original-goals
+    type: derives
+    note: "Source of the HelmComposition/KustomizeComposition proposal"
+  - target: cp-composition-beta-functions
+    type: derives
+    note: "Implements extension via Functions instead of alternate types"
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

@@ -1,0 +1,47 @@
+id: go-errors-as-generics-dependency
+type: element
+confidence: frontier
+title: "errors.As draft assumed generics availability; shipped without it"
+content: |
+  The draft error inspection design (go2draft-error-inspection.md, Aug 2018)
+  defines errors.As using the contracts/generics draft syntax:
+
+    func As(type E)(err error) (e E, ok bool)
+
+  It explicitly says: "Here we are assuming the use of the contracts draft
+  design to make errors.As explicitly polymorphic." It provides a fallback
+  AsValue function "If Go 2 does not choose to adopt polymorphism."
+
+  The formal proposal (29934-error-values.md, Jan 2019) shipped errors.As
+  with a non-generic signature using interface{} and pointer target:
+
+    func As(err error, target interface{}) bool
+
+  The rationale section explicitly acknowledges the change: "The original
+  draft design proposed that the As function use generics, and suggested
+  an AsValue function as a temporary alternative until generics were
+  available. We find that the As function in the form we describe here
+  is just as concise and readable as a generic version would be."
+
+  This seam is acknowledged and handled. The later document explicitly
+  supersedes the earlier design choice and provides rationale.
+edges:
+  - target: go-check-handle-abandoned
+    type: derives
+    note: "Both are Go 2 error proposals — check/handle was the companion"
+  - target: go-contracts-to-interfaces
+    type: derives
+    note: "The generics design that errors.As originally depended on"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "go-proposals/design/go2draft-error-inspection.md"
+    - "go-proposals/design/29934-error-values.md"
+    - "go-proposals/design/go2draft-error-values-overview.md"
+  reviewed_by: null
+tags:
+  - seam-acknowledged
+  - api-evolution
+  - error-handling

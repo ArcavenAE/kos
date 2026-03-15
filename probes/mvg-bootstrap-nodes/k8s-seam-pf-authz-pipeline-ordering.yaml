@@ -1,0 +1,47 @@
+id: k8s-seam-pf-authz-pipeline-ordering
+type: element
+confidence: frontier
+title: "Pipeline ordering ambiguity: where P&F sits relative to authorization"
+content: |
+  The three KEPs describe overlapping request pipeline stages but none
+  precisely specifies the ordering relative to each other. Specifically:
+
+  KEP-1040 says its filter operates at "the identified point in the handler
+  chain" and links to an apiserver code tour slide, but does not explicitly
+  state whether it runs before or after authorization. It references the
+  handler chain diagram at:
+  https://speakerdeck.com/sttts/kubernetes-api-codebase-tour?slide=18
+
+  In practice (from Kubernetes source code), the handler chain ordering is:
+  Authentication -> Authorization -> P&F -> Admission -> Handler.
+  This means authorization webhook latency occurs BEFORE P&F queuing, so
+  requests spend time in authorization before P&F begins tracking them.
+
+  However, KEP-1040 states "Upon arrival at the handler, a request is
+  assigned to exactly one priority level and exactly one flow" -- the word
+  "arrival" suggests P&F acts at a fixed point, after authentication.
+  But the observed request examples in KEP-1040 include user.Info (post-authn)
+  data, confirming P&F runs after authentication.
+
+  None of the three KEPs makes a definitive statement about whether P&F
+  runs before or after authorization in the chain. This is implicit knowledge
+  derived from the codebase, not from the specifications themselves.
+
+  Sources: KEPs 1040, 3221, 4601
+edges:
+  - target: k8s-claim-authz-chain-ordering
+    type: derives
+  - target: k8s-claim-pf-request-categorization
+    type: derives
+  - target: k8s-claim-pf-webhook-latency-interaction
+    type: derives
+    note: "Pipeline ordering determines latency accounting"
+tags:
+  - k8s
+  - api-machinery
+  - authorization
+  - pipeline-ordering
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-k8s-probe"
+  created_at: "2026-03-15"

@@ -1,0 +1,21 @@
+id: ag-agentkey-validation-contradiction
+type: claim
+confidence: frontier
+claim:
+  text: >
+    Three different documents state three different constraints for agent key
+    values. The user-facing doc (agent-identity-and-lifecycle.md) and the
+    AgentId.key docstring say "alphanumeric and underscores only." The design
+    spec (doc 04) says "ascii 32-126" (very permissive). The actual Python
+    code applies NO validation to the key at all -- only the type is validated.
+    Meanwhile, the same user doc uses example keys like
+    "github.com/microsoft/autogen/issues/1" containing slashes, dots, and
+    colons, which violate the alphanumeric-only claim stated paragraphs earlier.
+  source_docs:
+    - python/docs/src/user-guide/core-user-guide/core-concepts/agent-identity-and-lifecycle.md
+    - docs/design/04 - Agent and Topic ID Specs.md
+    - python/packages/autogen-core/src/autogen_core/_agent_id.py
+  severity: medium
+  category: spec-implementation-mismatch
+  self_contradicting: true
+tags: [seam, agent-id, validation, v0.4]

@@ -1,0 +1,45 @@
+id: cp-seam-alpha-beta-api-break
+type: finding
+confidence: frontier
+title: "Alpha-to-beta transition: breaking API changes well-documented"
+content: |
+  Category: Positive finding (well-handled seam)
+
+  The beta functions design explicitly acknowledges and documents the
+  breaking changes from the alpha design:
+
+  1. desired.resources changed from array to map (documented with rationale:
+     "The previous pattern was a result of FunctionIO attempting to be an
+     idiomatic KRM object, which is not a constraint for RunFunctionRequest")
+
+  2. Connection secrets and readiness checks removed from desired.resources
+     (documented: "a Function is intended to set XR connection details and/or
+     readiness by mutating them directly")
+
+  3. FunctionIO YAML -> protobuf RunFunctionRequest/RunFunctionResponse
+     (documented: "the FunctionIO elevated from opaque YAML-encoded bytes to
+     'native' RPC code")
+
+  4. Short-lived containers -> long-running Deployments (documented with
+     extensive rationale about scaling and ecosystem fragmentation)
+
+  The beta document links to the alpha as [alpha-design] and states it
+  "supersedes" it. The alpha is properly moved to design/defunct/.
+
+  This is a well-managed design evolution. The supersession is explicit,
+  the rationale for changes is documented, and the defunct document is
+  preserved but clearly marked.
+edges:
+  - target: cp-composition-alpha-functions
+    type: derives
+    note: "Alpha is the source of the superseded decisions"
+  - target: cp-composition-beta-functions
+    type: derives
+    note: "Beta documents the changes explicitly"
+finding:
+  probe: brief-mvg-bootstrap
+  result: confirms
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

@@ -1,0 +1,115 @@
+id: finding-005-backstage
+type: finding
+confidence: frontier
+title: "Backstage ADR/BEP seam test: gaps dominate, no hard contradictions"
+content: |
+  Probe target: Backstage (Spotify/CNCF) architecture documents.
+  Documents examined:
+  - ADR002: Default catalog file format
+  - ADR004: Module export structure
+  - ADR005: Catalog core entities
+  - ADR009: Entity references
+  - ADR011: Plugin package structure
+  - BEP-0002: Dynamic frontend plugins (provisional)
+  - BEP-0003: Auth architecture evolution (implemented)
+  - BEP-0007: Auth external services (implemented)
+  - BEP-0009: Plugin metadata (implemented)
+
+  SEAM TEST RESULTS:
+  5 inconsistencies found. 0 Category 1 (contradiction). 4 Category 2
+  (gap). 1 Category 3 (structural chaos, minor). 1 clean seam noted.
+  1 temporal drift (new category: a stale future-tense claim).
+
+  FINDINGS BY SEAM:
+
+  1. BEP-0002 <-> BEP-0003 (dynamic plugins vs auth): Category 2 Gap.
+     Dynamic plugin loading proposal does not mention authentication
+     at all. Auth-related packages missing from the singleton sharing
+     list. Security-critical gap at the intersection of untrusted
+     runtime code loading and access control.
+     Node: bs-seam-dynamic-plugins-no-auth-mention
+
+  2. BEP-0002 <-> ADR011 (dynamic plugins vs package structure):
+     Category 2 Gap. ADR011 defines static npm package conventions.
+     BEP-0002 introduces a parallel naming scheme (dynamic-backstage.
+     plugin-<name>) and directory layout without acknowledging ADR011.
+     Not contradictory (both can coexist), but the relationship is
+     undocumented.
+     Node: bs-seam-bep0002-adr011-build-divergence
+
+  3. BEP-0002 <-> BEP-0009 (dynamic manifest vs package metadata):
+     Category 2 Gap. Two separate metadata systems for plugins
+     (plugin-manifest.json vs package.json backstage field) with no
+     cross-reference. Different identity schemes (dot-separated full
+     name vs bare pluginId).
+     Node: bs-seam-bep0009-bep0002-metadata-overlap
+
+  4. BEP-0007 self-inconsistency: Category 3 minor. The scope config
+     field is called "plugins" (plural) in one example and "plugin"
+     (singular) in another within the same document.
+     Node: bs-seam-bep0003-bep0007-scope-field-inconsistency
+
+  5. ADR002 apiVersion graduation: Temporal drift. ADR002 promised
+     migration from v1alpha1 to v1, which has not happened after
+     4+ years. All subsequent documents still use v1alpha1 without
+     noting the discrepancy.
+     Node: bs-seam-adr002-apiversion-stale
+
+  CLEAN SEAM:
+  BEP-0007 -> BEP-0003: The only explicit dependency declaration
+  in the corpus. Auth external services correctly builds on auth
+  evolution without contradicting it.
+  Node: bs-seam-auth-chain-coherent
+
+  OBSERVATIONS:
+
+  The dominant pattern is gaps, not contradictions. The ADRs and BEPs
+  operate in relative isolation from each other. The ADRs were written
+  2020-2021 and established foundational decisions. The BEPs were
+  written 2024 and propose changes to the systems the ADRs defined.
+  But only BEP-0007 explicitly references another BEP. No BEP
+  references any ADR by number or name.
+
+  This is consistent with the KOS hypothesis (B5, Shadow Principle):
+  each document is individually coherent, but the relationships
+  between documents are implicit and untracked. The graph reveals
+  what the documents alone do not surface.
+
+  Compared to prior probes: Backstage shows less severe inconsistencies
+  than project-alpha (which had contradictions and phase boundary erosion).
+  The Backstage documents are more honest about their scope -- BEP-0002
+  marks sections TBD, BEP-0003 labels open questions. The gaps exist
+  because documents were written by different authors at different times
+  for different purposes, not because of overclaiming.
+
+  The most concerning finding is #1 (dynamic plugins + auth gap).
+  Dynamically loading and executing third-party JavaScript in the
+  browser is a security-sensitive operation. The BEP that proposes it
+  should at minimum acknowledge the auth architecture that protects
+  the backend APIs the dynamic plugins will call.
+
+finding:
+  probe: brief-mvg-bootstrap
+  result: confirms
+
+edges:
+  - target: bs-seam-dynamic-plugins-no-auth-mention
+    type: derives
+  - target: bs-seam-bep0002-adr011-build-divergence
+    type: derives
+  - target: bs-seam-bep0009-bep0002-metadata-overlap
+    type: derives
+  - target: bs-seam-bep0003-bep0007-scope-field-inconsistency
+    type: derives
+  - target: bs-seam-adr002-apiversion-stale
+    type: derives
+  - target: bs-seam-auth-chain-coherent
+    type: derives
+tags:
+  - backstage
+  - checksum-property
+  - seam-test
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-backstage-probe"
+  created_at: "2026-03-15"

@@ -1,0 +1,46 @@
+id: py-seam-protocol-variance-rule-change
+type: element
+confidence: frontier
+title: "Seam: PEP 544 changes variance rules relative to PEP 484 for structural types"
+content: |
+  PEP 484 states that generic types are invariant by default and that
+  variance is controlled by the TypeVar declaration (covariant=True or
+  contravariant=True). The choice of variance is up to the class author.
+
+  PEP 544 introduces a new rule for protocols: "unlike nominal classes,
+  de facto covariant protocols cannot be declared as invariant, since
+  this would break transitivity of subtyping."
+
+  Example from PEP 544:
+    class AnotherBox(Protocol[T]):  # Error — protocol is covariant in T
+        def content(self) -> T:     # but T is declared invariant
+            ...
+
+  Under PEP 484 rules, this would be valid — the author chose invariant T,
+  and that's their prerogative. Under PEP 544, the type checker must REJECT
+  this because structural subtyping requires variance to match actual usage.
+
+  This is a genuine rule change, not just an extension. A class that would
+  be valid under PEP 484's nominal system becomes invalid when used as a
+  Protocol under PEP 544. PEP 544 acknowledges this in the rejected ideas
+  section, explaining that allowing invariant declarations would break
+  transitivity.
+
+  Severity: LOW-MEDIUM. The rule change is justified and well-documented,
+  but it means the same TypeVar can produce different validity results
+  depending on whether it appears in a nominal class or a Protocol class.
+  This could surprise authors converting ABCs to Protocols.
+edges:
+  - target: py-pep484-type-system-foundation
+    type: derives
+    note: "PEP 484 establishes variance as author-declared"
+  - target: py-pep544-protocols
+    type: derives
+    note: "PEP 544 constrains variance for protocols"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-probe-010
+  created_at: 2026-03-15
+  derived_from:
+    - pep-0484.rst
+    - pep-0544.rst

@@ -1,0 +1,20 @@
+id: oh-docker-image-v0-stale
+type: claim
+confidence: frontier
+claim:
+  text: >
+    The docker-image-locations.md reference document explicitly notes that
+    containers/dev/compose.yml "still points to ghcr.io/openhands/runtime
+    instead of agent-server, and the tag is 1.2-nikolaik (stale from the
+    V0 era)." This is a self-documented known issue where V0 image
+    references persist in V1 infrastructure files. Development.md also
+    references V0 runtime images (ghcr.io/openhands/runtime:X.Y-nikolaik)
+    as the SANDBOX_RUNTIME_CONTAINER_IMAGE example, without noting the
+    V1 agent-server transition.
+  source_doc: .agents/skills/update-sdk/references/docker-image-locations.md
+  contradicted_by:
+    - containers/dev/compose.yml
+    - Development.md
+  severity: low
+  category: stale-infrastructure-reference
+tags: [seam, v0-v1, docker, images, known-issue]

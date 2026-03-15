@@ -1,0 +1,21 @@
+id: oh-agenthub-delegation-stale
+type: claim
+confidence: frontier
+claim:
+  text: >
+    openhands/agenthub/README.md describes the multi-agent delegation
+    system and references three agents by name: "Delegator Agent",
+    "RepoStudyAgent", and "VerifierAgent". None of these agents exist
+    in the codebase. The actual agents in agenthub/ are: CodeActAgent,
+    BrowsingAgent, VisualBrowsingAgent, DummyAgent, LocAgent, and
+    ReadOnlyAgent. The README also references AddTaskAction and
+    ModifyTaskAction; grep finds these only in the README itself — not
+    in the events/action/ source code. These appear to be removed
+    features whose documentation was not cleaned up.
+  source_doc: openhands/agenthub/README.md
+  contradicted_by:
+    - openhands/agenthub/ (directory listing)
+    - openhands/events/action/ (no AddTaskAction/ModifyTaskAction)
+  severity: medium
+  category: stale-feature-reference
+tags: [seam, delegation, agents, stale]

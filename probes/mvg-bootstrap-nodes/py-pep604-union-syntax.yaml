@@ -1,0 +1,31 @@
+id: py-pep604-union-syntax
+type: element
+confidence: frontier
+title: "PEP 604: X | Y union type syntax, superseding Union[X, Y]"
+content: |
+  PEP 604 (Python 3.10, 2019) adds the | operator for union types,
+  providing syntactic sugar for PEP 484's Union[X, Y].
+  Key claims:
+
+  1. X | Y is equivalent to Union[X, Y]. Explicitly states equivalence.
+  2. None | T is equivalent to Optional[T].
+  3. The | syntax works in isinstance() and issubclass() calls.
+  4. Creates a new types.Union type at runtime to hold the result.
+  5. Interoperability between types.Union and typing.Union is required.
+
+  This PEP is purely syntactic — it adds no new type system semantics.
+
+  Source: pep-0604.rst (Status: Final)
+edges:
+  - target: py-pep484-type-system-foundation
+    type: supersedes
+    note: "Provides new syntax for Union types defined in PEP 484"
+  - target: py-pep526-variable-annotations
+    type: derives
+    note: "References PEP 526 as prior art for annotation syntax"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-probe-010
+  created_at: 2026-03-15
+  derived_from:
+    - pep-0604.rst

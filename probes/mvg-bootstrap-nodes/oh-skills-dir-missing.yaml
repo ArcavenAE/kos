@@ -1,0 +1,20 @@
+id: oh-skills-dir-missing
+type: claim
+confidence: frontier
+claim:
+  text: >
+    skills/README.md states that V1 repository-specific skills should go in
+    ".openhands/skills/" and that the project's own repository should have
+    this directory. However, the OpenHands repo itself has no
+    .openhands/skills/ directory — only .openhands/microagents/ (the V0
+    path). Similarly, AGENTS.md states public microagents are "Located in
+    microagents/" but no microagents/ directory exists at the repo root;
+    they are in skills/. The project's own repo structure does not match
+    the V1 conventions its own documentation prescribes.
+  source_doc: skills/README.md
+  contradicted_by:
+    - .openhands/ (directory listing shows only microagents/, no skills/)
+    - AGENTS.md (references microagents/ directory that does not exist)
+  severity: low
+  category: doc-reality-mismatch
+tags: [seam, v0-v1, directory-structure, self-reference]

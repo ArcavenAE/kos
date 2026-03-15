@@ -1,0 +1,53 @@
+id: rs-future-trait-signature-drift
+type: element
+confidence: frontier
+title: "Future trait signature differs across RFCs 2349, 2394, and 2592"
+content: |
+  Three RFCs in the async ecosystem each show a different Future trait signature:
+
+  RFC 2349 (Pin, 2018-02-19):
+    trait Future {
+        type Item;
+        type Error;
+        fn poll(self: Pin<Self>, cx: &mut task::Context) -> Poll<Self::Item, Self::Error>;
+    }
+
+  RFC 2394 (async/await, 2018-03-30):
+    Uses Future<Output = T> in prose (e.g. "impl Future<Output = usize>")
+    but the await expansion references Poll::Ready and Poll::Pending.
+
+  RFC 2592 (futures API, 2018-11-09):
+    trait Future {
+        type Output;
+        fn poll(self: Pin<&mut Self>, waker: &Waker) -> Poll<Self::Output>;
+    }
+
+  The drift: RFC 2349 defines Future with Item+Error (matching futures 0.1 style).
+  RFC 2592 explicitly drops the Error type — this is discussed in its rationale
+  section. RFC 2394 was written between the two and uses Output (the 2592 form)
+  even though 2592 had not been written yet — 2394 was tracking the design
+  direction ahead of its formal RFC.
+
+  The Pin RFC's Future definition was never the final form. It served as
+  a motivating example, not a spec. But a reader treating the RFC set as
+  a specification would find three incompatible signatures for the same trait.
+edges:
+  - target: rs-pin-type-redesign
+    type: derives
+    note: "Pin signature changes are part of the same evolution"
+  - target: rs-poll-parameter-evolution
+    type: derives
+    note: "poll parameter also changed across the same documents"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "rust-rfcs/text/2349-pin.md"
+    - "rust-rfcs/text/2394-async_await.md"
+    - "rust-rfcs/text/2592-futures.md"
+  reviewed_by: null
+tags:
+  - contradiction
+  - api-evolution
+  - async-ecosystem

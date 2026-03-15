@@ -1,0 +1,36 @@
+id: bs-seam-auth-chain-coherent
+type: element
+confidence: frontier
+title: "Clean seam: BEP-0003 and BEP-0007 auth chain is well-linked"
+content: |
+  Notable absence of contradiction.
+
+  BEP-0007 explicitly declares its dependency on BEP-0003 in its
+  Dependencies section. It correctly builds on BEP-0003's AuthService
+  interface without contradicting it. The implementation approach
+  (modifying the authenticate() method, adding scope to service
+  principal) is consistent with BEP-0003's design.
+
+  BEP-0007 uses the correct service names (coreServices.auth,
+  coreServices.httpAuth) that BEP-0003 defined. It correctly
+  identifies that the legacy backend.auth.keys config is being
+  superseded.
+
+  This is the only BEP-to-BEP seam in the examined documents that
+  has an explicit dependency declaration. The other cross-document
+  relationships are implicit.
+
+  Sources: BEP-0003 (AuthService), BEP-0007 (Dependencies section)
+edges:
+  - target: bs-bep0003-auth-evolution
+    type: derives
+  - target: bs-bep0007-auth-external
+    type: derives
+tags:
+  - backstage
+  - clean-seam
+  - auth
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-backstage-probe"
+  created_at: "2026-03-15"

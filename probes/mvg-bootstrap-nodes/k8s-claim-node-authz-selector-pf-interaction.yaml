@@ -1,0 +1,46 @@
+id: k8s-claim-node-authz-selector-pf-interaction
+type: element
+confidence: frontier
+title: "KEP-4601 node authorizer changes affect P&F's node flow assumptions"
+content: |
+  KEP-4601 modifies the Node authorizer to restrict kubelets: they can only
+  list/watch pods with a fieldSelector containing spec.nodeName=$nodeName.
+  Previously, the Node authorizer allowed broader list/watch access.
+
+  KEP-1040's example FlowSchemas categorize node requests based on the
+  system:nodes group and resource type. Its flow distinguisher uses the
+  username (e.g., system:node:127.0.0.1). The FlowSchema examples show
+  node heartbeat requests and kubelet operations on system objects, but
+  do not show list/watch pod requests from kubelets.
+
+  KEP-4601's rollout risk section notes: "Non-kubelet clients using kubelet
+  credentials to make API requests could be forbidden if they are listing/
+  watching pods without filtering to pods scheduled to the node."
+
+  The P&F FlowSchema defaults were designed before KEP-4601 tightened Node
+  authorizer behavior. If a kubelet's pod list request is now denied by the
+  Node authorizer (because it lacks the correct fieldSelector), the request
+  still consumed a P&F concurrency seat during authorization. The denied
+  request contributes to the flow's queue usage despite producing no useful
+  work. This is an operational consideration rather than a specification
+  contradiction -- P&F is designed to handle rejected requests -- but the
+  P&F default configuration does not distinguish between "authorized node
+  requests" and "soon-to-be-denied node requests."
+
+  Sources: KEPs 1040, 4601
+edges:
+  - target: k8s-claim-selector-authz-attributes
+    type: derives
+    note: "Node authorizer changes driven by selector attributes"
+  - target: k8s-claim-pf-request-categorization
+    type: derives
+    note: "P&F flow schemas designed before node authz tightening"
+tags:
+  - k8s
+  - authorization
+  - flow-control
+  - node
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-k8s-probe"
+  created_at: "2026-03-15"

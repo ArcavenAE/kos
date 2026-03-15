@@ -1,0 +1,37 @@
+id: rs-pinbox-dropped
+type: element
+confidence: frontier
+title: "PinBox<T> proposed in RFC 2349 was silently dropped by later RFCs"
+content: |
+  RFC 2349 devotes significant space to PinBox<T> — a pinning-aware Box
+  analog. It defines safe construction from T and Box<T>, Deref/DerefMut
+  impls, and unsafe get_mut/into_inner methods.
+
+  RFC 2394 (async/await) does not mention PinBox. RFC 2592 (futures) does
+  not mention PinBox. Neither RFC formally supersedes or graveyards the type.
+
+  What happened: when Pin was redesigned from Pin<'a, T> to Pin<P> (generic
+  over pointer type), PinBox<T> became expressible as Pin<Box<T>> and was
+  no longer needed as a separate type. This is described in the "Rethinking
+  Pin" blog post linked from RFC 2592 but is not stated in any RFC text.
+
+  From a KOS perspective: this is a case where a proposed API element was
+  dropped without a formal record in the RFC chain. The blog post serves
+  as the graveyard entry, but it is outside the RFC system. A reader of
+  only the RFCs would see PinBox proposed and then never mentioned again.
+edges:
+  - target: rs-pin-type-redesign
+    type: derives
+    note: "PinBox obsolescence follows from Pin redesign"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "rust-rfcs/text/2349-pin.md"
+    - "rust-rfcs/text/2592-futures.md"
+  reviewed_by: null
+tags:
+  - gap
+  - api-evolution
+  - async-ecosystem

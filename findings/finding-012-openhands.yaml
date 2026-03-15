@@ -1,0 +1,104 @@
+id: finding-012-openhands
+type: finding
+confidence: frontier
+title: "OpenHands V0-to-V1 transition creates widespread documentation seams"
+finding:
+  probe: brief-mvg-bootstrap
+  result: confirms
+
+content: |
+  ## Summary
+
+  OpenHands is undergoing a major architectural transition from V0 (monolithic
+  Python backend with in-process runtime) to V1 (SDK-based architecture with
+  separate agent-server). The skills/README.md and app_server/README.md are
+  V1-aware, but most other documentation remains in V0 terms. This creates
+  exactly the kind of seam inconsistencies the checksum property probe
+  hypothesized.
+
+  ## Findings
+
+  Seven seam nodes were extracted. They cluster into three categories:
+
+  ### 1. Architecture model divergence (medium severity)
+
+  **oh-v0-arch-link-stale**: openhands/README.md describes V0 classes
+  (AgentController, EventStream, Runtime, Server, Session) as the current
+  architecture. openhands/app_server/README.md declares most of the repository
+  "legacy" and describes a different V1 module structure. Neither document
+  cross-references the other or explains the transition.
+
+  ### 2. Stale feature references (medium severity)
+
+  **oh-agenthub-delegation-stale**: The agenthub README references three
+  agents (Delegator, RepoStudy, Verifier) and two actions (AddTask,
+  ModifyTask) that do not exist in the codebase. These appear to be removed
+  features whose documentation survived their deletion.
+
+  **oh-runtime-readme-impl-mismatch**: The runtime README claims four
+  implementations (Docker, Remote, Modal, Runloop). The actual impl/
+  directory has six different ones (docker, remote, local, cli,
+  action_execution, kubernetes), and Modal/Runloop live under third_party/.
+
+  ### 3. V0/V1 terminology and directory mismatch (low severity)
+
+  **oh-microagent-terminology-seam**: skills/README.md defines the V0
+  "microagent" to V1 "skill" naming transition. Five other documents use
+  only V0 terminology without qualification.
+
+  **oh-skills-dir-missing**: The project's own repo does not have the
+  .openhands/skills/ directory its V1 docs prescribe; it only has the V0
+  .openhands/microagents/ path. AGENTS.md references a microagents/ root
+  directory that does not exist.
+
+  **oh-glossary-missing-v1-terms**: The glossary defines V0 concepts
+  exclusively and omits all V1 terms (skill, app_server, agent-server, SDK).
+
+  **oh-docker-image-v0-stale**: V0 Docker image references persist in
+  dev infrastructure files. This is self-documented as a known issue in
+  the docker-image-locations reference.
+
+  ## Assessment
+
+  This project **confirms** the checksum property hypothesis: major
+  architectural transitions create seam inconsistencies between old and new
+  documentation. The seams here are real but mostly low-to-medium severity.
+  The project is aware of the transition (skills/README.md and the
+  docker-image-locations doc are explicit about V0 vs V1), but the update
+  has not propagated to all documentation surfaces.
+
+  The pattern is characteristic: the "center of gravity" docs get updated
+  (skills/README.md, app_server/README.md), but peripheral docs (glossary,
+  resolver README, AGENTS.md, agenthub README, runtime README) retain stale
+  V0 assumptions. This is a natural consequence of decentralized documentation
+  without a consistency-checking mechanism -- exactly the gap KOS aims to fill.
+
+edges:
+  - target: oh-v0-arch-link-stale
+    type: derives
+    note: "Architecture model divergence between V0 and V1 READMEs"
+  - target: oh-microagent-terminology-seam
+    type: derives
+    note: "V0 microagent terminology persists in five peripheral docs"
+  - target: oh-runtime-readme-impl-mismatch
+    type: derives
+    note: "Runtime README lists wrong implementations"
+  - target: oh-agenthub-delegation-stale
+    type: derives
+    note: "Agenthub README references removed agents and actions"
+  - target: oh-docker-image-v0-stale
+    type: derives
+    note: "V0 Docker image refs in dev infrastructure"
+  - target: oh-skills-dir-missing
+    type: derives
+    note: "V1 directory conventions not followed in own repo"
+  - target: oh-glossary-missing-v1-terms
+    type: derives
+    note: "Glossary omits all V1 terminology"
+
+provenance:
+  created_by: agent:claude-opus-4-6@1m
+  session: session-012-openhands
+  created_at: 2026-03-15
+
+tags: [openhands, v0-v1, architectural-transition, documentation-seams]
