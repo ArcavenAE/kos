@@ -1,0 +1,26 @@
+id: ax-code-config-stub
+type: observation
+confidence: frontier
+title: "config.rs is a 2-line stub despite SOUL.md principle #13: behavior is config"
+content: |
+  SOUL.md principle #13 states: "Behavior is config; policy is types."
+  This is listed as a core architectural principle.
+
+  axiathon-core/src/config.rs exists but contains only a header comment
+  and no implementation. The module is declared but empty.
+
+  Code-only signal: the project's stated philosophy prioritizes
+  configuration-driven behavior, but the only implemented crate has
+  no configuration system. This is either (a) planned for later crates,
+  or (b) a philosophy-implementation gap.
+
+  Not detectable from documents alone — SOUL.md describes intent,
+  and planning docs wouldn't flag an empty source file.
+edges: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - axiathon/SOUL.md
+    - axiathon/crates/axiathon-core/src/config.rs

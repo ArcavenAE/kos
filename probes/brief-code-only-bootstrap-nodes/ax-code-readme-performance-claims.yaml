@@ -1,0 +1,37 @@
+id: ax-code-readme-performance-claims
+type: observation
+confidence: frontier
+title: "README performance claims vs. code reality — no benchmarks, no implementation"
+content: |
+  README.md claims:
+  - 100K+ events-per-second single-node ingestion
+  - <100ms query latency on 1TB datasets
+  - Sub-5-second event-to-alert latency
+  - 10 Gbps sustained packet capture
+
+  Code reality:
+  - axiathon-ingestion: 2-line stub
+  - axiathon-query: 2-line stub
+  - axiathon-detection: 2-line stub
+  - No benchmark suite, no criterion dependency, no performance tests
+  - No networking code capable of packet capture
+
+  The README describes a product that does not exist in code.
+  This is normal for aspirational project documentation, but it
+  creates a claim-vs-reality gap that is structurally detectable.
+
+  Partially overlaps with finding-003 issue #2 (query latency targets)
+  but from a different angle: finding-003 found documents disagreeing
+  with each other about the latency target. Code-only bootstrap finds
+  that NO latency target is implementable because no query code exists.
+edges:
+  - target: ax-query-latency-claims
+    type: derives
+    note: "different angle on same issue — docs disagree on target, code has no implementation"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - axiathon/README.md
+    - axiathon/crates/*/Cargo.toml

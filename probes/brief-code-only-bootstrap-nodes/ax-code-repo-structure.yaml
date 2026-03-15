@@ -1,0 +1,29 @@
+id: ax-code-repo-structure
+type: observation
+confidence: frontier
+title: "ax-orc is a 5-day-old meta-repo wrapping axiathon — organizational structure from git"
+content: |
+  ax-orc repository created 2026-03-10. 5 commits total, all chore:
+  prefix. All authored by Michael Pursifull.
+
+  Contains: axiathon/ (Rust SIEM), axiathon-webui/ (React companion),
+  sprint/ (30 epics, 500+ story context files).
+
+  Commit messages reference "orc-ax PR#13" — suggests extraction from
+  a prior organizational structure. Migration script was created and
+  deleted in the same session (commits 1 and 2), indicating a
+  pre-planned repo restructuring.
+
+  Code-only signal: this is an orchestration/planning layer, not a
+  development repo. The actual code lives in axiathon/ subdirectory.
+  Sprint infrastructure (30 epics) vastly outweighs implementation
+  (361 LOC in one crate). This ratio is invisible from documents
+  because documents don't measure their own weight against code.
+edges: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - git log (ax-orc)
+    - ax-orc directory structure
