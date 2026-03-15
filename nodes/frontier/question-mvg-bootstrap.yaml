@@ -10,6 +10,13 @@ content: |
   git history, code) with no prior spec nodes, using only inferred
   correspondences? At what point does inferred-only coverage become
   useful versus noisy?
+
+  PROBED in session-002. See finding-001-mvg-bootstrap.
+  Result: PARTIAL. The checksum property is real — the graph surfaces
+  inter-document inconsistencies invisible in individual documents.
+  The schema is sufficient for decomposition but needs edge types
+  beyond depends_on and temporal state handling.
+  Spawned: question-edge-types, question-temporal-state.
 provenance:
   created_by: human
   session: session-001

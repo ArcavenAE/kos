@@ -1,0 +1,40 @@
+id: td-mood-tracking
+type: element
+confidence: frontier
+title: "ThreeDoors mood tracking"
+content: |
+  Mood tracking appears in three documents with different commitments:
+
+  Source A (executive-summary.md, success criteria):
+    "Mood-task correlation data accumulates to enable adaptive door selection
+     within 2 weeks of regular use"
+    — This is a MEASURABLE SUCCESS CRITERION for the full product.
+
+  Source B (product-scope.md, Phase 1):
+    "Mood tracking with predefined and custom options"
+    — This is a Phase 1 scope item, meaning it ships in the tech demo.
+
+  Source C (high-level-architecture.md):
+    Phase 1 architecture has no mood component in either layer.
+    Mood appears implicitly in the Intelligence Layer (Phase 2-3) under
+    "learning algorithms" but is never named.
+
+  DEPENDENCY BREAK: The executive summary promises mood-task correlation as
+  a success criterion. The PRD puts mood tracking in Phase 1. The architecture
+  doesn't implement it in Phase 1. The success criterion depends on a feature
+  that depends on an architecture that doesn't include it.
+
+  Graph signal: following the dependency chain from success criterion to
+  implementation reveals a gap. The chain breaks at the architecture layer.
+depends_on:
+  - td-vision
+  - td-phase1-scope
+  - td-arch-phase1
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - executive-summary.md
+    - product-scope.md
+    - high-level-architecture.md
