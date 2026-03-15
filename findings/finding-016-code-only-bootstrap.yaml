@@ -122,6 +122,36 @@ content: |
     evaluate whether embedding-based node inference adds signal beyond
     structural matching.
 
+  ## Implications for B4 (correspondence layer)
+
+  If code and docs produce different signal classes, the correspondence
+  layer is not optional infrastructure for a future version — it is
+  structurally necessary. Without typed links between code-derived nodes
+  and doc-derived nodes, the graph has two disconnected halves that each
+  see different problems. The correspondence layer is where the two
+  lenses unify into a single graph. B4 moves from "planned feature" to
+  "load-bearing requirement."
+
+  ## Implications for B5 (shadow principle — extension)
+
+  B5 says documents are lossy projections of the graph. This probe
+  shows code is ALSO a lossy projection. Code missed 9 of 11 doc-based
+  issues (81% loss). Docs missed 4 code-based issues. Both are shadows
+  of the full understanding, cast from different angles. B5 should be
+  extended: the graph holds both code and documents as projections, and
+  signal appears at the seams between ALL projections, not just between
+  documents.
+
+  ## Implications for Q2 (ripple engine — new sub-question)
+
+  If two lenses have different signal profiles, ripple propagation
+  across them is a design question. A change in code that contradicts
+  a doc-derived node creates a cross-lens ripple. A change in a
+  planning document that invalidates code-derived observations creates
+  the reverse. The ripple engine must operate across lenses with
+  different signal types, different update frequencies, and different
+  confidence characteristics. This sharpens Q2.
+
   ## Implications for B7 (process quality gradient)
 
   B7 says KOS adds most value where governance is weakest. Code-only

@@ -76,18 +76,26 @@ detects divergence and surfaces it to the layer that understands the semantics.
 
 **B4: The Correspondence Layer**
 Typed, versioned, bidirectional links between spec nodes and code nodes.
+Not optional infrastructure — structurally necessary. Code-derived and
+doc-derived nodes produce different signal classes (finding-016); without
+the correspondence layer, the graph has two disconnected halves that each
+see different problems. The correspondence layer is where the lenses unify.
 Relationship types: implements | tests | explores | violates | extends | obsoletes.
 Confidence: declared | inferred | stale. Drift has three signatures: spec ahead
 of code, code ahead of spec, symmetric divergence. Each requires different response.
 
 **B5: The Shadow Principle**
 Existing SDD documents (PRDs, architecture docs, ADRs, epics) are valid but lossy
-projections of the graph — a 2D shadow of an N-dimensional object. The graph
-can always generate the documents. The documents cannot recover the graph.
-Running in parallel, the graph surfaces signal at document seams — disagreements,
-gaps, and drift that are invisible in individual documents. Signal classification
-(error, evolution, drift) requires human judgment and declared supersession. The
-graph makes signal countable and connected; it does not automatically distinguish
+projections of the graph — a 2D shadow of an N-dimensional object. Code is also
+a lossy projection, cast from a different angle. The graph can always generate
+the documents; the documents cannot recover the graph. Code carries signal that
+documents miss (technology migration paths, philosophy-implementation gaps,
+aspirational claims); documents carry signal that code misses (phase boundaries,
+cross-document contradictions about unimplemented features). Neither projection
+is sufficient. Signal appears at the seams between ALL projections — document
+to document, code to code, and code to document. Signal classification (error,
+evolution, drift) requires human judgment and declared supersession. The graph
+makes signal countable and connected; it does not automatically distinguish
 bugs from intended change.
 
 *Session-002 validation (12 projects):* Tested against three personal projects
@@ -97,6 +105,10 @@ BMAD enterprise, OpenHands, AutoGen). All twelve produced signal at document
 seams. Signal types stabilized across the sample: errors (hard contradictions),
 evolution (intentional supersession), drift (stale references), and silent
 abandonment (missing graveyard entries). See findings 001-013.
+
+*Session-003 extension:* Code-only bootstrap of project-alpha (finding-016) showed
+code is also a lossy projection — missed 9 of 11 doc-based issues. The shadow
+principle is symmetric: documents and code are both shadows of the graph.
 
 **B7: The Process Quality Gradient**
 KOS adds the most value where existing documentation governance is weakest.
@@ -233,7 +245,11 @@ expensive late-stage discovery of wrong assumptions.
    schema needs edge types beyond depends_on and temporal state handling before
    the graph can fully express what it finds. See findings 001-003.
 2. How does the ripple engine surface conflicts to humans without creating
-   noise that gets ignored?
+   noise that gets ignored? *Session-003 sharpening:* If code-derived and
+   doc-derived nodes have different signal profiles (finding-016), the ripple
+   engine must propagate across lenses with different signal types, update
+   frequencies, and confidence characteristics. A code change that contradicts
+   a doc-derived node is a cross-lens ripple. How does the engine handle this?
 3. What does the executive loop look like as software — scheduler, event
    system, agent orchestration?
 4. ~~Can the graph bootstrap from a codebase with no existing spec, using only
