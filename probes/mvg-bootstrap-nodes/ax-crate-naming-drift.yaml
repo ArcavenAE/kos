@@ -1,0 +1,36 @@
+id: ax-crate-naming-drift
+type: element
+confidence: frontier
+title: "Crate naming inconsistency between starter-template-evaluation and project-structure-boundaries"
+content: |
+  The starter-template-evaluation.md (the earlier document) defines 8 workspace crates:
+    axiathon-core, axiathon-ingestion, axiathon-detection, axiathon-storage,
+    axiathon-query, axiathon-ot, axiathon-api, axiathon-tui
+
+  The project-structure-boundaries.md (the later, authoritative document) defines 8 crates:
+    axiathon-core, axiathon-ingestion, axiathon-detection, axiathon-storage,
+    axiathon-query, axiathon-ot, axiathon-server, axiathon-client
+
+  Two crates were renamed between documents:
+    axiathon-api -> axiathon-server (expanded to include daemon management, not just API)
+    axiathon-tui -> axiathon-client (expanded to include CLI + TUI, not just TUI)
+
+  The actual crate directory matches project-structure-boundaries (the later doc).
+  The starter-template-evaluation was never updated to reflect this decision.
+
+  This is a Category 2 gap: the earlier document was superseded but not updated.
+  It creates a risk that any agent or human referencing the starter evaluation
+  will expect axiathon-api and axiathon-tui to exist, when they do not.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "axiathon/_bmad-output/planning-artifacts/architecture/starter-template-evaluation.md"
+    - "axiathon/_bmad-output/planning-artifacts/architecture/project-structure-boundaries.md"
+  reviewed_by: null
+tags:
+  - naming
+  - architecture
+  - drift

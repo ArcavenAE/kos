@@ -1,0 +1,45 @@
+id: ax-realtime-comms-conflict
+type: element
+confidence: frontier
+title: "Inconsistent real-time communication mechanism between architecture documents"
+content: |
+  The data-architecture.md pipeline flow shows alert delivery via:
+    "SSE push (WebUI/TUI real-time)"
+
+  The cli-tui-architecture.md states:
+    "Real-Time Updates: WebSocket connection to server"
+    "Automatic reconnection on disconnect"
+    "Heartbeat every 30 seconds"
+
+  The project-structure-boundaries.md API boundaries table says:
+    "Client TUI: HTTP/JSON+SSE"
+
+  SSE (Server-Sent Events) and WebSocket are different protocols with
+  different capabilities:
+    - SSE is unidirectional (server to client), simpler, HTTP-native
+    - WebSocket is bidirectional, requires upgrade handshake, more complex
+
+  The architecture uses both terms in different documents to describe the
+  same real-time update channel for the TUI. This is a Category 1
+  contradiction: two architecture documents disagree on the protocol
+  for the same feature.
+
+  The detection engine collaborative rule editing section also specifies
+  "WebSocket Protocol" for CRDT synchronization, which is a legitimate
+  WebSocket use case (bidirectional). So the system may need both protocols,
+  but the TUI alert push should be one or the other.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "axiathon/_bmad-output/planning-artifacts/architecture/core-architectural-decisions/data-architecture.md"
+    - "axiathon/_bmad-output/planning-artifacts/architecture/core-architectural-decisions/cli-tui-architecture.md"
+    - "axiathon/_bmad-output/planning-artifacts/architecture/project-structure-boundaries.md"
+  reviewed_by: null
+tags:
+  - communication
+  - contradiction
+  - sse
+  - websocket

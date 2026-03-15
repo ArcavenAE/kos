@@ -1,0 +1,30 @@
+id: po-rs-composable-workflows
+type: element
+confidence: frontier
+title: "RS claim: workflows need variants, overlays, and chains"
+content: |
+  The rs.md identifies that BMAD workflows are standalone and not composable.
+  You cannot inherit a PRD workflow to create a feature-requirements variant,
+  attach a compliance overlay, or chain workflows together. Each improvement
+  to a base workflow does not benefit derivatives.
+
+  The rs.md proposes three composition mechanisms: variants (inherit and
+  override), overlays (attach non-destructively), and chains (sequence
+  with output-to-input piping).
+
+  The BIKELANE.md architecture doc describes three workflow types (stepped,
+  phased, procedural) but no composition mechanisms. The BikeLane engine
+  as documented has no variant inheritance, no overlay attachment, and no
+  chain composition. The rs.md proposes capabilities that don't exist in
+  the architecture it is extending.
+
+  Source: lifecycle-improvement-rs.md, section 7, Vision E.
+depends_on:
+  - po-bikelane-workflow-types
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md
+    - BIKELANE.md

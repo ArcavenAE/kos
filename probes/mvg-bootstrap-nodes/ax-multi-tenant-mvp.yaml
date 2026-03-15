@@ -1,0 +1,40 @@
+id: ax-multi-tenant-mvp
+type: element
+confidence: frontier
+title: "Multi-tenant architecture as MVP foundation"
+content: |
+  The PRD product-scope.md declares multi-tenancy as MVP:
+    "Multi-Tenant Architecture (MVP):
+     Single control plane, isolated data per tenant
+     Per-tenant encryption keys, query-level tenant filtering
+     MSSP-ready from day one"
+
+  The architecture delivers a detailed multi-tenant design:
+    - Logical isolation with row-level filtering
+    - Mandatory tenant_id injection at query planning (DataFusion TenantIsolationRule)
+    - Per-tenant KEK/DEK encryption hierarchy
+    - RocksDB column families per tenant for correlation state
+    - Tenant tiers (Starter, Professional, Enterprise)
+    - PostgreSQL tenant registry with RLS
+
+  This is the most architecturally load-bearing MVP decision. Nearly every other
+  system (storage, detection, query, alerting) must be tenant-aware from inception.
+  The architecture correctly reflects this pervasiveness.
+
+  However, the tenant tier structure (Starter/Professional/Enterprise) with
+  per-tier quotas (EPS, storage, users) appears only in the architecture doc,
+  not in the PRD. The PRD says "tier-based quotas" (FR94) but doesn't define
+  the tiers. The architecture invented them.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "axiathon/_bmad-output/planning-artifacts/prd/product-scope.md"
+    - "axiathon/_bmad-output/planning-artifacts/architecture/core-architectural-decisions/multi-tenant-architecture-mvp.md"
+  reviewed_by: null
+tags:
+  - multi-tenant
+  - mvp
+  - architecture

@@ -1,0 +1,43 @@
+id: ax-query-latency-claims
+type: element
+confidence: frontier
+title: "Inconsistent query latency targets between PRD and architecture"
+content: |
+  The executive-summary.md claims:
+    "sub-100ms query latency"
+
+  The functional requirements (FR44) say:
+    "System can return query results with sub-100ms p99 latency"
+
+  The data-architecture.md specifies tiered latency targets:
+    Hot tier (0-30 days): <100ms p95
+    24h data: <500ms p95
+    7 day data: <2s p95
+    30 day data: <5s p95
+
+  The PRD's "sub-100ms" claim is unqualified — it reads as a general performance
+  characteristic. But the architecture reveals this is only achievable for
+  hot-tier data, and even then only at p95, not p99 as FR44 claims.
+
+  FR44 says p99 sub-100ms. The architecture says p95 sub-100ms for hot tier.
+  p99 is a much harder target than p95. For 24-hour data the architecture
+  targets 500ms at p95 — the p99 would be even higher.
+
+  This is a Category 1 contradiction: the PRD makes a performance promise
+  that the architecture's own analysis shows is only achievable under narrow
+  conditions (hot tier, p95). The executive summary presents it as a general
+  capability.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "axiathon/_bmad-output/planning-artifacts/prd/executive-summary.md"
+    - "axiathon/_bmad-output/planning-artifacts/prd/functional-requirements.md"
+    - "axiathon/_bmad-output/planning-artifacts/architecture/core-architectural-decisions/data-architecture.md"
+  reviewed_by: null
+tags:
+  - performance
+  - query
+  - contradiction

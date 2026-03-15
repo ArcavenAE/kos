@@ -1,0 +1,30 @@
+id: po-rs-fractal-lifecycle
+type: element
+confidence: frontier
+title: "RS claim: lifecycle should be fractal (same pattern at every scale)"
+content: |
+  The rs.md proposes that the lifecycle should repeat at product, feature,
+  and bug scale. Each level inherits structure from the parent but operates
+  at reduced scope and speed. Feature lifecycle produces requirements deltas
+  and architecture deltas rather than full documents.
+
+  Phase 3 of the rs.md's build plan proposes four new workflows:
+  feature-brief, feature-requirements, feature-architecture, and spike.
+
+  The BikeLane engine (BIKELANE.md) has no variant inheritance mechanism.
+  Workflows are standalone YAML definitions. There is no mechanism for
+  a feature-brief to inherit from product-brief and override scope.
+  The rs.md's Phase 4 (composability) would need to build this into
+  BikeLane from scratch.
+
+  Source: lifecycle-improvement-rs.md, section 2, Vision C, Phase 3-4.
+depends_on:
+  - po-rs-lifecycle-incomplete
+  - po-bikelane-workflow-types
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md
+    - BIKELANE.md

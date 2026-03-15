@@ -1,0 +1,128 @@
+id: finding-002-penny-orc
+type: finding
+confidence: frontier
+title: "Penny-orc seam test: what the graph reveals between documents"
+content: |
+  ## Summary
+
+  Decomposed three penny-orc documents into 17 typed nodes with dependency
+  edges. The documents: lifecycle-improvement-rs.md (a research/analysis
+  critiquing BMAD's lifecycle), bikeshop-prd.md (a PRD for team-scale
+  infrastructure), and pf-prd.md (a PRD for CLI tooling), plus BIKELANE.md
+  (architecture doc for the workflow engine).
+
+  The seam test found findings in three categories. The most revealing
+  pattern: the rs.md and the PRDs describe the same project from angles
+  that don't acknowledge each other's concerns.
+
+  ## Category 1: Contradictions
+
+  **The scale paradox (po-seam-scale-ambition).** The rs.md argues BMAD
+  "doesn't scale" beyond greenfield — yet the project has produced 48
+  planning documents using BMAD-derived workflows, including a 46-requirement
+  PRD for a complex multi-component system (bikeshop-prd.md). The process
+  the rs.md calls broken is demonstrably producing output at scale. The
+  rs.md does acknowledge the sweet spot is "real and valuable," but frames
+  the limitations as "breaks down" rather than "friction increases." The
+  observable evidence suggests the latter.
+
+  **BMAD compatibility as a feature (po-bikelane-bmad-compat).** The rs.md
+  critiques BMAD's single flat workflow type as fundamentally insufficient.
+  BIKELANE.md advertises "full BMAD 6.0 compatibility" as a selling point.
+  The resolution exists (Pennyfarthing added phased and procedural types on
+  top of BMAD's stepped workflows) but neither document frames the
+  relationship honestly — one calls BMAD broken, the other calls BMAD
+  compatibility a feature.
+
+  ## Category 2: Gaps
+
+  **Telemetry without fidelity (po-seam-drift-vs-telemetry).** BikeShop
+  monitors execution (who's doing what, how fast, are they stuck) but has
+  no concept of spec drift (does the code match the spec). The rs.md says
+  drift detection is the critical missing capability. BikeShop builds
+  elaborate visibility for execution state while the rs.md argues the
+  critical missing visibility is spec-execution correspondence. Neither
+  document acknowledges the other's concern. This is the richest finding:
+  the project is investing in two orthogonal visibility dimensions without
+  a model of how they relate.
+
+  **Context budget contradiction (po-seam-context-vs-bikeshop).** The rs.md
+  presents context as the binding constraint (97% consumed before work
+  begins). BikeShop proposes pushing MORE context to agents on connect
+  (sprint catch-up, changelogs, notifications, team state). BikeShop's
+  PRD has latency targets but never asks whether the pushed content fits
+  in the context window. These are incompatible assumptions held by the
+  same project.
+
+  **Ad hoc drift correction (po-seam-prd-no-learn-phase).** The
+  bikeshop-prd.md was itself revised to fix an architecturally incorrect
+  component boundary (WheelHub). This revision is exactly the kind of
+  drift the rs.md says has no process — but the correction happened by
+  human inspection, not by any structured channel. The PRD is a live
+  specimen of the problem it belongs to a project trying to solve.
+
+  **Solo project building team infrastructure (po-seam-solo-vs-team).** The
+  rs.md critiques BMAD for being solo-practitioner-shaped. BikeShop is team
+  infrastructure (10+ concurrent sessions, multi-session dashboards). But
+  the project has at most two contributors. The team-scale claims rest on
+  projection, not experience. The user journeys ("Drummer," "Holden,"
+  "Naomi") describe team dynamics that don't yet exist. Neither document
+  distinguishes between evidence-grounded claims and speculative
+  team-scale projections.
+
+  ## Category 3: Structural Chaos
+
+  **Broken paths in the architecture doc (po-seam-bikelane-path-refs).**
+  BIKELANE.md contains hardcoded paths from a different user's filesystem
+  (/Users/keithavery/Projects/pennyfarthing-2/). The rs.md specifically
+  identifies broken file references as 25% of all bugs in BMAD-METHOD.
+  The architecture doc exhibits the class of error the research doc warns
+  about.
+
+  ## What the graph reveals that single documents hide
+
+  No single document is wrong on its own terms. The rs.md is a careful,
+  well-cited analysis. The bikeshop-prd.md is a thorough PRD. The
+  pf-prd.md is a well-scoped operational fix. BIKELANE.md is detailed
+  architecture documentation.
+
+  The graph reveals that these documents don't share a model of what
+  matters. The rs.md says the critical problem is spec-execution
+  correspondence and context scaling. The PRDs build execution visibility
+  and team infrastructure without addressing either concern. The context
+  ceiling research exists in the same project as a PRD that assumes
+  context is free. The drift analysis exists in the same project as a
+  telemetry system that doesn't measure drift.
+
+  The most telling pattern: the rs.md is authored by M. Pursifull and
+  revised by M. Pursifull on the bikeshop-prd. The cross-pollination
+  between these documents should be high — the same person wrote the
+  critique and revised the artifact. But the concerns don't transfer.
+  The revision fixes terminology, not the structural gaps the rs.md
+  identifies. This suggests the rs.md's problems may be real but not
+  yet actionable — the project knows what's wrong but hasn't integrated
+  that knowledge into its own practice.
+
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+
+depends_on:
+  - po-seam-drift-vs-telemetry
+  - po-seam-scale-ambition
+  - po-seam-context-vs-bikeshop
+  - po-seam-bikelane-path-refs
+  - po-seam-prd-no-learn-phase
+  - po-seam-solo-vs-team
+  - po-bikelane-bmad-compat
+  - po-question-evidence-boundary
+
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md
+    - bikeshop-prd.md
+    - pf-prd.md
+    - BIKELANE.md

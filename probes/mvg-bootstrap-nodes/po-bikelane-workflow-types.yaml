@@ -1,0 +1,28 @@
+id: po-bikelane-workflow-types
+type: element
+confidence: frontier
+title: "BikeLane: three workflow types (stepped, phased, procedural)"
+content: |
+  BIKELANE.md documents three workflow types in Pennyfarthing's orchestration:
+
+  1. Stepped: progressive disclosure, one step at a time, user gates at
+     decision points. Used for planning (PRD, Architecture, Research, Sprint).
+     BMAD 6.0 compatible — all nine BMAD planning workflows ported.
+
+  2. Phased: agent-driven with automated handoffs, session state tracking.
+     Used for implementation (TDD, BDD, Trivial, Agent-Docs).
+
+  3. Procedural: flexible checklists, agent decides order, no fixed sequence.
+     Used for reviews and exploration (Brainstorming, Code Review, Retro).
+
+  The inventory is large: 4 phased, 10 stepped, 3 procedural = 17 total
+  workflows. This is a mature workflow catalog.
+
+  Source: BIKELANE.md.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - BIKELANE.md

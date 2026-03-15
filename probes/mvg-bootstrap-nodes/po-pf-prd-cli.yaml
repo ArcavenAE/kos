@@ -1,0 +1,29 @@
+id: po-pf-prd-cli
+type: element
+confidence: frontier
+title: "pf-prd: Python CLI to replace bash scripts"
+content: |
+  The pf-prd.md defines a Python CLI (`pf`) to replace Pennyfarthing's bash
+  scripts and eliminate symlink-related path errors. Core value proposition:
+  "When an agent invokes a Pennyfarthing command, it executes. Period."
+
+  MVP scope: workflow status check, agent session start, phase check.
+  Three migration phases. Click-based CLI. Module invocation via
+  `python -m pennyfarthing_scripts.cli`. Self-locating via pip install.
+
+  This PRD is a concrete, well-scoped operational fix. It addresses a real
+  pain point (broken symlinks) with a pragmatic solution (Python modules).
+  It was produced using Pennyfarthing's own stepped PRD workflow — the
+  YAML frontmatter shows all 11 steps completed.
+
+  Notable: this PRD was authored by Keith Avery, the framework author,
+  using the framework's own PRD workflow. It is self-hosting evidence.
+
+  Source: pf-prd.md.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - pf-prd.md

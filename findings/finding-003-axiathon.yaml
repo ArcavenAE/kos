@@ -1,0 +1,194 @@
+id: finding-003-axiathon
+type: finding
+confidence: frontier
+title: "Axiathon seam test: PRD-to-architecture graph reveals systematic phase boundary erosion and internal contradictions"
+content: |
+  ## Summary
+
+  We decomposed the Axiathon PRD (executive-summary, product-scope, functional-requirements)
+  and architecture (project-structure-boundaries, data-architecture, multi-tenant-architecture,
+  cli-tui-architecture, detection-engine, architecture-gaps, validation-results) into 14 typed
+  KOS nodes with declared dependencies. The decomposition surfaced 10 inconsistencies across
+  the document set.
+
+  The architecture's own validation (architecture-gaps.md, architecture-validation-results.md)
+  declares all gaps resolved and the system ready for implementation. This probe found
+  inconsistencies that the validation missed because it checked coverage (does every FR have
+  an architecture document?) rather than consistency (do the documents agree with each other?).
+
+  ## Category 1: Contradictions
+
+  These are cases where two documents claim different things about the same concept.
+
+  **1. Detection DSL parser technology (ax-detection-dsl-parser)**
+  CLAUDE.md says "custom PEG grammar (pest)." Architecture says "Chumsky 0.10 parser."
+  These are different parsing frameworks. An AI agent following CLAUDE.md would implement
+  the wrong parser.
+
+  **2. Query latency targets (ax-query-latency-claims)**
+  Executive summary: "sub-100ms query latency" (unqualified).
+  FR44: "sub-100ms p99 latency."
+  Architecture: "<100ms p95" for hot tier only; 24h data is "<500ms p95."
+  The PRD promises p99 sub-100ms; the architecture can only deliver p95 sub-100ms
+  on the hottest data tier.
+
+  **3. Iceberg catalog implementation (ax-iceberg-catalog-conflict)**
+  Same architecture document says both "SQLite catalog (validated in spike)" and
+  "PostgreSQL 16 — Iceberg SQL Catalog" in the infrastructure table. Two different
+  catalog backends for the same system.
+
+  **4. Real-time communication protocol (ax-realtime-comms-conflict)**
+  Data architecture says "SSE push" for TUI real-time updates.
+  CLI/TUI architecture says "WebSocket connection to server."
+  Project structure boundaries says "HTTP/JSON+SSE."
+  Three documents, two protocols.
+
+  **5. HTTP client timeout (ax-http-timeout-conflict)**
+  CLI/TUI architecture specifies both "60s default" and "30 seconds default"
+  in different sections of the same document.
+
+  **6. RBAC phase assignment (ax-rbac-phase-conflict)**
+  Product scope: RBAC is Phase 2 (Growth).
+  Functional requirements: FR72-84 define RBAC roles with no phase annotation.
+  Architecture: treats RBAC as part of the authentication system (MVP).
+  Multi-tenant MVP requires role differentiation (MSSP operator role) but the
+  PRD says roles are Growth.
+
+  ## Category 2: Gaps
+
+  These are cases where information exists in one document but is missing from
+  another where it should appear.
+
+  **7. Infrastructure dependencies invisible in PRD (ax-infra-services-undeclared)**
+  The architecture requires PostgreSQL 16, Redis 7, RocksDB, and SeaweedFS.
+  The PRD promises installation via "cargo install" and "one-liner script."
+  The PRD was never updated to reflect the operational complexity of the
+  architecture's infrastructure requirements.
+
+  **8. Crate naming drift (ax-crate-naming-drift)**
+  Starter template evaluation says axiathon-api and axiathon-tui.
+  Project structure boundaries says axiathon-server and axiathon-client.
+  The actual codebase matches the latter. The earlier document was superseded
+  but never updated.
+
+  ## Category 3: Structural chaos — phase boundary erosion
+
+  This is the most significant finding and the one that only becomes visible
+  when the graph connects all the documents together.
+
+  **9. Systematic MVP scope inflation (ax-mvp-scope-inflation)**
+  The product-scope.md defines a focused MVP. The functional requirements and
+  architecture progressively expand it:
+    - Temporal Context Engine (business hours, holidays, maintenance windows,
+      cron schedules) — labeled MVP in FRs, not in product-scope
+    - Hybrid Correlation Engine (multi-stage DAG, RocksDB persistence, risk
+      scoring, campaign grouping) — labeled MVP in FRs, product-scope puts
+      "advanced correlation" in Growth
+    - Extensible Dissector Plugin System (WASM plugins, SDK) — labeled MVP
+      in FRs, not mentioned in product-scope at all
+    - OCSF 83-class proto pipeline — implied by architecture, not scoped in PRD
+
+  **10. Cross-phase dependencies (ax-dissector-plugin-phase-conflict)**
+  The dissector plugin system is labeled MVP but depends on the asset graph
+  (Growth) and session detection DSL (Growth). Implementing the full plugin
+  system at MVP requires pulling Growth features forward.
+
+  **11. TUI phase bleed (ax-tui-phase-conflict)**
+  TUI is explicitly Growth in product-scope. But FR33 (query via TUI) has no
+  phase annotation and sits alongside MVP requirements. The binary architecture
+  (axiathon-client) packages CLI and TUI in the same crate, creating a structural
+  coupling between MVP and Growth scope.
+
+  The pattern across items 9-11: each document is internally consistent about
+  phases, but the boundaries erode as you move from PRD to FRs to architecture.
+  Product-scope defines the perimeter. Functional requirements expand it by
+  adding "MVP" labels to features not in product-scope. Architecture accepts
+  the expanded scope without checking back against the original perimeter.
+  The validation documents check architecture-internal consistency but never
+  validate against the original PRD scope.
+
+  ## What the graph revealed that single-document reading hides
+
+  No single document has an error you'd catch by reading it carefully. The
+  executive summary is compelling. The product scope is well-organized. The
+  functional requirements are thorough. The architecture is detailed. The
+  validation confirms coverage.
+
+  The problems exist exclusively at the seams:
+  - PRD says X is Growth; FRs say X is MVP; architecture builds X as MVP
+  - PRD promises simplicity; architecture requires 4 infrastructure services
+  - CLAUDE.md says pest; architecture says Chumsky
+  - One architecture doc says SSE; another says WebSocket
+  - Validation checks coverage but not cross-document consistency
+
+  The graph made these visible because building dependency edges between
+  nodes FORCES you to ask: does the upstream node agree with the downstream
+  node? When it doesn't, the edge can't be drawn cleanly.
+
+  ## Meta-observation
+
+  The architecture-gaps.md and architecture-validation-results.md represent
+  a self-assessment. They confirm that the architecture covers all FRs. But
+  they don't check whether the FRs are consistent with the PRD, or whether
+  the architecture's technology choices match the project's CLAUDE.md. The
+  validation is vertical (does each FR have a home?) rather than horizontal
+  (do the documents agree at the seams?). This is exactly the kind of check
+  that the graph-based seam test provides.
+depends_on:
+  - brief-mvg-bootstrap
+  - ax-rbac-phase-conflict
+  - ax-tui-phase-conflict
+  - ax-mvp-scope-inflation
+  - ax-dissector-plugin-phase-conflict
+  - ax-query-latency-claims
+  - ax-infra-services-undeclared
+  - ax-detection-dsl-parser
+  - ax-crate-naming-drift
+  - ax-iceberg-catalog-conflict
+  - ax-realtime-comms-conflict
+  - ax-http-timeout-conflict
+  - ax-validation-self-assessment
+  - ax-multi-tenant-mvp
+  - ax-webui-first
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - brief-mvg-bootstrap
+    - ax-crate-naming-drift
+    - ax-rbac-phase-conflict
+    - ax-multi-tenant-mvp
+    - ax-tui-phase-conflict
+    - ax-webui-first
+    - ax-dissector-plugin-phase-conflict
+    - ax-mvp-scope-inflation
+    - ax-query-latency-claims
+    - ax-infra-services-undeclared
+    - ax-detection-dsl-parser
+    - ax-validation-self-assessment
+    - ax-iceberg-catalog-conflict
+    - ax-realtime-comms-conflict
+    - ax-http-timeout-conflict
+  reviewed_by: null
+finding:
+  probe: brief-mvg-bootstrap
+  result: confirms
+  details: |
+    The seam test confirms the checksum property on a real, production-scale
+    planning document set. The Axiathon docs are individually well-written
+    and the architecture validation marks everything resolved — but the
+    graph-based decomposition found 6 contradictions, 2 gaps, and a
+    systematic pattern of phase boundary erosion that the project's own
+    validation process did not detect.
+
+    The strongest signal: the self-assessment documents (architecture-gaps.md,
+    architecture-validation-results.md) check coverage but not consistency.
+    They confirm every FR has an architecture home, but never ask whether
+    the homes agree with each other or with the PRD that generated them.
+    The graph catches what the checklist misses.
+
+    Result is CONFIRMS (not partial) because the probe question was whether
+    the graph reveals inter-document inconsistencies that reading individual
+    documents hides. It does, clearly and repeatedly, across a document set
+    that already underwent its own internal validation pass.

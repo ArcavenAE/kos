@@ -1,0 +1,45 @@
+id: ax-dissector-plugin-phase-conflict
+type: element
+confidence: frontier
+title: "Extensible Dissector Plugin System labeled MVP but depends on Growth features"
+content: |
+  The functional requirements section "Extensible Dissector Plugin System (MVP)"
+  (FR314-FR338) declares the WebAssembly plugin system as MVP scope.
+
+  However, multiple FRs within this section depend on features that are
+  explicitly Growth-phase:
+    - FR320-324 (Dissector-to-Graph Integration) depend on the Asset Graph,
+      which is Growth (FR185-204)
+    - FR325-329 (Dissector-to-Detection DSL Integration) require session
+      conditions and graph conditions, which are Growth features (FR291-308)
+
+  The architecture (native-packet-capture-engine.md) describes the dissector
+  system as "Native + WASM Hybrid" with deep integration into the graph and
+  detection DSL — both Growth features.
+
+  This creates an implicit dependency: implementing the full dissector plugin
+  system at MVP requires implementing Growth-phase features (graph, session
+  detection) that aren't scheduled until later. Either the dissector plugin
+  system needs to ship in a reduced form at MVP (without graph/DSL integration),
+  or the phase boundaries need adjustment.
+
+  The PRD product-scope.md doesn't mention the plugin system at all — it only
+  references OT protocol parsing and edge collectors. The plugin architecture
+  was introduced in the architecture phase without a corresponding PRD entry.
+depends_on:
+  - ax-mvp-scope-inflation
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "axiathon/_bmad-output/planning-artifacts/prd/functional-requirements.md"
+    - "axiathon/_bmad-output/planning-artifacts/prd/product-scope.md"
+    - "axiathon/_bmad-output/planning-artifacts/architecture/native-packet-capture-engine.md"
+  reviewed_by: null
+tags:
+  - phase-conflict
+  - plugins
+  - mvp
+  - growth
+  - dependency-chain

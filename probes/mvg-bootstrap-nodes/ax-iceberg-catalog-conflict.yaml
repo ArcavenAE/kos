@@ -1,0 +1,38 @@
+id: ax-iceberg-catalog-conflict
+type: element
+confidence: frontier
+title: "Iceberg catalog type contradiction between architecture documents"
+content: |
+  The data-architecture.md states:
+    "Implementation: iceberg-rust 0.8 with SQLite catalog (validated in spike, Feb 2026)"
+
+  The infrastructure services table in the same document states:
+    "PostgreSQL 16 — Iceberg SQL Catalog (via iceberg-sql-catalog crate —
+     metadata only, not data files)"
+
+  These are two different catalog implementations. SQLite catalog is embedded
+  (no external dependency), while the PostgreSQL SQL catalog requires an external
+  PostgreSQL instance. Both are stated in the same architecture document.
+
+  The spike used SQLite (appropriate for prototyping), but the production
+  infrastructure table specifies PostgreSQL. If this is an intentional evolution
+  (SQLite for dev, PostgreSQL for production), it's not stated. If it's a
+  contradiction, one needs to be corrected.
+
+  This matters for the deployment story: SQLite catalog means the system
+  could theoretically run with just the binary + object storage. PostgreSQL
+  catalog means PostgreSQL is a hard dependency for all deployments.
+depends_on:
+  - ax-infra-services-undeclared
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "axiathon/_bmad-output/planning-artifacts/architecture/core-architectural-decisions/data-architecture.md"
+  reviewed_by: null
+tags:
+  - iceberg
+  - storage
+  - contradiction
+  - infrastructure

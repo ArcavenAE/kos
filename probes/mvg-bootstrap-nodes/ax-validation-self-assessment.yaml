@@ -1,0 +1,49 @@
+id: ax-validation-self-assessment
+type: element
+confidence: frontier
+title: "Architecture validation marks all gaps resolved but misses cross-document contradictions"
+content: |
+  The architecture-gaps.md declares:
+    "Status: ALL GAPS RESOLVED"
+    "Total Gaps Identified: 7 → Total Gaps Resolved: 7"
+    (Plus 6 research-based gaps, all resolved)
+
+  The architecture-validation-results.md declares:
+    "Overall Status: READY FOR IMPLEMENTATION"
+    "Confidence Level: HIGH"
+    "Critical Gaps: None"
+
+  Both documents validate architecture-internal consistency: do the architecture
+  documents cover all functional requirements? They do this well — 912 FRs mapped
+  to architecture documents.
+
+  What neither document checks:
+    - Whether the architecture's MVP scope matches the PRD's MVP scope
+    - Whether phase assignments in FRs match phase assignments in product-scope
+    - Whether performance claims in the executive summary match architecture targets
+    - Whether infrastructure requirements are compatible with deployment claims
+    - Whether the CLAUDE.md project context matches architecture decisions
+
+  The validation is coverage-oriented (does every FR have an architecture doc?)
+  rather than consistency-oriented (do the documents agree with each other?).
+  This is the gap that a graph-based seam test fills: the validation confirmed
+  that every FR has a home, but not that the homes are compatible with each other
+  or with the PRD that generated them.
+depends_on:
+  - ax-rbac-phase-conflict
+  - ax-mvp-scope-inflation
+  - ax-query-latency-claims
+  - ax-infra-services-undeclared
+  - ax-detection-dsl-parser
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "axiathon/_bmad-output/planning-artifacts/architecture/architecture-gaps.md"
+    - "axiathon/_bmad-output/planning-artifacts/architecture/architecture-validation-results.md"
+  reviewed_by: null
+tags:
+  - validation
+  - meta
+  - gaps
