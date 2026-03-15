@@ -160,6 +160,17 @@ Automated mechanisms (git conventions, embedding, pattern matching) remain
 untested. The manual workflow is: read documents, identify claims, cast as typed
 nodes with depends_on edges, look for contradictions and gaps at seams.
 
+*Session-003 update:* Code-only bootstrap tested against axiathon (finding-016).
+Result: PARTIAL. Code+git produces valid nodes and real signal, but the signal
+class is different from document-based probing. Code finds: technology migration
+paths, philosophy-implementation gaps, aspirational claims gaps, planning weight
+ratios. Code misses: phase boundary erosion, cross-document contradictions about
+unimplemented features. Key insight: code-only and doc-only are complementary
+lenses, not substitutes. A complete graph needs both sources. Of the three
+proposed mechanisms: git conventions showed limited value (too sparse), structural
+pattern matching showed high value (Cargo.toml analysis, stub detection), embedding
+similarity remains untested.
+
 **F5: The collaboration model**
 Human provides continuity, direction, judgment, and graveyard maintenance.
 Agent provides inference, synthesis, and reasoning within sessions. The
@@ -171,6 +182,13 @@ judgment shaped probe direction (broad before deep, skepticism about the ten).
 Division of labor functioned as designed. Tooling question narrowing: the
 repo-as-context-handoff pattern works for Claude Code; the original concern
 about cross-session continuity may be solved for this tool specifically.
+
+*Session-003 update:* Clean cold-start validated (finding-015). New agent
+instance (Opus 4.6, 1M context) restored full project context from repo alone.
+Correctly prioritized open questions without human correction. Conditions:
+model-dependent, scale-dependent (repo still small), tested for orientation
+not deep continuation. Remaining F5 question: when does the charter stop being
+sufficient as the compression artifact?
 
 ---
 
@@ -218,8 +236,15 @@ expensive late-stage discovery of wrong assumptions.
    noise that gets ignored?
 3. What does the executive loop look like as software — scheduler, event
    system, agent orchestration?
-4. Can the graph bootstrap from a codebase with no existing spec, using only
-   code structure and git history?
+4. ~~Can the graph bootstrap from a codebase with no existing spec, using only
+   code structure and git history?~~ **Partially answered (session-003).**
+   Yes — code-only bootstrap produces valid nodes and real signal, but a
+   different class of signal than document-based probing. Code finds technology
+   migration paths, philosophy-implementation gaps, aspirational claims.
+   Code misses phase boundary erosion and cross-document contradictions about
+   unimplemented features. The two are complementary, not substitutes.
+   Remaining gap: automated extraction (structural pattern matching showed
+   promise, embedding untested). See finding-016.
 5. Where does this break — what class of problems does the graph model fail
    on that documents handle naturally? *Session-002 data point:* penny-orc
    showed a case the graph handles awkwardly — a project whose analysis
@@ -269,10 +294,9 @@ Here is where we are."
 ---
 
 *Document status: CURRENT*
-*Established: session-001, updated session-002*
-*Next action: schema v0.3 complete (signal classification). Twelve projects
-probed. Checksum property confirmed with nuance (signal, not errors). Next
-probes: question 2 (ripple noise), question 3 (executive mechanism),
-question 4 (code-only bootstrap), or question 5 (where does this break).
-The process quality gradient (B7) suggests targeting adoption at projects
-with weak governance, where signal yield is highest.*
+*Established: session-001, updated session-003*
+*Next action: Q5 (where does this break) is the next probe. Q4 answered
+(partial — code and docs are complementary lenses). Cold-start validated
+(finding-015). Remaining open questions: Q2 (ripple noise), Q3 (executive
+mechanism), Q5 (failure modes). Charter priority encoding under observation
+(question-charter-priority-encoding).*
