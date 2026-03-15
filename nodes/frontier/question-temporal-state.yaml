@@ -24,6 +24,14 @@ content: |
   when it's complete) was one of the inconsistencies the probe found.
   If the schema can't represent temporal state, the graph can't detect
   temporal drift.
+
+  PROBED in session-002. See finding-004-schema-revision.
+  Result: DEFERRED. Temporal state does not need its own schema field.
+  External temporal inconsistencies are expressible as contradicts edges.
+  Internal KOS lifecycle is derived from graph topology (question with
+  finding = answered, promoted node = bedrock). Reopener: a temporal
+  distinction that is not expressible as contradiction AND not derivable
+  from graph topology AND matters for automation.
 depends_on:
   - question-mvg-bootstrap
   - elem-confidence-classification

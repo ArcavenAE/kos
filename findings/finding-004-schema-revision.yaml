@@ -1,0 +1,139 @@
+id: finding-004-schema-revision
+type: finding
+confidence: frontier
+title: "Schema revision: typed edges replace depends_on; temporal state deferred"
+content: |
+  ## Summary
+
+  Combined probe addressing question-edge-types and question-temporal-state.
+  Tested proposed schema changes against three existing probe nodes
+  (td-storage-format, ax-detection-dsl-parser, td-phase1-scope) to verify
+  that structural detectability improves without breaking existing nodes.
+
+  ## Edge types: CONFIRMED
+
+  Replaced flat depends_on (list of node ids) with typed edges:
+    - derives: equivalent to v0.1 depends_on
+    - implements: this node claims to realize the target's spec
+    - contradicts: incompatible claims about the same concept
+    - supersedes: this node replaces the target
+
+  Tested against three cases:
+
+  1. td-storage-format (PRD says txt, arch says yaml): the contradiction
+     moved from a prose description in the content field to a typed
+     contradicts edge. A tool scanning for contradicts edges can find this
+     without reading content. Structural detectability: achieved.
+
+  2. ax-detection-dsl-parser (CLAUDE.md says pest, arch says Chumsky):
+     worked, but revealed that contradicts edges are most useful when placed
+     directly between the two conflicting source nodes, not on a third-party
+     finding node. This means finer decomposition produces better graph signal.
+
+  3. td-phase1-scope (VALIDATED vs In Scope): the temporal inconsistency
+     was expressible as a contradicts edge between two nodes representing
+     the two temporal claims. No separate temporal state field was needed,
+     but the temporal claims must be decomposed into their own nodes.
+
+  Backward compatibility: depends_on remains valid as shorthand for
+  edges with type: derives. Existing nodes don't break.
+
+  ## Temporal state: DEFERRED (not needed as separate field)
+
+  Hypothesis tested: temporal state (planned, completed, validated) needs
+  its own schema axis separate from epistemic confidence (bedrock, frontier,
+  graveyard).
+
+  Finding: the cases that motivated question-temporal-state are handled by
+  existing mechanisms plus typed edges:
+
+  - External system temporal inconsistencies (Phase 1 "VALIDATED" vs
+    "In Scope"): expressible as contradicts edges between nodes representing
+    the conflicting temporal claims.
+
+  - KOS internal node lifecycle (is this question answered?): derived from
+    graph topology. A question with a finding is answered. A brief without
+    a finding is in-progress. A promoted node is bedrock. The cycle
+    (question -> brief -> finding -> harvest -> promote) already encodes
+    lifecycle state without a field.
+
+  - Completed-but-not-bedrock nodes: a node that was frontier and is now
+    done can be promoted to bedrock (if it's a stable truth) or left in
+    frontier with a finding attached (if it's answered but not foundational).
+    The finding's result field (confirms/partial/redirects) carries the
+    lifecycle signal.
+
+  Temporal state was not added to the schema. It is documented in the schema
+  as an intentional omission with rationale. If future probes reveal cases
+  that typed edges and graph topology cannot handle, this decision should be
+  revisited. The reopener would be: a temporal state distinction that is
+  (a) not expressible as a contradiction between nodes, AND (b) not
+  derivable from graph topology, AND (c) matters for ripple propagation or
+  automated detection.
+
+  ## Modeling observations
+
+  The probe revealed a design principle for decomposition: contradicts edges
+  are most useful when conflicting claims are separate nodes. If two
+  contradictory assertions are embedded in the same node, the contradiction
+  is invisible to the graph — it's internal to the node and can only be
+  found by reading the content. This means decomposition granularity affects
+  graph signal strength. Finer decomposition = more edges = more detectable
+  contradictions.
+
+  This is a tradeoff. Finer decomposition means more nodes, more maintenance,
+  more noise. The right granularity is: one node per CLAIM that could
+  independently contradict another claim. Not one node per sentence, but not
+  one node per document either.
+
+  ## Assessment against success criteria (from brief-schema-revision)
+
+  1. "A revised schema that adds edge types and temporal state without
+     breaking existing nodes" — YES. edges field added, depends_on remains
+     as backward-compatible shorthand. No existing node needs modification.
+
+  2. "At least 3 existing seam-finding nodes can be re-expressed using
+     typed edges" — YES. All three test cases (td-storage-format,
+     ax-detection-dsl-parser, td-phase1-scope) successfully moved
+     contradictions from content to edges.
+
+  3. "The revised schema can express contradictions as relationships,
+     not prose" — YES. type: contradicts with a note field.
+
+  4. "The temporal state extension doesn't collapse into confidence" —
+     N/A (temporal state was not added as a field). The two axes remain
+     independent: confidence is a schema field, temporal state is derived
+     from graph topology or expressed as contradicts edges.
+
+  Three of four criteria met, fourth rendered moot by the finding that
+  temporal state doesn't need its own field. Result: CONFIRMS.
+
+edges:
+  - target: brief-schema-revision
+    type: derives
+  - target: question-edge-types
+    type: derives
+  - target: question-temporal-state
+    type: derives
+  - target: finding-001-mvg-bootstrap
+    type: derives
+  - target: finding-002-penny-orc
+    type: derives
+  - target: finding-003-axiathon
+    type: derives
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - brief-schema-revision
+    - finding-001-mvg-bootstrap
+    - finding-002-penny-orc
+    - finding-003-axiathon
+    - td-storage-format
+    - ax-detection-dsl-parser
+    - td-phase1-scope
+  reviewed_by: null
+finding:
+  probe: brief-schema-revision
+  result: confirms
