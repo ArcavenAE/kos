@@ -1,5 +1,5 @@
 # KOS Node Schema
-# Version: 0.2
+# Version: 0.3
 # Status: FRONTIER
 # Purpose: Minimum viable spec node — human-writable, agent-parseable,
 #          no tooling required. Validate under real use, then revise.
@@ -9,6 +9,9 @@
 #   0.2 — session-002: added typed edges (replaces depends_on),
 #          based on three-project probe (findings 001-003).
 #          See finding-004-schema-revision for rationale.
+#   0.3 — session-002: added signal classification on edges,
+#          based on twelve-project probe (findings 001-013).
+#          See finding-014-twelve-project-synthesis for rationale.
 
 # ─────────────────────────────────────────────
 # REQUIRED FIELDS (every node)
@@ -104,6 +107,7 @@ edges:
   format:
     - target: node-id
       type: derives | implements | contradicts | supersedes
+      signal: "Optional. error | evolution | drift"
       note: "Optional. One-line explanation of the relationship."
 
   notes: >
@@ -118,6 +122,50 @@ edges:
 
     Start with this set of four edge types. Add types only when an
     existing type genuinely cannot carry the meaning.
+
+# ─────────────────────────────────────────────
+# SIGNAL CLASSIFICATION
+# ─────────────────────────────────────────────
+#
+# The graph surfaces signal at document seams. But not all signal
+# is the same kind of problem. Signal classification tells you
+# what to DO with what the graph found.
+#
+# Signal types (optional field on edges):
+#
+#   error:      "Genuine inconsistency. Something is wrong. The two
+#                nodes cannot both be true and no supersession was
+#                declared. Requires resolution."
+#                Example: PRD says tasks.txt, architecture says tasks.yaml.
+#
+#   evolution:  "Intentional change. The later node deliberately replaces
+#                or modifies the earlier node's claim. Not a bug — normal
+#                design progression. Should have a supersedes edge."
+#                Example: Rust Pin<'a, T> became Pin<P> by design.
+#
+#   drift:      "Unintentional staleness. A reference, count, or term
+#                went stale when something else changed. Low severity,
+#                high frequency. Usually fixable by updating the stale
+#                reference."
+#                Example: README says 35 fragments, actual count is 42.
+#
+# Signal classification requires human judgment. The graph detects
+# that two nodes disagree. Whether that disagreement is an error,
+# intended evolution, or drift is a judgment call that depends on
+# context the graph doesn't have.
+#
+# When signal is omitted, the edge is unclassified. Unclassified
+# edges are the default for newly detected inconsistencies —
+# classification happens during review, not during detection.
+#
+# SILENT ABANDONMENT is not a signal type — it is a detectable
+# graph pattern: a node that other nodes reference but that has no
+# outgoing supersedes edge and no graveyard entry. It indicates a
+# missing graveyard record. Detection is an analysis operation on
+# the graph, not a field on an edge. The fix is to add the missing
+# graveyard entry or supersedes edge.
+# See: Crossplane composition immutability (finding-006),
+#      Rust PinBox (finding-008), Go check/handle (finding-009).
 
 # depends_on (v0.1 COMPATIBILITY)
 #
@@ -308,18 +356,23 @@ notes:
 # ─────────────────────────────────────────────
 
 # This schema is FRONTIER.
-# v0.2 has survived one full probe cycle (session-002, findings 001-003)
-# and one schema revision probe (finding-004).
-# The v0.1 depends_on field was validated under use and found
-# insufficient — typed edges replaced it with backward compatibility.
-# The confidence field was examined for temporal state conflation
-# and found sufficient — temporal state is handled by other mechanisms.
+# v0.3 has survived twelve project probes (session-002, findings 001-013)
+# and two schema revision cycles (findings 004, 014).
+#
+# Evolution:
+#   v0.1: depends_on only. Validated under use, found insufficient.
+#   v0.2: typed edges (derives, implements, contradicts, supersedes).
+#         Validated across 3 projects.
+#   v0.3: signal classification on edges (error, evolution, drift).
+#         Silent abandonment documented as graph analysis pattern.
+#         Validated across 12 projects with diverse governance models.
 #
 # Specific things likely to change under further use:
-#   - edge type enum (four types — too many or too few?)
+#   - signal type enum (three types — too many or too few?)
 #   - correspondence vs edges unification (are they redundant?)
 #   - graveyard fields (are these the right questions?)
 #   - correspondence code_node format (path:symbol may not be enough)
+#   - silent abandonment detection (manual analysis → tooling?)
 #
 # Tooling may now cautiously target this schema. The core fields
-# (id, type, confidence, content, edges) are stabilizing.
+# (id, type, confidence, content, edges with signal) are stabilizing.
