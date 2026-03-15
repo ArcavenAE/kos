@@ -1,0 +1,49 @@
+id: rs-poll-parameter-evolution
+type: element
+confidence: frontier
+title: "Future::poll second parameter changed across all three async RFCs"
+content: |
+  The second parameter to Future::poll appears differently in each RFC:
+
+  RFC 2349 (Pin):
+    fn poll(self: Pin<Self>, cx: &mut task::Context) -> Poll<Self::Item, Self::Error>
+    Second parameter: &mut task::Context
+
+  RFC 2394 (async/await), await expansion:
+    match Future::poll(Pin::borrow(&mut pin), &mut ctx)
+    Uses "&mut ctx" — implies a Context type
+
+  RFC 2592 (futures), final definition:
+    fn poll(self: Pin<&mut Self>, waker: &Waker) -> Poll<Self::Output>
+    Second parameter: &Waker (not Context)
+
+  The stabilized form (Rust 1.36) uses:
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output>
+    Second parameter: &mut Context<'_> (which wraps a Waker)
+
+  So RFC 2592 — the "stabilization RFC" for the futures API — shows a
+  signature that differs from what was actually stabilized. The RFC text
+  uses bare &Waker, but the stabilized API wraps it in Context<'_> to
+  allow future extension. This is discussed in 2592's section on the
+  historical evolution but the code example in the trait definition
+  itself shows the pre-stabilization form.
+
+  RFC 2394's await expansion also references Pin::borrow — an API from
+  the original Pin<'a, T> design that doesn't exist in the Pin<P> redesign.
+edges:
+  - target: rs-future-trait-signature-drift
+    type: derives
+    note: "Part of the same signature evolution"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "rust-rfcs/text/2349-pin.md"
+    - "rust-rfcs/text/2394-async_await.md"
+    - "rust-rfcs/text/2592-futures.md"
+  reviewed_by: null
+tags:
+  - contradiction
+  - api-evolution
+  - async-ecosystem

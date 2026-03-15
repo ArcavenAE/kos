@@ -1,0 +1,43 @@
+id: py-seam-annotation-eval-divergence
+type: element
+confidence: frontier
+title: "Seam: PEP 484 vs 526 diverge on when annotations are evaluated"
+content: |
+  PEP 484 states that annotations "must be valid expressions that evaluate
+  without raising exceptions at the time the function is defined."
+  This applies uniformly to function annotations.
+
+  PEP 526 introduces a split:
+  - Module/class level annotations ARE evaluated and stored in __annotations__
+  - Local variable annotations are NOT evaluated:
+    `def f(): x: NonexistentName  # No error.`
+
+  PEP 526 claims it introduces "no new semantics beyond PEP 484," but this
+  evaluation split IS a new semantic. PEP 484 had no concept of annotations
+  that are syntactically present but never evaluated. The type comment
+  `x = 5  # type: NonexistentName` would also not raise (comments are never
+  evaluated), but the NEW SYNTAX `x: NonexistentName` in a function body
+  is parsed by the interpreter yet deliberately not evaluated — a behavior
+  PEP 484 never contemplated.
+
+  This is not a contradiction in the breaking sense — PEP 526 explicitly
+  documents this behavior. But it IS a silent expansion of what "annotation"
+  means. PEP 484 annotations are always evaluated. PEP 526 annotations
+  sometimes are, sometimes aren't, depending on scope.
+
+  Severity: LOW. Well-documented, but the "no new semantics" claim is
+  technically inaccurate regarding evaluation behavior.
+edges:
+  - target: py-pep484-type-system-foundation
+    type: derives
+    note: "PEP 484 defines annotation evaluation rules"
+  - target: py-pep526-variable-annotations
+    type: derives
+    note: "PEP 526 changes evaluation rules by scope"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-probe-010
+  created_at: 2026-03-15
+  derived_from:
+    - pep-0484.rst
+    - pep-0526.rst

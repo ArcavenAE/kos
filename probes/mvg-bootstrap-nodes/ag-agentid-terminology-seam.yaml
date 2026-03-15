@@ -1,0 +1,17 @@
+id: ag-agentid-terminology-seam
+type: claim
+confidence: frontier
+claim:
+  text: >
+    The AutoGen Agent Worker Protocol design doc (03) identifies agents by
+    the tuple (namespace, name), while all other design docs (04), user-facing
+    documentation, and Python code use (type, key). The Worker Protocol doc
+    was never updated to match the terminology that shipped.
+  source_doc: docs/design/03 - Agent Worker Protocol.md
+  contradicted_by:
+    - docs/design/04 - Agent and Topic ID Specs.md
+    - python/packages/autogen-core/src/autogen_core/_agent_id.py
+    - python/docs/src/user-guide/core-user-guide/core-concepts/agent-identity-and-lifecycle.md
+  severity: low
+  category: stale-terminology
+tags: [seam, agent-id, v0.4, design-doc]

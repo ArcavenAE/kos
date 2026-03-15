@@ -1,0 +1,24 @@
+id: bs-adr002-catalog-file-format
+type: element
+confidence: frontier
+title: "ADR002: Catalog descriptor file format (YAML, K8s-inspired envelope)"
+content: |
+  ADR002 defines the descriptor file format for catalog entities.
+  Key decisions:
+  - YAML format, K8s-inspired envelope: apiVersion, kind, metadata, spec
+  - apiVersion: backstage.io/v1alpha1 (alpha/beta initially, then backstage.io/v1)
+  - metadata fields: name, namespace, description, labels, annotations
+  - Names: unique per kind within namespace, case-insensitive, 1-63 chars
+  - Labels and annotations follow Kubernetes conventions
+  - backstage.io/ prefix reserved for core components
+  - Only Component kind defined with spec.type
+
+  Source: docs/architecture-decisions/adr002-default-catalog-file-format.md
+tags:
+  - backstage
+  - catalog
+  - schema
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-backstage-probe"
+  created_at: "2026-03-15"

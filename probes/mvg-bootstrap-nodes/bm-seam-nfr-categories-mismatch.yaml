@@ -1,0 +1,38 @@
+id: bm-seam-nfr-categories-mismatch
+type: element
+confidence: frontier
+title: "BMAD TEA seam: NFR categories differ between reference doc and implementation"
+content: |
+  The commands reference (docs/reference/commands.md, line 264) lists the
+  NFR assessment categories as:
+    "Security, Performance, Reliability, Maintainability"
+
+  The actual nfr-assess workflow implementation has 4 subagent workers:
+    step-04a-subagent-security.md
+    step-04b-subagent-performance.md
+    step-04c-subagent-reliability.md
+    step-04d-subagent-scalability.md
+
+  The 4th category is SCALABILITY in the implementation but MAINTAINABILITY
+  in the reference doc. Both categories appear in the checklist and report
+  template (the checklist has sections for both Maintainability and
+  Scalability, and the report template has sections for both), suggesting
+  the workflow actually covers 5 NFR areas but only has 4 subagents.
+
+  The gap is that Maintainability assessment is listed as a category in the
+  checklist and report template but has no dedicated subagent worker. It
+  appears to be covered as part of evidence gathering (step-03) rather than
+  as a parallel assessment worker.
+
+  Category: contradiction between reference doc and implementation
+edges:
+  - target: bm-commands-reference
+    type: contradicts
+    note: "Reference says Maintainability; implementation has Scalability"
+  - target: bm-workflow-implementations
+    type: derives
+    note: "Implementation has Security/Performance/Reliability/Scalability"
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-bmad-enterprise-probe"
+  created_at: "2026-03-15"

@@ -1,0 +1,35 @@
+id: k8s-claim-authz-chain-ordering
+type: element
+confidence: frontier
+title: "KEP-3221 authorization chain is ordered and configurable"
+content: |
+  KEP-3221 establishes that the authorization chain is explicitly ordered
+  via a configuration file. The ordering of authorizers (Node, RBAC, Webhooks)
+  is determined by the order specified in the file. Multiple webhooks are
+  allowed; other authorizer types appear at most once.
+
+  The chain processes requests sequentially: each authorizer returns Allow,
+  Deny, or NoOpinion. The first Allow or Deny is terminal for that authorizer;
+  NoOpinion passes to the next in chain.
+
+  system:masters group is always processed by a superuser authorizer that
+  runs BEFORE the configured chain. KEP-3221 explicitly lists as a non-goal:
+  "Allow ordering of super user authorizer (always allow user group;
+  system:masters) so that it can be moved from the beginning of the auth chain."
+
+  Source: keps/sig-auth/3221-structured-authorization-configuration/README.md
+edges:
+  - target: k8s-claim-sar-version-contract
+    type: derives
+    note: "Authorization chain dispatches SARs to webhooks; version matters"
+  - target: k8s-claim-pf-request-categorization
+    type: derives
+    note: "P&F categorization happens in the same request pipeline"
+tags:
+  - k8s
+  - authorization
+  - api-machinery
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-k8s-probe"
+  created_at: "2026-03-15"

@@ -1,0 +1,31 @@
+id: cp-fn-rollout
+type: element
+confidence: frontier
+title: "Controlled rollout of Composition Functions"
+content: |
+  The function rollout one-pager (Adam Wolfe Gordon) addresses a gap:
+  CompositionRevisions version the Composition itself, but function changes
+  are all-or-nothing (only one active revision at a time).
+
+  Solution:
+  - activeRevisionLimit field on Function resource (default: 1)
+  - Multiple function revisions can be active simultaneously
+  - functionRevisionRef/functionRevisionSelector added to pipeline steps
+  - Labels propagated from Function to FunctionRevision
+  - Services named per revision (not per package) to allow concurrent traffic
+
+  This design explicitly acknowledges that the beta functions design
+  created a rollout gap that CompositionRevisions alone cannot solve.
+
+  Source: /tmp/kos-probes/crossplane/design/one-pager-controlled-rollout-of-composition-functions.md
+edges:
+  - target: cp-composition-beta-functions
+    type: derives
+    note: "Addresses a gap in the beta functions design"
+  - target: cp-composition-revisions
+    type: derives
+    note: "Extends the revision concept to function packages"
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

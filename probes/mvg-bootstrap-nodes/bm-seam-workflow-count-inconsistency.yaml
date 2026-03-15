@@ -1,0 +1,41 @@
+id: bm-seam-workflow-count-inconsistency
+type: element
+confidence: frontier
+title: "BMAD TEA seam: eight vs nine workflow count"
+content: |
+  The testing-as-engineering.md (design philosophy doc) says "eight executable
+  workflows" and lists 8 in its table, omitting teach-me-testing. The
+  tea-overview.md has a section titled "TEA's 8 Workflows Across Phases"
+  (which omits teach-me-testing from the phase table, since it doesn't
+  belong to a phase).
+
+  Meanwhile, README.md, docs/index.md, CHANGELOG.md, and dozens of other
+  documents consistently say "nine workflows" or "9 workflows" and include
+  teach-me-testing.
+
+  The actual implementation has 9 workflow directories. teach-me-testing is
+  fully implemented with its own steps-c, steps-e, steps-v, templates, and
+  data directories.
+
+  This is a definitional seam: is teach-me-testing a "workflow" in the same
+  sense as the others? It does not fit the phase lifecycle (it's a learning
+  tool, not a development workflow), and the subagent-architecture.md
+  explicitly excludes it from orchestration coverage. Two documents (the
+  design philosophy and the overview's phase table) treat the count as 8.
+  Everything else treats it as 9.
+
+  Category: definitional inconsistency (what counts as a "workflow")
+edges:
+  - target: bm-testing-as-engineering
+    type: contradicts
+    note: "Says 8 workflows, actual count is 9"
+  - target: bm-readme-overview
+    type: contradicts
+    note: "README says 9, testing-as-engineering says 8"
+  - target: bm-workflow-implementations
+    type: derives
+    note: "Implementation has 9 directories"
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-bmad-enterprise-probe"
+  created_at: "2026-03-15"

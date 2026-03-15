@@ -1,0 +1,48 @@
+id: rs-pin-type-redesign
+type: element
+confidence: frontier
+title: "Pin<'a, T> redesigned to Pin<P> between RFC 2349 and actual stabilization"
+content: |
+  RFC 2349 defines Pin as:
+
+    pub struct Pin<'a, T: ?Sized + 'a> {
+        data: &'a mut T,
+    }
+
+  This is a struct parameterized over a lifetime and a target type, wrapping
+  a mutable reference.
+
+  RFC 2394 (async/await) uses "Pin<Self>" in its Future trait example — omitting
+  the lifetime, which doesn't match 2349's definition. It also uses "Pin::borrow"
+  in the await expansion, an API from the 2349 design.
+
+  RFC 2592 (futures) uses "Pin<&mut Self>" — Pin is now generic over the pointer
+  type, not the target type. This is the form that was stabilized.
+
+  The redesign (described in the blog post "Rethinking Pin" linked from 2592)
+  happened between the RFCs. The consequence: Pin RFC 2349 defines PinBox<T>
+  as a separate type, but in the redesigned Pin<P>, PinBox<T> is just
+  Pin<Box<T>>. Neither RFC 2394 nor 2592 mentions PinBox at all.
+
+  RFC 2592 acknowledges this explicitly in its historical context section,
+  linking to the "Rethinking Pin" blog post. So the later RFC DOES flag the
+  drift — it doesn't pretend the earlier RFC is still accurate.
+edges:
+  - target: rs-future-trait-signature-drift
+    type: derives
+    note: "Part of the same API evolution across the RFC set"
+  - target: rs-pinbox-dropped
+    type: derives
+    note: "PinBox removal is a consequence of Pin redesign"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "rust-rfcs/text/2349-pin.md"
+    - "rust-rfcs/text/2394-async_await.md"
+    - "rust-rfcs/text/2592-futures.md"
+  reviewed_by: null
+tags:
+  - api-evolution
+  - async-ecosystem

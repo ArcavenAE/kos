@@ -1,0 +1,48 @@
+id: go-contracts-to-interfaces
+type: element
+confidence: frontier
+title: "Generics constraint mechanism changed from contracts to interfaces"
+content: |
+  The generics overview and contracts draft (go2draft-generics-overview.md,
+  Aug 2018) introduces "contracts" as the constraint mechanism for type
+  parameters. Contracts use a body-like syntax showing operations:
+
+    contract Equal(t T) {
+        t == t
+    }
+
+  The type parameter syntax uses parentheses: func F(type T Equal)(x T)
+
+  The final type parameters proposal (43651-type-parameters.md, Aug 2021)
+  replaces contracts entirely with interfaces and changes the syntax to
+  square brackets:
+
+    func F[T comparable](x T)
+
+  The final proposal explicitly acknowledges this: "This version of the
+  design has many similarities to a design draft presented on July 31, 2019,
+  but contracts have been removed and replaced by interface types, and the
+  syntax has changed."
+
+  Interface types used as constraints gained new capabilities: type elements
+  (~T for underlying type, T1 | T2 for unions). This is a complete redesign
+  of the constraint system, acknowledged in the later document.
+
+  This seam is acknowledged and handled.
+edges:
+  - target: go-errors-as-generics-dependency
+    type: derives
+    note: "errors.As draft depended on this design"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "go-proposals/design/go2draft-generics-overview.md"
+    - "go-proposals/design/43651-type-parameters.md"
+    - "go-proposals/design/15292-generics.md"
+  reviewed_by: null
+tags:
+  - seam-acknowledged
+  - generics
+  - type-system

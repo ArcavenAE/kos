@@ -1,0 +1,34 @@
+id: cp-composition-alpha-functions
+type: element
+confidence: frontier
+title: "Alpha Composition Functions design (defunct)"
+content: |
+  The alpha design (Nic Cope + Sergen Yalcin, ~2022) proposed adding a
+  `functions` array to the Composition type. Functions are OCI containers
+  run to completion — short-lived processes that read FunctionIO on stdin
+  and write FunctionIO on stdout. A sidecar container runner (xfn) runs
+  functions in rootless containers.
+
+  Key design choices:
+  - Function type: Container (with Webhook as future alternative)
+  - Communication: YAML-encoded FunctionIO via stdin/stdout
+  - Runner: sidecar container using crun for rootless containers
+  - Packaging: OCI images with package.yaml metadata (Function.meta.pkg.crossplane.io)
+  - desired.resources is an ARRAY with name fields
+  - Functions could return derived connection secrets and readiness checks
+  - API version: apiextensions.crossplane.io/v2alpha1
+
+  Status: Defunct. Superseded by beta design.
+
+  Source: /tmp/kos-probes/crossplane/design/defunct/design-doc-composition-functions.md
+edges:
+  - target: cp-composition-beta-functions
+    type: derives
+    note: "Beta explicitly supersedes alpha"
+  - target: cp-composition-original-goals
+    type: derives
+    note: "Alpha implements the extension points anticipated by original design"
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

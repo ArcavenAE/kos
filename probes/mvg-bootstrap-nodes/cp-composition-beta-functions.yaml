@@ -1,0 +1,40 @@
+id: cp-composition-beta-functions
+type: element
+confidence: frontier
+title: "Beta Composition Functions design (active)"
+content: |
+  The beta design (Nic Cope, ~2023) supersedes the alpha. It makes several
+  fundamental architectural changes:
+
+  Key design shifts from alpha:
+  - Functions are LONG-RUNNING processes (Deployments), not short-lived containers
+  - Communication: gRPC RunFunctionRequest/RunFunctionResponse (not FunctionIO YAML)
+  - Runner: no sidecar; Functions deployed as separate Deployments by package manager
+  - New `mode` field: Composition has mode: Pipeline or mode: Resources (default)
+  - `pipeline` array replaces `functions` array
+  - Steps reference Functions by name via `functionRef`
+  - desired.resources changed from ARRAY to MAP keyed by resource name
+  - Functions can NO LONGER return derived connection secrets or readiness checks
+  - Functions installed like Providers (pkg.crossplane.io/v1beta1 Function)
+  - mTLS between Crossplane and Functions
+  - Function input is inline KRM resource (with future inputRef planned)
+
+  Future items explicitly deferred:
+  - Metrics and tracing (required for GA)
+  - Caching (likely required for GA)
+  - Dynamic composed resource watches
+  - Runtime configuration (ControllerConfig replacement)
+  - P&T as a Function (breaking change, maybe deprecate/freeze)
+
+  Source: /tmp/kos-probes/crossplane/design/design-doc-composition-functions.md
+edges:
+  - target: cp-composition-alpha-functions
+    type: supersedes
+    note: "Beta explicitly states it supersedes the alpha design"
+  - target: cp-composition-original-goals
+    type: implements
+    note: "Realizes the extension points the original design anticipated"
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

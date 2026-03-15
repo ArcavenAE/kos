@@ -1,0 +1,41 @@
+id: cp-seam-original-note-incomplete
+type: finding
+confidence: frontier
+title: "Original Composition doc's evolution note covers naming but not structural changes"
+content: |
+  Category 2 (Gap): Partial acknowledgment of evolution
+
+  The original design-doc-composition.md has an italicized note at the top:
+
+    "Note that Composition has evolved since this design document was accepted.
+     ...we elected not to build distinct a InfrastructureDefinition and
+     ApplicationDefinition, and instead expose a less opinionated
+     CompositeResourceDefinition. An 'infrastructure requirement' is now a
+     'resource claim'..."
+
+  This note covers NAMING changes (InfrastructureDefinition -> XRD,
+  requirement -> claim, publication -> offered). It does NOT cover:
+  - The abandonment of ApplicationDefinition entirely
+  - The abandonment of Composition immutability
+  - The introduction of Composition Functions (the largest structural change)
+  - The mode: Pipeline mechanism
+  - The shift from "from/to" field naming to "compositeTypeRef/resources"
+
+  The note gives a reader the impression that the evolution was primarily
+  cosmetic (renaming), when in fact the system underwent deep structural
+  changes. A reader who trusts the note as complete will miss the more
+  significant divergences.
+edges:
+  - target: cp-composition-original-goals
+    type: derives
+    note: "The original document with the incomplete note"
+  - target: cp-composition-beta-functions
+    type: derives
+    note: "The structural changes not mentioned in the note"
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

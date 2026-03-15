@@ -1,0 +1,21 @@
+id: oh-v0-arch-link-stale
+type: claim
+confidence: frontier
+claim:
+  text: >
+    openhands/README.md links to external "architecture documentation" and
+    explicitly labels it "(v0 backend architecture)". The same README then
+    describes the current class hierarchy (AgentController, EventStream,
+    Runtime, Server, Session, ConversationManager) without noting that
+    this is the V0 model. Meanwhile, openhands/app_server/README.md states
+    that "much of the code in the OpenHands repository can be regarded as
+    legacy, having been superseded by the code in AgentSDK" and describes
+    an entirely different module structure (conversation/, event/, sandbox/).
+    The two READMEs describe different architectures without cross-referencing
+    or clarifying which is current.
+  source_doc: openhands/README.md
+  contradicted_by:
+    - openhands/app_server/README.md
+  severity: medium
+  category: stale-architecture
+tags: [seam, v0-v1, architecture, documentation]

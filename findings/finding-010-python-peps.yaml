@@ -1,0 +1,144 @@
+id: finding-010-python-peps
+type: finding
+confidence: frontier
+title: "Python typing PEPs maintain strong consistency across a 6-year evolution, with three identifiable seams"
+content: |
+  ## Summary
+
+  We decomposed four Python typing PEPs (484, 526, 544, 604) spanning
+  2014-2019 into 7 typed KOS nodes: 4 element nodes representing each
+  PEP's core claims, and 3 seam nodes capturing inter-document tensions.
+  The probe question was: do these PEPs maintain internal consistency as
+  the type system grows, or do later PEPs silently contradict earlier ones?
+
+  ## Answer: PARTIAL — the PEPs are remarkably well-managed, but seams exist
+
+  The Python typing PEPs are an unusually disciplined set of evolving
+  specifications. Each later PEP explicitly references earlier ones, states
+  what it supersedes, and preserves backward compatibility. This is a
+  *designed system with good hygiene*. The seams that exist are mostly
+  acknowledged by the documents themselves.
+
+  ### Finding 1: Annotation evaluation semantics diverge silently (LOW severity)
+
+  PEP 484 says annotations must evaluate without error at definition time.
+  PEP 526 introduces a scope-dependent split: module/class annotations
+  evaluate, local annotations do not. PEP 526 claims "no new semantics
+  beyond PEP 484," but this evaluation split IS a new semantic — PEP 484
+  never contemplated parsed-but-unevaluated annotations.
+
+  Graph signal: py-pep526-variable-annotations supersedes
+  py-pep484-type-system-foundation on variable annotation syntax, but
+  the supersession is incomplete — the evaluation model changed without
+  being flagged as a change. A depends_on from any annotation-evaluation
+  node would need to distinguish which PEP's rules apply by scope.
+
+  See node: py-seam-annotation-eval-divergence
+
+  ### Finding 2: Nominal-only static semantics vs structural runtime (MEDIUM severity)
+
+  PEP 484 defines typing ABCs (Iterable, Sized) that behave structurally
+  at runtime via __subclasshook__. But PEP 484 only specifies nominal
+  subtyping for static type checkers. For 3 years (2014-2017), the runtime
+  and the spec were inconsistent about whether structural conformance
+  counted for static checking.
+
+  PEP 544 resolves this by making structural subtyping official, but only
+  via explicit Protocol classes. The pre-existing typing ABCs are
+  retroactively understood as protocols. This resolution works but required
+  the community and type checker implementers to navigate an underspecified
+  gap for years.
+
+  Graph signal: py-pep484-type-system-foundation and py-pep544-protocols
+  have a derives relationship, but the earlier node's ABCs were already
+  behaving as if the later node existed. The graph shows this as a
+  three-year gap between runtime behavior and specified semantics.
+
+  See node: py-seam-nominal-vs-structural-tension
+
+  ### Finding 3: Variance rules change for protocols (LOW-MEDIUM severity)
+
+  PEP 484 treats variance as author-declared via TypeVar parameters.
+  PEP 544 adds a constraint: protocol classes cannot declare invariance
+  if their actual usage is covariant, because structural subtyping
+  requires variance to match de facto usage. The same TypeVar can produce
+  different validity results depending on whether it appears in a nominal
+  class or a Protocol.
+
+  This is not a contradiction — it's a rule addition. But it means code
+  that is valid under PEP 484's rules may become invalid when the class
+  is converted to a Protocol. PEP 544 documents this clearly.
+
+  Graph signal: py-pep544-protocols supersedes py-pep484-type-system-foundation
+  on variance rules, but only for the Protocol subset. The variance model
+  is now bifurcated: one set of rules for nominal classes, another for
+  protocols.
+
+  See node: py-seam-protocol-variance-rule-change
+
+  ## What the graph reveals vs what reading reveals
+
+  Unlike the planning document probes (findings 001-003), where documents
+  actively contradicted each other, the Python PEPs show a different
+  pattern: **managed evolution with explicit supersession**.
+
+  The seams here are not "document A says X, document B says not-X."
+  They are:
+  - **Incomplete supersession** (Finding 1): a later PEP changes behavior
+    while claiming not to
+  - **Spec-runtime gap** (Finding 2): the implementation outran the
+    specification for years
+  - **Rule bifurcation** (Finding 3): a later PEP adds rules that apply
+    to a subset of types, creating two variance regimes
+
+  The graph catches all three, but they are of a fundamentally different
+  character than the contradictions found in planning documents. Planning
+  documents from different authors frequently contradict each other without
+  knowing it. The PEPs contradict each other *in minor ways despite active
+  effort to be consistent*. The PEP process itself — with its explicit
+  cross-references, backward compatibility sections, and community review
+  — serves as a manual version of what KOS's contradicts edges detect
+  automatically.
+
+  ## Implications for KOS
+
+  This probe suggests a classification axis for seam types:
+  1. **Hard contradictions**: incompatible claims (the ThreeDoors/Axiathon pattern)
+  2. **Incomplete supersession**: later doc changes earlier doc's semantics
+     while claiming not to
+  3. **Spec-implementation gaps**: runtime behavior diverges from spec
+  4. **Rule bifurcation**: later doc adds rules that apply only to subsets,
+     splitting the model
+
+  Categories 2-4 are harder to detect than category 1 and may need
+  different edge types or edge metadata to represent clearly.
+
+edges:
+  - target: py-pep484-type-system-foundation
+    type: derives
+  - target: py-pep526-variable-annotations
+    type: derives
+  - target: py-pep544-protocols
+    type: derives
+  - target: py-pep604-union-syntax
+    type: derives
+  - target: py-seam-annotation-eval-divergence
+    type: derives
+  - target: py-seam-nominal-vs-structural-tension
+    type: derives
+  - target: py-seam-protocol-variance-rule-change
+    type: derives
+
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-probe-010
+  created_at: 2026-03-15
+  derived_from:
+    - pep-0484.rst
+    - pep-0526.rst
+    - pep-0544.rst
+    - pep-0604.rst

@@ -1,0 +1,47 @@
+id: bs-seam-bep0009-bep0002-metadata-overlap
+type: element
+confidence: frontier
+title: "Gap: BEP-0009 and BEP-0002 define separate plugin metadata systems with no cross-reference"
+content: |
+  Category 2 (Gap).
+
+  BEP-0009 (implemented) defines plugin metadata in package.json:
+  - backstage.pluginId, backstage.role, backstage.pluginPackages
+  - Generated and validated by backstage-cli
+  - Required at publish time
+
+  BEP-0002 (provisional) defines a separate plugin manifest system:
+  - plugin-manifest.json: name, version, loadScripts, buildHash,
+    customProperties, registrationMethod, baseURL
+  - Generated at build time by Webpack/Module Federation tooling
+  - Used at runtime for dynamic loading
+
+  These are two separate metadata systems for the same logical entity
+  (a Backstage plugin). BEP-0002 does not reference BEP-0009 at all.
+  BEP-0009 does not mention dynamic plugins or the manifest format.
+
+  The "name" field in BEP-0002's manifest uses "backstage.plugin-<x>"
+  format (dot-separated), while BEP-0009's pluginId uses just "<x>"
+  (e.g., "catalog"). There is no documented mapping between the two.
+
+  This may be entirely fine in practice -- BEP-0009 is about npm
+  package metadata for discoverability, BEP-0002 is about runtime
+  loading. But when both describe "plugin metadata" without
+  acknowledging each other, it creates potential for confusion about
+  which is the canonical identity system for a plugin.
+
+  Sources: BEP-0009 (package metadata), BEP-0002 (plugin manifest)
+edges:
+  - target: bs-bep0009-plugin-metadata
+    type: derives
+  - target: bs-bep0002-dynamic-frontend-plugins
+    type: derives
+tags:
+  - backstage
+  - seam
+  - plugins
+  - metadata
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-backstage-probe"
+  created_at: "2026-03-15"

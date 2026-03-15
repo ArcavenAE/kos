@@ -1,0 +1,41 @@
+id: cp-seam-immutability-abandoned
+type: finding
+confidence: frontier
+title: "Original Composition immutability claim silently abandoned"
+content: |
+  Category 2 (Gap): Missing cross-reference / silent design reversal
+
+  The original design-doc-composition.md explicitly states:
+  "This document proposes compositions be immutable."
+
+  The rationale: immutability avoids complex update and garbage collection
+  logic for composed resources.
+
+  However, the CompositionRevision one-pager's entire premise is that
+  Compositions ARE mutable — that's the problem it solves ("Today it is
+  possible to update a Composition in place, but doing so is risky").
+  The revision system was built specifically to manage the consequences
+  of Composition mutability.
+
+  Neither the Revisions one-pager nor the beta functions design acknowledges
+  this reversal of the original immutability decision. The original design
+  doc has a note at the top about naming changes (InfrastructureDefinition ->
+  CompositeResourceDefinition, etc.) but says nothing about immutability
+  being dropped.
+
+  This is not necessarily wrong — immutability may have been impractical —
+  but the decision to abandon it is undocumented. The "why" is lost.
+edges:
+  - target: cp-composition-original-goals
+    type: derives
+    note: "Source of the immutability claim"
+  - target: cp-composition-revisions
+    type: derives
+    note: "Implicitly contradicts immutability by managing mutable Compositions"
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

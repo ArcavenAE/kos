@@ -1,0 +1,134 @@
+id: finding-009-go-proposals
+type: finding
+confidence: frontier
+title: "Go proposal seam test: coordinated Go 2 drafts show one genuine unacknowledged seam"
+content: |
+  ## Summary
+
+  We decomposed overlapping Go proposals from the Go 2 design effort (Aug 2018)
+  and their formal successors (2019-2021) into typed nodes with dependency edges.
+  The documents examined:
+
+  - go2draft-generics-overview.md (Aug 2018) — contracts-based generics
+  - go2draft-error-handling-overview.md + go2draft-error-handling.md (Aug 2018)
+  - go2draft-error-values-overview.md + go2draft-error-inspection.md (Aug 2018)
+  - 29934-error-values.md (Jan 2019) — formal error values proposal
+  - 43651-type-parameters.md (Aug 2021) — final generics proposal
+  - generics-implementation-dictionaries-go1.18.md — implementation details
+
+  These six documents form two overlapping chains:
+  1. Generics: overview -> contracts draft -> type parameters proposal -> implementation
+  2. Errors: handling overview + values overview -> inspection draft -> formal proposal (29934)
+
+  The chains intersect: the error inspection draft depends on the generics design
+  for errors.As's type-parameterized signature.
+
+  ## What the seam test found
+
+  **Seams acknowledged and handled (3):**
+
+  1. errors.As generic signature (go-errors-as-generics-dependency): The draft
+     errors.As uses generics syntax. The formal proposal (29934) explicitly
+     acknowledges the change and provides rationale for the non-generic API.
+     Well-handled supersession.
+
+  2. Contracts to interfaces (go-contracts-to-interfaces): The generics constraint
+     mechanism changed completely from contracts (body-like syntax) to interfaces
+     (with type elements). The final proposal explicitly states "contracts have
+     been removed and replaced by interface types." Clean supersession with
+     rationale.
+
+  3. Formatter method rename (go-formatter-method-rename): Format() renamed to
+     FormatError() between draft and formal proposal. No explicit rationale given,
+     but likely to avoid conflict with fmt.Formatter. Minor seam — the change
+     is visible but unexplained.
+
+  **Seam unacknowledged (1):**
+
+  4. check/handle abandonment (go-check-handle-abandoned): The Go 2 drafts
+     present error handling (check/handle) and error values (Is/As/Unwrap)
+     as a coordinated pair. The error inspection draft explicitly predicts
+     wrapping "will become more common if Go adopts the suggested new
+     error-handling control flow features." Error values shipped in Go 1.13;
+     check/handle was abandoned after community feedback. The formal error
+     values proposal (29934) drops all references to check/handle without
+     acknowledging that the companion feature was being abandoned. The
+     motivational argument in the draft — that the new wrapping APIs would
+     be driven by check/handle making wrapping more convenient — was never
+     revisited.
+
+     This is a genuine unacknowledged seam: the drafts describe a coordinated
+     design effort; the formal proposal silently decouples from its abandoned
+     companion. The error values design proved independently valuable, but the
+     rhetorical link between the two features exists only in the drafts and is
+     never explicitly severed in the proposal that shipped.
+
+  ## What the graph reveals vs. what document reading reveals
+
+  Reading the formal proposal (29934) alone, you see a clean, self-contained
+  design. Reading the drafts alone, you see a coordinated three-pillar effort
+  (generics, error handling, error values). Reading both and tracing edges
+  between them, you see that two of the three pillars changed substantially
+  (generics) or were abandoned (check/handle) — and only the generics change
+  is explicitly handled at the seam.
+
+  The Go team's proposal process is notably disciplined about supersession
+  within a feature line (errors.As's signature change is explicitly documented).
+  The gap is in cross-feature dependencies: when one feature in a coordinated
+  set is abandoned, the surviving features' documents don't acknowledge what
+  they lost.
+
+  ## Comparison to previous probes
+
+  This project has qualitatively different seam characteristics from prior
+  probes (Axiathon, penny-orc, ThreeDoors):
+
+  - Previous probes found contradictions where documents disagreed about facts
+    (parser technology, latency targets, protocol choices).
+  - This probe found mostly acknowledged evolution — later proposals explicitly
+    supersede earlier design decisions with rationale.
+  - The single unacknowledged seam is rhetorical rather than technical: the
+    error values design is sound regardless of check/handle, but the motivational
+    argument connecting them was silently dropped rather than explicitly addressed.
+
+  The Go proposals demonstrate that a mature, disciplined proposal process
+  handles most intra-feature seams well. Cross-feature seams (coordinated
+  designs where one part is abandoned) are the residual gap.
+
+  ## Nodes produced
+
+  4 nodes created:
+  - go-errors-as-generics-dependency (seam acknowledged)
+  - go-contracts-to-interfaces (seam acknowledged)
+  - go-check-handle-abandoned (seam unacknowledged)
+  - go-formatter-method-rename (seam minor)
+edges:
+  - target: go-errors-as-generics-dependency
+    type: derives
+    note: "Node produced by this probe"
+  - target: go-contracts-to-interfaces
+    type: derives
+    note: "Node produced by this probe"
+  - target: go-check-handle-abandoned
+    type: derives
+    note: "Node produced by this probe"
+  - target: go-formatter-method-rename
+    type: derives
+    note: "Node produced by this probe"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "go-proposals/design/go2draft-generics-overview.md"
+    - "go-proposals/design/go2draft-error-handling-overview.md"
+    - "go-proposals/design/go2draft-error-handling.md"
+    - "go-proposals/design/go2draft-error-values-overview.md"
+    - "go-proposals/design/go2draft-error-inspection.md"
+    - "go-proposals/design/29934-error-values.md"
+    - "go-proposals/design/43651-type-parameters.md"
+    - "go-proposals/design/generics-implementation-dictionaries-go1.18.md"
+  reviewed_by: null
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial

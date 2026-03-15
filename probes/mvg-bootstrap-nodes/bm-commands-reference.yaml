@@ -1,0 +1,20 @@
+id: bm-commands-reference
+type: element
+confidence: frontier
+title: "BMAD TEA: commands.md reference document claims"
+content: |
+  The commands reference lists all 9 workflows with their phases, frequency,
+  inputs, and outputs. Key claims:
+  - test-review scoring: Determinism 30%, Isolation 30%, Maintainability 25%,
+    Performance 15% (verified consistent with step-03f-aggregate-scores.md)
+  - nfr-assess categories: "Security, Performance, Reliability, Maintainability"
+  - trace gate rules: P0 100%, P1 >=90% PASS, Overall >=80%
+  - TEA Academy Session 7: "35 knowledge fragments exploration"
+
+  Source: docs/reference/commands.md
+depends_on:
+  - bm-readme-overview
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-bmad-enterprise-probe"
+  created_at: "2026-03-15"
