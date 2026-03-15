@@ -37,6 +37,24 @@ These are separate from /nodes/ — probe artifacts are evidence, not graph node
 6. Harvest: update affected nodes, move files if confidence changed
 7. Update KOS-charter.md if bedrock changed significantly
 
+### Harvest Verification (before starting the next cycle)
+When a session runs multiple probe cycles, verify harvest is complete
+before starting the next cycle. The gap between cycles is where drift
+accumulates — forward-facing artifacts (findings, charter, schema) get
+updated, backward-facing ones (stale questions, missing briefs) get
+skipped.
+
+Check:
+- Frontier questions touched by this probe: updated with result?
+- Answered questions: annotated or moved?
+- Brief exists for this probe? (Write retroactively if skipped.)
+- Charter next-action still reflects reality?
+- Schema version matches committed changes?
+
+This is a prompt, not a gate. Missing one is drift, not failure.
+The checklist exists because session-002 ran four cycles and
+accumulated harvest gaps at each transition. See finding-014.
+
 ### Commit Convention
 [action]: [node-ids affected] — [one line description]
 

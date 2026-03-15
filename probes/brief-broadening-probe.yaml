@@ -1,0 +1,43 @@
+id: brief-broadening-probe
+type: brief
+confidence: frontier
+title: "Broadening probe — test category stability across 9 external projects"
+content: |
+  Written retroactively. This brief was skipped during execution —
+  the probe was launched directly from conversation without writing
+  an exploration brief first. This is itself a harvest gap that
+  motivated the addition of harvest verification to the session
+  protocol. See CLAUDE.md.
+
+  The probe extended the MVG bootstrap test (findings 001-003) from
+  three personal projects to twelve total by adding nine external
+  open-source projects with diverse governance models, scales, and
+  document types.
+edges:
+  - target: brief-mvg-bootstrap
+    type: derives
+  - target: question-mvg-bootstrap
+    type: derives
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - brief-mvg-bootstrap
+brief:
+  hypothesis: |
+    The three categories identified in findings 001-003 (contradictions,
+    gaps, structural chaos) are stable across projects with different
+    governance models, scales, and document types. If the categories
+    are artifacts of BMAD-shaped solo projects, they will not appear
+    in projects with RFC/KEP/PEP processes and larger teams.
+  excluded_scope: |
+    - Schema changes (handled by brief-schema-revision)
+    - Tooling or automation
+    - Spec-to-code correspondence testing
+  success_signal: |
+    - Categories appear in external projects: confirms stability
+    - Categories don't appear: suggests they're BMAD-specific
+    - New categories emerge: expands the model
+    All three outcomes are informative. The goal is data, not confirmation.
+  timebox: "session-002 (executed in parallel across 9 agents)"

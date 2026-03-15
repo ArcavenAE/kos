@@ -32,6 +32,13 @@ content: |
   finding = answered, promoted node = bedrock). Reopener: a temporal
   distinction that is not expressible as contradiction AND not derivable
   from graph topology AND matters for automation.
+
+  FURTHER VALIDATED in twelve-project broadening probe. Signal
+  classification (v0.3) handles the temporal cases that surfaced
+  (drift = stale reference, evolution = intentional supersession).
+  No evidence from twelve projects that a temporal state field is
+  needed. Reopener criteria unchanged. This question is deferred
+  with confidence.
 depends_on:
   - question-mvg-bootstrap
   - elem-confidence-classification
