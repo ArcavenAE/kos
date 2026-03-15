@@ -1,0 +1,67 @@
+id: brief-schema-revision
+type: brief
+confidence: frontier
+title: "Schema revision probe — edge types and temporal state"
+content: |
+  Combined probe addressing question-edge-types and question-temporal-state,
+  informed by three-project data set (findings 001-003, 43 decomposed nodes).
+
+  The schema (node.schema.yaml v0.1) was validated for basic decomposition but
+  revealed two gaps:
+  1. depends_on is the only relationship type. The graph can express derivation
+     but not the nature of the relationship (implements, contradicts, supersedes).
+     Without typed edges, contradictions must be encoded in content rather than
+     structure — making them visible but not automatically detectable.
+  2. Confidence (bedrock/frontier/graveyard) conflates epistemic state with
+     temporal state. "Completed" is not bedrock (not a design principle), not
+     frontier (not uncertain), not graveyard (didn't fail). The schema cannot
+     represent lifecycle state.
+
+  The tension identified by the user: the system must hold contradictions as
+  first-class visible objects (because real documents ARE contradictory, and a
+  graph that rejects them can't represent reality), while also making them
+  structurally detectable (because silent contradictions are the problem we're
+  solving). Contradictions should be nodes or typed edges, not errors.
+depends_on:
+  - question-edge-types
+  - question-temporal-state
+  - question-mvg-bootstrap
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - finding-001-mvg-bootstrap
+    - finding-002-penny-orc
+    - finding-003-axiathon
+brief:
+  hypothesis: |
+    The schema can be extended with (a) typed edges and (b) a temporal state
+    field such that contradictions become structurally detectable without
+    rejecting inconsistent input. The test: re-express a subset of the 43
+    existing probe nodes using the revised schema and verify that seam
+    inconsistencies are expressible as typed relationships rather than
+    content-embedded descriptions.
+  excluded_scope: |
+    - Tooling to automate contradiction detection (that's a later probe)
+    - Ripple engine design (depends on edge types but is a separate question)
+    - Correspondence layer generalization (B4 scope expansion is noted but
+      not addressed here)
+    - Schema validation tooling (CLI, linting — comes after schema stabilizes)
+  success_signal: |
+    1. A revised schema that adds edge types and temporal state without
+       breaking the existing 43 nodes (backward compatible or with a clear
+       migration path)
+    2. At least 3 of the existing seam-finding nodes (td-*, po-*, ax-*)
+       can be re-expressed using typed edges instead of content-embedded
+       contradiction descriptions
+    3. The revised schema can express "this node contradicts that node"
+       as a relationship, not as prose in a content field
+    4. The temporal state extension doesn't collapse into confidence —
+       the two axes remain independent
+
+    If all four hold: confirms (promote schema toward bedrock).
+    If edge types work but temporal state is unclear: partial.
+    If the extension breaks the existing node set or adds complexity
+    without detectable benefit: redirects.
+  timebox: "Remainder of session-002"
