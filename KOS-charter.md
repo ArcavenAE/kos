@@ -84,15 +84,36 @@ of code, code ahead of spec, symmetric divergence. Each requires different respo
 Existing SDD documents (PRDs, architecture docs, ADRs, epics) are valid but lossy
 projections of the graph — a 2D shadow of an N-dimensional object. The graph
 can always generate the documents. The documents cannot recover the graph.
-Running in parallel, the graph acts as checksum and diagnostic on the shadow
-system. Errors invisible in documents become structurally apparent in the graph —
-measurable, not interpretive.
+Running in parallel, the graph surfaces signal at document seams — disagreements,
+gaps, and drift that are invisible in individual documents. Signal classification
+(error, evolution, drift) requires human judgment and declared supersession. The
+graph makes signal countable and connected; it does not automatically distinguish
+bugs from intended change.
 
-*Session-002 validation:* Tested against three real projects (ThreeDoors,
-penny-orc, project-alpha). All three had individually-coherent documents hiding
-inter-document inconsistencies at seams. Project Alpha's documents had passed their
-own internal validation ("ALL GAPS RESOLVED") while containing 6 contradictions
-and systematic phase boundary erosion. See findings 001-003.
+*Session-002 validation (12 projects):* Tested against three personal projects
+(ThreeDoors, penny-orc, project-alpha) and nine external open-source projects
+(Backstage, Crossplane, Kubernetes KEPs, Rust RFCs, Go Proposals, Python PEPs,
+BMAD enterprise, OpenHands, AutoGen). All twelve produced signal at document
+seams. Signal types stabilized across the sample: errors (hard contradictions),
+evolution (intentional supersession), drift (stale references), and silent
+abandonment (missing graveyard entries). See findings 001-013.
+
+**B7: The Process Quality Gradient**
+KOS adds the most value where existing documentation governance is weakest.
+Projects with disciplined RFC/KEP/PEP processes (Kubernetes, Go, Python)
+already handle most seams through explicit supersession and review. The graph
+finds residual cross-feature gaps but the yield is lower. Projects with loose
+governance (solo BMAD, ad-hoc docs) have the most to gain — hard contradictions,
+phase boundary erosion, and orphaned concepts are common and undetected. This
+is not a limitation — it is a targeting principle. KOS should be applied where
+existing processes leave the most signal undetected, not where processes are
+already strong.
+
+*Evidence:* Kubernetes KEPs produced 2 issues (both minor gaps). ThreeDoors
+produced 10 issues including hard contradictions. Project Alpha's documents passed
+their own validation ("ALL GAPS RESOLVED") while containing 6 contradictions
+and systematic phase boundary erosion. The gradient is consistent across the
+twelve-project sample. See findings 001-013.
 
 **B6: The Cognitive Architecture**
 The system is metabolically complementary to LLM inference:
@@ -249,7 +270,9 @@ Here is where we are."
 
 *Document status: CURRENT*
 *Established: session-001, updated session-002*
-*Next action: schema v0.2 complete. Next probes: question 2 (ripple noise),
-question 3 (executive mechanism), question 4 (code-only bootstrap), or
-question 5 (where does this break). Alternatively: test schema v0.2 by
-migrating existing KOS nodes from depends_on to typed edges.*
+*Next action: schema v0.3 complete (signal classification). Twelve projects
+probed. Checksum property confirmed with nuance (signal, not errors). Next
+probes: question 2 (ripple noise), question 3 (executive mechanism),
+question 4 (code-only bootstrap), or question 5 (where does this break).
+The process quality gradient (B7) suggests targeting adoption at projects
+with weak governance, where signal yield is highest.*
