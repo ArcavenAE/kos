@@ -1,0 +1,86 @@
+id: finding-015-cold-start-validation
+type: finding
+confidence: frontier
+title: "Cold-start validation: agent restored full project context from repo alone"
+content: |
+  ## Summary
+
+  Session-003 opened with no manual context injection. A new agent instance
+  (Claude Opus 4.6) was given only the working directory. The agent read
+  CLAUDE.md, KOS-charter.md, and the findings directory, then:
+
+  1. Correctly identified all four remaining open questions
+  2. Recommended Q4 (code-only bootstrap) as highest-value next probe
+  3. Justified the recommendation against B7 (process quality gradient)
+     and F4 (bootstrap status)
+  4. Ranked Q5 (where does this break) as second priority
+  5. Identified the relationship between Q4 and the adoption targeting
+     principle from B7
+
+  The human confirmed the reasoning was sound and the priority was correct.
+  No corrections were needed to the agent's understanding of project state.
+
+  ## What this tests
+
+  F5 (collaboration model) predicted that the repo-as-context-handoff
+  pattern — CLAUDE.md + charter + git history — would be sufficient for
+  cross-session continuity with Claude Code specifically. Session-002
+  noted this as a partial answer. Session-003 is the first clean test:
+  a new agent, a new session, no carryover, no paste-the-charter prompt.
+
+  ## Result: CONFIRMS
+
+  The context handoff worked. The agent's first action after reading the
+  charter was a correct prioritization of open work. No human intervention
+  was needed to restore context. The repo IS the context.
+
+  ## Conditions and limits
+
+  1. This test was performed by Claude Opus 4.6 with a 1M context window.
+     Smaller context windows or less capable models may not restore context
+     as reliably. The finding is model-dependent.
+
+  2. The repo is still small (14 findings, 3 probes, ~30 nodes). The
+     pattern may degrade as the graph grows and the charter can no longer
+     summarize the full state. The charter's role as a compression artifact
+     becomes load-bearing at scale.
+
+  3. The agent read 3 files to restore context (CLAUDE.md, charter, one
+     finding for format). A project with hundreds of findings would require
+     the charter to do more summarization work, or would need an index
+     artifact that the charter currently is not.
+
+  4. The cold start succeeded for orientation (what to work on next). It
+     has not yet been tested for deep work (e.g., modifying the schema
+     based on understanding accumulated across prior sessions). Orientation
+     is easier than continuation.
+
+  ## Implications
+
+  - F5 can be narrowed: for Claude Code + repos of this scale, the
+    context handoff problem is solved. The remaining F5 question is about
+    scaling — when does the charter stop being sufficient?
+  - The charter is doing double duty: re-introduction document AND
+    compression artifact. These may need to separate as the project grows.
+  - CLAUDE.md + charter is a two-layer handoff: CLAUDE.md says how to
+    work here, charter says what the work is. Both are necessary. Neither
+    alone is sufficient.
+
+edges:
+  - target: finding-014-twelve-project-synthesis
+    type: derives
+    note: "cold start depended on synthesis being complete and charter being current"
+  - target: elem-collaboration-model
+    type: implements
+    note: "direct test of the F5 repo-as-context-handoff prediction"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - KOS-charter.md
+    - CLAUDE.md
+  reviewed_by: null
+finding:
+  probe: null  # no exploration brief — the test was the session itself
+  result: confirms
