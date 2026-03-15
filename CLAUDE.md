@@ -38,22 +38,25 @@ These are separate from /nodes/ — probe artifacts are evidence, not graph node
 7. Update KOS-charter.md if bedrock changed significantly
 
 ### Harvest Verification (before starting the next cycle)
+# Arose: session-002, cycle boundary drift
+# Limitation: manual prompt only. Automated detection of skipped
+# backward-facing artifacts is a tooling concern, not a CLAUDE.md concern.
+# Expected evolution: checklist items will be revised as signal/noise
+# ratio becomes clearer across sessions.
+
 When a session runs multiple probe cycles, verify harvest is complete
 before starting the next cycle. The gap between cycles is where drift
 accumulates — forward-facing artifacts (findings, charter, schema) get
 updated, backward-facing ones (stale questions, missing briefs) get
 skipped.
 
-Check:
-- Frontier questions touched by this probe: updated with result?
-- Answered questions: annotated or moved?
-- Brief exists for this probe? (Write retroactively if skipped.)
-- Charter next-action still reflects reality?
-- Schema version matches committed changes?
+- [ ] Finding node written and committed
+- [ ] Schema changes committed if implied by finding
+- [ ] Charter updated if bedrock changed
+- [ ] Frontier questions updated (closed, opened, or revised)
+- [ ] Exploration briefs marked complete or carried forward
 
 This is a prompt, not a gate. Missing one is drift, not failure.
-The checklist exists because session-002 ran four cycles and
-accumulated harvest gaps at each transition. See finding-014.
 
 ### Commit Convention
 [action]: [node-ids affected] — [one line description]
