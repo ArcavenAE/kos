@@ -1,0 +1,528 @@
+# KOS Seed Nodes — Session 001
+# The charter recast as typed nodes.
+# This IS the first probe output — the schema applied to itself.
+# Status of these nodes reflects the charter confidence map.
+# Each node would live at nodes/[confidence]/[id].yaml in the repo.
+# Collected here for the bootstrap session.
+
+# ─────────────────────────────────────────────
+# VALUES
+# ─────────────────────────────────────────────
+
+---
+id: val-spec-is-product
+type: value
+confidence: bedrock
+title: "The spec is the product"
+content: |
+  Code is a sketch medium. Cheap, parallel, disposable. What is expensive
+  is accumulated understanding. The spec is where that lives. Code implements
+  the spec. Code is evidence. Understanding is the deliverable.
+
+  This principle inverts the classical order: build to learn, then encode
+  what was learned into the spec. The spec matures from probe findings,
+  not from upfront planning.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: val-uncertainty-structural
+type: value
+confidence: bedrock
+title: "Uncertainty is structural, not rhetorical"
+content: |
+  Confidence must be declared, not performed. Current documentation
+  practices perform confidence — specs are written as if everything is known.
+  This is dishonest and dangerous: it obscures what is actually bedrock
+  from what is a guess dressed in authoritative language.
+
+  A knowledge system that does not represent its own confidence level
+  is untrustworthy by design. Every spec element carries an explicit
+  confidence classification. Uncertainty is a first-class value.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: val-typed-traversable
+type: value
+confidence: bedrock
+title: "Understanding-execution relationship must be typed and traversable"
+content: |
+  The relationship between spec understanding and code execution must be
+  typed, versioned, and traversable in both directions — or it will
+  silently corrupt.
+
+  Untyped relationships decay. Changes propagate invisibly. Agent
+  mismatches produce plausible-looking wrong output. The correspondence
+  layer exists because a hyperlink and a foreign key constraint both
+  reference something, but only one tells you when the reference breaks.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+# ─────────────────────────────────────────────
+# NON-GOALS
+# ─────────────────────────────────────────────
+
+---
+id: ng-replace-sdd
+type: non-goal
+confidence: bedrock
+title: "Do not replace existing SDD processes"
+content: |
+  KOS runs alongside existing SDD systems. It does not require teams to
+  change their tools or workflows. Existing documents (PRDs, ADRs,
+  architecture docs) are ingested as low-confidence inferred nodes —
+  valid but lossy projections of the graph.
+
+  The transition from shadow to graph as source of truth happens gradually,
+  not by flag day. This is a strategic non-goal: replacing existing processes
+  creates adoption friction that would kill the project before it demonstrates value.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: ng-better-document-format
+type: non-goal
+confidence: bedrock
+title: "Not a better document format"
+content: |
+  Documents are a rendering format for human consumption — a projection
+  of the graph, not the source of truth. KOS is not a new document schema,
+  a new wiki, or a new way to organize markdown files.
+
+  The graph is the source. Documents are views over it.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: ng-permanent-solution
+type: non-goal
+confidence: bedrock
+title: "Not a permanent solution"
+content: |
+  KOS is a moment in time. It will be superseded. That is not a flaw —
+  it is evidence that it belongs to the same lineage as everything it
+  builds on. The goal is useful-for-a-time, not final.
+
+  Building as if this must last forever would front-load design investment
+  in exactly the way the process is designed to avoid.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+# ─────────────────────────────────────────────
+# BEDROCK ELEMENTS
+# ─────────────────────────────────────────────
+
+---
+id: elem-confidence-classification
+type: element
+confidence: bedrock
+title: "Three-state confidence classification"
+content: |
+  Every spec node carries exactly one of three confidence states:
+
+  BEDROCK: Committed. Evidence-based. Load-bearing. Changing this
+  node invalidates dependents. Requires evidence to promote, not consensus.
+
+  FRONTIER: Active hypothesis. Under exploration. Expected to hold
+  but subject to revision from probe findings. Questions live here.
+
+  GRAVEYARD: Tried, ruled out, permanently recorded. Append-only.
+  Never deleted. Never promoted back without new evidence and explicit
+  rationale. The graveyard is the system's wisdom layer.
+
+  PLACEHOLDER: Known unknown. Honest marker. Not a guess dressed
+  as fact. Marks a gap the system knows it has.
+depends_on:
+  - val-uncertainty-structural
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: elem-spec-cycle
+type: element
+confidence: bedrock
+title: "The Spec Cycle — atomic unit of process"
+content: |
+  Every unit of work, at every scale, is a Spec Cycle:
+
+  1. ORIENT    — what do we know, what don't we know, what matters now
+  2. QUESTION  — the single most valuable thing to learn next
+  3. PROBE     — smallest possible action that answers the question
+  4. HARVEST   — write the finding into the spec
+  5. PROMOTE   — does anything become bedrock; does anything die to graveyard
+
+  The cycle is fractal. It takes 20 minutes solo on day one.
+  It takes two weeks with eight teams on a complex system.
+  The shape is identical at every scale.
+
+  The question is the unit of work — not the feature, sprint, or milestone.
+  Probes have hard timeboxes. Findings are harvested regardless of
+  probe "completeness." Dead ends go to graveyard — they are discoveries,
+  not failures.
+depends_on:
+  - val-spec-is-product
+  - val-uncertainty-structural
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: elem-storage-model
+type: element
+confidence: bedrock
+title: "Immutable fact store over Git substrate"
+content: |
+  Storage is layered:
+
+  GIT SUBSTRATE: Content-addressed, distributed, cryptographically sound.
+  Git stores serialized transaction batches as blobs. Never sees files or
+  line diffs. Git commits are durability checkpoints, not semantic units.
+  Git's job: detect diverging sequences, surface to layer above.
+
+  FACT STORE: Datomic-style immutable datom accumulation.
+  Every fact: (entity, attribute, value, transaction-time).
+  Facts are never deleted — only superseded. History is the primary record.
+  Current state is a view over it. Time-travel queries are native.
+
+  SEMANTIC GRAPH: Typed nodes, dependency edges, dirty propagation,
+  agent contracts, provenance, semantic diff, type-aware merge.
+  This is where spec intelligence lives.
+
+  Conflicts are resolved at the layer that understands their semantics.
+  Git resolves structural storage conflicts.
+  Fact store resolves temporal conflicts.
+  Graph resolves semantic conflicts.
+  Humans resolve intent conflicts.
+depends_on:
+  - val-typed-traversable
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: elem-correspondence-layer
+type: element
+confidence: bedrock
+title: "Typed correspondence between spec and code"
+content: |
+  The correspondence layer sits between the spec graph and the code graph.
+  Neither layer knows about the other directly — all traversal goes through
+  the correspondence layer.
+
+  Every correspondence is a typed, versioned fact:
+  - spec_node + code_node (with hashes at time of establishment)
+  - link_type: implements | tests | explores | violates | extends | obsoletes
+  - confidence: declared | inferred | stale
+
+  Stale correspondences are flagged, not deleted.
+  Drift has three signatures, each requiring different response:
+  - Spec ahead of code: coverage gap
+  - Code ahead of spec: extends or obsoletes
+  - Symmetric divergence: potential violation, highest severity
+
+  An agent traversing this layer can move from a behavioral spec element
+  to the code that realizes it, the tests that verify it, the graveyard
+  entries that explain its shape, and back again.
+depends_on:
+  - val-typed-traversable
+  - elem-storage-model
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: elem-shadow-principle
+type: element
+confidence: bedrock
+title: "Existing SDD documents are projections of the graph"
+content: |
+  Existing SDD documents (PRDs, architecture docs, ADRs, epics) are valid
+  but lossy projections of the graph — a 2D shadow of an N-dimensional object.
+
+  The projection is systematic, not random. It discards: dependency
+  relationships, confidence classification, provenance, graveyard,
+  temporal dimension, correspondence between understanding and code.
+
+  The graph can always generate the documents.
+  The documents cannot recover the graph.
+  The graph strictly contains the documents.
+
+  Running in parallel, the graph acts as checksum and diagnostic on the
+  shadow system. Errors invisible in documents become structurally apparent
+  in the graph — measurable geometry, not interpretation.
+
+  The transition from shadow to graph as source of truth requires no flag day.
+  It happens gradually as bedrock accumulates and the graph demonstrates
+  more trustworthiness than the documents.
+depends_on:
+  - elem-confidence-classification
+  - elem-correspondence-layer
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: elem-cognitive-architecture
+type: element
+confidence: bedrock
+title: "KOS as cognitive architecture — graph and inference"
+content: |
+  KOS and LLM inference are metabolically complementary.
+  Each supplies exactly what the other lacks.
+
+  INFERENCE: Generates, synthesizes, reasons, forgets, asks, present-tense.
+  GRAPH: Persists, accumulates, remembers, retains, verifies, temporal.
+
+  The graph gives inference: stable, typed, provenance-rich world to reason
+  about. Not a flat context window — structured knowledge where confidence
+  is declared and the graveyard prevents re-exploring dead ends.
+
+  Inference gives the graph: capacity to notice what it means. To traverse
+  and recognize patterns no single node states. To read the graveyard and
+  see why failures cluster.
+
+  Architectural correspondences:
+  - Graph = long-term memory
+  - Inference = working memory + reasoning
+  - Correspondence layer = proprioception
+  - Ripple engine = attention
+  - Graveyard = wisdom
+  - Spec Cycle = the executive loop
+
+  This is not a documentation system with an AI layer on top.
+  It is a designed cognitive substrate for collaborative intelligence
+  between humans and agents over time.
+depends_on:
+  - elem-spec-cycle
+  - elem-shadow-principle
+  - val-uncertainty-structural
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+# ─────────────────────────────────────────────
+# GRAVEYARD ENTRIES
+# ─────────────────────────────────────────────
+
+---
+id: grv-documents-as-source
+type: graveyard
+confidence: graveyard
+title: "Documents as source of truth"
+content: |
+  The entire existing SDD ecosystem — PRDs, architecture docs, ADRs —
+  treated as source of truth rather than projection.
+graveyard:
+  approach: >
+    Use documents (PRD, architecture doc, ADRs, epics) as the authoritative
+    source of system understanding. Improve their format and rigor.
+  context: >
+    This is the universal current practice. Appeared to be the most
+    incremental and adoptable improvement path.
+  finding: >
+    Documents have no dependency modeling, no confidence classification,
+    no provenance, no ripple propagation. Agent mismatches against
+    untyped text are undetectable. Corruption is silent. The format
+    cannot be checksummed against reality. Improving document format
+    does not fix the fundamental lossiness.
+  ruling: >
+    Documents survive as rendering format only — a projection for
+    human consumption. They are views over the graph, not the graph.
+  reopener: >
+    If the cost of graph infrastructure proves prohibitive and a
+    typed document format with embedded dependency declarations
+    could approximate the graph properties, revisit. Threshold:
+    must support confidence classification, dependency tracking,
+    and provenance without external tooling.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: grv-git-semantic-layer
+type: graveyard
+confidence: graveyard
+title: "Git as the semantic layer"
+content: |
+  Using Git's merge and diff semantics for spec conflict resolution.
+graveyard:
+  approach: >
+    Adapt Git — possibly with conventions and hooks — to serve as the
+    primary semantic layer for the spec graph. Use branches for probes,
+    merges for harvest, diffs for change tracking.
+  context: >
+    Git is battle-tested, universally understood, and has an enormous
+    ecosystem. It already has a DAG structure. Appeared to be the path
+    of least resistance.
+  finding: >
+    Git resolves conflicts by text proximity with no concept of type
+    constraints. A semantically invalid merge with no textual conflict
+    passes silently. Branch semantics don't distinguish probe branches
+    (never merge) from collaboration branches (do merge). Harvest
+    requires selective fact extraction, not merge. The semantic
+    decisions happen entirely outside Git, undocumented.
+  ruling: >
+    Git is retained as substrate only — content-addressed storage
+    and distribution. It never sees files or line diffs in the spec
+    graph. It stores serialized transaction batches as blobs.
+    Conflict detection surfaces to the fact store layer.
+  reopener: >
+    If a Git extension (custom merge drivers, typed ref conventions)
+    could enforce type constraints at merge time, partial reinstatement
+    as semantic layer is possible. Would require Git to understand
+    node types — a significant ecosystem investment.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: grv-waterfall-frontload
+type: graveyard
+confidence: graveyard
+title: "Comprehensive upfront specification"
+content: |
+  Exhaustive planning before implementation — the waterfall assumption.
+graveyard:
+  approach: >
+    Front-load design investment. Write complete specs before building.
+    Treat the unknown as a planning failure rather than a discovery opportunity.
+  context: >
+    Justified when code was expensive to write and impossible to throw away.
+    Remains dominant practice in most organizations.
+  finding: >
+    Code is now cheap enough to be a learning instrument. The assumption
+    that knowledge is front-loaded and execution is back-loaded is broken.
+    Front-loading produces false confidence in early stages and expensive
+    late-stage discovery of wrong assumptions. You don't know what you
+    don't know — and massive early investment assumes you do.
+  ruling: >
+    Inverted. Build to learn, encode findings into spec. The spec evolves
+    from probe evidence, not from planning sessions. The Charter Kernel
+    is the only front-loaded artifact — and it is deliberately thin.
+  reopener: >
+    For systems with genuine hard constraints known upfront (regulatory,
+    safety-critical, fixed external interfaces), partial front-loading
+    of those constraints as bedrock is appropriate. The constraint is
+    bedrock. Everything else follows the probe model.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+# ─────────────────────────────────────────────
+# OPEN QUESTIONS
+# ─────────────────────────────────────────────
+
+---
+id: question-mvg-bootstrap
+type: question
+confidence: frontier
+title: "What is the minimum viable graph?"
+content: |
+  What is the minimum viable implementation that demonstrates the checksum
+  property against an existing SDD process?
+
+  Specifically: can the graph bootstrap from existing artifacts (documents,
+  git history, code) with no prior spec nodes, using only inferred
+  correspondences? At what point does inferred-only coverage become
+  useful versus noisy?
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: question-executive-mechanism
+type: question
+confidence: frontier
+title: "What is the executive mechanism as software?"
+content: |
+  The executive loop is described functionally: query graph → infer →
+  generate candidate → verify → harvest or graveyard → update → repeat.
+
+  What runs this as software? Scheduler? Event system? Agent orchestration?
+  How does it allocate attention across the graph? How does it maintain
+  coherence of purpose across sessions when the inference layer is amnesiac?
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: question-ripple-noise
+type: question
+confidence: frontier
+title: "How does the ripple engine surface conflicts without noise?"
+content: |
+  The ripple engine must surface drift and invalidation to humans without
+  creating a noise floor that gets ignored. Too many signals = all signals
+  ignored. Too few = silent corruption persists.
+
+  What is the right granularity and frequency of ripple reporting?
+  What filters distinguish signal from noise? Who sees which reports?
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: question-node-schema-validity
+type: question
+confidence: frontier
+title: "Does the node schema hold under real use?"
+content: |
+  The node schema (v0.1) was designed without implementation experience.
+  This seed file is the first real use. Specific unknowns:
+
+  - Is the type enum right? Too many types? Too few?
+  - Is depends_on at the right granularity?
+  - Do the graveyard fields capture what we actually need?
+  - Is the correspondence code_node format (path:symbol) sufficient?
+  - Does one-node-per-file scale or become unwieldy?
+
+  This question is answered by using the schema and noting friction.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
+
+---
+id: question-collaboration-continuity
+type: question
+confidence: frontier
+title: "How does context transfer across sessions practically?"
+content: |
+  The human carries continuity. The AI carries inference within a session.
+  The charter re-introduction document is the current handoff mechanism.
+
+  Is the charter sufficient for full context restoration? What's lost
+  in the compression? How does the handoff degrade as the graph grows
+  and the charter can no longer summarize it fully?
+
+  At what scale does the charter-as-handoff break, and what replaces it?
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
