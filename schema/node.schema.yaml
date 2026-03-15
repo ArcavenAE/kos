@@ -1,8 +1,14 @@
 # KOS Node Schema
-# Version: 0.1 (probe)
+# Version: 0.2
 # Status: FRONTIER
 # Purpose: Minimum viable spec node — human-writable, agent-parseable,
 #          no tooling required. Validate under real use, then revise.
+#
+# Revision history:
+#   0.1 — session-001: initial design, unvalidated
+#   0.2 — session-002: added typed edges (replaces depends_on),
+#          based on three-project probe (findings 001-003).
+#          See finding-004-schema-revision for rationale.
 
 # ─────────────────────────────────────────────
 # REQUIRED FIELDS (every node)
@@ -47,6 +53,15 @@ confidence:
     Confidence is not quality. A placeholder is not a failure —
     it is the most honest thing a spec can say.
 
+    Confidence is EPISTEMIC, not temporal. It says how certain we are,
+    not what lifecycle state something is in. Temporal state (planned,
+    completed, validated) is not a schema field — it is either:
+    (a) derived from graph topology (a question with a finding is answered),
+    (b) expressed as content in the node, or
+    (c) a contradiction between nodes when two sources disagree about
+        temporal state (detectable via contradicts edges).
+    See finding-004-schema-revision for rationale.
+
 title:
   type: string
   description: "Short human label. Enough to identify in a dependency list."
@@ -61,20 +76,69 @@ content:
     questions produce vague probes.
 
 # ─────────────────────────────────────────────
-# DEPENDENCY FIELDS
+# EDGE FIELDS
 # ─────────────────────────────────────────────
 
-depends_on:
-  type: list of node ids
+edges:
+  type: list of typed edges
   required: false
   description: >
-    Nodes this node was derived from or is grounded in.
-    When a dependency changes, this node is marked dirty.
-    Declare conservatively — every declared dependency is
-    a ripple propagation path.
+    Typed relationships to other nodes. Each edge has a target
+    (node id), a type, and an optional note.
+
+    Edge types:
+      derives:      "This node was built from or grounded in the target.
+                     When the target changes, this node may be dirty.
+                     Equivalent to the v0.1 depends_on relationship."
+      implements:   "This node claims to realize the target's specification.
+                     The target is the spec; this node is the implementation.
+                     Valid for architecture→PRD, code→spec, etc."
+      contradicts:  "This node and the target make incompatible claims
+                     about the same concept. Bidirectional in meaning
+                     (if A contradicts B, B contradicts A) but only needs
+                     to be declared on one side. Highest-severity signal."
+      supersedes:   "This node replaces the target. The target remains
+                     readable but is no longer authoritative. Directional:
+                     the newer node supersedes the older."
+
+  format:
+    - target: node-id
+      type: derives | implements | contradicts | supersedes
+      note: "Optional. One-line explanation of the relationship."
+
+  notes: >
+    Use edges to express the NATURE of the relationship, not just
+    its existence. A contradicts edge makes inconsistencies detectable
+    by graph traversal alone — without reading content fields.
+
+    Contradicts edges should be placed between the two conflicting
+    source nodes when possible, not on a third-party finding node.
+    The finding node derives from both sources; the sources
+    contradict each other.
+
+    Start with this set of four edge types. Add types only when an
+    existing type genuinely cannot carry the meaning.
+
+# depends_on (v0.1 COMPATIBILITY)
+#
+# The v0.1 schema used depends_on as a flat list of node ids:
+#   depends_on:
+#     - node-a
+#     - node-b
+#
+# This is equivalent to:
+#   edges:
+#     - target: node-a
+#       type: derives
+#     - target: node-b
+#       type: derives
+#
+# Existing nodes using depends_on remain valid. New nodes should
+# prefer edges. Tooling should treat depends_on as shorthand for
+# edges with type: derives.
 
 # consumers is DERIVED, not declared.
-# The graph computes it from depends_on relationships.
+# The graph computes it from edges relationships.
 # Do not write consumers by hand.
 
 # ─────────────────────────────────────────────
@@ -167,6 +231,13 @@ correspondence:
       extends:     "Code goes beyond spec — spec is incomplete"
       violates:    "Detected contradiction — highest severity"
       obsoletes:   "Code has no living spec node"
+    notes: >
+      The correspondence link_type overlaps intentionally with the
+      general edges type enum. implements and contradicts/violates
+      mean the same thing in both contexts. Correspondence is the
+      spec-to-code specialization; edges is the general spec-to-spec
+      relationship. If the two systems prove redundant under further
+      use, unify them.
   confidence:
     type: enum
     values:
@@ -201,11 +272,19 @@ notes:
 #   Human does not write this. It is derived.
 
 # consumers:
-#   Derived from depends_on graph traversal. Not declared.
+#   Derived from edges graph traversal. Not declared.
 
 # status (dirty/clean):
 #   Runtime state managed by ripple engine. Not stored in node file.
 #   Clean state is assumed. Dirty state is an event, not a property.
+
+# temporal_state:
+#   NOT a schema field. See confidence notes above.
+#   Temporal state is either derived from graph topology, expressed
+#   in content, or detectable as a contradicts edge when sources
+#   disagree. Adding a separate temporal axis was considered in
+#   session-002 and deferred — the evidence showed typed edges
+#   handle the cases that surfaced. See finding-004-schema-revision.
 
 # ─────────────────────────────────────────────
 # FILE CONVENTIONS
@@ -229,13 +308,18 @@ notes:
 # ─────────────────────────────────────────────
 
 # This schema is FRONTIER.
-# It was designed without implementation experience.
-# Expect revision after first real use.
-# Specific things likely to change:
-#   - type enum (too many or too few?)
-#   - depends_on granularity (too coarse? too fine?)
+# v0.2 has survived one full probe cycle (session-002, findings 001-003)
+# and one schema revision probe (finding-004).
+# The v0.1 depends_on field was validated under use and found
+# insufficient — typed edges replaced it with backward compatibility.
+# The confidence field was examined for temporal state conflation
+# and found sufficient — temporal state is handled by other mechanisms.
+#
+# Specific things likely to change under further use:
+#   - edge type enum (four types — too many or too few?)
+#   - correspondence vs edges unification (are they redundant?)
 #   - graveyard fields (are these the right questions?)
 #   - correspondence code_node format (path:symbol may not be enough)
 #
-# Do not build tooling against this schema until it has survived
-# at least one full probe cycle under real use.
+# Tooling may now cautiously target this schema. The core fields
+# (id, type, confidence, content, edges) are stabilizing.

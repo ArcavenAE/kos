@@ -1,0 +1,43 @@
+# SCHEMA REVISION TEST: td-phase1-scope — temporal state test
+#
+# Original: STATUS AMBIGUITY encoded in content field.
+# Test: can the temporal inconsistency be expressed as a contradicts edge
+# without a separate temporal state field?
+
+id: td-phase1-scope
+type: element
+confidence: frontier
+title: "ThreeDoors Phase 1 scope definition"
+content: |
+  Phase 1 (Technical Demo & Validation) scope as defined in product-scope.md.
+  Includes: CLI/TUI, Three Doors interface, status management, mood tracking,
+  session metrics, macOS primary.
+edges:
+  - target: td-vision
+    type: derives
+  - target: td-val-progress
+    type: derives
+  # The executive summary says Phase 1 is VALIDATED/PASSED.
+  # This node (from product-scope) still says "In Scope".
+  # That's a contradiction on temporal state — expressible as a contradicts
+  # edge pointing at the executive summary's claim.
+  - target: td-phase1-validated
+    type: contradicts
+    note: "product-scope says 'In Scope'; executive-summary says 'VALIDATED'"
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+
+# ASSESSMENT:
+# - The temporal inconsistency IS expressible as a contradicts edge.
+# - No separate temporal state field was needed.
+# - BUT: this requires td-phase1-validated to exist as its own node
+#   (the exec summary's claim about Phase 1 status). Without that node,
+#   there's nothing to point the contradicts edge at.
+# - This is fine — the exec summary's validation claim IS a distinct
+#   assertion that deserves its own node. The problem in the original
+#   decomposition was that we stuffed both claims into one node.
+# - VERDICT: temporal state as contradicts edge WORKS, but requires
+#   decomposing temporal claims into their own nodes rather than
+#   embedding them as annotations in content fields.

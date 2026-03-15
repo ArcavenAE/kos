@@ -205,12 +205,13 @@ expensive late-stage discovery of wrong assumptions.
    contradicts its own practice. The graph can show it but doesn't make it
    automatic. Intent-execution gaps may be a class of problem that requires
    judgment, not structure.
-6. What relationship types beyond depends_on does the schema need? See
-   question-edge-types. The correspondence layer (B4) already has typed links
-   for spec-to-code — do spec-to-spec relationships need the same treatment?
-7. How should the schema handle temporal status (planned, in-progress,
-   completed, validated) vs. epistemic confidence (bedrock, frontier,
-   graveyard)? See question-temporal-state.
+6. ~~What relationship types beyond depends_on does the schema need?~~
+   **Answered (session-002).** Four typed edges: derives, implements,
+   contradicts, supersedes. Added in schema v0.2. See finding-004.
+7. ~~How should the schema handle temporal status vs. epistemic confidence?~~
+   **Deferred (session-002).** Temporal state does not need its own field.
+   External temporal inconsistencies are contradicts edges. KOS lifecycle
+   is derived from graph topology. See finding-004. Reopener documented.
 
 ---
 
@@ -248,6 +249,7 @@ Here is where we are."
 
 *Document status: CURRENT*
 *Established: session-001, updated session-002*
-*Next action: probe question-edge-types and question-temporal-state (schema
-revision), informed by three-project data set. Broad evidence gathered;
-ready for targeted depth on schema design.*
+*Next action: schema v0.2 complete. Next probes: question 2 (ripple noise),
+question 3 (executive mechanism), question 4 (code-only bootstrap), or
+question 5 (where does this break). Alternatively: test schema v0.2 by
+migrating existing KOS nodes from depends_on to typed edges.*

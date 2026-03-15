@@ -1,0 +1,42 @@
+# SCHEMA REVISION TEST: ax-detection-dsl-parser re-expressed with typed edges
+#
+# Original: contradiction between CLAUDE.md and architecture encoded in content.
+# This version: two source nodes, contradicts edge between them.
+#
+# This case is different from td-storage-format: neither node implements
+# the other. They're parallel specifications that disagree.
+
+id: ax-detection-dsl-parser
+type: element
+confidence: frontier
+title: "query DSL parser technology disagreement"
+content: |
+  CLAUDE.md says parser-A (PEG). Architecture says parser-B (parser combinators).
+  Different parsing frameworks. An agent following CLAUDE.md would implement
+  the wrong parser.
+edges:
+  # This node was derived from both source documents
+  - target: ax-claude-md
+    type: derives
+  - target: ax-arch-validation
+    type: derives
+  # The two sources contradict each other (not this node contradicting them,
+  # but the contradiction BETWEEN them, expressed from this finding node)
+  - target: ax-claude-md
+    type: contradicts
+    note: "CLAUDE.md says parser-A; architecture says parser-B"
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+
+# ASSESSMENT:
+# - Works, but reveals a modeling question: is the contradicts edge between
+#   this node and ax-claude-md, or between ax-claude-md and ax-arch-validation?
+# - Ideally: ax-claude-md contradicts ax-arch-validation (direct edge between
+#   the conflicting sources). This finding node derives from both.
+# - But that requires the conflicting sources to be their own nodes.
+# - VERDICT: typed edges work, but contradicts edges are most useful when
+#   placed directly between the two conflicting source nodes, not on a
+#   third-party finding node. The finding node should derive; the sources
+#   should contradict.

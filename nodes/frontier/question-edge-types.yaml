@@ -23,6 +23,12 @@ content: |
   Key constraint: type proliferation is a smell (per schema notes).
   The answer should be the minimum set that makes contradictions
   structurally detectable.
+
+  PROBED in session-002. See finding-004-schema-revision.
+  Result: CONFIRMS. Four edge types added to schema v0.2:
+  derives, implements, contradicts, supersedes. Tested against three
+  existing probe nodes. Contradictions moved from content to structure.
+  refines was dropped — not needed by evidence. Four types, not five.
 depends_on:
   - question-mvg-bootstrap
   - elem-correspondence-layer
