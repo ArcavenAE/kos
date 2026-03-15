@@ -1,0 +1,43 @@
+id: po-seam-context-vs-bikeshop
+type: finding
+confidence: frontier
+title: "Seam: context ceiling critique vs. BikeShop's context-heavy design"
+content: |
+  CATEGORY 2 — GAP
+
+  The rs.md (section 8) presents measured evidence that flat-file context
+  loading hits a ceiling. A 25-epic project consumes 97% of the context
+  window before work begins. It proposes indexed retrieval, knowledge
+  graphs, and context budget monitoring as the solution (Vision F, Phase 5).
+
+  Meanwhile, bikeshop-prd.md envisions pushing MORE context to agents:
+  sprint catch-up on connect, framework changelogs, live sprint
+  notifications, team state. Journey 7 describes a new team member
+  receiving "the entire active sprint state, recent changelogs, and
+  any pending notifications" on first connect — before typing a single
+  prompt.
+
+  Neither document models the interaction between these goals. BikeShop's
+  push delivery adds to the context budget that the rs.md says is already
+  exhausted. The rs.md's context budget monitor (proposed but unbuilt)
+  would need to account for BikeShop's pushed context. But BikeShop's
+  PRD has no awareness of context budget constraints — its NFRs specify
+  latency targets but never ask "does this fit in the context window?"
+
+  The gap is architectural: BikeShop treats context as free (push
+  everything relevant) while the rs.md treats context as the binding
+  constraint (every token counts). These are incompatible assumptions
+  held by the same project.
+depends_on:
+  - po-rs-context-ceiling
+  - po-bikeshop-prd
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md
+    - bikeshop-prd.md

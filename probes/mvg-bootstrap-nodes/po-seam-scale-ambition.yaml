@@ -1,0 +1,44 @@
+id: po-seam-scale-ambition
+type: finding
+confidence: frontier
+title: "Seam: rs.md says BMAD can't scale, project scales BMAD anyway"
+content: |
+  CATEGORY 1 — CONTRADICTION
+
+  The rs.md (section 2) argues BMAD "doesn't scale up" — once a project
+  involves external APIs, multiple contributors, or multi-sprint critical
+  paths, the process breaks down. It "doesn't scale down" either — bug
+  fixes, spikes, and features need lighter-weight lifecycles.
+
+  But the project's own planning directory contains 48 PRDs, epics, and
+  planning documents — all produced using the BMAD-derived workflows the
+  rs.md critiques. The bikeshop-prd.md alone has 46 requirements, 7 user
+  journeys, 8 design review decisions. The pf-prd.md completed all 11
+  stepped workflow steps. These are not simple greenfield documents — they
+  are brownfield planning artifacts for a complex multi-component system.
+
+  The contradiction: the rs.md says the process breaks beyond greenfield,
+  but the project is successfully using the process for brownfield work
+  at significant scale. The rs.md's own evidence comes from this project's
+  experience. Either the breakage is subtler than "doesn't work" (it works
+  but with increasing friction), or the project has already adapted beyond
+  what the rs.md describes.
+
+  The rs.md does acknowledge the sweet spot is "real and valuable." But the
+  framing as "breaks down" contradicts the observable evidence of prolific
+  output from the very workflows being critiqued.
+depends_on:
+  - po-rs-context-ceiling
+  - po-bikeshop-prd
+  - po-pf-prd-cli
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md
+    - bikeshop-prd.md
+    - pf-prd.md

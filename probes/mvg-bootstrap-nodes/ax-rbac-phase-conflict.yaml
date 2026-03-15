@@ -1,0 +1,47 @@
+id: ax-rbac-phase-conflict
+type: element
+confidence: frontier
+title: "RBAC is Growth in PRD scope but MVP in functional requirements and architecture"
+content: |
+  The product-scope.md places RBAC squarely in Phase 2 (Growth):
+    "Phase 2: Growth — What makes it competitive: ... Role-based access control (RBAC)"
+
+  But the functional requirements (FR72-FR84) define a full RBAC role hierarchy
+  (Viewer, Analyst, Rule Author, Admin, Super Admin) with no phase annotation —
+  they read as if they're MVP requirements. FR77 specifically says:
+    "System can enforce role-based access control (Viewer, Analyst, Rule Author, Admin, Super Admin)"
+
+  The multi-tenant architecture (MVP) document describes tenant isolation, JWT
+  tenant extraction, cross-tenant operations roles, and per-tenant encryption —
+  all of which implicitly require some access control model to function. The
+  authentication-security architecture defines local auth, API keys, and session
+  management as MVP, which are the plumbing that RBAC sits on top of.
+
+  The architecture-gaps.md marks FR72-84 as "Fully Covered" by
+  authentication-security.md (which includes RBAC definitions), but does not
+  flag the phase conflict with product-scope.md.
+
+  This is a Category 1 contradiction: the PRD scope says Growth, the functional
+  requirements and architecture treat it as MVP. A team implementing MVP would
+  not know whether to build RBAC or defer it.
+
+  The practical consequence is severe: multi-tenancy without RBAC means every
+  authenticated user within a tenant has the same permissions. The MVP claims
+  operations-readiness, but operations operators need role differentiation to function.
+depends_on:
+  - ax-multi-tenant-mvp
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "project-alpha/_planning/prd/product-scope.md"
+    - "project-alpha/_planning/prd/functional-requirements.md"
+    - "project-alpha/_planning/architecture/core-architectural-decisions/multi-tenant-architecture-mvp.md"
+    - "project-alpha/_planning/architecture/architecture-gaps.md"
+  reviewed_by: null
+tags:
+  - phase-conflict
+  - rbac
+  - multi-tenant
+  - mvp

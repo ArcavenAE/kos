@@ -1,0 +1,49 @@
+id: ax-infra-services-undeclared
+type: element
+confidence: frontier
+title: "Infrastructure dependencies (PostgreSQL, Redis, embedded-kv, object-store) not mentioned in PRD"
+content: |
+  The data-architecture.md introduces four infrastructure services:
+    - PostgreSQL 16 (tenant registry, user storage, sessions, data catalog)
+    - Redis 7 (session revocation, query cache, rate limiting)
+    - embedded-kv (persistent correlation state, crash-recoverable)
+    - object-store (S3-compatible object storage for data lake files)
+
+  The PRD (executive-summary, product-scope, functional requirements) mentions
+  none of these. The PRD's self-hosting pitch emphasizes simplicity:
+    "Predictable economics — Asset-based pricing eliminates volume-based cost
+     anxiety. Self-host or managed cloud, your choice."
+
+  The deployment requirements (FR101-FR105) say:
+    - Docker Compose deployment
+    - Helm chart deployment
+    - Package manager installation (APT, YUM, Homebrew)
+    - cargo install
+    - One-liner script installation
+
+  A system requiring PostgreSQL + Redis + object-store + the application itself
+  cannot be installed via "cargo install" or a "one-liner script" in any
+  meaningful way. The architecture's infrastructure requirements contradict
+  the PRD's simplicity claims.
+
+  The architecture does document these dependencies clearly. The gap is that
+  the PRD was never updated to acknowledge the operational complexity of the
+  chosen architecture. A prospective user reading the PRD would expect something
+  much simpler to deploy than what the architecture actually requires.
+depends_on:
+  - ax-multi-tenant-mvp
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "project-alpha/_planning/prd/executive-summary.md"
+    - "project-alpha/_planning/prd/product-scope.md"
+    - "project-alpha/_planning/prd/functional-requirements.md"
+    - "project-alpha/_planning/architecture/core-architectural-decisions/data-architecture.md"
+  reviewed_by: null
+tags:
+  - infrastructure
+  - deployment
+  - contradiction
+  - complexity

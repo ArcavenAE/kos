@@ -1,0 +1,38 @@
+id: po-question-evidence-boundary
+type: question
+confidence: frontier
+title: "Where is the boundary between measured evidence and projection?"
+content: |
+  The rs.md is careful in some places: "PROJECTED -- not measured data,"
+  "sample size caveat," "these conclusions need to be confirmed." But
+  the document's rhetorical structure uses measured data (context window
+  numbers from 5 projects) to build momentum that carries through to
+  unmeasured claims (team scaling, fractal lifecycle value, composability
+  benefits).
+
+  The bikeshop-prd.md has no such caveats. Its user journeys describe
+  team dynamics with absolute confidence. The pf-prd.md is grounded
+  in a concrete, observed pain (broken symlinks).
+
+  The question: across the three documents, how much of the combined
+  argument rests on measured evidence vs. extrapolation? The rs.md's
+  measured data covers context window sizes and one project's gate
+  compliance. Everything else — team scaling, fractal value, drift
+  cost, ripple blast radius — is argued from first principles or
+  single-project observation.
+
+  This matters because the rs.md is the foundation document for a
+  multi-phase investment. If the evidence base is narrower than the
+  rhetorical confidence suggests, the risk of over-building is real.
+depends_on:
+  - po-rs-context-ceiling
+  - po-seam-solo-vs-team
+  - po-seam-scale-ambition
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md
+    - bikeshop-prd.md
+    - pf-prd.md
