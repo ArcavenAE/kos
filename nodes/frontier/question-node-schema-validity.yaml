@@ -13,6 +13,24 @@ content: |
   - Does one-node-per-file scale or become unwieldy?
 
   This question is answered by using the schema and noting friction.
+
+  ANSWERED across session-002 (findings 001-014, schema v0.1 → v0.3):
+  - Type enum: sufficient. All twelve projects decomposed without needing
+    new types. element and value carried everything.
+  - depends_on: insufficient. Replaced by typed edges in v0.2 (derives,
+    implements, contradicts, supersedes). Signal classification added in
+    v0.3 (error, evolution, drift).
+  - Graveyard fields: not yet stress-tested. No nodes were graveyarded
+    in session-002.
+  - Correspondence code_node format: not tested. No spec-to-code links
+    attempted.
+  - One-node-per-file: scales to 100+ probe nodes without friction. The
+    directory convention (confidence as directory) worked. File naming
+    by id worked.
+
+  This question is substantially answered. Remaining unknowns (graveyard
+  fields, correspondence format) need their own probes when those features
+  are exercised.
 provenance:
   created_by: human
   session: session-001

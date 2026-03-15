@@ -29,6 +29,11 @@ content: |
   derives, implements, contradicts, supersedes. Tested against three
   existing probe nodes. Contradictions moved from content to structure.
   refines was dropped — not needed by evidence. Four types, not five.
+
+  FURTHER VALIDATED in twelve-project broadening probe. Four edge types
+  plus signal classification (error/evolution/drift, added in v0.3)
+  covered all twelve projects. No additional edge types needed.
+  This question is answered.
 depends_on:
   - question-mvg-bootstrap
   - elem-correspondence-layer
