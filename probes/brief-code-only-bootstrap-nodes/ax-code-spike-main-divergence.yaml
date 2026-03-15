@@ -1,0 +1,33 @@
+id: ax-code-spike-main-divergence
+type: observation
+confidence: frontier
+title: "Spike has working system; main crates are stubs — parallel implementation visible from code"
+content: |
+  spike/ contains a separate Cargo workspace with working implementation:
+  demo data generation, WebUI, API routes, parser-A-based parsers, actual
+  functional code.
+
+  Main crates/ contains 8 crates: 1 implemented (alpha-core, 361 LOC),
+  7 stubs (2 LOC each — just a lib.rs with a module declaration).
+
+  The two codebases share a name and domain but use different technologies
+  (pest vs parser-B), different architectures, and are not linked by any
+  import or dependency. The spike is not a library consumed by main; it is
+  a parallel implementation.
+
+  Code-only signal: either the spike is a validated prototype being
+  rewritten in main (normal), or main has stalled while spike continues
+  to evolve (drift). The git history shows main crates were set up
+  intentionally with stub architecture. The spike predates main.
+
+  This is NOT visible from document-based probing because the documents
+  describe the target architecture, not the spike. Finding-003 did not
+  mention the spike at all.
+edges: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - project-alpha/spike/Cargo.toml
+    - project-alpha/crates/*/Cargo.toml

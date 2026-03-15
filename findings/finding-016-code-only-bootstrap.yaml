@@ -1,0 +1,165 @@
+id: finding-016-code-only-bootstrap
+type: finding
+confidence: frontier
+title: "Code-only bootstrap: produces complementary signal, not redundant signal"
+content: |
+  ## Summary
+
+  Probed project-alpha using only code, git history, README, CLAUDE.md, SOUL.md,
+  and .claude/ operational files. Deliberately ignored all BMAD documents,
+  PRDs, architecture docs, and planning artifacts. Produced 7 typed nodes
+  (probe artifacts). Compared results against finding-003's 11 issues.
+
+  ## Against success criteria
+
+  1. "At least 5 typed nodes" — YES (7 produced)
+  2. "At least 2 of 11 issues independently rediscovered" — PARTIAL (1 clean
+     rediscovery, 1 different-angle overlap)
+  3. "At least 1 code-only unique finding" — YES (at least 4 unique findings)
+
+  Result: PARTIAL — code-only bootstrap is viable and produces signal, but
+  the signal is largely DIFFERENT from document-based probing, not redundant
+  with it.
+
+  ## What was rediscovered from code alone
+
+  **Issue #1 (parser technology): REDISCOVERED**
+  Finding-003 caught CLAUDE.md saying pest vs architecture saying parser-B.
+  Code-only bootstrap found the same contradiction from a different source:
+  spike/Cargo.toml uses parser-A + parser-A-derive; main/Cargo.toml uses parser-B
+  with explicit comment "architecture decision: parser-B over parser-A."
+  Additionally, docs/.archive still references "parser-A DSL" and
+  .claude/known-spec-conflicts.md already acknowledges and triages this.
+  The code-only version is actually RICHER — it shows the technology
+  migration path (spike=parser-A, main=parser-B) rather than just the
+  contradiction.
+
+  **Issue #2 (query latency): DIFFERENT ANGLE**
+  Finding-003 found documents disagreeing on p95 vs p99 targets.
+  Code-only bootstrap found that no query code exists at all — the entire
+  debate is about targets for unwritten software. Same domain, but the
+  code-only signal is "aspirational claims vs. zero implementation"
+  rather than "documents disagree on the target."
+
+  ## What code-only MISSED (9 of 11 issues)
+
+  - #3 (data catalog SQLite vs PostgreSQL): Both mentioned in docs only
+  - #4 (SSE vs WebSocket): Both mentioned in docs only
+  - #5 (HTTP timeout 60s vs 30s): Both mentioned in docs only
+  - #6 (RBAC phase assignment): Phase metadata is document-only
+  - #7 (Infrastructure deps vs cargo install): PRD promise not in code
+  - #8 (Crate naming drift): Old names only in superseded docs
+  - #9 (MVP scope inflation): Phase boundaries are document-only
+  - #10 (Cross-phase dependencies): Phase metadata is document-only
+  - #11 (TUI phase bleed): Phase metadata is document-only
+
+  Pattern: 7 of 9 missed issues involve PHASE ASSIGNMENT — which feature
+  belongs to which release phase. Phase metadata lives exclusively in
+  planning documents. Code has no concept of "this is MVP" vs "this is
+  Growth." Phase boundary erosion, finding-003's strongest signal, is
+  completely invisible from code.
+
+  The remaining 2 missed issues (#3, #4) involve conflicting technology
+  choices documented in architecture specs. These choices haven't reached
+  code yet (the relevant crates are stubs), so there's nothing to
+  contradict.
+
+  ## What code-only found that documents MISSED
+
+  **1. Spike-to-main architectural divergence (ax-code-spike-main-divergence)**
+  spike/ is a parallel Cargo workspace with working parser-A-based code.
+  Main crates/ are parser-B-based stubs. Finding-003 never mentioned the
+  spike. Documents describe the target architecture; the spike is invisible
+  to document-based probing because it's not in any planning artifact.
+  This is a significant structural fact about the project.
+
+  **2. Config philosophy gap (ax-code-config-stub)**
+  SOUL.md principle #13: "Behavior is config; policy is types." The only
+  implemented crate has an empty config.rs. Philosophy and implementation
+  diverge on configuration. Not in any planning document because the gap
+  is between stated principles and actual source files.
+
+  **3. No binary target (ax-code-no-binary)**
+  A information system with no runnable artifact. Every crate is library-only.
+  README describes a product; code can't produce one. Normal for early
+  development, but the gap is only visible from code.
+
+  **4. Planning-to-code weight ratio (ax-code-repo-structure)**
+  30 epics, 500+ story context files, 5 commits all chore:. The
+  orchestration layer's planning infrastructure vastly outweighs its
+  codebase. This is a structural observation about project maturity
+  that documents can't make about themselves.
+
+  ## The key insight
+
+  Code-only and document-only probing produce COMPLEMENTARY signal, not
+  redundant signal. They catch different classes of problems:
+
+  | Signal class              | Docs find it? | Code finds it? |
+  |---------------------------|---------------|----------------|
+  | Phase boundary erosion    | YES           | NO             |
+  | Cross-doc contradictions  | YES           | NO (until implemented) |
+  | Technology migration path | NO            | YES            |
+  | Philosophy-impl gap       | NO            | YES            |
+  | Aspirational claims gap   | NO            | YES            |
+  | Planning weight ratio     | NO            | YES            |
+
+  This means Q4's answer is: YES, the graph can bootstrap from code alone,
+  but it finds DIFFERENT things. A complete graph needs both sources. Code
+  bootstrap is not a substitute for document probing — it's a second lens.
+
+  ## Implications for F4 (bootstrap from existing artifacts)
+
+  F4 proposed three automated mechanisms: git conventions, embedding
+  similarity, structural pattern matching. This probe suggests:
+
+  - Git conventions: limited value. alpha-orc has 5 chore: commits. The
+    commit history is too young and too sparse to carry semantic signal.
+  - Structural pattern matching: HIGH value. Cargo.toml dependency
+    analysis, stub detection, spike-vs-main comparison — these are
+    mechanizable.
+  - Embedding similarity: UNTESTED. Would need a larger codebase to
+    evaluate whether embedding-based node inference adds signal beyond
+    structural matching.
+
+  ## Implications for B7 (process quality gradient)
+
+  B7 says KOS adds most value where governance is weakest. Code-only
+  bootstrap adds a nuance: even well-governed projects (project-alpha has
+  extensive planning docs) have code-level signal that documents miss.
+  The gradient applies to documents, not to code. A project can have
+  strong document governance and still have code-visible gaps.
+
+edges:
+  - target: finding-003-alpha
+    type: derives
+    note: "ground truth comparison — 1 rediscovery, 1 overlap, 9 misses, 4 unique"
+  - target: brief-code-only-bootstrap
+    type: derives
+  - target: ax-code-parser-divergence
+    type: derives
+  - target: ax-code-spike-main-divergence
+    type: derives
+  - target: ax-code-config-stub
+    type: derives
+  - target: ax-code-no-binary
+    type: derives
+  - target: ax-code-test-implementation-ratio
+    type: derives
+  - target: ax-code-repo-structure
+    type: derives
+  - target: ax-code-readme-performance-claims
+    type: derives
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - finding-003-alpha
+    - brief-code-only-bootstrap
+    - project-alpha source code
+    - project-alpha git history
+  reviewed_by: null
+finding:
+  probe: brief-code-only-bootstrap
+  result: partial

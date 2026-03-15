@@ -1,0 +1,32 @@
+id: ax-code-test-implementation-ratio
+type: observation
+confidence: frontier
+title: "3:1 test-to-implementation LOC ratio in alpha-core"
+content: |
+  alpha-core implementation: 361 LOC (types.rs, error.rs, lib.rs)
+  alpha-core tests: 1,151 LOC (4 test files: integration, types,
+  snapshot, property-based)
+
+  The test suite is comprehensive: boundary testing, property-based
+  testing (proptest), snapshot testing (insta), async/Send/Sync
+  verification. Test names are self-documenting
+  (tenant_id_new_rejects_empty, not test_1).
+
+  Code-only signal: this ratio suggests deliberate spec-first
+  development where correctness of foundations is prioritized over
+  feature velocity. Consistent with SOUL.md principle #2 ("Make
+  wrong things impossible") and principle #8 ("Test boundaries,
+  name tests like docs").
+
+  This is a positive signal — philosophy and implementation align.
+  Not detectable from documents because documents describe intent,
+  not execution quality.
+edges: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - project-alpha/crates/alpha-core/src/
+    - project-alpha/crates/alpha-core/tests/
+    - project-alpha/SOUL.md
