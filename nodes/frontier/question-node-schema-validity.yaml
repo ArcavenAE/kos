@@ -1,0 +1,19 @@
+id: question-node-schema-validity
+type: question
+confidence: frontier
+title: "Does the node schema hold under real use?"
+content: |
+  The node schema (v0.1) was designed without implementation experience.
+  This seed file is the first real use. Specific unknowns:
+
+  - Is the type enum right? Too many types? Too few?
+  - Is depends_on at the right granularity?
+  - Do the graveyard fields capture what we actually need?
+  - Is the correspondence code_node format (path:symbol) sufficient?
+  - Does one-node-per-file scale or become unwieldy?
+
+  This question is answered by using the schema and noting friction.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

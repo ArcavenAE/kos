@@ -1,0 +1,32 @@
+id: elem-storage-model
+type: element
+confidence: bedrock
+title: "Immutable fact store over Git substrate"
+content: |
+  Storage is layered:
+
+  GIT SUBSTRATE: Content-addressed, distributed, cryptographically sound.
+  Git stores serialized transaction batches as blobs. Never sees files or
+  line diffs. Git commits are durability checkpoints, not semantic units.
+  Git's job: detect diverging sequences, surface to layer above.
+
+  FACT STORE: Datomic-style immutable datom accumulation.
+  Every fact: (entity, attribute, value, transaction-time).
+  Facts are never deleted — only superseded. History is the primary record.
+  Current state is a view over it. Time-travel queries are native.
+
+  SEMANTIC GRAPH: Typed nodes, dependency edges, dirty propagation,
+  agent contracts, provenance, semantic diff, type-aware merge.
+  This is where spec intelligence lives.
+
+  Conflicts are resolved at the layer that understands their semantics.
+  Git resolves structural storage conflicts.
+  Fact store resolves temporal conflicts.
+  Graph resolves semantic conflicts.
+  Humans resolve intent conflicts.
+depends_on:
+  - val-typed-traversable
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
