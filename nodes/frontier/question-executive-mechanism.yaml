@@ -1,0 +1,15 @@
+id: question-executive-mechanism
+type: question
+confidence: frontier
+title: "What is the executive mechanism as software?"
+content: |
+  The executive loop is described functionally: query graph → infer →
+  generate candidate → verify → harvest or graveyard → update → repeat.
+
+  What runs this as software? Scheduler? Event system? Agent orchestration?
+  How does it allocate attention across the graph? How does it maintain
+  coherence of purpose across sessions when the inference layer is amnesiac?
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

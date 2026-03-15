@@ -1,0 +1,15 @@
+id: ng-permanent-solution
+type: non-goal
+confidence: bedrock
+title: "Not a permanent solution"
+content: |
+  KOS is a moment in time. It will be superseded. That is not a flaw —
+  it is evidence that it belongs to the same lineage as everything it
+  builds on. The goal is useful-for-a-time, not final.
+
+  Building as if this must last forever would front-load design investment
+  in exactly the way the process is designed to avoid.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

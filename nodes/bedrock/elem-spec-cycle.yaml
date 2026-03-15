@@ -1,0 +1,28 @@
+id: elem-spec-cycle
+type: element
+confidence: bedrock
+title: "The Spec Cycle — atomic unit of process"
+content: |
+  Every unit of work, at every scale, is a Spec Cycle:
+
+  1. ORIENT    — what do we know, what don't we know, what matters now
+  2. QUESTION  — the single most valuable thing to learn next
+  3. PROBE     — smallest possible action that answers the question
+  4. HARVEST   — write the finding into the spec
+  5. PROMOTE   — does anything become bedrock; does anything die to graveyard
+
+  The cycle is fractal. It takes 20 minutes solo on day one.
+  It takes two weeks with eight teams on a complex system.
+  The shape is identical at every scale.
+
+  The question is the unit of work — not the feature, sprint, or milestone.
+  Probes have hard timeboxes. Findings are harvested regardless of
+  probe "completeness." Dead ends go to graveyard — they are discoveries,
+  not failures.
+depends_on:
+  - val-spec-is-product
+  - val-uncertainty-structural
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

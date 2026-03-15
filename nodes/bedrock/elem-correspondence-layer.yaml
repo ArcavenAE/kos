@@ -1,0 +1,30 @@
+id: elem-correspondence-layer
+type: element
+confidence: bedrock
+title: "Typed correspondence between spec and code"
+content: |
+  The correspondence layer sits between the spec graph and the code graph.
+  Neither layer knows about the other directly — all traversal goes through
+  the correspondence layer.
+
+  Every correspondence is a typed, versioned fact:
+  - spec_node + code_node (with hashes at time of establishment)
+  - link_type: implements | tests | explores | violates | extends | obsoletes
+  - confidence: declared | inferred | stale
+
+  Stale correspondences are flagged, not deleted.
+  Drift has three signatures, each requiring different response:
+  - Spec ahead of code: coverage gap
+  - Code ahead of spec: extends or obsoletes
+  - Symmetric divergence: potential violation, highest severity
+
+  An agent traversing this layer can move from a behavioral spec element
+  to the code that realizes it, the tests that verify it, the graveyard
+  entries that explain its shape, and back again.
+depends_on:
+  - val-typed-traversable
+  - elem-storage-model
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

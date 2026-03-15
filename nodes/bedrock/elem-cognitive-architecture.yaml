@@ -1,0 +1,38 @@
+id: elem-cognitive-architecture
+type: element
+confidence: bedrock
+title: "KOS as cognitive architecture — graph and inference"
+content: |
+  KOS and LLM inference are metabolically complementary.
+  Each supplies exactly what the other lacks.
+
+  INFERENCE: Generates, synthesizes, reasons, forgets, asks, present-tense.
+  GRAPH: Persists, accumulates, remembers, retains, verifies, temporal.
+
+  The graph gives inference: stable, typed, provenance-rich world to reason
+  about. Not a flat context window — structured knowledge where confidence
+  is declared and the graveyard prevents re-exploring dead ends.
+
+  Inference gives the graph: capacity to notice what it means. To traverse
+  and recognize patterns no single node states. To read the graveyard and
+  see why failures cluster.
+
+  Architectural correspondences:
+  - Graph = long-term memory
+  - Inference = working memory + reasoning
+  - Correspondence layer = proprioception
+  - Ripple engine = attention
+  - Graveyard = wisdom
+  - Spec Cycle = the executive loop
+
+  This is not a documentation system with an AI layer on top.
+  It is a designed cognitive substrate for collaborative intelligence
+  between humans and agents over time.
+depends_on:
+  - elem-spec-cycle
+  - elem-shadow-principle
+  - val-uncertainty-structural
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

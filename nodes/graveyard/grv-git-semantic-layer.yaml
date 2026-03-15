@@ -1,0 +1,36 @@
+id: grv-git-semantic-layer
+type: graveyard
+confidence: graveyard
+title: "Git as the semantic layer"
+content: |
+  Using Git's merge and diff semantics for spec conflict resolution.
+graveyard:
+  approach: >
+    Adapt Git — possibly with conventions and hooks — to serve as the
+    primary semantic layer for the spec graph. Use branches for probes,
+    merges for harvest, diffs for change tracking.
+  context: >
+    Git is battle-tested, universally understood, and has an enormous
+    ecosystem. It already has a DAG structure. Appeared to be the path
+    of least resistance.
+  finding: >
+    Git resolves conflicts by text proximity with no concept of type
+    constraints. A semantically invalid merge with no textual conflict
+    passes silently. Branch semantics don't distinguish probe branches
+    (never merge) from collaboration branches (do merge). Harvest
+    requires selective fact extraction, not merge. The semantic
+    decisions happen entirely outside Git, undocumented.
+  ruling: >
+    Git is retained as substrate only — content-addressed storage
+    and distribution. It never sees files or line diffs in the spec
+    graph. It stores serialized transaction batches as blobs.
+    Conflict detection surfaces to the fact store layer.
+  reopener: >
+    If a Git extension (custom merge drivers, typed ref conventions)
+    could enforce type constraints at merge time, partial reinstatement
+    as semantic layer is possible. Would require Git to understand
+    node types — a significant ecosystem investment.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15
