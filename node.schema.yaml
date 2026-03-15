@@ -1,0 +1,241 @@
+# KOS Node Schema
+# Version: 0.1 (probe)
+# Status: FRONTIER
+# Purpose: Minimum viable spec node — human-writable, agent-parseable,
+#          no tooling required. Validate under real use, then revise.
+
+# ─────────────────────────────────────────────
+# REQUIRED FIELDS (every node)
+# ─────────────────────────────────────────────
+
+id:
+  type: string
+  format: "[type-prefix]-[short-slug]"
+  description: >
+    Stable, unique, never reused. If a node is graveyarded,
+    its id is retired — not reassigned. Slugs should be
+    meaningful to a human reading a dependency list.
+  examples:
+    - val-uncertainty-first
+    - elem-node-schema
+    - question-executive-mechanism
+    - grv-waterfall-frontload
+
+type:
+  type: enum
+  values:
+    value:        "A design principle. Resolves tradeoffs. Load-bearing."
+    non-goal:     "Explicit exclusion. What this system must never become."
+    question:     "An open unknown. The unit of work."
+    brief:        "Exploration brief for a probe. One question, one timebox."
+    finding:      "Result of a probe. Evidence, not opinion."
+    element:      "General spec element — behavior, data, architecture, process."
+    graveyard:    "Tried, ruled out, permanently recorded. Append-only."
+    correspondence: "Typed link between a spec node and a code node."
+  notes: >
+    Start with this set. Add types only when an existing type
+    genuinely cannot carry the meaning. Type proliferation is a smell.
+
+confidence:
+  type: enum
+  values:
+    bedrock:      "Committed. Evidence-based. Changing this breaks dependents."
+    frontier:     "Active hypothesis. Expected to hold but may change."
+    placeholder:  "Known unknown. Honest marker. Not a guess dressed as fact."
+    graveyard:    "Closed. Append-only. Never promoted back without new evidence."
+  notes: >
+    Confidence is not quality. A placeholder is not a failure —
+    it is the most honest thing a spec can say.
+
+title:
+  type: string
+  description: "Short human label. Enough to identify in a dependency list."
+
+content:
+  type: string (markdown)
+  description: >
+    The substance of the node. Free text, markdown acceptable.
+    For graveyard nodes: what was tried and what was learned.
+    For finding nodes: what the probe revealed, not what was hoped.
+    For question nodes: the question precisely stated — vague
+    questions produce vague probes.
+
+# ─────────────────────────────────────────────
+# DEPENDENCY FIELDS
+# ─────────────────────────────────────────────
+
+depends_on:
+  type: list of node ids
+  required: false
+  description: >
+    Nodes this node was derived from or is grounded in.
+    When a dependency changes, this node is marked dirty.
+    Declare conservatively — every declared dependency is
+    a ripple propagation path.
+
+# consumers is DERIVED, not declared.
+# The graph computes it from depends_on relationships.
+# Do not write consumers by hand.
+
+# ─────────────────────────────────────────────
+# PROVENANCE FIELDS
+# ─────────────────────────────────────────────
+
+provenance:
+  created_by:
+    type: string
+    values: "human | agent:[agent-name]@[version]"
+  session:
+    type: string
+    description: "Session identifier. Links node to conversation or work unit."
+  created_at:
+    type: ISO date string
+  derived_from:
+    type: list
+    description: >
+      For agent-created nodes: input node ids WITH their hash at
+      the time of derivation. Format: "node-id@hash:abc123"
+      This is the provenance chain. Required for any agent-produced node.
+    required: "only for agent-produced nodes"
+  reviewed_by:
+    type: string or null
+    description: "Human reviewer id, or null if not yet reviewed."
+
+# ─────────────────────────────────────────────
+# TYPE-SPECIFIC FIELDS
+# ─────────────────────────────────────────────
+
+# For type: graveyard
+graveyard:
+  approach:
+    type: string
+    description: "What was tried."
+  context:
+    type: string
+    description: "What was known at the time. Why it seemed reasonable."
+  finding:
+    type: string
+    description: "What was actually learned."
+  ruling:
+    type: string
+    description: "What this closes off and why."
+  reopener:
+    type: string
+    description: "What would make this worth revisiting. Be specific."
+
+# For type: brief
+brief:
+  hypothesis:
+    type: string
+    description: "What question this probe is testing."
+  excluded_scope:
+    type: string
+    description: "What this probe deliberately does not need to solve."
+  success_signal:
+    type: string
+    description: "What would confirm or disconfirm the hypothesis."
+  timebox:
+    type: string
+    description: "Hard stop. Findings get harvested regardless of completeness."
+
+# For type: finding
+finding:
+  probe:
+    type: node id (brief)
+    description: "The brief that generated this finding."
+  result:
+    type: enum
+    values:
+      confirms:     "Hypothesis confirmed. Consider promoting to bedrock."
+      disconfirms:  "Hypothesis disconfirmed. Consider graveyarding."
+      partial:      "Partial answer. Spawns new questions."
+      redirects:    "Found something more important than the original question."
+
+# For type: correspondence
+correspondence:
+  spec_node:
+    type: node id
+  code_node:
+    type: string
+    format: "path/to/file.ext:SymbolOrLine"
+  link_type:
+    type: enum
+    values:
+      implements:  "Code realizes spec element behavior"
+      tests:       "Code verifies spec element assertions"
+      explores:    "Probe code, not yet spec-anchored"
+      extends:     "Code goes beyond spec — spec is incomplete"
+      violates:    "Detected contradiction — highest severity"
+      obsoletes:   "Code has no living spec node"
+  confidence:
+    type: enum
+    values:
+      declared:  "Explicitly stated by human or trusted agent"
+      inferred:  "Derived from analysis (naming, structure, embedding)"
+      stale:     "Either end changed since correspondence established"
+
+# ─────────────────────────────────────────────
+# OPTIONAL FIELDS
+# ─────────────────────────────────────────────
+
+tags:
+  type: list of strings
+  description: >
+    Informal classification. Do not use as a substitute for type.
+    Useful for cross-cutting concerns: security, performance,
+    data-model, agent-contract, etc.
+
+notes:
+  type: string
+  description: >
+    Scratchpad. Not part of the node's formal content.
+    Does not trigger ripple propagation when changed.
+    Does not affect content hash.
+
+# ─────────────────────────────────────────────
+# WHAT IS NOT IN THIS SCHEMA (intentionally)
+# ─────────────────────────────────────────────
+
+# content_hash:
+#   Computed, not declared. Tooling generates from content field.
+#   Human does not write this. It is derived.
+
+# consumers:
+#   Derived from depends_on graph traversal. Not declared.
+
+# status (dirty/clean):
+#   Runtime state managed by ripple engine. Not stored in node file.
+#   Clean state is assumed. Dirty state is an event, not a property.
+
+# ─────────────────────────────────────────────
+# FILE CONVENTIONS
+# ─────────────────────────────────────────────
+
+# One node per file.
+# Filename matches node id: val-uncertainty-first.yaml
+# Nodes live in /nodes/ directory.
+# Organized by confidence subdirectory:
+#   /nodes/bedrock/
+#   /nodes/frontier/
+#   /nodes/graveyard/
+#   /nodes/placeholder/
+#
+# Moving a file between directories IS the confidence change.
+# Git history of that move IS the promotion/demotion record.
+# No separate promotion log required — git provides it.
+
+# ─────────────────────────────────────────────
+# SCHEMA STATUS
+# ─────────────────────────────────────────────
+
+# This schema is FRONTIER.
+# It was designed without implementation experience.
+# Expect revision after first real use.
+# Specific things likely to change:
+#   - type enum (too many or too few?)
+#   - depends_on granularity (too coarse? too fine?)
+#   - graveyard fields (are these the right questions?)
+#   - correspondence code_node format (path:symbol may not be enough)
+#
+# Do not build tooling against this schema until it has survived
+# at least one full probe cycle under real use.
