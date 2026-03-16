@@ -154,10 +154,22 @@ The system is metabolically complementary to LLM inference:
 - Ripple engine = attention: notices change, directs resources
 - Graveyard = wisdom: accumulated shape of what was tried and where it led
 - The executive = the cycle running between graph and inference
+- Human = pattern recognition on undeclared structure
 
 Neither inference nor graph alone produces directed understanding. Together,
 running the orient-question-probe-harvest-promote loop continuously, they produce
 something that behaves like a mind applied to a problem over time.
+
+*Session-003 revision (finding-019):* The graph captures declared structure.
+It does not capture the structure of ideas themselves. Pattern recognition
+across undeclared conceptual relationships — seeing that findings 015-017
+and B3/B5 were all instances of the same recursive projection pattern —
+required the human. The agent had all the pieces and didn't connect them.
+This is not a temporary limitation. The human's role is permanently the
+pattern recognizer operating on the graph's blind spot: conceptual
+relationships that exist between nodes but haven't been typed and declared.
+Agents execute within declared structure. The human expands the declared
+structure by seeing what it doesn't yet contain.
 
 ---
 
