@@ -1,0 +1,44 @@
+id: finding-025-atmos-seam-test
+type: finding
+confidence: frontier
+title: "Atmos seam test: 8 issues, AI configuration seam is a new signal class"
+content: |
+  ## Summary
+
+  Probed CloudPosse Atmos (IaC orchestration, 75+ contributors)
+  across CLAUDE.md, .cursor/rules/atmos-rules.mdc, docs/development.md,
+  Makefile, .claude/agents/, and .claude/agents/README.md.
+
+  8 issues found. 3 MEDIUM severity, 5 LOW.
+
+  Most consequential: .cursor/rules contradicts CLAUDE.md on both
+  mocking library (testify/mock vs uber/mock MANDATORY) and testing
+  strategy (write integration tests vs avoid integration tests
+  MANDATORY). Two AI assistants on the same codebase would produce
+  incompatible code.
+
+  New signal class: AI CONFIGURATION SEAM. As projects adopt multiple
+  AI tools (Cursor, Claude Code, Copilot), each tool's configuration
+  becomes a specification that should be mutually consistent. When
+  they contradict, agents produce conflicting code without any human
+  noticing until code review.
+
+  Also found: dual development workflow (docs/development.md describes
+  atmos dev commands, CLAUDE.md describes make commands, neither
+  acknowledges the other).
+
+  See finding-023-signal-to-noise-four-projects for full signal-to-
+  noise classification.
+
+edges:
+  - target: brief-signal-to-noise
+    type: derives
+  - target: project-lineup
+    type: derives
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-16
+finding:
+  probe: brief-signal-to-noise
+  result: confirms
