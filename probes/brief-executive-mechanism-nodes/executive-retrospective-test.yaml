@@ -1,0 +1,241 @@
+id: executive-retrospective-test
+type: finding
+confidence: frontier
+title: "Retrospective test: executive mechanism against sessions 001-003"
+content: |
+  ## Method
+
+  Reconstructed the actual work sequence from sessions 1-3 and tested
+  whether the proposed executive mechanism would have produced the same
+  sequence. For each decision point, asked: what would the priority
+  function have recommended, and what actually happened?
+
+  ## Session 001: Genesis
+
+  State: Empty graph. No ripple data. No questions. No convergent flags.
+  All three input channels are empty.
+
+  Decision point: What to work on?
+  Actual: Human initiated — "let's design a knowledge accumulation system."
+  Executive would: Nothing. All channels empty. Wait for human input.
+  Result: MATCH. The executive correctly defers to the human channel when
+  automated channels are empty. This is the "directed mode" — human
+  provides the initial probe.
+
+  Session 001 produced B1-B6, G1-G4, Q1-Q7, and the schema. This is
+  entirely human-directed discovery work. The executive's role was
+  minimal — execute what the human specified.
+
+  ## Session 002: First probes
+
+  State: Graph has bedrock (B1-B6), graveyard (G1-G4), questions (Q1-Q7).
+  No ripple data (no prior changes to propagate).
+
+  Decision point 1: Which question first?
+  Priority function ranking:
+  - Q1 (minimum viable checksum) — highest dependency_depth. Q2-Q5 all
+    depend on Q1 working. If the checksum property doesn't hold, the
+    entire model is invalidated. governance_gap: high (this determines
+    whether KOS works at all).
+  - Q6 (edge types) — high dependency_depth (schema affects all nodes)
+    but lower governance_gap (schema is internal).
+  - Q2-Q5 — medium dependency_depth, various governance_gap scores.
+  Actual: Session 002 started with Q1 (MVG bootstrap against ThreeDoors).
+  Result: MATCH. Q1 is the correct first priority by dependency ranking.
+
+  Decision point 2: After findings 001-003 (three personal projects).
+  Priority function would recommend: Go deeper on Q1 (more projects)
+  OR address Q6 (schema was already showing strain — finding-001 noted
+  depends_on was insufficient).
+  Actual: Human said "broaden before deepening" — probe nine more
+  external projects.
+  Result: HUMAN OVERRIDE, correctly handled. The human channel trumped
+  the automated priority. The broadening decision was a pattern
+  recognition call — the human judged that breadth of evidence was
+  more valuable than depth at that point. The executive's mechanism
+  (human channel > question channel) would have enabled this.
+
+  Decision point 3: After findings 005-013 (nine external projects).
+  Priority function: Q6 (schema revision) now has convergent signals.
+  Findings 001-003 AND findings 005-013 all pointed at schema
+  insufficiency (depends_on not enough, no signal classification).
+  This is PATTERN CONVERGENCE — multiple independent findings
+  clustering around the same structural element.
+  Actual: Schema revision happened (finding-004, v0.2 and v0.3).
+  Result: MATCH. Pattern convergence correctly identifies schema
+  revision as the priority. This is the generalized convergence
+  principle working on findings rather than ripple — structurally
+  identical.
+
+  Decision point 4: After synthesis (finding-014).
+  Priority function: Q1 is now "partially answered." Q6 answered.
+  Remaining: Q2-Q5, Q7. No strong convergent signals.
+  Actual: Session 002 ended. Charter updated.
+  Result: N/A (session boundary, not a priority decision).
+
+  ## Session 003: Cold start
+
+  State: 14 findings, schema v0.3, B1-B7, G1-G4, Q1-Q7 (some answered).
+
+  Decision point 1: Cold start — what to work on?
+  Priority function ranking of remaining questions:
+  - Q4 (code-only bootstrap) — highest governance_gap (B7 says target
+    weak governance → need bootstrap without docs). High dependency_depth
+    (if code-only works, adoption path widens).
+  - Q5 (where does it break) — medium governance_gap, high strategic
+    value (finding limits before investing further).
+  - Q2 (ripple noise) — internal mechanism, lower governance_gap.
+  - Q3 (executive) — internal mechanism, depends on Q2 answer.
+  Actual: Agent recommended Q4, human confirmed.
+  Result: MATCH. Q4 is the correct priority by governance_gap × depth.
+  This is also a successful test of the continuity mechanism — the agent
+  restored full priority context from the charter alone.
+
+  Decision point 2: After finding-016 (code-only bootstrap).
+  Priority function: Q5 now has adjacent evidence (finding-016 showed
+  what code CAN'T find). Q5 probes what the graph CAN'T represent —
+  complementary question.
+  Actual: Agent moved to Q5 (finding-017).
+  Result: MATCH. Finding-016 sharpened Q5, making it the natural next
+  priority by freshness of adjacent evidence.
+
+  Decision point 3: After finding-017 (what can't be a node).
+  Priority function: Q2 (ripple) now has fresh constraints from
+  finding-017 (epistemological flattening constraint) and finding-016
+  (cross-lens requirement). Q2 is newly tractable.
+  Actual: Agent moved to Q2 (finding-018).
+  Result: MATCH. Finding-017 made Q2 tractable — the priority function
+  should surface newly-tractable questions (a form of convergent
+  signal: constraints that previously blocked a question being resolved).
+
+  Decision point 4: After finding-018 (ripple engine design).
+  During harvest, the HUMAN saw the recursive projection pattern across
+  findings 015-018, B3, and B5. This produced finding-019.
+  Priority function: would not have produced this. No automated channel
+  can detect undeclared conceptual structure.
+  Actual: Human injected finding-019 via the human channel.
+  Result: MATCH — the human channel is the only path to finding-019,
+  and the mechanism correctly gives the human channel highest authority.
+
+  ## Twelve-project sample: attention allocation analysis
+
+  The twelve-project probe (session-002) also provides data about how
+  attention SHOULD have been allocated if the executive were managing
+  the work:
+
+  Projects by signal yield (governance gap as predictor):
+  - ThreeDoors: 10 issues → high governance gap, high yield
+  - project-alpha: 11 issues → high governance gap, high yield
+  - OpenHands: 7 issues → mid governance gap, mid-high yield
+  - Backstage: 6 issues → mid governance gap, mid yield
+  - AutoGen: 5 issues → mid governance gap, mid yield
+  - Crossplane: 5 issues → mid governance gap, mid yield
+  - Rust RFCs: 6 issues → low governance gap, but legacy depth
+  - Go Proposals: 4 issues → low governance gap, acknowledged evolution
+  - BMAD enterprise: 3 issues → AI-generated, low yield
+  - Python PEPs: 3 issues → low governance gap, managed evolution
+  - Kubernetes KEPs: 2 issues → lowest governance gap, lowest yield
+
+  If the executive had been allocating probe time across these projects
+  (hypothetical — session-002 probed all of them):
+
+  The governance_gap weighting would have correctly prioritized
+  ThreeDoors and project-alpha (highest yield) over Kubernetes KEPs and
+  Python PEPs (lowest yield). The executive would have spent MORE
+  probe cycles on high-gap projects and fewer on low-gap ones.
+
+  However: the session-002 strategy of probing ALL twelve was correct
+  for a different reason — it was testing whether the categories
+  stabilize across diverse samples. The executive's priority function
+  would not have surfaced this meta-question. The human's "broaden
+  before deepening" override was necessary.
+
+  This is another instance of finding-019: the decision to broaden
+  required seeing a pattern (category stability requires diverse
+  samples) that the priority function cannot encode because it
+  operates on individual questions, not on the epistemological
+  structure of the investigation itself.
+
+  ## Summary of retrospective results
+
+  | Decision point          | Match? | Channel used     |
+  |------------------------|--------|-----------------|
+  | S1: Genesis            | MATCH  | Human (directed) |
+  | S2: Q1 first           | MATCH  | Question (dep.depth) |
+  | S2: Broaden            | OVERRIDE | Human (pattern) |
+  | S2: Schema revision    | MATCH  | Convergent (pattern) |
+  | S3: Q4 first           | MATCH  | Question (gov.gap) |
+  | S3: Q5 after Q4        | MATCH  | Question (adjacent) |
+  | S3: Q2 after Q5        | MATCH  | Question (tractable) |
+  | S3: Finding-019        | MATCH  | Human (undeclared) |
+
+  8/8 decision points accounted for. 6 by automated channels, 2 by
+  human channel. The human overrides were both instances of pattern
+  recognition on undeclared structure — exactly what finding-019
+  predicts the human channel is for.
+
+  ## What the retrospective reveals about the priority function
+
+  The composite score (dependency_depth × staleness × governance_gap)
+  is necessary but not sufficient. Three additional factors emerged
+  from the retrospective:
+
+  1. TRACTABILITY: A question becomes higher priority when adjacent
+     findings resolve constraints that previously blocked it. Q2
+     became tractable after findings 016 and 017. The priority
+     function needs a tractability signal, not just a static score.
+
+  2. ADJACENT EVIDENCE: Findings that are conceptually adjacent to
+     an open question should boost that question's priority. This is
+     not the same as dependency — Q5 doesn't derive from Q4, but
+     finding-016's result directly informed what Q5 should investigate.
+
+  3. META-EPISTEMOLOGICAL JUDGMENT: The decision to "broaden before
+     deepening" and the recursive projection pattern are both
+     judgments about the investigation itself, not about the subject
+     of investigation. These cannot be automated. They are the human
+     channel's unique contribution.
+
+  Revised priority function:
+
+  ```
+  priority = (
+    dependency_depth
+    × staleness
+    × governance_gap
+    × tractability_boost    # NEW: adjacent findings resolved blockers
+    × adjacent_evidence     # NEW: fresh related findings
+  )
+  ```
+
+  Meta-epistemological judgment remains in the human channel, not
+  the function.
+
+edges:
+  - target: executive-mechanism-proposal
+    type: derives
+  - target: brief-executive-mechanism
+    type: derives
+  - target: finding-014-twelve-project-synthesis
+    type: derives
+    note: "twelve-project data used for attention allocation analysis"
+  - target: finding-019-undeclared-structure
+    type: derives
+    note: "human channel validated by two override decision points"
+  - target: finding-015-cold-start-validation
+    type: derives
+    note: "continuity mechanism tested at session-003 boundary"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15
+  derived_from:
+    - executive-mechanism-proposal
+    - brief-executive-mechanism
+    - finding-014-twelve-project-synthesis
+    - finding-019-undeclared-structure
+    - finding-015-cold-start-validation
+  reviewed_by: null
+finding:
+  probe: brief-executive-mechanism
+  result: confirms

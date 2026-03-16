@@ -1,0 +1,175 @@
+id: executive-empirical-threedoors
+type: finding
+confidence: frontier
+title: "Executive empirical test: ThreeDoors (solo, weak governance, 10 issues)"
+content: |
+  ## Project profile
+
+  ThreeDoors: solo developer, BMAD-generated planning documents, no
+  formal review process. Three documents (executive-summary, product-scope,
+  high-level-architecture) decomposed into 12 typed nodes. 10 issues found
+  across three categories: contradictions (4), gaps (5), temporal drift (1).
+
+  ## Test 1: Convergence detection
+
+  The 10 issues cluster into identifiable convergence patterns:
+
+  CLUSTER A — Storage/data model (3 issues converge):
+  - td-storage-format: PRD says tasks.txt, architecture says tasks.yaml
+  - td-status-states: PRD conflates statuses with actions, arch separates
+  - td-door-keys: PRD says A/W/D, architecture says 1/2/3
+  All three are contradictions between the same two documents (PRD vs
+  architecture) about the same subsystem (the task data model). Three
+  independent dirty paths converge on the data model region.
+
+  Would threshold fire? YES. 3 independent paths, same structural region
+  (within 2 hops of a hypothetical "data-model" node). This is PATH
+  CONVERGENCE.
+
+  CLUSTER B — Phase structure (3 issues converge):
+  - td-phase-structure: duplicate phase IDs, overlapping scope
+  - td-mood-tracking: success criterion → feature → missing arch support
+  - td-val-progress: value declared in vision, absent from architecture
+  All three involve features that cross phase boundaries with inconsistent
+  treatment. The phase structure is the convergence point.
+
+  Would threshold fire? YES. 3 paths, same structural region. This is
+  also PATH CONVERGENCE with a CROSS-SOURCE element (executive-summary
+  vs product-scope vs architecture — three independent sources).
+
+  CLUSTER C — Provenance/traceability (2 issues):
+  - td-detail-view-provenance: architecture claims feature "not in PRD"
+    when it is
+  - td-personas: defined in vision, never referenced downstream
+  These share a theme (things getting lost between documents) but are
+  structurally independent. 2 paths, no convergence.
+
+  Would threshold fire? NO. Below the 3-path threshold. Correct behavior:
+  these are independent gaps, not a structural convergence.
+
+  REMAINING — td-temporal-drift (1 issue):
+  Isolated. Phase 1 marked VALIDATED in exec summary but "In Scope"
+  elsewhere. No convergence.
+
+  Convergence detection result: FIRES CORRECTLY on clusters A and B.
+  Does not fire on C or the isolated issue. Both escalations point at
+  real structural problems (data model inconsistency, phase boundary
+  erosion) that would merit discovery probes.
+
+  ## Test 2: Priority function
+
+  Applying the composite score to ThreeDoors' 10 issues:
+
+  td-storage-format:
+    dependency_depth: HIGH (everything downstream depends on storage)
+    governance_gap: HIGH (no review process)
+    tractability: HIGH (immediately investigable)
+    adjacent_evidence: HIGH (cluster A — 2 other data model issues)
+    COMPOSITE: HIGHEST PRIORITY
+
+  td-status-states:
+    dependency_depth: HIGH (UI, backend, and tests all depend on states)
+    governance_gap: HIGH
+    tractability: HIGH
+    adjacent_evidence: HIGH (cluster A)
+    COMPOSITE: HIGH
+
+  td-mood-tracking:
+    dependency_depth: MEDIUM (one feature chain)
+    governance_gap: HIGH
+    tractability: MEDIUM (requires architectural decision)
+    adjacent_evidence: MEDIUM (cluster B)
+    COMPOSITE: MEDIUM-HIGH
+
+  td-personas:
+    dependency_depth: LOW (orphan node, nothing depends on it)
+    governance_gap: HIGH
+    tractability: HIGH (just needs referencing or removal)
+    adjacent_evidence: LOW (cluster C, only 2 issues)
+    COMPOSITE: MEDIUM-LOW
+
+  td-temporal-drift:
+    dependency_depth: LOW (metadata, not functional)
+    governance_gap: HIGH
+    tractability: HIGH (simple update)
+    adjacent_evidence: LOW (isolated)
+    COMPOSITE: LOW
+
+  Would a human agree with this ranking? The data model issues (storage
+  format, status states, door keys) are objectively the most impactful —
+  they affect the core data structure that everything else depends on.
+  Phase boundary issues are next. Provenance and drift are lowest.
+
+  A reasonable human reviewer would likely agree: fix the data model
+  first, then the phase structure, then clean up the rest.
+
+  Priority function result: PRODUCES REASONABLE RANKING.
+
+  ## Test 3: Human channel necessity
+
+  Which issues required judgment the automated channels can't provide?
+
+  td-status-states: The PRD conflates statuses with actions; the
+  architecture separates them. This is an ONTOLOGICAL disagreement, not
+  just a value mismatch. Deciding which model is correct requires
+  understanding the product intent — that's human judgment. The
+  executive can surface the contradiction; it cannot resolve it.
+
+  td-val-progress: The value "progress visibility" is declared in
+  vision but reduced to a UI message in scope and absent from
+  architecture. Is this intentional scoping (the value was deprioritized)
+  or accidental loss (someone forgot)? Only the human knows.
+
+  td-phase-structure: Phase proliferation (3.5, 3.5+, 4+) suggests
+  the project's scope expanded without formal re-scoping. Recognizing
+  this as scope creep (a process problem, not a document problem)
+  requires meta-epistemological judgment — reasoning about the planning
+  process, not the plan.
+
+  Human channel result: AT LEAST 3 issues require human judgment.
+  td-phase-structure specifically requires the meta-epistemological
+  judgment from finding-019 — it's about the process, not the content.
+
+  ## Test 4: Graph maturity model
+
+  ThreeDoors has no KOS graph. It has documents.
+
+  Predicted behavior (YOUNG GRAPH): All work is discovery. Executive
+  is human-directed. No ripple possible. Priority function operates
+  on the question channel only.
+
+  Actual need: ThreeDoors needs DISCOVERY — the contradictions and
+  gaps have never been identified. There is nothing to maintain because
+  nothing has been declared. The first useful action is to decompose
+  documents into nodes and find the seams. That's exactly what the
+  session-002 probe did.
+
+  Maturity model result: MATCH. Young graph → discovery-dominant is
+  correct for ThreeDoors.
+
+  ## Test 5: Maintenance vs. discovery balance
+
+  Predicted: Nearly 100% discovery. No maintenance load (no prior
+  graph, no edges to propagate along).
+
+  After initial decomposition: maintenance becomes possible. The 12
+  nodes with edges could be maintained by ripple. But the signal yield
+  is so high (10 issues in 12 nodes) that discovery remains dominant
+  until the contradictions are resolved.
+
+  Balance result: DISCOVERY-DOMINANT, matching the young graph
+  prediction.
+
+edges:
+  - target: brief-executive-empirical-test
+    type: derives
+  - target: finding-001-mvg-bootstrap
+    type: derives
+    note: "ThreeDoors issue data"
+  - target: executive-mechanism-proposal
+    type: derives
+    note: "mechanism being tested"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15

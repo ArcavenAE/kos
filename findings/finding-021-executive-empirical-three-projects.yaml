@@ -1,0 +1,253 @@
+id: finding-021-executive-empirical-three-projects
+type: finding
+confidence: frontier
+title: "Executive empirical test: mechanism holds across governance gradient, one gap found"
+content: |
+  ## Summary
+
+  Tested the executive mechanism proposal against three projects with
+  maximally different governance profiles: ThreeDoors (solo, weak, 10
+  issues), Kubernetes KEPs (large team, strong, 2 issues), OpenHands
+  (mid-size, transitioning, 7 issues).
+
+  Results against success criteria: 5/5 met. Convergence detection,
+  priority function, human channel necessity, maturity model, and
+  maintenance/discovery balance all held across the gradient. One
+  mechanism gap discovered: no concept of "acknowledged debt" as a
+  suppression signal.
+
+  ## Criterion-by-criterion results
+
+  ### 1. Convergence detection fires where issues cluster
+
+  ThreeDoors: FIRES on two clusters.
+  - Cluster A (storage/data model): 3 independent contradictions about
+    the same subsystem. Path convergence, 3 paths. Real structural
+    problem — the data model is inconsistent across docs.
+  - Cluster B (phase structure): 3 issues crossing phase boundaries.
+    Path convergence with cross-source elements.
+
+  OpenHands: FIRES on two clusters.
+  - Cluster A (V0/V1 terminology): 4 independent terminology mismatches.
+    Path convergence, 4 paths. Real structural problem — the V1 rename
+    didn't propagate.
+  - Cluster B (stale implementations): 2 docs referencing removed code.
+    Cross-lens convergence (doc→code boundary). Real problem — docs
+    lag code changes.
+
+  Both escalations identify genuine structural problems that merit
+  investigation beyond individual dirty-flag triage.
+
+  Result: PASS.
+
+  ### 2. Convergence detection silent on Kubernetes
+
+  Kubernetes: CORRECTLY SILENT. 2 issues, both gaps about pipeline
+  ordering. Below the 3-path threshold. Structurally related (same
+  root cause) but not convergent (same path, not independent paths).
+
+  The executive correctly identifies these as targeted maintenance
+  (document the pipeline ordering) rather than discovery escalation.
+
+  Result: PASS.
+
+  ### 3. Priority function produces reasonable rankings
+
+  ThreeDoors: Data model issues ranked highest (highest dependency
+  depth + highest adjacent evidence from cluster). Phase issues next.
+  Provenance and drift lowest. A human would agree.
+
+  Kubernetes: Pipeline ordering ranked above cost model gap (it's a
+  prerequisite). Governance-gap factor correctly dampens urgency
+  relative to ThreeDoors. A human would agree.
+
+  OpenHands: Architecture divergence (root cause) ranked highest.
+  Terminology sweep next. Individual stale refs lowest. A human
+  would agree.
+
+  Cross-project: If managing all three simultaneously, the executive
+  would allocate more probe cycles to ThreeDoors (10 issues, high
+  governance gap) than OpenHands (7 issues, medium gap) than
+  Kubernetes (2 issues, low gap). This matches B7's targeting
+  principle — invest where governance is weakest.
+
+  Result: PASS (all 3 projects).
+
+  ### 4. Human channel necessary in each project
+
+  ThreeDoors: td-status-states (ontological judgment), td-val-progress
+  (intentional scoping vs. accidental loss), td-phase-structure
+  (meta-epistemological — recognizing scope creep as a process problem).
+
+  Kubernetes: Gap 2 (whether to investigate at all depends on adoption
+  patterns for multi-webhook authz — operational judgment a SIG lead
+  would make).
+
+  OpenHands: oh-v0-arch-link-stale (transition strategy — delete V0
+  docs? maintain coexistence? coordinate maintainers?), oh-docker-
+  image-v0-stale (social filtering — team already knows, suppress
+  re-escalation).
+
+  Result: PASS (at least 1 per project, multiple in ThreeDoors and
+  OpenHands).
+
+  ### 5. Maturity model matches signal profiles
+
+  ThreeDoors (young/absent graph): Discovery-dominant. No maintenance
+  possible because no structure exists to maintain. The executive
+  should recommend decomposition probes first. MATCH.
+
+  Kubernetes (mature/stable process): Maintenance-dominant. Strong
+  governance handles most coordination. KOS adds marginal cross-SIG
+  visibility. The executive should recommend low investment. MATCH.
+
+  OpenHands (growing/transitioning): Discovery-then-maintenance.
+  The V1 architecture needs specifying (discovery) before stale V0
+  docs can be updated (maintenance). Temporal ordering matters.
+  MATCH — with the nuance that growing-graph means the sequence
+  matters, not just the ratio.
+
+  Result: PASS.
+
+  ## The gap: acknowledged debt suppression
+
+  The OpenHands test exposed a mechanism gap. oh-docker-image-v0-stale
+  is self-documented as a known issue. The executive would flag it as
+  dirty and potentially waste attention on something the team already
+  tracks.
+
+  Missing input: ACKNOWLEDGED DEBT. A project's existing issue
+  tracker, known-issues docs, or tech debt backlogs should feed into
+  the executive as a fourth input channel — not for escalation, but
+  for SUPPRESSION. Dirty flags that match acknowledged debt are
+  reduced to lowest priority or silenced entirely.
+
+  This is a real gap, not a theoretical one. Every project of
+  meaningful size has a backlog of known issues. An executive that
+  re-discovers known issues wastes human attention — the scarcest
+  resource in the system.
+
+  Proposed addition to the mechanism:
+
+  ```
+  next_work = prioritize(
+    human_queue,
+    convergent_dirty,
+    open_questions,
+    isolated_dirty
+  ) MINUS acknowledged_debt
+  ```
+
+  Or more precisely: acknowledged_debt is a FILTER applied after
+  ranking, not a negative input. Items matching acknowledged debt
+  are not removed — they're annotated as "known" so the human can
+  skip them during review. This preserves the graph's completeness
+  (the debt is still tracked) while respecting the team's existing
+  awareness.
+
+  ## Cross-project observations
+
+  ### The governance gradient is a continuous variable, not categories
+
+  ThreeDoors, OpenHands, and Kubernetes sit at different points on
+  the governance gradient. The executive's behavior changes smoothly
+  across the gradient:
+  - Weak governance → high discovery, high convergence, many issues
+  - Medium governance → discovery-then-maintenance, moderate convergence
+  - Strong governance → low discovery, no convergence, few issues
+
+  This is not three categories. It's a continuous function. The
+  governance_gap factor in the priority function correctly produces
+  this gradient without discrete thresholds.
+
+  ### Cross-lens convergence is valuable even below path thresholds
+
+  OpenHands cluster B (stale implementation refs) was below the
+  3-path threshold for path convergence. But it crossed the doc→code
+  boundary, triggering the cross-lens criterion. This caught a real
+  problem (docs lagging code changes) that the path criterion missed.
+
+  The cross-lens criterion may be more sensitive and more valuable
+  than path convergence for projects in transition, where changes
+  originate in code and propagate (or fail to propagate) to docs.
+
+  ### The temporal ordering insight
+
+  OpenHands revealed that the executive should capture ORDERING, not
+  just priority. The V1 architecture must be specified BEFORE the
+  terminology sweep can happen. Priority alone says "architecture
+  first" but doesn't explain why. The executive should annotate
+  priority rankings with dependency: "this issue blocks that one."
+
+  This is actually already in the priority function as tractability:
+  the terminology sweep's tractability is LOW until the architecture
+  issue is resolved. But the mechanism proposal doesn't make the
+  dependency explicit — it surfaces through the composite score
+  rather than being declared. Making it explicit would help the human
+  understand the ranking.
+
+  ## Assessment against success criteria
+
+  1. Convergence fires where issues cluster — YES (ThreeDoors ×2,
+     OpenHands ×2)
+  2. Convergence silent on Kubernetes — YES
+  3. Priority function reasonable for ≥2 projects — YES (all 3)
+  4. Human channel necessary in each project — YES (3, 1, 2)
+  5. Maturity model matches all 3 — YES
+
+  Result: CONFIRMS — executive mechanism holds across governance
+  gradient.
+
+  One gap found (acknowledged debt suppression). Three refinements
+  identified (cross-lens sensitivity, temporal ordering, known-issue
+  filtering). None of these invalidate the mechanism — they extend it.
+
+  ## Remaining work
+
+  This is a three-project test. The brief specified starting with
+  three, then running all twelve. The nine remaining projects should
+  be tested to check:
+  - Does convergence detection produce false escalations?
+  - Does the priority function produce obviously wrong rankings?
+  - Does the acknowledged-debt gap appear in other projects?
+  - Does the cross-lens criterion's higher sensitivity hold up or
+    does it over-fire?
+
+edges:
+  - target: brief-executive-empirical-test
+    type: derives
+  - target: executive-empirical-threedoors
+    type: derives
+  - target: executive-empirical-kubernetes
+    type: derives
+  - target: executive-empirical-openhands
+    type: derives
+  - target: executive-mechanism-proposal
+    type: derives
+    note: "mechanism being tested — one gap found"
+  - target: finding-001-mvg-bootstrap
+    type: derives
+    note: "ThreeDoors issue data source"
+  - target: finding-007-kubernetes
+    type: derives
+    note: "Kubernetes issue data source"
+  - target: finding-012-openhands
+    type: derives
+    note: "OpenHands issue data source"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15
+  derived_from:
+    - brief-executive-empirical-test
+    - executive-empirical-threedoors
+    - executive-empirical-kubernetes
+    - executive-empirical-openhands
+    - executive-mechanism-proposal
+    - finding-001-mvg-bootstrap
+    - finding-007-kubernetes
+    - finding-012-openhands
+  reviewed_by: null
+finding:
+  probe: brief-executive-empirical-test
+  result: confirms

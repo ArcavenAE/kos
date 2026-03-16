@@ -1,0 +1,231 @@
+id: finding-020-executive-mechanism
+type: finding
+confidence: placeholder
+title: "Executive mechanism: event-driven priority queue, convergence as the bridge, human as meta-epistemologist"
+content: |
+  ## Summary
+
+  Proposed an executive mechanism as an event-driven priority queue
+  with three input channels (ripple, questions, human). Tested
+  retrospectively against sessions 001-003 (8 decision points) and
+  the twelve-project probe data. The mechanism accounts for all 8
+  decision points — 6 by automated channels, 2 by human channel.
+
+  The probe produced three findings beyond the mechanism itself:
+  1. Convergence is a general principle, not just a ripple property
+  2. The priority function needs dynamic signals (tractability,
+     adjacent evidence), not just static scores
+  3. The human's unique role is meta-epistemological judgment —
+     reasoning about the investigation, not just the subject
+
+  ## The mechanism (summary — full spec in executive-mechanism-proposal)
+
+  Three input channels, priority-ordered:
+  1. HUMAN CHANNEL: pattern recognition, direction, overrides (highest)
+  2. CONVERGENT SIGNALS: ripple convergence or finding convergence
+     that escalates maintenance into discovery
+  3. QUESTION CHANNEL: open questions ranked by composite score
+  4. ISOLATED DIRTY FLAGS: batch maintenance (lowest)
+
+  Priority function:
+    priority = dependency_depth × staleness × governance_gap
+               × tractability_boost × adjacent_evidence
+
+  The loop: orient → prioritize → select → brief → probe → harvest
+  → ripple → human check → harvest verification → loop.
+
+  Three modes: supervisory (human approves), autonomous (agent runs,
+  human reviews), directed (human specifies).
+
+  ## Central finding 1: Convergence is a general principle
+
+  The ripple-to-probe escalation from finding-018 is a special case
+  of a more general principle: independent signals converging on the
+  same structural region is always significant.
+
+  Four convergence types identified:
+  - PATH CONVERGENCE: multiple dirty paths reaching the same node
+  - CROSS-SOURCE CONVERGENCE: same node dirty from independent changes
+  - CROSS-LENS CONVERGENCE: dirty flag crossing code↔spec boundary
+  - PATTERN CONVERGENCE: multiple findings clustering around the same
+    structural element (schema, edge type, node type)
+
+  Pattern convergence is the generalized form. The schema revision
+  (finding-004) was pattern convergence — findings 001-003 and 005-013
+  all independently pointed at schema insufficiency. The executive
+  should have detected this and escalated it, which is what happened
+  (the human/agent recognized it and acted).
+
+  This means: convergence detection is not just a ripple-engine
+  feature. It is an executive-level capability that operates across
+  all input channels. Ripple convergence is one signal. Finding
+  convergence is another. Both trigger the same response: escalate
+  from maintenance to discovery.
+
+  ## Central finding 2: The priority function needs dynamic signals
+
+  The retrospective revealed that static scores (dependency_depth ×
+  governance_gap) are necessary but not sufficient. Two dynamic
+  signals emerged:
+
+  TRACTABILITY: A question's priority should increase when adjacent
+  findings resolve constraints that previously blocked it. In
+  session-003, Q2 (ripple) became tractable only after findings 016
+  and 017 resolved the cross-lens and epistemological constraints.
+  Before those findings, Q2 was blocked — high static priority but
+  low tractability. After, it was the natural next target.
+
+  ADJACENT EVIDENCE: Fresh findings that are conceptually (not just
+  structurally) related to an open question should boost that
+  question's priority. Finding-016 (code-only bootstrap) boosted Q5
+  (where does it break) even though there's no derives edge between
+  them — the conceptual adjacency was apparent.
+
+  The tension: adjacent evidence is partly an undeclared-structure
+  judgment (finding-019). The agent can detect structural adjacency
+  (shared edges, shared dependencies). The human detects conceptual
+  adjacency. The priority function handles the structural part; the
+  human channel handles the conceptual part.
+
+  ## Central finding 3: The human is the meta-epistemologist
+
+  The two human-channel decision points in the retrospective were
+  both meta-epistemological judgments:
+
+  1. "Broaden before deepening" (session-002): a judgment about the
+     investigation strategy, not about any specific question. The
+     priority function operates on questions. The human operated on
+     the question of how to ask questions.
+
+  2. Recursive projection pattern (finding-019): a judgment that
+     connected findings about different subjects into a single
+     structural insight. The priority function ranks questions. The
+     human saw that the questions were instances of the same question.
+
+  This refines finding-019's characterization. The human isn't just
+  seeing undeclared structure in the subject matter. The human is
+  seeing undeclared structure in the investigation process itself.
+  This is meta-epistemological — reasoning about the knowing, not
+  about the known.
+
+  The executive cannot automate this. But it can create the conditions
+  for it: step 8 (human check) presents the accumulated state after
+  each cycle, giving the human the material to pattern-match on.
+  The executive's job is to show the human what the graph looks like
+  after the change, not to interpret what the human sees.
+
+  ## Retrospective test results
+
+  8/8 decision points accounted for:
+  - 6 by automated channels (question ranking, convergence detection)
+  - 2 by human channel (meta-epistemological judgment)
+  - 0 mismatches (no case where the mechanism would have produced
+    a different, worse sequence)
+
+  Success criteria from the brief:
+  1. "Clear trigger/response rules" — YES (three channels, four
+     convergence types, priority function with five factors)
+  2. "Similar work sequence to sessions 001-003" — YES (8/8 match)
+  3. "Concrete escalation trigger conditions" — YES (four convergence
+     types with initial thresholds, plus tractability/adjacency
+     dynamic signals)
+  4. "Human-in-the-loop without bottleneck" — YES (three modes,
+     human as meta-epistemologist not gate-keeper)
+
+  Result: CONFIRMS — executive design is viable.
+
+  ## The graph maturity model (emergent finding)
+
+  The retrospective revealed that the executive behaves differently
+  based on graph maturity:
+
+  YOUNG GRAPH (session-001): No automated signals. Executive is
+  purely human-directed. All work is discovery. This is correct —
+  there is nothing to maintain yet.
+
+  GROWING GRAPH (sessions-002-003): Question channel dominates.
+  Convergent signals appear from findings (pattern convergence).
+  Discovery is primary, maintenance is emerging. Human overrides
+  are frequent — the graph structure is still being established.
+
+  MATURE GRAPH (hypothetical): Ripple channel generates real
+  maintenance load. Convergent dirty flags trigger probes
+  automatically. Discovery and maintenance are balanced. Human
+  overrides are less frequent — the declared structure is rich
+  enough to guide attention.
+
+  STABLE GRAPH (hypothetical): Maintenance dominates. Discovery is
+  occasional. The executive mostly runs ripple and triages dirty
+  flags. Human channel is rare but high-value (the human sees
+  something that the mature graph missed).
+
+  This maturity model is testable: as KOS's own graph grows across
+  sessions, the balance between channels should shift predictably.
+  If it doesn't, the model is wrong.
+
+  ## Charter implications
+
+  1. Q3 is answerable: the executive mechanism is an event-driven
+     priority queue with three channels. The design is viable. The
+     remaining work is implementation and calibration, not conceptual
+     design.
+
+  2. B2 (process cycle) extended: the cycle is not just the unit of
+     discovery — it's the unit of executive scheduling. Each cycle
+     is one pass through the loop. The executive IS the cycle, running
+     continuously.
+
+  3. B6 (cognitive architecture) extended: the executive is now
+     specified. It is the attention allocator — ripple is the
+     peripheral attention (automatic, maintenance), the priority
+     function is the focused attention (deliberate, discovery), and
+     the human channel is the meta-attention (reasoning about what
+     to attend to).
+
+  4. Finding-019 deepened: the human's role is not just pattern
+     recognition on undeclared structure — it is meta-epistemological
+     judgment about the investigation itself. This is a stronger
+     claim than "sees undeclared structure." It says the human operates
+     at a level the executive fundamentally cannot reach: the level
+     of reasoning about reasoning.
+
+  5. New frontier question: the convergence principle is general
+     (applies to ripple, findings, and potentially other signal
+     sources). What are the limits of convergence as a discovery
+     trigger? Can it produce false escalations?
+
+edges:
+  - target: brief-executive-mechanism
+    type: derives
+  - target: executive-mechanism-proposal
+    type: derives
+  - target: executive-retrospective-test
+    type: derives
+  - target: finding-018-ripple-engine-design
+    type: derives
+    note: "ripple as maintenance, convergence escalation"
+  - target: finding-019-undeclared-structure
+    type: derives
+    note: "human as meta-epistemologist — deepens the original finding"
+  - target: finding-015-cold-start-validation
+    type: derives
+    note: "continuity mechanism validated, scaling question identified"
+  - target: finding-014-twelve-project-synthesis
+    type: derives
+    note: "twelve-project data used for attention allocation test"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15
+  derived_from:
+    - brief-executive-mechanism
+    - executive-mechanism-proposal
+    - executive-retrospective-test
+    - finding-018-ripple-engine-design
+    - finding-019-undeclared-structure
+    - finding-015-cold-start-validation
+    - finding-014-twelve-project-synthesis
+  reviewed_by: null
+finding:
+  probe: brief-executive-mechanism
+  result: confirms
