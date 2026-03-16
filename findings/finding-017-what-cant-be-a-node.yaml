@@ -1,0 +1,154 @@
+id: finding-017-what-cant-be-a-node
+type: finding
+confidence: frontier
+title: "What can't be a node: two genuine limits, one pervasive flattening"
+content: |
+  ## Summary
+
+  Tested five hypothesized categories of knowledge that resist node
+  decomposition. Used real decisions from KOS (sessions 001-003) and
+  axiathon. Found two genuine structural limits and one pervasive
+  flattening problem that runs through three of the five categories.
+
+  ## Results by category
+
+  | Category              | Can be a node? | What's lost?              | Severity |
+  |-----------------------|----------------|---------------------------|----------|
+  | Axiom provenance      | YES            | Origin outside graph      | LOW      |
+  | Meta-process patterns | INSTANCES yes  | Capacity/pattern          | MEDIUM   |
+  | Negative space        | NO             | Structurally impossible   | HIGH*    |
+  | Reasoner constraints  | YES            | Epistemological character | MEDIUM   |
+  | Political/temporal    | YES            | Epistemological character | LOW-MED  |
+
+  *HIGH for completeness claims, LOW for practical use.
+
+  ## Genuine structural limit 1: NEGATIVE SPACE
+
+  The graph has graveyard (tried, rejected) and absence (not in graph).
+  It has no representation for "never considered." The absence of a
+  node is not a node. The graph cannot represent its own boundaries.
+
+  This is not "hard to express" — it is logically impossible without a
+  meta-artifact. The graph can say "we decided against X" (graveyard)
+  but cannot say "we never thought of X." When someone asks "did you
+  consider approach Y?", the graph's silence is ambiguous: either the
+  entry was lost, or Y was never in scope. The graph can't distinguish
+  its own gaps from its own decisions.
+
+  Possible mitigation: a "scope" node type that declares what the graph
+  COVERS. Everything outside declared scope is acknowledged negative
+  space. This moves the boundary from invisible to declared but doesn't
+  eliminate the problem — the scope declaration itself has a boundary.
+
+  ## Genuine structural limit 2: META-PROCESS PATTERNS
+
+  The graph can record instances: "human corrected finding-016."
+  It cannot structurally capture the pattern: "human consistently
+  identifies implications agent misses." Patterns about the graph-
+  building process have no natural edges — nothing derives from them,
+  nothing implements them, they don't contradict anything in the domain.
+  They're knowledge ABOUT HOW THE KNOWING HAPPENS, not knowledge about
+  the designed system.
+
+  The graph models what is known. Meta-process knowledge is about how
+  the knowing works. These are different layers. The current schema
+  doesn't distinguish object-level from meta-level nodes, so meta-
+  process observations float without structural role.
+
+  This matters because B6 (cognitive architecture) claims the system
+  is "metabolically complementary to LLM inference." If the graph
+  can't structurally represent how the human-agent collaboration
+  functions, it can't evaluate whether B6's claim is true.
+
+  ## Pervasive flattening: EPISTEMOLOGICAL CHARACTER OF EDGES
+
+  Three categories (axioms, reasoner constraints, political decisions)
+  share the same underlying problem. They CAN be nodes. The content
+  is expressible. What's lost is in the EDGES.
+
+  A derives edge means different things depending on what's on each end:
+  - finding → conclusion: "supported by evidence"
+  - axiom → design: "motivated by conviction"
+  - authority → decision: "directed by organizational power"
+  - capability → recommendation: "constrained by reasoner's limits"
+
+  These are epistemologically different relationships. The graph collapses
+  them all into "derives." The type system partially compensates — a
+  node of type: value is distinguishable from type: finding. But edges
+  don't carry the distinction forward. During graph traversal, you see
+  topology but lose epistemology.
+
+  This is not a fatal flaw. It's a known lossy compression. But it
+  means the graph can show you THAT two things are connected, not
+  WHY they're connected in the philosophical sense. Signal classification
+  (error/evolution/drift) on edges was a step toward richer edges.
+  Epistemological classification (evidential/axiomatic/authoritative/
+  constrained) would be the next step — if the additional complexity
+  is worth the signal.
+
+  ## Assessment against success criteria
+
+  1. "At least 3 real decisions tested" — YES (5 tested: axiom origin,
+     finding correction, graph scope, agent recommendation, BMAD adoption)
+  2. "At least 1 class genuinely resists" — YES (negative space is
+     structurally impossible; meta-process patterns structurally resist)
+  3. "Resistance characterized precisely" — YES:
+     - Negative space: graph can't represent its own boundaries (scope)
+     - Meta-process: graph can't distinguish object-level from meta-level
+     - Edge flattening: topology preserved, epistemology lost
+
+  Result: CONFIRMS. The graph has describable blind spots.
+
+  ## Charter implications
+
+  1. B1 (spec graph model) needs annotation: the graph has known limits.
+     Negative space and meta-process are outside its representational
+     scope. This is not a bug — all models have limits — but it should
+     be declared rather than discovered by future users.
+
+  2. B6 (cognitive architecture) is partially undermined. If meta-process
+     patterns can't be nodes, the graph can't evaluate its own cognitive
+     architecture claims. The "proprioception" metaphor (correspondence
+     layer = the system's sense of its own body) stops at the boundary
+     where the system would need to sense its own sensing.
+
+  3. The edge type system may need epistemological classification if
+     the flattening problem causes real confusion under use. This is
+     a schema concern but not yet actionable — no case has been found
+     where flattening caused a wrong decision, only where it lost
+     information. Watch for a case where it matters.
+
+edges:
+  - target: brief-what-cant-be-a-node
+    type: derives
+  - target: test-01-axiom-provenance
+    type: derives
+  - target: test-02-meta-process
+    type: derives
+  - target: test-03-negative-space
+    type: derives
+  - target: test-04-reasoner-constraints
+    type: derives
+  - target: test-05-political-temporal
+    type: derives
+  - target: val-spec-is-product
+    type: derives
+    note: "tested as axiom decomposition case"
+  - target: finding-016-code-only-bootstrap
+    type: derives
+    note: "the correction event tested as meta-process case"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - brief-what-cant-be-a-node
+    - test-01-axiom-provenance
+    - test-02-meta-process
+    - test-03-negative-space
+    - test-04-reasoner-constraints
+    - test-05-political-temporal
+  reviewed_by: null
+finding:
+  probe: brief-what-cant-be-a-node
+  result: confirms
