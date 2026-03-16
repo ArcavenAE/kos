@@ -61,6 +61,14 @@ classification but may conflate epistemic state with temporal state (e.g.,
 question-temporal-state. The node model itself was validated across three
 project decompositions (43 nodes) with no missing fields or insufficient types.
 
+*Session-003 note:* Known representational limits identified (finding-017):
+(1) Negative space — the graph cannot represent what was never considered;
+the absence of a node is not a node. (2) Meta-process patterns — the graph
+holds instances of process events but not patterns about how the graph-building
+process works. (3) Edges flatten epistemological character — "derives from
+evidence" and "derives from conviction" use the same edge type. These are
+declared limits, not bugs. All models have boundaries; these are KOS's.
+
 **B2: The Process Cycle**
 A single fractal cycle scales from solo to multi-team without changing shape:
 Orient → Question → Probe → Harvest → Promote. Probes are timeboxed. Dead ends
@@ -261,12 +269,17 @@ expensive late-stage discovery of wrong assumptions.
    unimplemented features. The two are complementary, not substitutes.
    Remaining gap: automated extraction (structural pattern matching showed
    promise, embedding untested). See finding-016.
-5. Where does this break — what class of problems does the graph model fail
-   on that documents handle naturally? *Session-002 data point:* penny-orc
-   showed a case the graph handles awkwardly — a project whose analysis
-   contradicts its own practice. The graph can show it but doesn't make it
-   automatic. Intent-execution gaps may be a class of problem that requires
-   judgment, not structure.
+5. ~~Where does this break — what class of problems does the graph model fail
+   on that documents handle naturally?~~ **Partially answered (session-003).**
+   Narrow probe: "what can't be a node?" (finding-017). Two structural limits
+   found: negative space (can't represent what was never considered) and
+   meta-process patterns (can't capture patterns about the knowing process).
+   One pervasive flattening: edges lose epistemological character. Remaining
+   angles untested: signal-to-noise ratio (do the issues the graph finds
+   matter?) and redundancy (is there a project type where code and docs
+   produce the same signal?). *Session-002 data point:* penny-orc showed
+   intent-execution gaps require judgment, not structure — consistent with
+   the edge-flattening finding.
 6. ~~What relationship types beyond depends_on does the schema need?~~
    **Answered (session-002).** Four typed edges: derives, implements,
    contradicts, supersedes. Added in schema v0.2. See finding-004.
@@ -311,8 +324,9 @@ Here is where we are."
 
 *Document status: CURRENT*
 *Established: session-001, updated session-003*
-*Next action: Q5 (where does this break) is the next probe. Q4 answered
-(partial — code and docs are complementary lenses). Cold-start validated
-(finding-015). Remaining open questions: Q2 (ripple noise), Q3 (executive
-mechanism), Q5 (failure modes). Charter priority encoding under observation
-(question-charter-priority-encoding).*
+*Next action: Q4 and Q5 both partially answered in session-003. Cold-start
+validated (finding-015). The graph's representational limits are now declared
+(finding-017). Remaining open questions: Q2 (ripple noise — sharpened by
+cross-lens signal profiles), Q3 (executive mechanism), and the untested
+angles of Q5 (signal-to-noise, redundancy). Charter priority encoding under
+observation (question-charter-priority-encoding).*
