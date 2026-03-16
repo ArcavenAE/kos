@@ -263,6 +263,16 @@ because: creates coordination artifacts that serve project managers, not
 engineering comprehension. Produces false confidence in early stages and
 expensive late-stage discovery of wrong assumptions.
 
+**G5: Git as sufficient long-term substrate**
+Using git repos as the primary KOS substrate at scale. Ruled out because:
+git repos are lossy projections of the knowledge topology — the same
+recursive pattern as documents being lossy projections of the spec graph.
+The file presentation layer, single-repo boundaries, and human-paced
+workflows will become limiting. The required properties (content-addressing,
+immutability, cryptographic integrity, distributed sync) are substrate-
+agnostic. Git remains valid at current scale. See grv-git-as-sufficient-
+substrate for full rationale and reopener.
+
 ---
 
 ## Open Questions
@@ -355,10 +365,12 @@ Here is where we are."
 
 *Document status: CURRENT*
 *Established: session-001, updated session-003*
-*Next action: Session-003 answered or partially answered Q2, Q4, Q5. Q2 answered:
-ripple is maintenance not discovery (finding-018). Q4 partial: complementary
-lenses (finding-016). Q5 partial: two structural limits, one flattening
-(finding-017). Cold-start validated (finding-015). Remaining: Q3 (executive
-mechanism — now sharpened as coordinator between probes and ripple), untested
-Q5 angles (signal-to-noise, redundancy). Charter priority encoding under
-observation (question-charter-priority-encoding).*
+*Next action: Session-003 produced five findings (015-019), answered Q2,
+partially answered Q4 and Q5, graveyarded git-as-sufficient-substrate, and
+revised B3, B4, B5, B6. The session's most significant result: finding-019
+(the graph captures declared structure, not the structure of ideas — the
+human's role is permanently the pattern recognizer on undeclared structure).
+Remaining open: Q3 (executive mechanism — now sharpened as coordinator
+between probes/discovery and ripple/maintenance), untested Q5 angles
+(signal-to-noise, redundancy). Charter priority encoding under observation
+(question-charter-priority-encoding).*
