@@ -129,22 +129,35 @@ abandonment (missing graveyard entries). See findings 001-013.
 code is also a lossy projection — missed 9 of 11 doc-based issues. The shadow
 principle is symmetric: documents and code are both shadows of the graph.
 
-**B7: The Process Quality Gradient**
-KOS adds the most value where existing documentation governance is weakest.
-Projects with disciplined RFC/KEP/PEP processes (Kubernetes, Go, Python)
-already handle most seams through explicit supersession and review. The graph
-finds residual cross-feature gaps but the yield is lower. Projects with loose
-governance (solo BMAD, ad-hoc docs) have the most to gain — hard contradictions,
-phase boundary erosion, and orphaned concepts are common and undetected. This
-is not a limitation — it is a targeting principle. KOS should be applied where
-existing processes leave the most signal undetected, not where processes are
-already strong.
+**B7: The Review Gap Gradient**
+KOS adds the most value where cross-document consistency review is absent.
+The strongest predictor of signal yield is not governance quality or artifact
+visibility — it is whether anyone checks whether the documents agree *with
+each other*. Projects with disciplined RFC/KEP/PEP processes (Kubernetes, Go,
+Python) have implicit cross-document review through community feedback and
+explicit supersession. Projects with no review process (solo projects, ad-hoc
+docs) have the highest signal yield. This is the targeting principle: KOS
+should be applied where cross-document consistency checking doesn't exist.
 
-*Evidence:* Kubernetes KEPs produced 2 issues (both minor gaps). ThreeDoors
-produced 10 issues including hard contradictions. Axiathon's documents passed
-their own validation ("ALL GAPS RESOLVED") while containing 6 contradictions
-and systematic phase boundary erosion. The gradient is consistent across the
-twelve-project sample. See findings 001-013.
+*Session-002 evidence:* Kubernetes KEPs produced 2 issues (both minor gaps).
+ThreeDoors produced 10 issues including hard contradictions. Axiathon's
+documents passed their own validation ("ALL GAPS RESOLVED") while containing
+6 contradictions — the self-validation checked coverage, not consistency.
+The gradient is consistent across the twelve-project sample. See findings
+001-013.
+
+*Session-004 revision:* "Governance gap" renamed to "review gap" after
+twelve-project executive mechanism test (finding-022). The original framing
+suggested the predictor was governance quality. It is not — Kubernetes has
+excellent governance but low signal because its repo contains polished
+records, not the working process. The actual predictor is cross-document
+consistency review: does anyone ask "do these documents agree?" Internal
+review (axiathon's self-validation) is insufficient. The review must be
+cross-document. Note: some repos (Kubernetes, Rust RFCs, Go Proposals)
+are meta-projects — the repo contains decisions, not the deliberation
+that produced them. Much of the thinking happens in meetings, mailing
+lists, and Slack channels that the repo never sees. Low signal yield in
+these cases reflects low visibility, not high quality.
 
 **B6: The Cognitive Architecture**
 The system is metabolically complementary to LLM inference:
@@ -171,6 +184,18 @@ relationships that exist between nodes but haven't been typed and declared.
 Agents execute within declared structure. The human expands the declared
 structure by seeing what it doesn't yet contain.
 
+*Session-004 revision (finding-022):* The executive is now specified as an
+event-driven priority queue with three input channels: (1) ripple channel
+(automatic dirty-flag propagation after harvest), (2) question channel
+(open questions ranked by dependency depth × staleness × review gap ×
+tractability × adjacent evidence), (3) human channel (highest authority —
+meta-epistemological judgment about the investigation itself, not just
+the subject). The human channel is not a gate — it is the input that
+reasons about the reasoning. "Broaden before deepening" and the recursive
+projection pattern are both meta-epistemological: judgments about how to
+investigate, not what to investigate. The priority function cannot reach
+this level. See finding-022.
+
 ---
 
 ## Frontier
@@ -182,9 +207,22 @@ Documents are a projection of the graph. How many dimensions are lost in the
 projection is not established. The point is systematic lossiness, not the count.
 
 **F2: The executive mechanism**
-The executive loop is described functionally but not architecturally implemented.
-What runs it, how it allocates attention, how it maintains coherence of purpose
-across time — open.
+The executive loop is now designed but not implemented. It is an event-driven
+priority queue with three input channels (ripple, questions, human), convergence
+detection across four types (path, cross-source, cross-lens, pattern), and
+three work types (discovery, maintenance, synthesis). Validated against twelve
+projects (finding-022). Remaining open: implementation, threshold calibration,
+and the parallel-vs-sequential document distinction.
+
+*Session-004 update:* Designed and tested across full twelve-project sample.
+The mechanism holds — convergence detection fired correctly on 8/12 projects
+(0 false positives, 0 false negatives), priority function produced reasonable
+rankings for 12/12, maturity model matched 12/12. Three work types identified:
+discovery (new structure), maintenance (propagate staleness), synthesis
+(consolidate sequential documents that have drifted apart). The priority
+function uses review_gap (cross-document consistency checking) not governance
+quality or visibility — see B7 revision. See findings 020 (placeholder),
+021, 022.
 
 **F3: Agent type signatures and contracts**
 Described in principle. Not specified: the schema for agent declarations,
@@ -296,11 +334,19 @@ substrate for full rationale and reopener.
    axiathon issues detectable conditional on decomposition quality. Key insight:
    ripple effectiveness is bounded by probe decomposition quality. See
    finding-018.
-3. What does the executive loop look like as software — scheduler, event
-   system, agent orchestration? *Session-003 sharpening:* The executive loop
-   must coordinate probes (discovery) and ripple (maintenance). The bridge:
-   convergent dirty flags from ripple trigger new probes. This is the most
-   important open design question.
+3. ~~What does the executive loop look like as software — scheduler, event
+   system, agent orchestration?~~ **Partially answered (session-004).**
+   The executive is an event-driven priority queue with three input channels
+   (ripple, questions, human) and convergence detection that bridges
+   maintenance to discovery. Tested against all twelve projects from the
+   session-002 sample (findings 020-022). The mechanism holds across the
+   full governance gradient. Three work types: discovery, maintenance,
+   synthesis (new — consolidating drifted sequential documents). Key
+   revision: "governance gap" is actually "review gap" — the predictor
+   of signal yield is cross-document consistency review, not governance
+   quality. Remaining open: implementation as software, threshold
+   calibration, and whether convergence detection produces false
+   escalations at scale (tested only on probe data, not live graphs).
 4. ~~Can the graph bootstrap from a codebase with no existing spec, using only
    code structure and git history?~~ **Partially answered (session-003).**
    Yes — code-only bootstrap produces valid nodes and real signal, but a
@@ -364,13 +410,22 @@ Here is where we are."
 ---
 
 *Document status: CURRENT*
-*Established: session-001, updated session-003*
-*Next action: Session-003 produced five findings (015-019), answered Q2,
-partially answered Q4 and Q5, graveyarded git-as-sufficient-substrate, and
-revised B3, B4, B5, B6. The session's most significant result: finding-019
-(the graph captures declared structure, not the structure of ideas — the
-human's role is permanently the pattern recognizer on undeclared structure).
-Remaining open: Q3 (executive mechanism — now sharpened as coordinator
-between probes/discovery and ripple/maintenance), untested Q5 angles
-(signal-to-noise, redundancy). Charter priority encoding under observation
-(question-charter-priority-encoding).*
+*Established: session-001, updated session-004*
+*Next action: Session-004 produced three findings (020-022), partially
+answered Q3 (executive mechanism). The executive is designed and validated
+against all twelve projects. B7 revised from "governance gap" to "review
+gap" — the predictor is cross-document consistency review, not governance
+quality. B6 extended with executive specification. Three work types
+identified (discovery, maintenance, synthesis). The session's most
+significant results: (1) convergence is a general principle operating
+across ripple, findings, and document types — not just a ripple property;
+(2) the human's role refined from "pattern recognizer on undeclared
+structure" to "meta-epistemologist" — reasoning about the investigation,
+not just the subject; (3) repos of mature projects (Kubernetes, Rust,
+Go, Python) are meta-projects whose repos contain decisions, not
+deliberation — the thinking happens outside the repo.
+Remaining open: Q3 implementation, untested Q5 angles (signal-to-noise,
+redundancy), threshold calibration for convergence detection, the
+parallel-vs-sequential document distinction needs schema-level support.
+Charter priority encoding under observation (question-charter-priority-
+encoding).*
