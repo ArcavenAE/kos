@@ -1,0 +1,86 @@
+id: brief-what-cant-be-a-node
+type: brief
+confidence: frontier
+title: "Q5 probe (narrow): What can't be a node?"
+content: |
+  Open question 5 (narrowed): Where does the graph model fail? Specifically,
+  what kinds of knowledge drive real decisions but resist decomposition into
+  typed nodes with edges?
+
+  A node has: id, type, confidence, content, edges, provenance. Everything
+  in the graph must fit this structure. The question is: what important
+  things DON'T fit, and what happens when you force them?
+
+  ## Approach
+
+  Two test subjects, chosen for different reasons:
+
+  1. KOS itself (sessions 001-003). This project has been making decisions
+     for three sessions. We have full provenance. We can ask: what drove
+     each decision, and can the driver be expressed as a node? Use git
+     history, findings, charter revisions, and the conversation record
+     (the commits are the trace).
+
+  2. Axiathon decision archaeology. We've already decomposed axiathon
+     twice (docs, code). Now decompose the DECISIONS — not what was
+     decided, but WHY. For each major architectural choice visible in
+     the code or docs, attempt to express the reasoning as a node.
+     Where does the reasoning resist?
+
+  ## Categories to test
+
+  Hypothesized classes of knowledge that may resist node decomposition:
+
+  a. TACIT EXPERTISE: "We chose X because the team knows X" — the
+     knowledge that makes a choice load-bearing lives in heads, not docs
+  b. POLITICAL/ORGANIZATIONAL: "We deprioritized Y because the client
+     demo is next week" — temporal pressure, authority, stakeholder dynamics
+  c. AESTHETIC/JUDGMENT: "This feels over-engineered" — pattern recognition
+     that resists decomposition into claims
+  d. META-PROCESS: "The human corrected the agent's interpretation" —
+     the act of improving the graph is itself knowledge not in the graph
+  e. NEGATIVE SPACE: "We didn't consider Z" — absence of exploration,
+     which is different from graveyard (tried and rejected)
+
+  The probe succeeds if it finds at least one class that genuinely
+  can't be a node (not just "hard to express" but "loses essential
+  character when forced into the structure").
+
+depends_on:
+  - question-where-does-this-break
+edges:
+  - target: finding-016-code-only-bootstrap
+    type: derives
+    note: "Q4 result sharpened what Q5 should test"
+  - target: finding-003-axiathon
+    type: derives
+    note: "decision archaeology on already-probed project"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+brief:
+  hypothesis: |
+    At least two of the five hypothesized categories (tacit, political,
+    aesthetic, meta-process, negative space) will resist node decomposition
+    in a way that is NOT solved by "just add more content to the node."
+    The failure will be structural — the node schema flattens something
+    that matters. The graph will have a describable blind spot.
+  excluded_scope: |
+    - Broad failure mode analysis (only testing "what can't be a node")
+    - Signal-to-noise ratio question (angle 2 — separate probe)
+    - Redundancy question (angle 1 — separate probe)
+    - Tooling or automation
+  success_signal: |
+    1. At least 3 real decisions from KOS or axiathon are tested for
+       node-decomposability
+    2. At least 1 class of knowledge is identified that genuinely resists
+       (not just "is hard")
+    3. The resistance is characterized precisely enough to know whether
+       it's a schema limitation, a fundamental limit of typed graphs, or
+       a scope boundary (things the graph shouldn't try to capture)
+
+    If all three: confirms (the graph has a describable blind spot).
+    If decisions decompose cleanly: redirects (the hypothesis was wrong,
+    everything CAN be a node, or we tested the wrong decisions).
+  timebox: "Session-003, second probe cycle"
