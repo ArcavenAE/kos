@@ -1,0 +1,69 @@
+id: project-lineup
+type: element
+confidence: frontier
+title: "KOS test project lineup — 20 projects across governance gradient"
+content: |
+  ## Active projects (15)
+
+  1.  ThreeDoors — Solo, BMAD-generated docs. Control subject (owner knows it well).
+  2.  penny-orc — Solo, research + PRDs. Model divergence between critique and practice.
+  3.  project-alpha — Solo, AI-generated docs. Self-validation passed with 6 contradictions.
+  4.  Backstage — Spotify/CNCF, large OSS. ADR/BEP process, docs in isolation.
+  11. OpenHands — Mid-size OSS, V0→V1 architectural transition.
+  12. AutoGen — Microsoft, mid-size OSS, V0.2→V0.4 transition.
+  13. Claude Code — Anthropic, closed-source CLI. Young (~1yr), reasoning internal.
+      Process probe, not architecture probe.
+  14. GitLab (issues-as-spec) — Massive self-hosted, 75k+ open issues. Issues board
+      IS the spec. Hierarchical epics→issues→MRs, structured labels, formal DoD.
+      Tests whether the graph works on non-document specifications.
+  15. LangGraph — LangChain Inc, mid-size. Design rationale lives in blog posts,
+      not the repo. Concept definitions (State, Node, Edge, Checkpoint) appear in
+      4+ document types.
+  16. GitHub SpecKit — GitHub's SDD toolkit. Meta: an SDD tool's own spec artifacts
+      (constitution.md → spec.md → plan.md → tasks.md).
+  17. CloudPosse Atmos — IaC tooling, 75+ contributors. Has ADRs, schema-driven
+      config. Closest to formal SDD in the sample.
+  18. OpenClaw — Local-first AI assistant platform. 19k commits, 316k stars, 28+
+      doc directories, i18n layer (translation divergence as consistency surface).
+  19. SuperClaude Framework — Meta-prompting layer for Claude Code. 30+ commands,
+      16 agents, 7 modes. Moderate activity. Command/agent definition consistency.
+  20. GSD (Get Shit Done) — Context engineering framework. 1k+ commits, 30k stars.
+      Spec-driven, generates living docs (PROJECT.md → REQUIREMENTS.md → PLAN.md).
+      Thematically adjacent to KOS.
+
+  ## Stable projects (5) — doc-as-product, available if needed
+
+  5.  Crossplane — CNCF, silent abandonment pattern.
+  6.  Kubernetes KEPs — Large multi-team, meta-project. Repo is record, not work.
+  7.  Rust RFCs — Large community, sequential docs. Lost records pattern.
+  8.  Go Proposals — Go team, sequential docs. Cross-feature gap pattern.
+  9.  Python PEPs — Python community, sequential docs. Managed evolution.
+  10. BMAD enterprise — ~3 person passion project, AI-generated. Count drift.
+
+  ## Selection principles
+
+  - ThreeDoors is the permanent control (owner knows it deeply)
+  - Rotate the other active projects between probes
+  - Don't start every probe with the same sample
+  - Stable projects are available for targeted questions but not default picks
+  - New projects can be added as the investigation warrants
+
+  ## Lineup rationale (session-004)
+
+  The original 12 (session-002) were biased toward doc-as-product projects.
+  Session-004 additions bring in:
+  - Closed-source with internal reasoning (Claude Code)
+  - Non-document specification source (GitLab issues)
+  - Design-in-blogs pattern (LangGraph)
+  - SDD-adjacent projects (SpecKit, Atmos, GSD)
+  - Massive mature OSS with i18n (OpenClaw)
+  - Meta-prompting/agent tooling (SuperClaude)
+
+edges:
+  - target: finding-022-executive-twelve-project-synthesis
+    type: derives
+    note: "lineup expanded based on twelve-project synthesis findings"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-16
