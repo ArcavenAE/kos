@@ -357,16 +357,25 @@ substrate for full rationale and reopener.
    Remaining gap: automated extraction (structural pattern matching showed
    promise, embedding untested). See finding-016.
 5. ~~Where does this break — what class of problems does the graph model fail
-   on that documents handle naturally?~~ **Partially answered (session-003).**
+   on that documents handle naturally?~~ **Partially answered (sessions 003-004).**
    Narrow probe: "what can't be a node?" (finding-017). Two structural limits
    found: negative space (can't represent what was never considered) and
    meta-process patterns (can't capture patterns about the knowing process).
-   One pervasive flattening: edges lose epistemological character. Remaining
-   angles untested: signal-to-noise ratio (do the issues the graph finds
-   matter?) and redundancy (is there a project type where code and docs
-   produce the same signal?). *Session-002 data point:* penny-orc showed
-   intent-execution gaps require judgment, not structure — consistent with
-   the edge-flattening finding.
+   One pervasive flattening: edges lose epistemological character.
+   *Session-004 update (signal-to-noise):* Tested against four projects
+   (ThreeDoors with owner ground truth, OpenClaw, Atmos, GitLab). 31 issues,
+   45% consequential, 32% noticed/low consequence, 23% noise. The graph's
+   value is not finding MORE than humans — it's finding EARLIER. ThreeDoors
+   #6 (mood-tracking broken dependency chain) would have been caught before
+   an ineffective feature was built. OpenClaw and GitLab issues were
+   independently discovered by community through pain — the graph finds
+   them structurally before users are affected. Four new signal classes:
+   AI configuration seam (multiple AI tool configs contradicting each other),
+   analysis-vs-operations divergence, enforcement gaps, authority surface
+   fragmentation. The graph misses behavioral gaps that require running
+   the software (CLI changes, removed features, edge-case behaviors).
+   Remaining angle: redundancy (is there a project type where code and docs
+   produce the same signal?). See findings 023-026.
 6. ~~What relationship types beyond depends_on does the schema need?~~
    **Answered (session-002).** Four typed edges: derives, implements,
    contradicts, supersedes. Added in schema v0.2. See finding-004.
@@ -389,6 +398,8 @@ substrate for full rationale and reopener.
 - **Shape Up (Basecamp)** — appetite-bounded, uncertainty-first; closest process analog
 - **ADRs (Nygard)** — closest to graveyard entries; widely adopted, rarely done well
 - **GraphRAG / LlamaIndex** — graph-structured LLM retrieval; infrastructure without spec semantics
+- **GitHub SpecKit** — SDD toolkit (constitution → spec → plan → tasks); closest to KOS's
+  spec-as-product philosophy but linear pipeline, not graph-structured
 
 *The integration and the philosophy that connects them is the missing piece.*
 
@@ -424,8 +435,14 @@ structure" to "meta-epistemologist" — reasoning about the investigation,
 not just the subject; (3) repos of mature projects (Kubernetes, Rust,
 Go, Python) are meta-projects whose repos contain decisions, not
 deliberation — the thinking happens outside the repo.
-Remaining open: Q3 implementation, untested Q5 angles (signal-to-noise,
-redundancy), threshold calibration for convergence detection, the
-parallel-vs-sequential document distinction needs schema-level support.
+Session-004 also produced findings 023-026, partially answering Q5
+signal-to-noise. Tested four projects (ThreeDoors with owner ground truth,
+OpenClaw, Atmos, GitLab issues-as-spec). 31 issues, 45% consequential.
+The graph's primary value is speed — finding issues before organic
+discovery. Four new signal classes identified: AI configuration seam,
+analysis-vs-operations divergence, enforcement gaps, authority surface
+fragmentation. Project lineup expanded from 12 to 20.
+Remaining open: Q3 implementation, Q5 redundancy angle, threshold
+calibration, parallel-vs-sequential document distinction.
 Charter priority encoding under observation (question-charter-priority-
 encoding).*
