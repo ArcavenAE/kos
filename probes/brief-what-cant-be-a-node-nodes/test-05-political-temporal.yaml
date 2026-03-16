@@ -1,0 +1,79 @@
+id: test-05-political-temporal
+type: observation
+confidence: frontier
+title: "Test: can organizational/political pressures be nodes?"
+content: |
+  ## Decision tested
+
+  Project Alpha has 30 epics and 500+ story context files for 361 LOC of
+  implementation. Why? The BMAD methodology drives upfront planning
+  structure. The organizational choice to use BMAD is a political/
+  process decision, not a technical one.
+
+  Additionally: project-alpha's spike/ directory contains working code
+  using parser-A. The main crates/ use parser-B. The decision to rewrite
+  rather than migrate the spike is visible in code but the REASON
+  (architecture review, team capability, or simply "the spike was
+  a prototype, not production code") is not.
+
+  ## Attempt to decompose
+
+    id: ax-bmad-adoption
+    type: observation
+    content: "BMAD methodology adopted for project governance.
+      Drives 30-epic planning structure ahead of implementation."
+    edges:
+      - target: ax-code-repo-structure
+        type: derives
+
+    id: ax-spike-rewrite-decision
+    type: observation
+    content: "Decision to rewrite spike code using parser-B rather
+      than migrate existing parser-A-based spike to production."
+    edges:
+      - target: ax-code-parser-divergence
+        type: derives
+
+  ## What works
+
+  Both nodes are writable. The FACT of the decision decomposes fine.
+  "We adopted BMAD" and "We chose to rewrite" are claims that can be
+  nodes with edges.
+
+  ## What resists
+
+  The REASONS behind organizational decisions often involve factors
+  that are:
+  - Temporally bounded: "the client demo is next week" — true at one
+    moment, meaningless a month later. The graph has no temporal decay.
+  - Authority-based: "the CTO chose BMAD" — the reasoning is
+    "because the CTO said so," which is honest but not graph-traversable.
+  - Socially embedded: "the team knows parser-B" — a fact about humans,
+    not about the system being designed.
+
+  These reasons CAN be content in a node. But they don't produce
+  meaningful edges. "ax-spike-rewrite-decision derives from
+  team-knows-parser-B" is technically valid but the derives edge means
+  something very different here than "finding-016 derives from
+  finding-003." One is evidential derivation. The other is causal but
+  social.
+
+  ## Category: POLITICAL/ORGANIZATIONAL
+
+  This category is WEAKER than hypothesized. The decisions themselves
+  decompose. The reasons partially decompose (you can write them down).
+  What's lost is the WEIGHT and CHARACTER of the reasoning — same
+  problem as test-04 (epistemological flattening).
+
+  ## Severity
+
+  LOW to MEDIUM. Political/organizational decisions are expressible
+  as nodes. The graph just can't distinguish "derives because evidence
+  supports it" from "derives because the CTO said so." This is the
+  same fundamental issue as test-04: edges flatten epistemological
+  character.
+edges: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15

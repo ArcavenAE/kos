@@ -1,0 +1,49 @@
+id: test-01-axiom-provenance
+type: observation
+confidence: frontier
+title: "Test: can design values be nodes? — yes, but provenance is fabricated"
+content: |
+  ## Decision tested
+
+  val-spec-is-product: "The spec is the product. Code is evidence.
+  Understanding is the deliverable."
+
+  ## Attempt to decompose
+
+  The node EXISTS and is well-formed. It has id, type (value), confidence
+  (bedrock), content, and provenance (created_by: human, session: session-001).
+
+  ## What resists
+
+  The provenance says session-001, but the belief predates session-001.
+  The human brought this conviction TO the project. The graph records
+  when it was written down, not where it came from. There is no
+  derived_from — because it wasn't derived from anything in the graph.
+
+  If we try to add edges: what does val-spec-is-product derive from?
+  Possible answers:
+  - "Experience with failed SDD processes" — not a node, not in the graph
+  - "Reading Shape Up, Wardley, ADR literature" — external, not in the graph
+  - "The problem statement" — circular, the problem statement is also an axiom
+
+  The node is syntactically valid. Its provenance is honest ("human,
+  session-001") but epistemically incomplete. The graph can hold the
+  VALUE but not its ORIGIN. The derived_from field is either empty
+  (honest but disconnected) or reconstructive (connected but fictional).
+
+  ## Category: AESTHETIC/FOUNDATIONAL
+
+  Axioms resist provenance, not decomposition. They can be nodes. Their
+  edges are the problem — they're roots of the graph with no incoming
+  edges, and the reason they're roots is outside the graph's scope.
+
+  ## Severity
+
+  LOW. The graph doesn't need to explain where axioms come from. It needs
+  to record them, mark them bedrock, and propagate from them. The
+  limitation is real but not load-bearing. Axioms are inputs, not products.
+edges: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
