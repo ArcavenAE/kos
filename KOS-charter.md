@@ -76,11 +76,22 @@ go to graveyard. Bedrock requires evidence, not consensus. The cycle is the
 unit, not the sprint or the phase.
 
 **B3: The Storage Model**
-Git as substrate (content-addressed, distributed, cryptographically sound) with
-a Datomic-style immutable fact store above it. Every fact is a datom:
-(entity, attribute, value, transaction-time). History is the primary record.
-Current state is a view over it. Git never resolves semantic conflicts — it
-detects divergence and surfaces it to the layer that understands the semantics.
+A content-addressed immutable fact store with cryptographic integrity and
+distributed sync. Every fact is a datom: (entity, attribute, value,
+transaction-time). History is the primary record. Current state is a view
+over it. The substrate never resolves semantic conflicts — it detects
+divergence and surfaces it to the layer that understands the semantics.
+
+*Session-003 revision:* "Git as substrate" graveyarded as a long-term
+assumption (grv-git-as-sufficient-substrate). Git remains valid at current
+scale but its file presentation layer is a projection — the same kind of
+lossy flattening that B5 identifies in documents. The required properties
+are content-addressing, immutability, cryptographic integrity, and distributed
+sync. Git has these but also imposes single-repo boundaries, file-shaped
+content, and human-paced workflows that will become limiting. The recursive
+projection pattern: documents flatten the spec graph, git repos flatten the
+knowledge topology, the file layer flattens the content-addressed DAG.
+Each layer is a human interface that loses structure agents could use directly.
 
 **B4: The Correspondence Layer**
 Typed, versioned, bidirectional links between spec nodes and code nodes.
