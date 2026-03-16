@@ -252,14 +252,22 @@ expensive late-stage discovery of wrong assumptions.
    categories (contradictions, gaps, structural chaos). Remaining gaps: the
    schema needs edge types beyond depends_on and temporal state handling before
    the graph can fully express what it finds. See findings 001-003.
-2. How does the ripple engine surface conflicts to humans without creating
-   noise that gets ignored? *Session-003 sharpening:* If code-derived and
-   doc-derived nodes have different signal profiles (finding-016), the ripple
-   engine must propagate across lenses with different signal types, update
-   frequencies, and confidence characteristics. A code change that contradicts
-   a doc-derived node is a cross-lens ripple. How does the engine handle this?
+2. ~~How does the ripple engine surface conflicts to humans without creating
+   noise that gets ignored?~~ **Answered (session-003).** Ripple is maintenance,
+   not discovery. It propagates staleness along existing edges using dirty-flag
+   propagation with typed attenuation: contradicts edges always propagate,
+   derives edges attenuate by distance, supersedes edges stop propagation
+   (firebreak). Noise is false staleness, not false conflicts — managed by
+   distance attenuation, content hashing, and supersession. Cross-lens
+   propagation via correspondence confidence levels. Retrospective test: 10/11
+   project-alpha issues detectable conditional on decomposition quality. Key insight:
+   ripple effectiveness is bounded by probe decomposition quality. See
+   finding-018.
 3. What does the executive loop look like as software — scheduler, event
-   system, agent orchestration?
+   system, agent orchestration? *Session-003 sharpening:* The executive loop
+   must coordinate probes (discovery) and ripple (maintenance). The bridge:
+   convergent dirty flags from ripple trigger new probes. This is the most
+   important open design question.
 4. ~~Can the graph bootstrap from a codebase with no existing spec, using only
    code structure and git history?~~ **Partially answered (session-003).**
    Yes — code-only bootstrap produces valid nodes and real signal, but a
@@ -324,9 +332,10 @@ Here is where we are."
 
 *Document status: CURRENT*
 *Established: session-001, updated session-003*
-*Next action: Q4 and Q5 both partially answered in session-003. Cold-start
-validated (finding-015). The graph's representational limits are now declared
-(finding-017). Remaining open questions: Q2 (ripple noise — sharpened by
-cross-lens signal profiles), Q3 (executive mechanism), and the untested
-angles of Q5 (signal-to-noise, redundancy). Charter priority encoding under
+*Next action: Session-003 answered or partially answered Q2, Q4, Q5. Q2 answered:
+ripple is maintenance not discovery (finding-018). Q4 partial: complementary
+lenses (finding-016). Q5 partial: two structural limits, one flattening
+(finding-017). Cold-start validated (finding-015). Remaining: Q3 (executive
+mechanism — now sharpened as coordinator between probes and ripple), untested
+Q5 angles (signal-to-noise, redundancy). Charter priority encoding under
 observation (question-charter-priority-encoding).*
