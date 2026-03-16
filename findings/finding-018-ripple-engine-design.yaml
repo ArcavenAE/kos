@@ -1,0 +1,153 @@
+id: finding-018-ripple-engine-design
+type: finding
+confidence: frontier
+title: "Ripple engine design: maintenance not discovery, bounded by decomposition quality"
+content: |
+  ## Summary
+
+  Proposed a dirty-flag propagation mechanism with typed attenuation.
+  Tested retrospectively against finding-003's 11 project-alpha issues.
+  Mechanism detects 10/11 issues (conditional on graph decomposition
+  quality). False positives estimated at 2-3, within threshold.
+
+  The probe produced a more important finding than the mechanism itself:
+  ripple is maintenance, not discovery. This cleanly separates Q2 (ripple)
+  from Q3 (executive loop) and reframes the noise question.
+
+  ## The mechanism (summary — full spec in ripple-mechanism-proposal)
+
+  Four propagation rules:
+  1. contradicts edges: always propagate, DIRTY_HARD
+  2. derives edges: propagate downstream, attenuate by distance
+  3. implements edges: bidirectional, asymmetric (spec→code is hard,
+     code→spec is soft)
+  4. supersedes edges: stop propagation (firebreak)
+
+  Three dirty states: DIRTY_HARD (requires review), DIRTY_SOFT
+  (may require review, accumulates), DIRTY_STALE (batch reviewable).
+
+  Cross-lens propagation via correspondence confidence: declared (full),
+  inferred (reduced), stale (re-evaluate link only).
+
+  Source-type weighting as epistemological proxy: value changes propagate
+  deeper than finding changes, which propagate deeper than observations.
+
+  ## The central finding: ripple is maintenance, not discovery
+
+  Ripple propagates consequences of changes along EXISTING edges. It
+  does not find contradictions that haven't been encoded as edges.
+  The twelve-project probe was discovery — it created edges by reading
+  content. Ripple would have found NONE of the 11 issues before the
+  probe created the edges. After the probe, ripple maintains all of them.
+
+  This separation is clean and useful:
+  - PROBES discover signal (new edges, new contradictions)
+  - RIPPLE maintains signal (propagates staleness along known edges)
+  - EXECUTIVE LOOP coordinates both (when to probe, when to ripple)
+
+  The noise question reframes: ripple noise is false STALENESS (a node
+  is marked dirty but hasn't changed in meaning), not false CONFLICTS.
+  False staleness is manageable via content hashing, distance attenuation,
+  and supersession firebreaks.
+
+  ## Retrospective test results
+
+  Against finding-003's 11 project-alpha issues:
+  - Unconditional detection: 4/11 (contradictions with existing edges)
+  - Conditional detection: 6/11 (require proper decomposition)
+  - Correct suppression: 1/11 (supersession firebreak)
+  - False positives: 2-3 estimated
+
+  Success criteria: 8/11 detection with ≤3 FP. Met (10/11 conditional).
+
+  ## The decomposition dependency
+
+  6 of 11 detections require that contradicting claims be separate nodes
+  with typed edges. If both claims live inside one node's content, ripple
+  is blind. This means: ripple effectiveness is bounded by probe quality.
+  Better probes → finer decomposition → more edges → better ripple
+  maintenance.
+
+  The unit of improvement is not "better propagation algorithm" — it's
+  "better decomposition during probes." This connects to finding-004:
+  decomposition granularity determines graph signal strength.
+
+  ## Cross-lens propagation (finding-016 constraint)
+
+  Handled by correspondence confidence levels. Declared correspondence
+  propagates at full strength. Inferred correspondence propagates as
+  DIRTY_STALE. This means: the graph starts with weak cross-lens
+  maintenance (most correspondence is inferred early) and strengthens
+  as humans declare correspondence links. The system self-improves
+  through use.
+
+  ## Epistemological flattening (finding-017 constraint)
+
+  Partially mitigated by source-type weighting: a value node changing
+  propagates deeper than an observation node changing. This uses the
+  existing type system as an epistemological proxy without new edge
+  types. Not a complete solution — derives edges still don't carry
+  whether derivation was evidential or axiomatic — but sufficient for
+  the maintenance function. Discovery (probes) is where epistemological
+  judgment lives.
+
+  ## Assessment against success criteria
+
+  1. "Proposed mechanism with clear rules" — YES
+  2. "Would detect 8/11 project-alpha issues" — YES (10/11 conditional)
+  3. "≤3 false positives" — YES (2-3 estimated)
+  4. "Cross-lens propagation rules" — YES (correspondence confidence)
+
+  Result: CONFIRMS — ripple design is viable.
+
+  ## Charter implications
+
+  1. Q2 answered: noise is managed by typed attenuation, supersession
+     firebreaks, and the maintenance/discovery separation. The engine
+     doesn't need to be smart about conflicts — it needs to be reliable
+     about staleness.
+
+  2. Q3 sharpened: the executive loop must coordinate probes (discovery)
+     and ripple (maintenance). The escalation case — ripple detecting
+     convergent dirty flags as a trigger for running a probe — is the
+     bridge between the two. This is the most important open design
+     question for Q3.
+
+  3. B2 (process cycle) validated: the orient-question-probe-harvest-
+     promote cycle IS the discovery mechanism. Ripple is the inter-cycle
+     maintenance that keeps the graph honest between probes.
+
+edges:
+  - target: brief-ripple-engine-design
+    type: derives
+  - target: ripple-mechanism-proposal
+    type: derives
+  - target: ripple-retrospective-test
+    type: derives
+  - target: ripple-discovery-boundary
+    type: derives
+  - target: finding-003-alpha
+    type: derives
+    note: "retrospective test data"
+  - target: finding-016-code-only-bootstrap
+    type: derives
+    note: "cross-lens constraint"
+  - target: finding-017-what-cant-be-a-node
+    type: derives
+    note: "epistemological flattening constraint"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - brief-ripple-engine-design
+    - ripple-mechanism-proposal
+    - ripple-retrospective-test
+    - ripple-discovery-boundary
+    - finding-003-alpha
+    - finding-016-code-only-bootstrap
+    - finding-017-what-cant-be-a-node
+  reviewed_by: null
+finding:
+  probe: brief-ripple-engine-design
+  result: confirms

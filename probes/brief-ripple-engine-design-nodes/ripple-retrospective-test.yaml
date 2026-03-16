@@ -1,0 +1,106 @@
+id: ripple-retrospective-test
+type: observation
+confidence: frontier
+title: "Retrospective test: ripple mechanism against project-alpha 11 issues"
+content: |
+  ## Method
+
+  For each of finding-003's 11 project-alpha issues, ask:
+  1. Would the ripple engine have detected it? (sensitivity)
+  2. At what severity? (calibration)
+  3. Under what conditions? (decomposition dependency)
+
+  ## Results
+
+  | #  | Issue                    | Detected? | Severity    | Condition           |
+  |----|--------------------------|-----------|-------------|---------------------|
+  | 1  | Parser (pest/parser-B)    | YES       | DIRTY_HARD  | contradicts edge    |
+  | 2  | Latency (p95/p99)        | YES       | DIRTY_HARD  | contradicts edges   |
+  | 3  | data catalog (SQLite/PG)      | COND.     | DIRTY_HARD  | separate nodes req. |
+  | 4  | Comms (SSE/WS)           | YES       | DIRTY_HARD  | contradicts edges   |
+  | 5  | Timeout (60s/30s)        | COND.     | DIRTY_HARD  | separate nodes req. |
+  | 6  | RBAC phase               | YES       | DIRTY_HARD  | contradicts edges   |
+  | 7  | Infra deps gap           | COND.     | DIRTY_SOFT  | edge must exist     |
+  | 8  | Crate naming drift       | SUPPRESS  | (correct)   | supersedes firebreak|
+  | 9  | MVP scope inflation      | COND.     | DIRTY_SOFT  | phase as nodes      |
+  | 10 | Cross-phase deps         | COND.     | DIRTY_SOFT  | cross-phase edges   |
+  | 11 | TUI phase bleed          | COND.     | DIRTY_SOFT  | phase as nodes      |
+
+  ## Scoring
+
+  Unconditional detection: 4/11 (issues 1, 2, 4, 6)
+  Conditional detection: 6/11 (issues 3, 5, 7, 9, 10, 11)
+  Correct suppression: 1/11 (issue 8 — supersession working as designed)
+
+  Total detectable if graph is properly decomposed: 10/11
+  Success criterion was 8/11: MET (conditional on decomposition)
+
+  ## Analysis by category
+
+  **Contradictions (issues 1-6): ripple handles well.**
+  These are the ripple engine's strongest case. A contradicts edge
+  between two nodes that disagree fires DIRTY_HARD whenever either
+  changes. 4 of 6 are unconditionally detected. The 2 conditional
+  cases (3, 5) fail only because the contradicting claims are in the
+  SAME document — they need to be decomposed into separate nodes for
+  the edge to exist.
+
+  **Gaps (issues 7-8): ripple handles partially.**
+  Gap detection requires edges that don't exist. Issue 7 (infra deps
+  not in PRD) is detectable IF there's a derives edge from PRD
+  deployment to architecture infrastructure. If nobody built that
+  edge, ripple can't fire. Issue 8 (naming drift) is correctly
+  handled by supersession.
+
+  **Phase boundary erosion (issues 9-11): ripple handles weakly.**
+  Phase erosion is a PATTERN across multiple edges, not a single
+  edge signal. Ripple can detect individual phase disagreements
+  (if phase assignments are nodes with contradicts edges), but the
+  SYSTEMATIC pattern — "each layer expands the previous layer's
+  scope" — is invisible to edge-by-edge propagation. This is a
+  structural pattern that requires probe-level analysis, not
+  ripple-level maintenance.
+
+  ## False positives estimate
+
+  For the project-alpha graph:
+  - Hub node "MVP scope" connects to ~15 downstream nodes. A minor
+    wording change would dirty all 15, most unnecessarily. → ~2 FP
+  - Formatting-only changes to any node would trigger content hash
+    change → ~1 FP per edit (mitigated by semantic hashing, but
+    that's tooling, not mechanism)
+
+  Estimated false positives: 2-3 for a typical edit session.
+  Success criterion was ≤3: MET.
+
+  ## The decomposition dependency
+
+  6 of 11 detections are conditional on graph decomposition quality.
+  This is the central finding: ripple effectiveness is BOUNDED by
+  decomposition quality. If contradictions live inside a single node's
+  content, ripple is blind. If they're separate nodes with typed
+  edges, ripple sees them.
+
+  This connects to finding-004's observation: "decomposition
+  granularity affects graph signal strength. Finer decomposition =
+  more edges = more detectable contradictions."
+
+  The practical implication: the unit of effort for improving ripple
+  detection is not "better propagation algorithm" — it's "better
+  decomposition during probes." The probe cycle's decomposition
+  choices determine what ripple can maintain.
+
+edges:
+  - target: ripple-mechanism-proposal
+    type: implements
+    note: "tests the proposed mechanism against real data"
+  - target: finding-003-alpha
+    type: derives
+    note: "test data source"
+  - target: finding-004-schema-revision
+    type: derives
+    note: "decomposition granularity observation"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
