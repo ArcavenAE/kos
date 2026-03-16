@@ -1,0 +1,164 @@
+id: executive-empirical-batch2-solo
+type: finding
+confidence: frontier
+title: "Executive empirical test batch 2: penny-orc and axiathon (solo projects)"
+content: |
+  ## penny-orc (solo developer, 7 issues)
+
+  ### Visibility assessment
+  HIGH. Solo developer, thinking in commits. The rs.md is literally the
+  developer's own critique of their own process. All reasoning is in the
+  repo — but the reasoning in the rs.md and the reasoning in the PRDs
+  don't acknowledge each other.
+
+  ### Convergence detection
+  CLUSTER: "shared model" divergence (3+ issues converge)
+  - po-seam-drift-vs-telemetry: rs.md says drift detection matters,
+    BikeShop builds execution telemetry instead
+  - po-seam-context-vs-bikeshop: rs.md says context is the constraint,
+    BikeShop pushes more context to agents
+  - po-seam-solo-vs-team: rs.md critiques solo limitations, BikeShop
+    builds team infrastructure for a solo project
+
+  All three stem from the same root: the rs.md and the PRDs operate
+  from different models of what the project's problems are. Three
+  independent paths converge on "project identity" — what is this
+  project actually trying to solve?
+
+  Would threshold fire? YES. 3 paths, same structural region.
+  Is it a real problem? YES — and it's the richest finding in the
+  probe. The project is simultaneously critiquing its own foundations
+  and building on them without resolving the tension.
+
+  ISOLATED: po-bikelane-bmad-compat (contradiction but standalone),
+  po-seam-prd-no-learn-phase (gap), po-seam-bikelane-path-refs
+  (structural chaos). Below threshold individually.
+
+  ### Priority function
+  po-seam-drift-vs-telemetry should rank highest:
+  - dependency_depth: HIGHEST (the question "what visibility does the
+    project need?" affects everything downstream)
+  - visibility_gap: HIGH (all reasoning is visible)
+  - tractability: MEDIUM (requires architectural decision)
+  - adjacent_evidence: HIGHEST (3-issue convergence)
+
+  A human would agree: the drift-vs-telemetry finding is the most
+  consequential because it questions the project's investment thesis.
+
+  ### Human channel
+  The meta-observation from finding-002 is pure finding-019 territory:
+  "the same person wrote the critique and revised the artifact, but the
+  concerns don't transfer." This is a cognitive finding, not a document
+  finding. It says something about how human attention works — you can
+  hold a critique and a practice simultaneously without integrating them.
+  No automated channel surfaces this.
+
+  This is STRONGER than the Kubernetes meta-project observation. In
+  Kubernetes, invisible thinking happens in different people's heads
+  across SIG boundaries. In penny-orc, invisible thinking happens in
+  ONE person's head. The model divergence is intra-personal, not
+  inter-team. The visibility is high but the integration is low.
+
+  ### Maturity model
+  Young graph, discovery-dominant. Matches prediction. But with a
+  nuance: penny-orc has HIGH visibility (everything is in the repo)
+  and still has severe model divergence. Visibility alone doesn't
+  prevent the problem. The executive can see everything and the
+  project is still incoherent.
+
+  This is a challenge to the visibility-gap metric: penny-orc has
+  LOW visibility-gap (everything is visible) but HIGH signal yield
+  (7 issues). ThreeDoors also has LOW visibility-gap and HIGH signal
+  yield (10 issues). The correlation that governance-gap (now
+  visibility-gap) predicts signal yield may be confounded — these
+  solo projects have high visibility AND high signal because they
+  have NO review process, not because visibility causes problems.
+
+  ---
+
+  ## axiathon (solo developer, AI-generated docs, 11 issues)
+
+  ### Visibility assessment
+  HIGH. Solo developer, all docs AI-generated and in repo. The
+  self-validation (architecture-gaps.md, architecture-validation-results.md)
+  is also in the repo. Everything is visible. The validation passes while
+  containing 6 contradictions.
+
+  ### Convergence detection
+  CLUSTER A: Phase boundary erosion (3 issues converge)
+  - ax-rbac-phase-conflict: RBAC in Phase 2 per scope, MVP per arch
+  - ax-dissector-plugin-phase-conflict: MVP label but Growth dependencies
+  - ax-tui-phase-conflict: TUI is Growth per scope, but packaged with CLI
+
+  Three independent phase assignment conflicts converge on "phase
+  boundary integrity." Each involves a different feature, a different
+  pair of documents, but the same structural failure: scope document
+  says one phase, downstream documents say another.
+
+  Would threshold fire? YES. 3 paths, same structural region.
+
+  CLUSTER B: Technology contradictions (3 issues converge)
+  - ax-detection-dsl-parser: pest vs Chumsky
+  - ax-realtime-comms-conflict: SSE vs WebSocket vs HTTP/JSON+SSE
+  - ax-http-timeout-conflict: 60s vs 30s in same document
+
+  Three independent technology specification conflicts. Different
+  subsystems, but all are "architecture says X, another source says Y"
+  about implementation choices.
+
+  Would threshold fire? YES. 3 paths to "technology specification
+  consistency."
+
+  REMAINING: ax-query-latency-claims (standalone contradiction),
+  ax-iceberg-catalog-conflict (standalone), ax-infra-services-undeclared
+  (gap), ax-crate-naming-drift (drift), ax-mvp-scope-inflation (related
+  to Cluster A but different — it's the general pattern, not a specific
+  phase conflict).
+
+  ### Priority function
+  ax-mvp-scope-inflation should rank highest:
+  - dependency_depth: HIGHEST (scope inflation affects the entire project
+    trajectory — if MVP is actually 3x larger than scoped, everything
+    downstream is miscalibrated)
+  - visibility_gap: HIGH
+  - tractability: HIGH (the evidence is clear, requires a scoping decision)
+  - adjacent_evidence: HIGHEST (Cluster A is the specific instances)
+
+  ax-detection-dsl-parser should rank second:
+  - dependency_depth: HIGH (an agent following CLAUDE.md would implement
+    the wrong parser — immediate implementation impact)
+  - tractability: HIGHEST (one of the two is wrong, just needs checking)
+
+  A human would agree: scope inflation first (strategic), parser
+  contradiction second (tactical but immediately harmful).
+
+  ### Human channel
+  The self-validation gap: "architecture-gaps.md checks coverage not
+  consistency." Recognizing that the validation process itself is
+  insufficient — that checking "does every FR have a home?" is not the
+  same as checking "do the homes agree?" — is a meta-process judgment.
+  It's reasoning about the validation, not about the architecture.
+
+  This is another instance of the finding-019 pattern, and it's the
+  most actionable one so far: you could FIX this by changing the
+  validation to include consistency checks.
+
+  ### Maturity model
+  Young graph, discovery-dominant. Matches prediction. The AI-generated
+  docs create an illusion of maturity (thorough, formatted, validated)
+  that masks a young project with no review process. The self-validation
+  is a false signal of maturity.
+
+edges:
+  - target: brief-executive-empirical-test
+    type: derives
+  - target: finding-002-penny-orc
+    type: derives
+  - target: finding-003-axiathon
+    type: derives
+  - target: executive-mechanism-proposal
+    type: derives
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15

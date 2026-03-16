@@ -1,0 +1,130 @@
+id: brief-executive-mechanism
+type: brief
+confidence: frontier
+title: "Q3 probe: the executive mechanism — coordinating discovery and maintenance"
+content: |
+  Open question 3: What does the executive loop look like as software —
+  scheduler, event system, agent orchestration — that coordinates probes
+  (discovery) and ripple (maintenance)?
+
+  Sharpened by session-003:
+  - Finding-018: ripple is maintenance, not discovery. Ripple propagates
+    staleness along existing edges. Probes discover new edges and signal.
+    The executive must coordinate both.
+  - Finding-018 bridge insight: convergent dirty flags from ripple should
+    trigger new probes. This is the escalation path from maintenance to
+    discovery.
+  - Finding-019: the human sees undeclared structure. The executive must
+    include a human-in-the-loop mechanism for pattern recognition that
+    agents cannot perform.
+  - B2: the process cycle (orient-question-probe-harvest-promote) is the
+    unit of discovery. The executive runs this cycle.
+  - B6: cognitive architecture — graph is memory, inference is working
+    memory, ripple is attention, executive is "the cycle running between
+    graph and inference."
+
+  ## Approach
+
+  This is a DESIGN probe. Propose an executive mechanism, then test it
+  against existing findings and the ripple engine design (finding-018)
+  to check whether it coordinates correctly.
+
+  Three design sub-questions:
+
+  1. SCHEDULING: What triggers a probe cycle? What triggers a ripple
+     pass? How are they interleaved? The naive answer is "human decides"
+     — but the bridge insight says ripple can escalate to probes
+     automatically. What does that look like?
+
+  2. ATTENTION ALLOCATION: Given a graph with N dirty nodes and M open
+     questions, what gets worked on next? The executive must allocate
+     agent attention. This is the prioritization problem. It must handle:
+     - Dirty nodes from ripple (maintenance backlog)
+     - Open questions from probes (discovery frontier)
+     - Convergent dirty flags (ripple-to-probe escalation)
+     - Human-identified patterns (finding-019 — undeclared structure)
+
+  3. COHERENCE OVER TIME: How does the executive maintain purpose across
+     sessions? The charter is the current answer (finding-015 validated
+     cold-start from repo). But as the graph grows, the charter will
+     compress lossy (F5 remaining question). What is the executive's
+     continuity mechanism at scale?
+
+  For each sub-question, propose a mechanism and test it against the
+  existing probe data (three sessions, 19 findings) to check whether
+  the proposed mechanism would have produced the same sequence of work.
+
+  ## Design constraints (from existing bedrock and findings)
+
+  - The cycle is the unit, not the sprint or the phase (B2)
+  - History is the primary record; current state is a view (B3)
+  - Human provides continuity, direction, judgment, graveyard
+    maintenance (collaboration model)
+  - Agent provides inference, synthesis, reasoning within sessions
+  - Ripple is dirty-flag propagation with typed attenuation (finding-018)
+  - Probes are timeboxed (B2)
+  - Pattern recognition on undeclared structure requires the human
+    (finding-019) — the executive cannot fully automate
+  - The process quality gradient (B7) means the executive should
+    target effort where governance is weakest
+
+depends_on:
+  - question-executive-mechanism
+edges:
+  - target: finding-018-ripple-engine-design
+    type: derives
+    note: "ripple as maintenance, bridge to probe escalation"
+  - target: finding-019-undeclared-structure
+    type: derives
+    note: "human-in-the-loop is constitutional, not transitional"
+  - target: finding-015-cold-start-validation
+    type: derives
+    note: "charter as continuity mechanism — works at current scale"
+  - target: finding-014-twelve-project-synthesis
+    type: derives
+    note: "retrospective test data for scheduling validation"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15
+brief:
+  hypothesis: |
+    The executive is an event-driven loop with three input channels
+    (ripple flags, open questions, human pattern recognition) and one
+    output (the next probe cycle to run). It does not need a scheduler
+    in the traditional sense — it needs a priority function over the
+    three channels and a mechanism for the human to override it.
+
+    The key mechanism: ripple convergence (multiple independent dirty
+    paths converging on the same region of the graph) is a signal that
+    maintenance has found something probes should investigate. This is
+    the automatic escalation from maintenance to discovery.
+
+    Human-in-the-loop is not a gate — it is an input channel with
+    higher authority than the other two. The human can inject questions,
+    redirect attention, and see patterns the graph cannot represent.
+  excluded_scope: |
+    - Implementation (no code, just mechanism design)
+    - UI/notification design (how the human sees the priority queue)
+    - Multi-agent orchestration (how multiple agents coordinate — too
+      early without a single-agent executive working first)
+    - Tooling for the executive (IDE integration, CLI, etc.)
+  success_signal: |
+    1. A proposed mechanism with clear trigger/response rules for all
+       three input channels
+    2. Retrospective test: the mechanism would have produced a similar
+       work sequence to what sessions 001-003 actually did (the human
+       would have been offered similar probes in similar order)
+    3. The ripple-to-probe escalation path is specified with concrete
+       trigger conditions (not just "convergent dirty flags" — what
+       threshold, what topology?)
+    4. The human-in-the-loop mechanism preserves finding-019's insight
+       (human sees undeclared structure) without making the human a
+       bottleneck
+
+    If all four: confirms (executive design is viable).
+    If 1-2 only: partial (mechanism works, escalation needs more work).
+    If the retrospective test shows the mechanism would have produced
+    a very different sequence: redirects (the priority function is
+    wrong or the input channels are wrong).
+  timebox: "Session-004, first probe cycle"

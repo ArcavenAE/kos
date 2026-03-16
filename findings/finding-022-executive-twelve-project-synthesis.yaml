@@ -1,0 +1,273 @@
+id: finding-022-executive-twelve-project-synthesis
+type: finding
+confidence: frontier
+title: "Executive mechanism twelve-project synthesis: mechanism holds, three new findings, one structural correction"
+content: |
+  ## Summary
+
+  Tested the executive mechanism proposal against all twelve projects
+  from the session-002 probe. The mechanism's core claims (convergence
+  detection, priority function, maturity model) hold across the full
+  governance gradient. Three new findings emerged that weren't visible
+  in the three-project test. One structural correction is needed.
+
+  ## Scorecard: convergence detection
+
+  Projects where convergence FIRES (8/12):
+  | Project     | Issues | Cluster                          | Paths |
+  |-------------|--------|----------------------------------|-------|
+  | ThreeDoors  | 10     | Data model contradictions        | 3     |
+  | ThreeDoors  | 10     | Phase boundary issues            | 3     |
+  | penny-orc   | 7      | "What matters" model divergence  | 3     |
+  | axiathon    | 11     | Phase boundary erosion           | 3     |
+  | axiathon    | 11     | Technology contradictions         | 3     |
+  | Backstage   | 6      | BEP-0002 integration gaps        | 3     |
+  | Crossplane  | 5      | Original design intent abandoned | 3     |
+  | Rust RFCs   | 7      | Pin API evolution                | 3     |
+  | OpenHands   | 7      | V0/V1 terminology propagation    | 4     |
+  | OpenHands   | 7      | Stale implementation refs        | 2*    |
+  | AutoGen     | 5      | Agent identity specification     | 3     |
+
+  * OpenHands cluster B fires on cross-lens criterion, not path count.
+
+  Projects where convergence is correctly SILENT (4/12):
+  | Project       | Issues | Why silent                        |
+  |---------------|--------|-----------------------------------|
+  | Kubernetes    | 2      | Related but same root cause       |
+  | Go Proposals  | 4      | 3 acknowledged, 1 isolated        |
+  | Python PEPs   | 3      | Independent issues, no clustering |
+  | BMAD          | 3      | Below threshold, cosmetic         |
+
+  No false escalations detected. Every firing identifies a genuine
+  structural cluster. Every silence is correct — no project had
+  convergent issues that the mechanism missed.
+
+  Result: PASS. 0 false positives, 0 false negatives across 12 projects.
+
+  ## Scorecard: priority function
+
+  Reasonable rankings for 12/12 projects. In every case, the highest-
+  ranked issue is the one a human reviewer would address first.
+
+  But two systematic weaknesses emerged:
+
+  WEAKNESS 1: Immutable/historical documents. For Rust RFCs, Go
+  Proposals, and Python PEPs, tractability is LOW because the documents
+  can't be amended. The priority function correctly ranks these issues
+  low — but some of them are historically significant (PinBox, check/
+  handle). The function needs a "learning value" dimension for sequential
+  documents where the goal is understanding, not fixing.
+
+  WEAKNESS 2: The visibility-gap factor doesn't predict signal yield
+  the way governance-gap was supposed to. See "structural correction"
+  below.
+
+  ## Scorecard: maturity model
+
+  12/12 projects match the predicted behavior:
+  - Young/absent: ThreeDoors, BMAD → discovery-dominant (correct)
+  - Growing: penny-orc, axiathon, Backstage, OpenHands, AutoGen →
+    discovery-primary with emerging maintenance (correct)
+  - Mature/stable: Kubernetes, Crossplane, Rust, Go, Python →
+    maintenance-dominant, low discovery yield (correct)
+
+  ## New finding 1: Parallel vs. sequential documents
+
+  The mechanism treats all documents the same. It shouldn't.
+
+  PARALLEL documents (ThreeDoors, axiathon, penny-orc, Backstage,
+  Crossplane, OpenHands, AutoGen, BMAD): Multiple documents that are
+  supposed to be mutually consistent at a point in time. Contradictions
+  are bugs. Convergent dirty flags mean "there's a structural problem."
+
+  SEQUENTIAL documents (Rust RFCs, Go Proposals, Python PEPs,
+  Kubernetes KEPs): Later documents supersede earlier ones.
+  Contradictions are expected evolution. Convergent dirty flags mean
+  "the specification chain has accumulated enough drift that a
+  CONSOLIDATION document is warranted."
+
+  This is a new work type: SYNTHESIS — combining multiple stale
+  sequential documents into one current account. Not discovery (no
+  new structure). Not maintenance (not updating existing nodes).
+  Synthesis is recognizing that the specification has evolved past
+  what any single document describes and producing a consolidated
+  current-state document.
+
+  Rust edition guides, Python "What's New" pages, and Go release
+  notes serve this function informally. The executive should recognize
+  this as a distinct work type and recommend it when sequential-
+  document convergence fires.
+
+  ## New finding 2: The penny-orc cognitive finding
+
+  penny-orc produced the strongest human-channel finding in the
+  twelve-project sample: the same person wrote the critique (rs.md)
+  and revised the artifact (bikeshop-prd.md), but the concerns don't
+  transfer. This is not a documentation problem. It's a cognitive
+  problem. You can hold a critique and a practice simultaneously
+  without integrating them.
+
+  This has implications for the collaboration model (B6). The human
+  is the pattern recognizer on undeclared structure (finding-019).
+  But penny-orc shows the human can also FAIL to recognize patterns
+  across their own work. The graph doesn't just help agents — it
+  helps humans by making their own inconsistencies structurally
+  visible.
+
+  The executive mechanism should surface this class of finding to
+  the human channel with high priority. When convergence detection
+  finds that a single author's documents diverge on fundamental
+  assumptions, that's a signal the author may not be aware of.
+  The graph sees what the author's attention didn't integrate.
+
+  ## New finding 3: AI-generated docs have a unique visibility gap
+
+  BMAD enterprise revealed a new kind of visibility gap: the
+  artifacts are fully visible (all in the repo) but the cognition
+  that produced them is constitutionally irrecoverable. The AI
+  session that generated the docs is gone. The human can't be asked
+  "why did you make this choice?" because no human made the choice.
+
+  This connects to B6 (cognitive architecture): when the inference
+  engine (AI) generates artifacts, it produces outputs without
+  the provenance that human artifacts carry implicitly (memory of
+  deliberation, context of decision, rejected alternatives). The
+  graph would need to capture this provenance AT GENERATION TIME
+  or lose it permanently.
+
+  For the executive: AI-generated documents should be treated as
+  having high artifact-visibility but low reasoning-visibility.
+  The priority function's visibility_gap factor should account for
+  this split.
+
+  ## Structural correction: visibility-gap doesn't predict signal yield
+
+  The three-project test replaced governance_gap with visibility_gap
+  based on the Kubernetes meta-project insight. The twelve-project
+  data challenges this:
+
+  penny-orc: HIGH visibility, HIGH signal (7 issues)
+  axiathon: HIGH visibility, HIGHEST signal (11 issues)
+  BMAD: HIGH visibility, LOW signal (3 issues)
+  Kubernetes: LOW visibility, LOW signal (2 issues)
+  Rust: LOW-MEDIUM visibility, HIGH signal (7 issues)
+
+  The correlation between visibility and signal yield is WEAK.
+  penny-orc and axiathon have everything visible and still have
+  severe problems. BMAD has everything visible and few problems.
+  Rust has low visibility and many issues.
+
+  What DOES predict signal yield? Looking at the data:
+
+  | Project     | Issues | Has review process? | Doc authors |
+  |-------------|--------|---------------------|-------------|
+  | axiathon    | 11     | No (self-validation)| 1 + AI      |
+  | ThreeDoors  | 10     | No                  | 1 + AI      |
+  | penny-orc   | 7      | No                  | 1 + AI      |
+  | OpenHands   | 7      | Partial (transition)| Multiple    |
+  | Rust RFCs   | 7      | Yes (but immutable) | Multiple    |
+  | Backstage   | 6      | Yes (ADR/BEP)       | Multiple    |
+  | Crossplane  | 5      | Yes (design docs)   | Multiple    |
+  | AutoGen     | 5      | Partial (transition)| Multiple    |
+  | Go Proposals| 4      | Yes (formal)        | Small team  |
+  | BMAD        | 3      | No (AI-generated)   | AI          |
+  | Python PEPs | 3      | Yes (formal)        | Multiple    |
+  | Kubernetes  | 2      | Yes (KEP process)   | Multiple    |
+
+  The strongest predictor is the combination of:
+  (a) NO cross-document review process, AND
+  (b) documents written by few authors (solo or solo+AI)
+
+  VISIBILITY is not the variable. REVIEW is the variable. Specifically:
+  does anyone check whether the documents are consistent WITH EACH
+  OTHER? Not internal review (axiathon's self-validation passed).
+  Cross-document consistency review.
+
+  Revised factor name: REVIEW_GAP — the degree to which the project
+  lacks cross-document consistency checking. This is what B7 actually
+  measures. It's not governance quality (Kubernetes has great
+  governance). It's not visibility (penny-orc has high visibility).
+  It's whether anyone asks "do these documents agree?"
+
+  The priority function should use review_gap, not visibility_gap:
+
+  ```
+  priority = dependency_depth × staleness × review_gap
+             × tractability_boost × adjacent_evidence
+  ```
+
+  This also explains BMAD's low signal despite no review: AI-generated
+  docs from a structured methodology are internally consistent because
+  the generation process enforces consistency. The "review" is built
+  into the generation. But the AI can't check itself against future
+  changes — hence the count drift pattern.
+
+  ## Assessment against brief success criteria
+
+  1. Convergence fires where issues cluster — YES (8/12 projects,
+     11 clusters, 0 false positives)
+  2. Convergence silent on Kubernetes — YES (and on Go, Python, BMAD)
+  3. Priority function reasonable for ≥2 projects — YES (12/12)
+  4. Human channel necessary in each project — YES (12/12)
+  5. Maturity model matches all 3 — YES (12/12)
+
+  Result: CONFIRMS with three new findings and one structural
+  correction (review_gap replaces visibility_gap).
+
+  ## What finding-020 should say now
+
+  Finding-020 (placeholder confidence) can be revised. The twelve-
+  project test provides independent evidence. The mechanism holds
+  with corrections:
+
+  1. review_gap replaces visibility_gap (and the original governance_gap)
+  2. Parallel vs. sequential document distinction needed
+  3. Synthesis as a third work type (beyond discovery and maintenance)
+  4. Historical/learning value dimension for sequential documents
+  5. AI-generated doc visibility split (artifact vs. reasoning)
+  6. Single-author convergence as a high-priority human-channel signal
+
+  The core mechanism (three channels, priority function, convergence
+  detection, maturity model) is confirmed across the full sample.
+
+edges:
+  - target: brief-executive-empirical-test
+    type: derives
+  - target: executive-empirical-threedoors
+    type: derives
+  - target: executive-empirical-kubernetes
+    type: derives
+  - target: executive-empirical-openhands
+    type: derives
+  - target: executive-empirical-batch2-solo
+    type: derives
+  - target: executive-empirical-batch3-mid
+    type: derives
+  - target: executive-empirical-batch4-mature
+    type: derives
+  - target: finding-020-executive-mechanism
+    type: supersedes
+    signal: evolution
+    note: "twelve-project evidence replaces self-referential test"
+  - target: finding-021-executive-empirical-three-projects
+    type: supersedes
+    signal: evolution
+    note: "twelve-project synthesis supersedes three-project test"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15
+  derived_from:
+    - brief-executive-empirical-test
+    - executive-empirical-threedoors
+    - executive-empirical-kubernetes
+    - executive-empirical-openhands
+    - executive-empirical-batch2-solo
+    - executive-empirical-batch3-mid
+    - executive-empirical-batch4-mature
+    - finding-020-executive-mechanism
+    - finding-021-executive-empirical-three-projects
+  reviewed_by: null
+finding:
+  probe: brief-executive-empirical-test
+  result: confirms

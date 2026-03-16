@@ -1,0 +1,270 @@
+id: executive-empirical-batch4-mature
+type: finding
+confidence: frontier
+title: "Executive empirical test batch 4: Rust RFCs, Go Proposals, Python PEPs, BMAD enterprise (mature/sequential/AI)"
+content: |
+  ## Rust RFCs (large community, 7 issues)
+
+  ### Visibility assessment
+  LOW-MEDIUM. RFCs are the polished record. The actual design
+  evolution happens in blog posts ("Rethinking Pin"), lang team
+  meetings, internals.rust-lang.org discussions, and pre-RFC
+  shepherding. Finding-008 explicitly notes that PinBox's graveyard
+  entry exists only in a blog post outside the RFC system.
+
+  This is the Kubernetes meta-project pattern: the repo contains
+  decisions, not deliberation. But Rust is MORE visible than
+  Kubernetes because the blog posts and internals discussions are
+  public — just not in the RFC repo.
+
+  ### Convergence detection
+  CLUSTER: Pin API evolution (3 issues converge)
+  - rs-pin-type-redesign: Pin<'a, T> → Pin<P>
+  - rs-pinbox-dropped: PinBox proposed then silently removed
+  - rs-poll-parameter-evolution: poll(&mut Context) changed 4 times
+
+  Three independent API changes all converge on the Pin/Future
+  design region. Each happened at a different time for different
+  reasons, but they all affect the same part of the async model.
+
+  Would threshold fire? YES. 3 paths to "Pin API specification."
+  Is it a real problem? PARTIALLY. The evolution was correct — the
+  stabilized API is better than any RFC version. The problem is
+  not the changes but the LOST RECORD of why each change happened.
+  The RFC system is immutable; the designs evolved; the gap between
+  them is permanent.
+
+  CLUSTER NOTE: This convergence is on SEQUENTIAL documents, not
+  parallel ones. The mechanism should behave differently — for
+  sequential docs, convergent dirty flags mean "the specification
+  chain has accumulated enough drift that a consolidation document
+  is warranted," not "there's a bug."
+
+  ISOLATED: rs-future-trait-signature-drift (acknowledged evolution),
+  rs-into-future-undefined (undefined reference), rs-unresolved-
+  questions-resolution (process gap), rs-async-iterator-correct-seam
+  (positive finding).
+
+  ### Priority function
+  rs-pinbox-dropped should rank highest:
+  - dependency_depth: MEDIUM (PinBox is unused — nothing depends on
+    it now, but its removal REASON matters for understanding the API)
+  - visibility_gap: LOW-MEDIUM (the reason is in a blog post, not
+    the RFC system)
+  - tractability: LOW (RFCs are immutable — you can't fix this
+    within the RFC system)
+  - adjacent_evidence: HIGH (Pin cluster)
+
+  PROBLEM: The priority function doesn't handle immutable documents
+  well. tractability is LOW because the RFCs can't be amended. The
+  correct response is not "fix the RFC" but "write a consolidation
+  document" — a different work type than the mechanism currently
+  distinguishes (discovery vs maintenance). This is a third type:
+  SYNTHESIS (combine multiple stale sequential docs into one current
+  account). The Rust edition guides serve this function informally.
+
+  ### Human channel
+  The observation that "RFCs are snapshots, contradictions are
+  expected evolution" is a meta-judgment about DOCUMENT TYPE. The
+  executive mechanism currently treats all documents the same. It
+  should distinguish parallel documents (supposed to be mutually
+  consistent — contradictions are bugs) from sequential documents
+  (later supersedes earlier — contradictions are evolution). This
+  distinction affects how convergence is interpreted.
+
+  ### Maturity model
+  Mature/stable process. Matches prediction: the RFC system handles
+  most intra-feature evolution. KOS adds marginal value for cross-
+  feature and cross-time consolidation.
+
+  ---
+
+  ## Go Proposals (Go team, 4 issues)
+
+  ### Visibility assessment
+  LOW-MEDIUM. Like Kubernetes and Rust, the Go team's actual
+  decision-making happens in meetings, CL reviews, and the golang-dev
+  mailing list. The proposals are prepared records. The check/handle
+  abandonment happened through community feedback and internal
+  discussion — the proposal system has no record of the decision
+  to drop it.
+
+  ### Convergence detection
+  4 issues, 3 acknowledged, 1 unacknowledged. No convergence.
+  - go-errors-as-generics-dependency: acknowledged (clean)
+  - go-contracts-to-interfaces: acknowledged (clean)
+  - go-formatter-method-rename: minor (unexplained but trivial)
+  - go-check-handle-abandoned: unacknowledged (genuine gap)
+
+  Would threshold fire? NO. Issues are independent. The acknowledged
+  ones are clean supersessions. check/handle is a standalone gap.
+
+  Is silence correct? YES. These are individual, well-scoped issues.
+  There is no structural convergence — the Go team handled each
+  feature's evolution independently and mostly well.
+
+  ### Priority function
+  go-check-handle-abandoned should rank highest:
+  - dependency_depth: MEDIUM (the error values design stands alone,
+    but its motivational argument assumed check/handle)
+  - visibility_gap: LOW-MEDIUM
+  - tractability: LOW (proposals are historical records)
+  - adjacent_evidence: LOW (isolated)
+
+  COMPOSITE: LOW-MEDIUM. The priority function correctly ranks this
+  as low priority — it's a rhetorical gap in a historical document,
+  not an actionable inconsistency.
+
+  But: this is the most interesting finding in the Go corpus. The
+  executive undervalues it because the priority function emphasizes
+  tractability and dependency. The HISTORICAL significance (a
+  coordinated design effort partially abandoned without acknowledgment)
+  is invisible to the priority function.
+
+  This suggests: the priority function should have a "historical/
+  learning value" factor for sequential documents, separate from
+  tractability. Some findings are not actionable but are important
+  for understanding the project's evolution.
+
+  ### Human channel
+  The insight that Go handles intra-feature seams well but cross-
+  feature seams poorly is a meta-observation about process structure.
+  The proposal system works per-feature but has no mechanism for
+  tracking cross-feature dependencies. This is analogous to
+  Backstage's ADR/BEP disconnect — documents that address different
+  concerns don't cross-reference.
+
+  ### Maturity model
+  Mature/stable. Matches prediction. Like Kubernetes: the value KOS
+  adds is marginal but specific (cross-feature dependency tracking).
+
+  ---
+
+  ## Python PEPs (Python community, 3 issues)
+
+  ### Visibility assessment
+  LOW-MEDIUM. PEPs are the polished record. typing-sig mailing list,
+  mypy/pyright issue trackers, and core dev discussions carry the
+  actual reasoning. PEP 484's structural subtyping gap existed for
+  3 years partly because the discussion was spread across multiple
+  venues.
+
+  ### Convergence detection
+  3 issues, all independent:
+  - py-seam-annotation-eval-divergence: evaluation semantics changed
+  - py-seam-nominal-vs-structural-tension: 3-year spec-runtime gap
+  - py-seam-protocol-variance-rule-change: variance rules bifurcated
+
+  Would threshold fire? NO. Three independent issues at different
+  points in a 6-year evolution. No structural convergence.
+
+  Is silence correct? YES. Each issue is a separate instance of
+  "managed evolution with minor residual seams." They don't converge
+  on a common structural problem.
+
+  ### Priority function
+  py-seam-nominal-vs-structural-tension should rank highest:
+  - dependency_depth: HIGH (affected every user of typing ABCs for
+    3 years)
+  - visibility_gap: LOW-MEDIUM
+  - tractability: LOW (resolved by PEP 544 — historical finding)
+  - adjacent_evidence: LOW
+
+  Like Go's check/handle, the priority function correctly identifies
+  this as the most significant issue but assigns low priority because
+  it's already resolved. The function works for CURRENT issues but
+  undervalues HISTORICAL findings.
+
+  ### Human channel
+  The observation that "these seams exist DESPITE active effort to
+  be consistent" is a meta-judgment about the limits of manual
+  consistency management. Even the most disciplined process (PEPs
+  with explicit cross-references, backward compatibility sections,
+  community review) produces residual seams. This sets a floor: if
+  PEPs can't eliminate seams through process alone, less disciplined
+  projects certainly can't.
+
+  ### Maturity model
+  Mature/stable. Matches prediction. Lowest signal yield in the
+  twelve-project sample (tied with BMAD at 3 issues). The PEP
+  process is the closest existing analog to what KOS does manually.
+
+  ---
+
+  ## BMAD enterprise (AI-generated, 3 issues)
+
+  ### Visibility assessment
+  HIGH. AI-generated docs, all in repo. No hidden process — the
+  AI generation IS the process. No meetings, no discussions, no
+  mailing lists. What's in the repo is everything.
+
+  But: the AI's "reasoning" during generation is invisible. The
+  docs are outputs of a process (prompting an LLM) whose internals
+  are opaque. High visibility of artifacts, low visibility of the
+  reasoning that produced them. This is a new kind of visibility
+  gap — the process is visible but the cognition is not.
+
+  ### Convergence detection
+  3 issues:
+  - bm-seam-fragment-count-drift: 35→42, counts not updated
+  - bm-seam-workflow-count-inconsistency: 8 vs 9 workflows
+  - bm-seam-nfr-categories-mismatch: Maintainability vs Scalability
+
+  The two count drift issues share a root cause (collections grew,
+  references not updated). But 2 paths is below the 3-path threshold.
+  NFR mismatch is independent.
+
+  Would threshold fire? NO. Below threshold.
+  Is silence correct? YES. These are cosmetic issues, not structural
+  convergence. The architecture is internally consistent.
+
+  ### Priority function
+  bm-seam-nfr-categories-mismatch should rank highest:
+  - dependency_depth: MEDIUM (NFR assessment would use wrong categories)
+  - visibility_gap: HIGH (but it's the artifact visibility, not
+    process visibility — see above)
+  - tractability: HIGHEST (fix the reference doc)
+  - adjacent_evidence: LOW
+
+  Count drift issues rank lower (cosmetic, no implementation impact).
+  A human would agree.
+
+  ### Human channel
+  The observation that copy-paste consistency (identical orchestration
+  code across workflows) creates future maintenance hazard requires
+  forward-looking judgment. The system works now because nothing has
+  changed. When it does change, every copy needs independent updating.
+  This is acknowledged debt that the project doesn't know about yet
+  — a form of unknown unknown specific to AI-generated codebases.
+
+  The AI-specific visibility gap (artifact visible, cognition opaque)
+  is a new category. Human-authored docs have invisible reasoning too,
+  but the human can be ASKED why they made a choice. The AI that
+  generated these docs can't be asked — the session is gone. This
+  connects to the charter's collaboration model (B6): the AI "does
+  not persist between sessions." For AI-generated docs, the reasoning
+  is constitutionally irrecoverable.
+
+  ### Maturity model
+  Young graph. Matches prediction. The AI-generated docs create a
+  surface appearance of a mature project (thorough formatting,
+  consistent structure) but the graph would be young — few edges,
+  no review history, no evolution record.
+
+edges:
+  - target: brief-executive-empirical-test
+    type: derives
+  - target: finding-008-rust-rfcs
+    type: derives
+  - target: finding-009-go-proposals
+    type: derives
+  - target: finding-010-python-peps
+    type: derives
+  - target: finding-011-bmad-enterprise
+    type: derives
+  - target: executive-mechanism-proposal
+    type: derives
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15

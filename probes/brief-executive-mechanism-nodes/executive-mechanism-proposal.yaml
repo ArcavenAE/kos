@@ -1,0 +1,289 @@
+id: executive-mechanism-proposal
+type: element
+confidence: frontier
+title: "Executive mechanism: event-driven priority queue with three input channels"
+content: |
+  ## The mechanism
+
+  The executive is an event-driven priority queue with three input
+  channels and one output (the next work unit to execute).
+
+  ### Input channels
+
+  1. RIPPLE CHANNEL (automatic, after every harvest)
+     Dirty flags from ripple propagation. Three sub-priorities:
+     - DIRTY_HARD: requires review (contradicts edges, always)
+     - DIRTY_SOFT: may require review, accumulates
+     - DIRTY_STALE: batch-reviewable, lowest urgency
+
+  2. QUESTION CHANNEL (persistent, updated by findings)
+     Open questions from the charter plus new questions spawned by
+     findings. Each question is ranked by a composite score:
+
+       priority = dependency_depth × staleness × visibility_gap
+                  × tractability_boost × adjacent_evidence
+
+     - dependency_depth: how many other questions or nodes derive
+       from this one. Higher depth = more leverage.
+     - staleness: time since last probe touched this question.
+       Prevents starvation of low-priority questions.
+     - visibility_gap: how much of the project's thinking is
+       visible in the repo vs. locked in conversations, meetings,
+       and people's heads. Replaces "governance_gap" — what B7
+       actually measures is not governance quality but governance
+       VISIBILITY. A project with excellent governance that happens
+       entirely outside the repo (Kubernetes KEPs) has low visibility
+       even though its governance is strong. A solo project with no
+       process but all thinking in commits (ThreeDoors) has high
+       visibility even though its governance is weak.
+       Revised: session-004, based on Kubernetes meta-project insight.
+     - tractability_boost: dynamic signal — increases when adjacent
+       findings resolve constraints that previously blocked this
+       question. A question becomes higher priority when it becomes
+       answerable, not just when it's important.
+     - adjacent_evidence: dynamic signal — fresh findings conceptually
+       related to this question boost its priority. Structural
+       adjacency (shared edges) is detectable by the agent. Conceptual
+       adjacency (shared themes) requires the human channel.
+
+  3. HUMAN CHANNEL (highest authority, asynchronous)
+     Pattern recognition on undeclared structure (finding-019),
+     direction changes, priority overrides. The human can:
+     - Inject new questions (pattern recognition → declaration)
+     - Redirect attention ("broaden before deepening")
+     - Promote or graveyard without probe ("I know this already")
+     - Override the priority function entirely
+
+  ### The priority function
+
+  ```
+  next_work = prioritize(
+    human_queue,        # Always first — undeclared structure
+    convergent_dirty,   # Ripple escalation — structural change
+    open_questions,     # Ranked by composite score
+    isolated_dirty      # Batch maintenance — lowest priority
+  )
+  ```
+
+  Human channel always wins. Among automated channels, convergent
+  dirty flags beat open questions, which beat isolated dirty flags.
+  This ordering reflects the insight from finding-018: ripple
+  convergence is the signal that maintenance has found something
+  probes should investigate.
+
+  ### Convergence detection
+
+  A dirty flag escalates from "maintenance" to "discovery trigger"
+  when ANY of:
+
+  1. PATH CONVERGENCE: 3+ independent dirty paths (no shared
+     ancestor within 2 hops) reach the same node.
+
+  2. CROSS-SOURCE CONVERGENCE: A node becomes DIRTY_HARD from
+     2+ independent source changes (not propagated from same root).
+
+  3. CROSS-LENS CONVERGENCE: A dirty flag propagates across a
+     correspondence boundary (code→spec or spec→code).
+
+     IMPORTANT CAVEAT (session-004 revision): Cross-lens signals
+     are NOT inherently correlated with project transition state.
+     The initial hypothesis was that cross-lens convergence is
+     "more sensitive for transitioning projects." This is wrong.
+     Projects that visibly transition are the ones organized enough
+     to declare a transition. ALL projects are transitioning
+     continuously — entropy and drift are the default, not the
+     exception. Declaring a transition implies a level of self-
+     awareness most projects lack. Cross-lens convergence is a
+     GENERAL signal about doc↔code boundary drift. It may actually
+     be LESS detectable in the most chaotic projects because chaos
+     doesn't organize itself into convergent patterns. The signal's
+     sensitivity is a property of the project's visibility, not its
+     stability.
+
+  4. PATTERN CONVERGENCE (generalized from schema revision):
+     Multiple findings or dirty flags cluster around the same node
+     type, edge type, or schema element. This is not classic ripple
+     but is structurally identical — independent signals converging
+     on a structural element. Example: findings 001-003 all pointed
+     at schema insufficiency → finding-004 was the correct response.
+
+  These thresholds (3 paths, 2 hops, 2 sources) are initial
+  parameters, not laws. They need calibration under use.
+
+  ### The loop
+
+  ```
+  while project_is_active:
+    1. ORIENT
+       Read charter + work queue + dirty state.
+       (New session: full re-read. Same session: incremental.)
+
+    2. PRIORITIZE
+       Run priority function over all inputs.
+       Present top 3 candidates to human with rationale.
+
+    3. SELECT
+       Human confirms, redirects, or injects.
+       (Autonomous mode: agent selects, presents at step 8.)
+
+    4. BRIEF
+       Write exploration brief for selected work unit.
+       (Maintenance work may skip this — dirty flag review
+       doesn't always need a full probe.)
+
+    5. PROBE
+       Execute the probe (timeboxed per B2).
+       May be a discovery probe (full cycle) or a maintenance
+       review (dirty flag triage — confirm, dismiss, or escalate).
+
+    6. HARVEST
+       Commit findings. Update nodes. Move confidence.
+       This is the step that changes the graph.
+
+    7. RIPPLE
+       Propagate changes through graph via finding-018 mechanism.
+       Check for new convergent flags.
+
+    8. HUMAN CHECK
+       Present state to human. This is the constitutional
+       pattern-recognition step from finding-019.
+       Human may see connections the graph doesn't declare.
+       Human may inject new questions or redirect.
+
+    9. HARVEST VERIFICATION
+       (From CLAUDE.md) Verify backward-facing artifacts are
+       complete before starting next cycle. Finding committed?
+       Schema updated? Charter updated? Questions revised?
+
+    10. LOOP
+        Return to step 2 (same session) or step 1 (new session).
+  ```
+
+  ### Human-in-the-loop modes
+
+  The executive supports three modes based on graph maturity and
+  human availability:
+
+  SUPERVISORY (default): Human approves probe selection (step 3),
+  reviews findings (step 8), can redirect at any point. Every
+  cycle includes human judgment. This is the mode for early-stage
+  graphs where the structure is still being established.
+
+  AUTONOMOUS: Agent runs steps 1-7 without human input. Presents
+  accumulated results at step 8. Human reviews batched work. This
+  mode is viable when: the graph is mature (most structure is
+  declared), the open questions are well-scoped, and the priority
+  function is calibrated. Risk: the agent may miss undeclared
+  structure (finding-019), so autonomous runs should be time-bounded.
+
+  DIRECTED: Human specifies the exact probe. Agent executes steps
+  4-7 only. This is the current mode — the human says "probe Q3"
+  and the agent does it. Valid when the human has specific intent
+  that the priority function would not have surfaced.
+
+  ### Continuity mechanism
+
+  At current scale: charter + CLAUDE.md + git history (validated
+  by finding-015).
+
+  At larger scale, the charter splits into three artifacts:
+  1. ORIENTATION: what the project is, bedrock, values (stable)
+  2. WORK QUEUE: open questions, dirty regions, probe backlog
+     (changes every session)
+  3. PRIORITY STATE: what matters most right now and why, including
+     the current ripple state summary (changes frequently)
+
+  The split point is when a new agent can no longer restore full
+  context from the charter alone — when the charter's compression
+  becomes too lossy to prioritize correctly. This is testable: if
+  a cold-started agent picks the wrong next probe, the charter
+  needs splitting.
+
+  ### Maintenance vs. discovery work types
+
+  The executive doesn't just schedule probes. It schedules two
+  fundamentally different work types:
+
+  DISCOVERY WORK (probes): Full cycle. Exploration brief, timeboxed
+  investigation, finding, harvest. Creates new edges and nodes.
+  The output is new structure in the graph.
+
+  MAINTENANCE WORK (triage): Abbreviated cycle. Review dirty flags,
+  confirm or dismiss staleness, update edges if needed. Does not
+  create new structure — maintains existing structure. May escalate
+  to discovery if triage reveals something deeper.
+
+  The executive allocates time between these based on graph state:
+  - Young graph (few nodes, few edges): mostly discovery. Not enough
+    structure for ripple to find anything. Priority: build the graph.
+  - Mature graph (many nodes, dense edges): balanced. Ripple generates
+    real maintenance load. Priority: keep the graph honest while
+    continuing to expand it.
+  - Stable graph (mostly bedrock, few open questions): mostly
+    maintenance. Discovery is occasional. Priority: detect drift.
+
+  ### The visibility principle (session-004 revision)
+
+  The repo is a projection of the project's actual thinking — the
+  same recursive pattern as documents projecting the spec graph and
+  git projecting the knowledge topology. What appears in the repo is
+  the RECORD, not the WORK. For some projects (ThreeDoors, solo dev
+  thinking through commits), the record is nearly complete. For
+  others (Kubernetes, cross-SIG coordination via meetings and Slack),
+  the record is a thin slice of a much richer process.
+
+  This means: the executive operates on a projection. It can only
+  allocate attention to what's visible. The visibility_gap factor
+  in the priority function accounts for this — higher visibility
+  means more signal is available for the executive to act on.
+  Lower visibility means the executive should be MORE humble about
+  its recommendations, because it's working from a thinner shadow.
+
+  The aspiration: KOS makes the invisible visible. If the graph
+  captures the thinking that currently lives only in conversations
+  and heads, the visibility gap narrows. The executive becomes more
+  capable as the graph grows — not because the algorithm improves,
+  but because it has more to work with.
+
+  ### Acknowledged debt and the limits of detection
+
+  The three-project test (finding-021) exposed a gap: the mechanism
+  has no concept of "the team already knows this." But acknowledged
+  debt is the easy case. Harder:
+
+  - UNCONSCIOUS BIAS: assumptions the team makes without knowing
+    they're assumptions. The graph can't detect what no one has
+    declared. The human channel catches some of these (finding-019),
+    but only those the human happens to notice.
+  - UNKNOWN UNKNOWNS: things no one knows they don't know. These
+    are outside the graph by definition (finding-017, negative space).
+
+  These are not mechanism gaps to be patched. They are constitutional
+  limits of any knowledge representation system. They have been with
+  humanity longer than theory of mind. The graph's value is making
+  the boundary between known and unknown VISIBLE — not eliminating
+  the unknown.
+
+  For acknowledged debt specifically: the priority function should
+  accept a suppression input from the project's existing issue
+  tracker or known-issues docs. Items matching acknowledged debt
+  are annotated as "known" during review, not removed from the
+  graph. The graph stays complete; the human's attention is
+  protected.
+
+edges:
+  - target: brief-executive-mechanism
+    type: derives
+  - target: finding-018-ripple-engine-design
+    type: derives
+    note: "ripple as maintenance, convergence escalation"
+  - target: finding-019-undeclared-structure
+    type: derives
+    note: "human channel is constitutional"
+  - target: finding-015-cold-start-validation
+    type: derives
+    note: "continuity mechanism at current scale"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15
