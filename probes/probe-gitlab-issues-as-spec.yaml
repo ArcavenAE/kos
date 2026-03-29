@@ -1,0 +1,226 @@
+id: finding-023-gitlab-issues-as-spec-probe
+type: finding
+confidence: frontier
+title: "GitLab issues-as-spec probe: cross-document seams between process docs, templates, and label systems"
+content: |
+  ## Project Profile
+
+  GitLab (gitlab-org/gitlab) is a ~30M-line open-source DevOps platform whose
+  development process is documented across three distinct authority surfaces:
+  docs.gitlab.com (contributor-facing), handbook.gitlab.com (employee-facing),
+  and the repository's own .gitlab/ templates + label definitions (machine-facing).
+  The project explicitly acknowledges this fragmentation: the Product Development
+  Flow handbook page states "where there are conflicts, this page takes precedence"
+  — an admission that conflicts exist and a priority rule rather than a resolution.
+
+  ## Focus Area: Merge Request Workflow and Issue Triage
+
+  Chose this area because it spans all three authority surfaces: the MR workflow
+  docs describe what authors must do, the Definition of Done describes what "done"
+  means, the MR template encodes what authors are actually prompted to do, and
+  the label system encodes how automation tracks state.
+
+  ## Issues Found
+
+  ### 1. Definition of Done vs. MR Template Checklist Divergence
+  **Severity: HIGH**
+  **Sources:** docs.gitlab.com/development/definition_of_done/ vs. .gitlab/merge_request_templates/Default.md
+  **Disagreement:** The Definition of Done page lists ~25 requirements including:
+  usage instrumentation (MAU metrics, analytics attribution), observability
+  (logs, metrics, error tracking, alerts), rollout issue creation, success
+  KPIs, and stakeholder sign-off (PM, UX, EM). The MR template checklist
+  covers a subset: documentation, changelog, testing, screenshots. Items like
+  "usage metrics implemented," "observability in place," and "reviewed and
+  signed off by relevant PM, UX, and EM stakeholders" have no corresponding
+  checkbox in the template. The template is what authors actually see; the
+  Definition of Done page is what reviewers are theoretically checking against.
+  This is a classic spec-vs-implementation gap where the implementation (template)
+  has drifted from the spec (DoD). GitLab's own issue #31603 (gitlab-foss)
+  explicitly requests adding DoD tasks to the default MR template — evidence
+  the gap is known but unresolved.
+
+  ### 2. Phantom Label: ~"ready for review" vs. workflow::ready for review
+  **Severity: MEDIUM**
+  **Sources:** Code Review Guidelines (docs.gitlab.com/development/code_review/)
+  vs. actual label system (gitlab.com/gitlab-org/gitlab/-/labels)
+  **Disagreement:** The Code Review Guidelines documentation references a
+  ~"ready for review" label. Issue #205516 reports that this label does not
+  exist — searching for it returns no results and it does not appear in the
+  label list. The actual label is `workflow::ready for review` (with the
+  scoped prefix). Documentation references the unprefixed form, which sends
+  contributors searching for a label that doesn't exist. This is a naming
+  seam: the docs use one identifier, the label system uses another.
+
+  ### 3. Bug Template Does Not Apply Severity/Priority Labels; Triage Docs Require Them
+  **Severity: MEDIUM**
+  **Sources:** Issue Triage handbook (handbook.gitlab.com) vs. Bug issue template
+  (.gitlab/issue_templates/Bug.md)
+  **Disagreement:** The triage handbook states "all bugs should have a label
+  applied to indicate priority and severity" (~S1-S4, ~P1-P4). The Bug issue
+  template does not auto-apply these labels and does not prompt the reporter
+  to suggest severity/priority. Community contributors cannot apply labels
+  directly (permission restriction). This creates a systematic gap: every
+  community-filed bug enters the system missing labels that the triage process
+  considers mandatory. GitLab created automated triage policies (MR !18685)
+  specifically to catch bugs without severity/priority — evidence the template
+  gap produces real downstream cost.
+
+  ### 4. Three Authority Surfaces With No Declared Precedence Hierarchy
+  **Severity: HIGH (structural)**
+  **Sources:** docs.gitlab.com vs. handbook.gitlab.com vs. .gitlab/ templates
+  **Disagreement:** The Product Development Flow page declares itself the
+  single source of truth for workflow, with precedence over the rest of the
+  handbook. But it says nothing about precedence over docs.gitlab.com or the
+  repository templates. The Code Review Guidelines live on docs.gitlab.com.
+  The triage rules live on handbook.gitlab.com. The MR template lives in the
+  repo. When these three disagree (and they do — see items 1-3), there is
+  no declared resolution order. The handbook's self-declared precedence only
+  covers intra-handbook conflicts, not cross-surface conflicts.
+
+  ### 5. Workflow Label Set: Labels Docs vs. Product Development Flow
+  **Severity: LOW**
+  **Sources:** docs.gitlab.com/development/labels/ vs.
+  handbook.gitlab.com/handbook/product-development-flow/
+  **Disagreement:** The Labels documentation page lists workflow labels as a
+  brief reference (`workflow::in dev`, `workflow::in review`, `workflow::complete`).
+  The Product Development Flow page defines a richer set with 17+ labels including
+  `workflow::problem validation`, `workflow::solution validation`,
+  `workflow::validation backlog`, `workflow::scheduling`, `workflow::refinement`,
+  `workflow::ready for design`, `workflow::feature-flagged`, and
+  `workflow::awaiting security release`. The Labels docs page gives the
+  impression of a simple linear flow; the actual label system encodes a much
+  more complex lifecycle. A contributor reading only the Labels page would
+  not know most workflow states exist.
+
+  ### 6. Workflow Label Persistence After Issue Close
+  **Severity: LOW**
+  **Sources:** Workflow label system vs. issue board behavior
+  **Disagreement:** When an issue is closed (e.g., via MR merge), the last
+  workflow label (e.g., `workflow::in review`) persists on the closed issue.
+  The issue appears in the board's Closed column but retains its last workflow
+  label. Community users on the GitLab forum report this as confusing — the
+  label implies active work while the issue status says complete. Issue #428928
+  tracks the bug where workflow labels are erroneously removed when dragging
+  to closed list. The system cannot decide whether close should clear
+  workflow state.
+
+  ## Community-Reported Consistency Problems (Independent Discovery)
+
+  The following GitLab issues were filed by community members or GitLab staff
+  identifying the same class of problems this probe found:
+
+  1. **#205516** — "Mention of seemingly non-existent ~ready for review label"
+     Direct evidence of phantom label problem (finding #2 above).
+
+  2. **#31603** (gitlab-foss) — "Add task for Definitions of Done to default MR template"
+     Direct evidence of DoD/template divergence (finding #1 above).
+
+  3. **#31807** — "Allow creating a checklist that is attached to every issue
+     as a definition of done"
+     Request for structural solution to the DoD enforcement gap.
+
+  4. **#244309** — "Improve the labels documentation"
+     Acknowledgment that label docs are insufficient.
+
+  5. **#241773** — "Improve automation in workflow labels"
+     Recognition that workflow label management has gaps.
+
+  6. **#428928** — "Workflow label erroneously removed when dragging issue
+     to closed list on issue board"
+     The close-vs-workflow-state confusion (finding #6).
+
+  7. **#19830** — "Incomplete checklists in merge request should block approval"
+     Request to make template checklists enforceable, not advisory.
+
+  8. **triage-ops #293** — "Mapping workflow labels"
+     Internal acknowledgment that the workflow label flow needs
+     documentation/visualization because it is not self-evident.
+
+  9. **MR !18685** (gitlab-foss) — "Add triage policies for bugs with no
+     priority or severity"
+     Automation to compensate for the template gap (finding #3).
+
+  ## Observations: Issues-as-Spec vs. Traditional Doc Probing
+
+  ### What issues-as-spec reveals that doc probing misses
+
+  1. **Enforcement gaps.** Doc probing finds contradictions between two
+     written statements. Issues-as-spec finds contradictions between what
+     is written and what is enforced. The DoD says "usage metrics
+     implemented" — but nothing in the template, the label system, or the
+     automation checks for it. Doc probing would flag the DoD as internally
+     consistent. Issues-as-spec reveals it is externally unenforced.
+
+  2. **Permission asymmetries.** The triage docs say bugs need severity
+     labels. The template doesn't apply them. Community contributors can't
+     apply them manually. This three-way gap (doc says X, template doesn't
+     do X, user can't do X) is invisible to doc probing because it requires
+     understanding who can act, not just what is written.
+
+  3. **Automation as shadow spec.** The triage-ops bot applies labels,
+     moves workflow states, and enforces SLAs — but its rules are defined
+     in a separate repository (gitlab-org/quality/triage-ops), not in the
+     handbook or docs. The bot's behavior IS the real spec for many
+     workflows. Issues-as-spec surfaces this because you see the bot's
+     actions on issues and can compare them to what docs claim happens.
+
+  ### What doc probing reveals that issues-as-spec misses
+
+  1. **Semantic drift.** Doc probing catches when two documents define the
+     same term differently (e.g., "severity" in security context vs.
+     engineering context). Issues-as-spec sees labels applied but can't
+     easily detect that the same label means different things in different
+     handbook sections.
+
+  2. **Structural completeness.** Doc probing can verify that every section
+     referenced in a table of contents exists. Issues-as-spec has no
+     equivalent structural check.
+
+  ### The synthesis
+
+  Issues-as-spec and doc probing are complementary seam detectors. Doc
+  probing finds contradictions within the written layer. Issues-as-spec
+  finds contradictions between the written layer and the operational layer
+  (templates, labels, automation, permissions). The most valuable
+  inconsistencies — the ones that actually cause contributor confusion and
+  process failure — tend to be cross-layer, which is why the community
+  complaints (items 1-9 above) cluster at the seam between documentation
+  and implementation rather than within documentation alone.
+
+  For KOS: this suggests that a checksum property needs to operate across
+  representation layers, not just within a single document graph. A node
+  that says "all bugs require severity labels" needs a typed edge to the
+  template that should enforce it and the automation that compensates when
+  it doesn't. Without cross-layer edges, the inconsistency is invisible
+  to graph-internal consistency checks.
+
+source: "probe-gitlab-issues-as-spec"
+session: "session-004"
+date: "2026-03-16"
+references:
+  - url: "https://docs.gitlab.com/development/definition_of_done/"
+    label: "GitLab Definition of Done"
+  - url: "https://docs.gitlab.com/development/contributing/merge_request_workflow/"
+    label: "GitLab MR Workflow"
+  - url: "https://docs.gitlab.com/development/code_review/"
+    label: "GitLab Code Review Guidelines"
+  - url: "https://docs.gitlab.com/development/contributing/issue_workflow/"
+    label: "GitLab Issue Workflow"
+  - url: "https://docs.gitlab.com/development/labels/"
+    label: "GitLab Labels Documentation"
+  - url: "https://handbook.gitlab.com/handbook/product-development/how-we-work/product-development-flow/"
+    label: "GitLab Product Development Flow"
+  - url: "https://handbook.gitlab.com/handbook/engineering/infrastructure/engineering-productivity/issue-triage/"
+    label: "GitLab Issue Triage Handbook"
+  - url: "https://gitlab.com/gitlab-org/gitlab/-/issues/205516"
+    label: "Issue: phantom ready-for-review label"
+  - url: "https://gitlab.com/gitlab-org/gitlab-foss/-/issues/31603"
+    label: "Issue: add DoD to MR template"
+  - url: "https://gitlab.com/gitlab-org/gitlab/-/issues/244309"
+    label: "Issue: improve labels documentation"
+  - url: "https://gitlab.com/gitlab-org/gitlab/-/issues/241773"
+    label: "Issue: improve workflow label automation"
+  - url: "https://gitlab.com/gitlab-org/gitlab/-/issues/428928"
+    label: "Issue: workflow label removed on close"
+  - url: "https://gitlab.com/gitlab-org/gitlab/-/issues/19830"
+    label: "Issue: incomplete checklists should block approval"
