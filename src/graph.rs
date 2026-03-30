@@ -128,7 +128,9 @@ fn print_mermaid(graph: &DiGraph<String, String>, nodes: &[Node]) {
         let source = graph[edge_ref.source()].replace('-', "_");
         let target = graph[edge_ref.target()].replace('-', "_");
         let label = edge_ref.weight();
-        println!("    {source} -->|{label}| {target}");
+        // Sanitize label for mermaid — parentheses break the parser
+        let safe_label = label.replace(['(', ')'], "");
+        println!("    {source} -->|{safe_label}| {target}");
     }
 }
 
