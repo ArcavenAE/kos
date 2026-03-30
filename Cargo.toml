@@ -33,6 +33,9 @@ dirs-next = "2"
 # Regex for markdown parsing
 regex = "1"
 
+# Content hashing for drift detection
+sha2 = "0.10"
+
 [dev-dependencies]
 insta = { version = "1", features = ["yaml", "json"] }
 tempfile = "3"
