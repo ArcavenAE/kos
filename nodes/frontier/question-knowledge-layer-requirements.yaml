@@ -1,0 +1,46 @@
+id: question-knowledge-layer-requirements
+type: question
+confidence: frontier
+title: "What properties must the knowledge layer have that no current architecture fully provides?"
+content: |
+  The cognitive architecture (B6) describes three layers: inference,
+  knowledge, and executive. The knowledge layer is currently implemented
+  as a typed node graph in YAML over a git substrate.
+
+  As the system scales beyond single-repo, single-session, single-human
+  operation, the knowledge layer will need properties the current
+  implementation doesn't have. Before evaluating candidate architectures
+  (RAG, DAG, graph databases, vector stores, hybrid approaches), we need
+  to state what we're evaluating against.
+
+  Specifically unknown:
+  - What retrieval properties are required? (semantic, structural, temporal, all three?)
+  - What write properties are required? (append-only, versioned, content-addressed?)
+  - What composition properties are required? (how does the knowledge layer
+    interface with inference and executive layers?)
+  - What is the minimum viable architecture that supports the promotion
+    of tacit to explicit — the property current graph models constitutionally lack?
+
+  Candidate architectures to evaluate once requirements are stated:
+  RAG (retrieval-augmented generation), DAG-based stores, property graph
+  databases (Neo4j class), vector stores with metadata filtering,
+  git-as-DAG used directly without file presentation layer, hybrid
+  approaches combining two or more of the above.
+
+  This question cannot be answered by reasoning alone. It requires
+  a probe against real KOS material — ideally the KOS graph itself
+  used as test subject.
+edges:
+  - target: elem-cognitive-architecture
+    type: derives
+    note: "Knowledge layer is one of three layers in B6"
+  - target: elem-storage-model
+    type: derives
+    note: "Current substrate is git; G5 already flagged its limits"
+  - target: elem-shadow-principle
+    type: derives
+    note: "The knowledge layer must hold what projections lose"
+provenance:
+  created_by: human
+  session: session-005
+  created_at: 2026-03-29
