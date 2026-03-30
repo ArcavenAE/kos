@@ -269,8 +269,17 @@ proposed mechanisms: git conventions showed limited value (too sparse), structur
 pattern matching showed high value (Cargo.toml analysis, stub detection), embedding
 similarity remains untested.
 
-*Session-005 note:* The RD-to-node bridge probe (brief-rd-bridge, session-008)
+*Session-005 note:* The RD-to-node bridge probe (brief-rd-bridge, session-009)
 is the first automated bootstrap test — extracting findings from prose briefs.
+
+*Session-009 update:* `kos bridge` built and validated (finding-032). Regex
+extraction parses 48/48 RD findings from 2 briefs. Structural pattern matching
+confirmed as high-value (the two brief formats, while different, share enough
+structure for programmatic extraction). The extracted records are not full kos
+nodes — they lack typed edges and often lack explicit confidence. The bridge
+is an index (queryable with grep/jq), not a graph. This partially answers F4:
+automated extraction from prose works when the prose has consistent structure.
+The remaining gap is edge inference — knowing what a finding *connects to*.
 
 **F5: The collaboration model**
 Human provides continuity, direction, judgment, and graveyard maintenance.
@@ -329,7 +338,11 @@ Build order, each a probe with a finding:
    kos.yaml manifest, graph discovery, `kos init` (full onboarding: dirs + charter
    + CLAUDE.md + commit rules), `kos doctor` (structure/content/process/cross-repo
    health checks). Three-tier graph model: orchestrator, repo-local, tool.
-4. `kos bridge` — RD-to-node extraction (session-009, brief-rd-bridge)
+4. ~~`kos bridge` — RD-to-node extraction (session-009, brief-rd-bridge)~~
+   **Complete (session-009).** Finding-032. 48/48 RD findings extracted (100%).
+   Two format variants parsed with one regex. Confidence explicit in 10/48.
+   Integrated with orient — per-repo queries now surface RD findings.
+   Bridge is an index, not a graph (no typed edges or correspondence).
 5. `kos drift` — simplest possible ripple (session-010, brief TBD)
 
 **Language: Rust.** kos is a correctness tool — it detects silent corruption
@@ -373,7 +386,15 @@ not the bottleneck at this scale. Remaining pressure points: schema
 validation (session-007), edge traversal (session-007 graph), drift
 detection (session-009).
 
-See: question-knowledge-layer-requirements (revised), finding-027, finding-029.
+*Session-009 data point (finding-032):* `kos bridge` extracts 48 findings
+from markdown prose using regex — no YAML parsing needed for this source.
+The pressure point here is format consistency, not substrate performance.
+RD briefs are parseable but lose structured metadata (confidence explicit
+in only 21% of findings). Remaining pressure point: drift detection
+(session-010).
+
+See: question-knowledge-layer-requirements (revised), finding-027, finding-029,
+finding-032.
 
 **F8: ThreeDoors as empirical kos evidence**
 ThreeDoors (2k commits, dark factory, 3 incident reports) has independently
@@ -566,7 +587,7 @@ Here is where we are."
 ---
 
 *Document status: CURRENT*
-*Established: session-001, updated session-007*
+*Established: session-001, updated session-009*
 
 *Session-006 built `kos orient` — the first running kos code. Rust CLI,
 all 6 success signals met, 3-11ms per query across 8 targets. YAML-in-git
@@ -595,8 +616,13 @@ produced.*
   5 repos (aae-orc 35 nodes, kos 25, aclaude 6, marvel 6, spectacle 5 =
   77 total). Moved kos graph to `_kos/` (dogfood). Upgraded aae-orc
   charter to re-introduction format. Mermaid edge label fix.~~*
-- *Session-009: `kos bridge` — extract RD findings into queryable format.
-  Probe: brief-rd-bridge.*
+- *~~Session-009: `kos bridge` — COMPLETE. Finding-032. 48/48 RD findings
+  extracted (100% parse rate) from 2 briefs. Two format variants parsed
+  with one regex. Confidence explicit in only 10/48 (marvel brief has it,
+  aclaude brief doesn't). Integrated with orient — `kos orient marvel`
+  now surfaces 10 RD findings, `kos orient aclaude` surfaces 38.
+  Bridge is an index, not a graph — answers "what was learned" but not
+  "how does it connect."~~*
 - *Session-010: `kos drift` — simplest ripple (hash, walk derives,
   flag dirty). Probe brief TBD.*
 
