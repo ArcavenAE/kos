@@ -2,7 +2,25 @@
 
 ## What This Is
 A graph-based knowledge accumulation system for designed systems.
+Rust CLI tool + knowledge graph in YAML over git.
 See KOS-charter.md for full context and re-introduction.
+
+@.claude/rules/rust.md
+@.claude/rules/git-commits.md
+@.claude/rules/bash.md
+
+## Build / Run / Test
+
+Requires: Rust 1.85+ (Edition 2024), `just`, nightly rustfmt.
+
+```sh
+just build          # cargo build
+just test           # cargo test
+just check          # fmt + clippy + deny (pre-commit mirror)
+just ci             # full CI mirror (fmt, clippy, build, deny, test, doc-test)
+just fmt            # cargo +nightly fmt --all
+just run orient     # run orient subcommand
+```
 
 ## How to Work Here
 
