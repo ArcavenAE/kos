@@ -72,6 +72,13 @@ enum Commands {
         update: bool,
     },
 
+    /// Extract RD findings from sprint/rd/ briefs into structured format
+    Bridge {
+        /// Output as JSONL instead of human-readable text
+        #[arg(long)]
+        json: bool,
+    },
+
     /// Check the health of a kos knowledge graph
     Doctor {
         /// Check all discovered graphs (orchestrator + includes)
@@ -166,6 +173,12 @@ fn main() -> anyhow::Result<()> {
                 let node_root = workspace.node_root();
                 kos::graph::run(&node_root, fmt)?;
             }
+        }
+
+        Commands::Bridge { json } => {
+            let cwd = std::env::current_dir()?;
+            let workspace = kos::workspace::Workspace::discover(&cwd)?;
+            kos::bridge::run(&workspace, json)?;
         }
 
         Commands::Graphs => {

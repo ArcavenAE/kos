@@ -1,0 +1,96 @@
+id: finding-032-rd-bridge-probe
+type: finding
+confidence: frontier
+title: "RD brief format is consistent enough for programmatic extraction — 100% of 48 findings parsed"
+content: |
+  ## Summary
+
+  Session-009 built `kos bridge` — a subcommand that reads sprint/rd/*.md
+  briefs from the aae-orc orchestrator and extracts numbered findings into
+  structured records. The hypothesis was >70% extraction rate with regex
+  parsing (no LLM needed). Result: 100% (48/48 findings from 2 briefs).
+
+  The bridge also integrates with `kos orient`, so `kos orient marvel` now
+  surfaces 10 marvel-specific RD findings alongside charter items and kos
+  findings. `kos orient aclaude` surfaces 38 aclaude findings. `kos orient kos`
+  surfaces F-08 (cross-repo knowledge continuity).
+
+  ## Findings
+
+  F1: Two distinct finding formats exist and both parse cleanly.
+  marvel-mvp-probe uses `**F-01: Title.**` (dash in ID, period-terminated,
+  confidence stated in body). aclaude-distribution uses `**F1: Title (date)**`
+  (no dash, date in parens, no explicit confidence). A single regex with
+  optional dash handles both: `**F-?\d+: ...**`.
+
+  F2: aclaude-distribution findings lack explicit confidence declarations.
+  marvel-mvp-probe consistently states "Confidence: frontier" or
+  "Confidence: bedrock" in the body text. aclaude-distribution findings
+  have no such marker — confidence is implicit (the brief's harvest section
+  classifies them). This means bridge extraction captures confidence for
+  10/48 findings (21%). The remaining 38 are null. This is a finding about
+  format consistency: the lighter-form RD briefs are parseable but lose
+  structured metadata compared to the more disciplined marvel brief.
+
+  F3: Repo attribution works via slug inference plus content analysis.
+  Brief slug determines the default repo (marvel-mvp-probe → marvel,
+  aclaude-distribution → aclaude). Content analysis refines attribution:
+  F-08 in marvel-mvp-probe explicitly says "this is kos's problem" and is
+  correctly attributed to kos. This two-level approach (slug default +
+  content override) avoids false negatives.
+
+  F4: Integration with orient is straightforward. The orient module already
+  had a gather() function that loads charter items, kos findings, and RD
+  briefs. Adding RD findings required: a new field on Orientation, a new
+  loader that calls bridge::extract_findings and filters by target repo,
+  and output formatting. Total change: ~40 lines in orient.rs.
+
+  F5: The two briefs without numbered findings (aclaude-bootstrap,
+  marvel-workspace-team-shift) are correctly skipped. aclaude-bootstrap
+  has confidence classifications but no F-numbered findings.
+  marvel-workspace-team-shift is a hypothesis document. The bridge
+  doesn't force findings where none exist.
+
+  ## Success signals (from brief-rd-bridge)
+
+  1. Tool reads all 4 RD briefs — YES (4 scanned)
+  2. >70% of findings extracted with structured fields — YES (100%, 48/48)
+  3. `kos orient marvel` surfaces marvel-relevant RD findings — YES (10 findings)
+  4. Unified index queryable — YES (JSONL output, grep/jq compatible)
+
+  ## What this means for the RD-to-kos bridge
+
+  The bridge confirms ADR-006's claim that RD briefs are "proto-kos artifacts."
+  The format is consistent enough to parse without LLM assistance. However,
+  the extracted records are not full kos nodes — they lack typed edges,
+  confidence is often implicit, and there's no correspondence layer to code.
+  The bridge is an index, not a graph. It answers "what was learned?" but
+  not "how does it connect?"
+
+  The next step toward full kos nodes would require either:
+  (a) standardizing RD brief format to include explicit confidence and
+      edge declarations (more ceremony, against RD's design), or
+  (b) using the bridge output as input for human-guided node creation
+      (preserve RD's light ceremony, add structure at harvest time).
+
+  Option (b) aligns better with kos's philosophy: the bridge surfaces what
+  exists, the human promotes what matters.
+edges:
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Fourth build in the implementation pivot sequence"
+  - target: finding-029-kos-orient-probe
+    type: derives
+    note: "Bridge output integrates with orient"
+  - target: finding-031-distributed-graph-pattern
+    type: derives
+    note: "Bridge reads from workspace sprint/rd/ — distributed knowledge"
+provenance:
+  created_by: human
+  session: session-009
+  created_at: "2026-03-30"
+tags:
+  - tooling
+  - bridge
+  - rd
+  - extraction
