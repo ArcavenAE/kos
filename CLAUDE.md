@@ -33,7 +33,7 @@ Read KOS-charter.md before any spec work. It contains:
 - Open questions (the current work queue)
 
 ### Node Files
-Nodes live in /nodes/[confidence]/[id].yaml
+Nodes live in _kos/nodes/[confidence]/[id].yaml
 Schema is in /schema/node.schema.yaml
 One node per file. Filename = node id.
 
@@ -42,13 +42,13 @@ Moving a file between confidence directories IS the promotion.
 Always accompany a move with a commit message explaining the evidence.
 
 ### Probe and Finding Files
-Exploration briefs live in /probes/[brief-slug].yaml
-Probe work products (decomposed nodes, test artifacts) live in /probes/[probe-slug]-nodes/
-Findings live in /findings/finding-NNN-[slug].yaml (numbered sequentially)
-These are separate from /nodes/ — probe artifacts are evidence, not graph nodes.
+Exploration briefs live in _kos/probes/[brief-slug].yaml
+Probe work products (decomposed nodes, test artifacts) live in _kos/probes/[probe-slug]-nodes/
+Findings live in _kos/findings/finding-NNN-[slug].yaml (numbered sequentially)
+These are separate from _kos/nodes/ — probe artifacts are evidence, not graph nodes.
 
 ### Ideas (pre-hypothesis brainstorming)
-Ideas live in /ideas/ as markdown files. They are generative, possibly
+Ideas live in _kos/ideas/ as markdown files. They are generative, possibly
 contradictory, and carry no commitment — the ideation stage between Orient
 and Question. Ideas are part of the graph's memory (the DAG): internal
 knowledge that springs into existence. Contrast with external research
@@ -61,10 +61,10 @@ pointing to what it became.
 
 ### Session Protocol
 1. Read KOS-charter.md
-2. Identify the highest-value open question — or capture new ideas in /ideas/
-3. Write an Exploration Brief in /probes/
+2. Identify the highest-value open question — or capture new ideas in _kos/ideas/
+3. Write an Exploration Brief in _kos/probes/
 4. Do the probe work
-5. Write a finding in /findings/
+5. Write a finding in _kos/findings/
 6. Harvest: update affected nodes, move files if confidence changed
 7. Update KOS-charter.md if bedrock changed significantly
 
