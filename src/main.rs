@@ -35,6 +35,16 @@ enum Commands {
         #[arg(long)]
         log: bool,
     },
+
+    /// Validate all nodes against the schema
+    Validate,
+
+    /// Render the node graph as mermaid or dot
+    Graph {
+        /// Output format: mermaid (default) or dot
+        #[arg(long, default_value = "mermaid")]
+        format: String,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -49,8 +59,6 @@ fn main() -> anyhow::Result<()> {
         } => {
             let cwd = std::env::current_dir()?;
 
-            // 1. Try auto-discovery from cwd
-            // 2. Fall back to --workspace / KOS_WORKSPACE
             let workspace = kos::workspace::Workspace::discover(&cwd).or_else(|discover_err| {
                 if let Some(ref ws_path) = workspace_path {
                     kos::workspace::Workspace::from_explicit(ws_path)
@@ -59,7 +67,6 @@ fn main() -> anyhow::Result<()> {
                 }
             })?;
 
-            // Infer target: explicit > workspace-relative > cwd directory name > "kos"
             let target = target
                 .or_else(|| workspace.infer_target(&cwd))
                 .or_else(|| {
@@ -70,6 +77,22 @@ fn main() -> anyhow::Result<()> {
                 .unwrap_or_else(|| "kos".to_string());
 
             kos::orient::run(&workspace, &target, json, log)?;
+        }
+
+        Commands::Validate => {
+            let cwd = std::env::current_dir()?;
+            let workspace = kos::workspace::Workspace::discover(&cwd)?;
+            kos::validate::run(&workspace.kos_root)?;
+        }
+
+        Commands::Graph { format } => {
+            let cwd = std::env::current_dir()?;
+            let workspace = kos::workspace::Workspace::discover(&cwd)?;
+            let fmt = match format.as_str() {
+                "dot" => kos::graph::GraphFormat::Dot,
+                _ => kos::graph::GraphFormat::Mermaid,
+            };
+            kos::graph::run(&workspace.kos_root, fmt)?;
         }
     }
 
