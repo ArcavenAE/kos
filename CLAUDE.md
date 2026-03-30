@@ -4,6 +4,7 @@
 A graph-based knowledge accumulation system for designed systems.
 Rust CLI tool + knowledge graph in YAML over git.
 See KOS-charter.md for full context and re-introduction.
+See docs/product-brief.md for the CLI tool overview.
 
 @.claude/rules/rust.md
 @.claude/rules/git-commits.md
