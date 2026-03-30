@@ -78,11 +78,11 @@ unit, not the sprint or the phase.
 *Session-008 note:* Ideation stage identified between Orient and Question.
 In science: Observe → Ideate → Hypothesize → Experiment → Analyze → Conclude.
 In kos: Orient → **Ideate** → Question → Probe → Harvest → Promote. Ideas
-live in ideas/ as markdown — generative, possibly contradictory, pre-hypothesis.
+live in _kos/ideas/ as markdown — generative, possibly contradictory, pre-hypothesis.
 They are part of the graph's memory (DAG): internal knowledge that springs
 into existence. Contrast with external research (RAG): referenced, queried,
 external information. Ideas crystallize into frontier questions and probe
-briefs. See ideas/dag-vs-rag-knowledge-topology.md.
+briefs. See _kos/ideas/dag-vs-rag-knowledge-topology.md.
 
 **B3: The Storage Model**
 A content-addressed immutable fact store with cryptographic integrity and
