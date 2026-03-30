@@ -224,10 +224,18 @@ function uses review_gap (cross-document consistency checking) not governance
 quality or visibility — see B7 revision. See findings 020 (placeholder),
 021, 022.
 
+*Session-005 note:* Implementation deprioritized behind tooling probes (F6-F9).
+The executive design is validated but building it requires a working graph with
+tooling — which doesn't exist yet. Build the substrate first.
+
 **F3: Agent type signatures and contracts**
 Described in principle. Not specified: the schema for agent declarations,
 the enforcement mechanism, how the precondition/postcondition system works
 in practice.
+
+*Session-005 note:* ThreeDoors's agent evaluation framework and label authority
+matrix (finding-028) are empirical implementations of agent contracts at one-repo
+scale. When this frontier reopens, ThreeDoors is prior art.
 
 **F4: Bootstrap from existing artifacts**
 Three mechanisms proposed (git message conventions, embedding similarity,
@@ -252,6 +260,9 @@ proposed mechanisms: git conventions showed limited value (too sparse), structur
 pattern matching showed high value (Cargo.toml analysis, stub detection), embedding
 similarity remains untested.
 
+*Session-005 note:* The RD-to-node bridge probe (brief-rd-bridge, session-008)
+is the first automated bootstrap test — extracting findings from prose briefs.
+
 **F5: The collaboration model**
 Human provides continuity, direction, judgment, and graveyard maintenance.
 Agent provides inference, synthesis, and reasoning within sessions. The
@@ -270,6 +281,51 @@ Correctly prioritized open questions without human correction. Conditions:
 model-dependent, scale-dependent (repo still small), tested for orientation
 not deep continuation. Remaining F5 question: when does the charter stop being
 sufficient as the compression artifact?
+
+*Session-005 note:* `kos orient` (brief-kos-orient, session-006) is the first
+tooling answer to F5 — mechanical context surfacing across repos.
+
+**F6: Implementation pivot — from theory to tooling**
+Session-005 reviewed the full kos corpus and the aae-orc ecosystem. Central
+finding (027): kos's process works through RD vocabulary (ADR-006) but lacks
+mechanical connection. The project has spent 4 sessions establishing that it's
+right without building anything usable. G3 (waterfall front-loading) predicts
+diminishing returns from more theory probes. The evidence base (16 projects,
+26 findings, validated schema, designed ripple and executive) is sufficient
+to begin building.
+
+Build order, each a probe with a finding:
+1. `kos orient` — cross-repo orientation CLI (session-006, brief-kos-orient)
+2. `kos validate` + `kos graph` — schema tooling (session-007, brief-schema-tooling)
+3. `kos bridge` — RD-to-node extraction (session-008, brief-rd-bridge)
+4. `kos drift` — simplest possible ripple (session-009, brief TBD)
+
+Each build tests the YAML-in-git substrate empirically. Where it breaks,
+those failures ARE the answer to question-knowledge-layer-requirements.
+
+Evidence: finding-027 (implementation pivot), finding-028 (ThreeDoors patterns).
+
+**F7: Where does YAML-in-git break?**
+Revised from the original question-knowledge-layer-requirements (session-005).
+The knowledge layer is YAML nodes in git, read by humans and agents via file
+I/O. Known pressure points: cross-repo orientation (manual), finding retrieval
+(grep works at 76, won't at 200+), edge traversal (no tooling), ripple
+propagation (designed, not implemented). The answer comes from building: each
+tool in F6 tests a pressure point. Failure modes discovered during building
+compose into the requirements list.
+
+See: question-knowledge-layer-requirements (revised), finding-027.
+
+**F8: ThreeDoors as empirical kos evidence**
+ThreeDoors (2k commits, dark factory, 3 incident reports) has independently
+implemented kos patterns: JSONL retrospector (primitive ripple), L0-L4
+provenance (primitive confidence), agent failure modes that match kos signal
+classes (enforcement gaps, silent abandonment, review gap at agent speed).
+These are practical solutions at one-repo scale, not validated principles.
+They inform implementation choices — particularly the JSONL output format for
+kos tooling.
+
+See: finding-028.
 
 ---
 
@@ -383,6 +439,12 @@ substrate for full rationale and reopener.
    **Deferred (session-002).** Temporal state does not need its own field.
    External temporal inconsistencies are contradicts edges. KOS lifecycle
    is derived from graph topology. See finding-004. Reopener documented.
+8. At what scale and complexity does the YAML-in-git approach break, and
+   what's the minimum additional infrastructure needed? **Opened (session-005).**
+   Revised from the original theoretical framing. The answer comes from
+   building tools on the current substrate and observing failure modes.
+   Sessions 006-009 are the probe. See question-knowledge-layer-requirements,
+   finding-027.
 
 ---
 
@@ -421,28 +483,36 @@ Here is where we are."
 ---
 
 *Document status: CURRENT*
-*Established: session-001, updated session-004*
-*Next action: Session-004 produced three findings (020-022), partially
-answered Q3 (executive mechanism). The executive is designed and validated
-against all twelve projects. B7 revised from "governance gap" to "review
-gap" — the predictor is cross-document consistency review, not governance
-quality. B6 extended with executive specification. Three work types
-identified (discovery, maintenance, synthesis). The session's most
-significant results: (1) convergence is a general principle operating
-across ripple, findings, and document types — not just a ripple property;
-(2) the human's role refined from "pattern recognizer on undeclared
-structure" to "meta-epistemologist" — reasoning about the investigation,
-not just the subject; (3) repos of mature projects (Kubernetes, Rust,
-Go, Python) are meta-projects whose repos contain decisions, not
-deliberation — the thinking happens outside the repo.
-Session-004 also produced findings 023-026, partially answering Q5
-signal-to-noise. Tested four projects (ThreeDoors with owner ground truth,
-OpenClaw, Atmos, GitLab issues-as-spec). 31 issues, 45% consequential.
-The graph's primary value is speed — finding issues before organic
-discovery. Four new signal classes identified: AI configuration seam,
-analysis-vs-operations divergence, enforcement gaps, authority surface
-fragmentation. Project lineup expanded from 12 to 20.
-Remaining open: Q3 implementation, Q5 redundancy angle, threshold
-calibration, parallel-vs-sequential document distinction.
-Charter priority encoding under observation (question-charter-priority-
+*Established: session-001, updated session-005*
+*Next action: SESSION-005 PIVOT — from theory to tooling.*
+
+*Session-005 reviewed the full kos corpus (28 findings, 25 nodes, 11
+probes, schema v0.3) and the aae-orc ecosystem (aclaude, marvel,
+ThreeDoors). Found that kos's process works through RD vocabulary
+(ADR-006) across the ecosystem, but kos-the-repo has zero running code.
+The project was violating its own G3 (waterfall front-loading). The
+evidence base — 16 projects, 26 findings, validated schema, designed
+ripple and executive — is sufficient to begin building.*
+
+*Findings 027-028 produced. question-knowledge-layer-requirements revised
+from theoretical ("what properties?") to empirical ("where does simple
+break?"). Three probe briefs written for the next three sessions.*
+
+*Session roadmap:*
+- *Session-006: Build `kos orient` — cross-repo orientation CLI (Go).
+  Probe: brief-kos-orient. Tests F5/F10 (context continuity).*
+- *Session-007: Build `kos validate` + `kos graph` — schema validator
+  and graph renderer. Probe: brief-schema-tooling. Tests schema v0.3
+  mechanically for the first time.*
+- *Session-008: Build `kos bridge` — extract RD findings into queryable
+  format. Probe: brief-rd-bridge. Tests whether RD briefs compose with
+  kos findings into a unified index.*
+- *Session-009: Build `kos drift` — simplest ripple (hash, walk derives,
+  flag dirty). Probe brief TBD. Tests finding-018's design empirically.*
+
+*Deprioritized: Q3 implementation (executive needs substrate first), Q5
+redundancy angle (diminishing returns), threshold calibration (needs live
+graph), more probing on the 20-project lineup (evidence base sufficient).*
+
+*Charter priority encoding still under observation (question-charter-priority-
 encoding).*

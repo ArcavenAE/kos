@@ -1,0 +1,69 @@
+id: brief-schema-tooling
+type: brief
+confidence: frontier
+title: "Build kos validate + kos graph — schema validation and graph rendering"
+content: |
+  Second implementation probe. Two subcommands:
+
+  `kos validate` — reads nodes/**/*.yaml, validates each against
+  schema/node.schema.yaml. Checks: required fields present, confidence
+  value valid, edge targets exist as node IDs, no orphan references,
+  filename matches node ID, file lives in correct confidence directory.
+
+  `kos graph` — reads all nodes, outputs dependency graph as mermaid
+  (default) or dot (--format dot). Nodes colored by confidence tier.
+  Edge labels show type and signal. Makes the graph VISIBLE for the
+  first time — currently 25 nodes + 130 probe work products that
+  nobody can see as a graph.
+
+  ## Why these are one probe
+
+  Both are read-only tools over the same YAML corpus. The validator
+  ensures data quality; the renderer makes the shape visible. Building
+  them together means the validator catches problems the renderer
+  would hit, and the renderer visualizes what the validator checks.
+
+  ## What we learn
+
+  This probe tests whether schema v0.3 (three times revised, never
+  tooled against) actually holds when code enforces it. Every node
+  that fails validation is a finding about schema-implementation drift.
+  The graph rendering will show whether the edge topology makes sense
+  visually or whether there are structural problems invisible in YAML.
+
+edges:
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Second build in the implementation pivot"
+  - target: question-node-schema-validity
+    type: derives
+    note: "First mechanical test of schema v0.3"
+provenance:
+  created_by: human
+  session: session-005
+  created_at: 2026-03-30
+brief:
+  hypothesis: |
+    Schema v0.3 is valid enough that > 90% of existing nodes pass
+    validation without modification. The remaining failures are drift
+    between the schema-as-documented and nodes-as-written — findings
+    about whether the schema is actually followed in practice.
+
+    The graph rendering will show a connected graph with clear
+    confidence-tier clustering. If the graph is mostly disconnected
+    (few edges between nodes), the edge model is underused. If the
+    graph is a hairball, the edge model is too permissive.
+  excluded_scope: |
+    - Ripple / drift detection (separate probe)
+    - Node creation or editing
+    - Probe work product validation (probes/ directory has different
+      formats than nodes/ — validate nodes first)
+    - Finding validation (findings/ may not conform to schema either)
+  success_signal: |
+    1. `kos validate` runs on all 25 nodes and reports pass/fail per node
+    2. > 90% of nodes pass without modification
+    3. Failures are genuine drift, not schema bugs
+    4. `kos graph` produces readable mermaid output for the 25-node graph
+    5. The graph reveals at least one structural insight not visible from
+       reading individual YAML files
+  timebox: "Session-007 (one session)"

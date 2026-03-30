@@ -1,0 +1,66 @@
+id: brief-rd-bridge
+type: brief
+confidence: frontier
+title: "Build kos bridge — extract RD findings into queryable kos format"
+content: |
+  Third implementation probe. Reads sprint/rd/*.md briefs from the
+  aae-orc orchestrator and extracts findings into structured YAML or
+  JSONL that kos tooling can query.
+
+  ADR-006 says RD briefs are "proto-kos artifacts" — same structure,
+  less ceremony. This tool makes the connection mechanical: it reads
+  the lighter-form findings (F-01 through F-10 in marvel-mvp-probe.md,
+  F1 through F38 in aclaude-distribution.md) and produces structured
+  records with: id, title, confidence, source_brief, source_repo,
+  date, and content.
+
+  This is NOT a format converter. It doesn't produce full kos nodes
+  with typed edges. It produces a queryable index of what was learned
+  across the ecosystem — the minimum needed for `kos orient` to
+  surface RD findings by repo.
+
+  ## What we learn
+
+  Whether the RD brief format is consistent enough to parse reliably.
+  The briefs were written by agents in conversation, not against a
+  schema. If they're too inconsistent, that's a finding about whether
+  ADR-006's "lighter form" needs more structure.
+
+  Also tests whether 48 RD findings + 28 kos findings compose into
+  a useful unified index, or whether the two corpora are too different
+  in shape to merge.
+
+edges:
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Third build in the implementation pivot"
+  - target: finding-028-threedoors-empirical-patterns
+    type: derives
+    note: "ThreeDoors JSONL pattern informs the output format"
+provenance:
+  created_by: human
+  session: session-005
+  created_at: 2026-03-30
+brief:
+  hypothesis: |
+    The RD briefs are consistent enough that > 70% of findings can be
+    extracted programmatically (regex + markdown parsing, no LLM needed).
+    The remaining 30% may need manual tagging or format standardization.
+
+    If extraction works: confirms that the RD-to-kos bridge is viable
+    with simple tooling.
+    If extraction fails (< 50% parseable): redirects — the RD brief
+    format needs a schema before the bridge can work.
+  excluded_scope: |
+    - Full kos node generation (typed edges, correspondence links)
+    - Automated confidence classification (human judgment required)
+    - ThreeDoors retrospector integration (different project, different format)
+    - Any LLM-based extraction (keep it simple, test the simple approach)
+  success_signal: |
+    1. Tool reads all 4 RD briefs and extracts a structured index
+    2. > 70% of numbered findings (F-01 through F-10, F1 through F38)
+       appear in the output with id, title, confidence, source_repo
+    3. `kos orient marvel` uses the index to surface marvel-relevant
+       findings that don't exist in kos's own findings/
+    4. The unified index is < 1 file, queryable with grep/jq
+  timebox: "Session-008 (one session)"

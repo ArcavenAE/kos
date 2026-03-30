@@ -1,0 +1,102 @@
+id: finding-028-threedoors-empirical-patterns
+type: finding
+confidence: frontier
+title: "ThreeDoors dark factory validates kos patterns empirically — JSONL, provenance labels, and agent failures as pattern instances"
+content: |
+  ## Summary
+
+  ThreeDoors (2,028 commits, 870 PRs, 34 ADRs, persistent agent
+  infrastructure) has independently implemented several concepts that
+  kos theorizes about. These are practical solutions to immediate
+  problems, not tested principles — but they provide empirical data
+  about what works at one-repo scale.
+
+  ## Pattern matches
+
+  ### 1. Retrospector as primitive ripple engine
+  ThreeDoors's retrospector-findings.jsonl tracks per-PR metrics:
+  ac_match (acceptance criteria), ci_first_pass, conflicts,
+  rebase_count. This is structured observation of whether artifacts
+  meet expected properties — the simplest possible implementation of
+  what kos calls ripple. It works. It's JSONL, not a graph.
+
+  Implication for kos: the first drift detector doesn't need graph
+  infrastructure. JSONL with structured fields, queryable by jq/grep,
+  is a validated practical minimum.
+
+  ### 2. Provenance tagging as practical confidence
+  L0-L4 autonomy levels on commits, stories, and PR labels. This is
+  kos's provenance model (created_by, confidence) implemented as simple
+  GitHub labels and commit trailers. It works well enough for the dark
+  factory audit trail.
+
+  Implication for kos: provenance doesn't need to live in node YAML
+  metadata to be useful. It can be projected into labels, commit
+  trailers, and structured comments — as long as the projection is
+  reversible (you can reconstruct the provenance from the labels).
+
+  ### 3. INC-001: Enforcement gap at agent speed
+  pr-shepherd contaminated a shared checkout because the agent
+  definition didn't prohibit git checkout in shared space. The agent
+  followed its definition faithfully — the definition was wrong. This
+  is kos finding-026's enforcement gap pattern: spec says X, nothing
+  enforces X, permission system doesn't prevent violation.
+
+  Implication for kos: enforcement gaps are not just a document problem.
+  They appear in agent definitions, operational runbooks, and any
+  normative text that agents follow literally. The graph needs to model
+  normative claims and their enforcement mechanisms as separate nodes.
+
+  ### 4. INC-002: Silent abandonment at agent speed
+  A cargo-culted "git sync FIRST" instruction persisted in supervisor
+  memory for 3 days across 100+ dispatches despite being unnecessary.
+  It was never re-evaluated because it never failed loudly. This is
+  kos's silent abandonment pattern (finding-014) operating in real time.
+
+  Implication for kos: the graveyard principle applies to operational
+  instructions, not just design documents. Agent memory and standing
+  orders are a new surface for silent abandonment detection.
+
+  ### 5. INC-003: Cross-document consistency at agent speed
+  Four parallel agents self-assigned Epic 42 within 2 minutes. The
+  Epic Number Registry was the coordination document, but no agent
+  checked it atomically. This is B7 (review gap) at machine speed —
+  the review gap that takes weeks in human projects takes seconds when
+  agents produce artifacts in parallel.
+
+  Implication for kos: the graph's speed advantage (finding-023: "finds
+  issues before organic discovery") is even more valuable in agent-
+  heavy workflows where organic discovery happens in minutes, not months.
+
+  ## What ThreeDoors does NOT validate
+
+  - These are solutions for ONE repo at ONE scale. Generalization untested.
+  - Provenance tagging is manual convention — agents apply it because
+    told to, not because a system enforces it.
+  - The retrospector measures what's measurable (CI pass, conflicts),
+    not what kos cares about (knowledge accumulation, cross-document
+    consistency).
+  - Incident reports are post-hoc analysis, not prevention.
+
+  ThreeDoors is a source of examples, not principles. It shows what
+  works at one point in one project. kos's job is to find what
+  generalizes — and building tools is how we test that.
+
+edges:
+  - target: finding-023-signal-to-noise-four-projects
+    type: derives
+    note: "ThreeDoors was the ground-truth project for signal-to-noise"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "ThreeDoors evidence reinforces the implementation pivot"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-005
+  created_at: 2026-03-30
+  derived_from:
+    - finding-023-signal-to-noise-four-projects
+    - finding-027-implementation-pivot
+  reviewed_by: null
+finding:
+  probe: null
+  result: partial
