@@ -26,6 +26,10 @@ petgraph = "0.7"
 # File system traversal
 walkdir = "2"
 
+# Usage logging (opt-in)
+chrono = { version = "0.4", features = ["serde"] }
+dirs-next = "2"
+
 # Regex for markdown parsing
 regex = "1"
 
