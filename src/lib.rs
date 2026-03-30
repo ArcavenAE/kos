@@ -2,6 +2,7 @@
 
 pub mod bridge;
 pub mod doctor;
+pub mod drift;
 pub mod error;
 pub mod graph;
 pub mod init;

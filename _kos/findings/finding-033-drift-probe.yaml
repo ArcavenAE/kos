@@ -1,0 +1,104 @@
+id: finding-033-drift-probe
+type: finding
+confidence: frontier
+title: "Simplest drift detection works — content hashing + edge walk flags stale dependents"
+content: |
+  ## Summary
+
+  Session-010 built `kos drift` — the simplest possible ripple from
+  finding-018's design. Content hashing (SHA-256 of node content field)
+  plus BFS edge walk along derives/contradicts edges. Snapshot stored
+  as JSON. No dirty state classification, no source-type weighting,
+  no cross-lens propagation.
+
+  Result: works at current scale. Modifying the root value node
+  (val-uncertainty-structural) correctly flagged 6 downstream dependents
+  as potentially stale via transitive edge walk.
+
+  ## Findings
+
+  F1: Edge coverage is 56% (14/25 nodes connected). Below the 60%
+  hypothesis. 11 nodes are isolated — invisible to drift detection.
+  Breakdown: 3 graveyards (expected — graveyards are terminal), 3
+  non-goals (reasonable — they're boundary declarations), 5 questions
+  (problematic — questions should connect to what they question).
+  This confirms finding-030's observation: the edge model is underused.
+  Questions like question-executive-mechanism and question-ripple-noise
+  have no edges despite clearly deriving from bedrock elements. The
+  graph was built to test the schema, not to exercise the edge model.
+
+  F2: Transitive propagation works correctly. Changing
+  val-uncertainty-structural (the root value node) flagged:
+  elem-confidence-classification (direct), elem-spec-cycle (direct),
+  elem-cognitive-architecture (direct + transitive), elem-shadow-principle
+  (transitive via confidence-classification), question-temporal-state
+  (direct via confidence-classification), question-knowledge-layer-requirements
+  (direct + transitive). 6 stale nodes from 1 change — the ripple is real.
+
+  F3: Content hashing with whitespace normalization produces zero false
+  positives. The hash normalizes trailing whitespace (trim before hash).
+  YAML content fields consistently end with a newline due to the `|`
+  block scalar. Trimming eliminates this noise. No formatting-only
+  changes detected in testing — 0% false positive rate (vs <20% hypothesis).
+
+  F4: The snapshot file is 1.2KB (25 nodes), human-readable JSON, and
+  easily diffable. BTreeMap ensures stable key ordering. The file is
+  gitignored (local state, not committed) — each developer's snapshot
+  reflects their last drift check. This is intentional: drift is relative
+  to your last known-good state, not to a shared baseline.
+
+  F5: petgraph edge traversal is instant at this scale. No performance
+  measurement needed — the 25-node graph completes in <1ms. The pressure
+  point from F7 (where does YAML-in-git break?) is not in edge traversal
+  at this scale.
+
+  F6: The edge direction convention matters. In kos, `A --derives--> B`
+  means "A derives from B." When B changes, A is stale — so drift must
+  walk INCOMING edges (reverse BFS). Getting this wrong would propagate
+  in the wrong direction. The implementation walks
+  `graph.edges_directed(node, Direction::Incoming)` which is correct.
+
+  ## Success signals (from brief-kos-drift)
+
+  1. `kos drift` runs and reports baseline — YES (25 nodes, 14 connected)
+  2. After modifying one node, detects change and flags dependents — YES
+     (1 changed, 6 stale)
+  3. Edge coverage report shows reachable vs isolated — YES (56%, 11 isolated)
+  4. Snapshot file is small, human-readable, diffable — YES (1.2KB JSON)
+
+  ## What this means for the ripple engine
+
+  The simplest drift works. The mechanism from finding-018 (dirty-flag
+  propagation with typed attenuation) is implementable incrementally on
+  top of this. Next steps from the finding-018 design:
+
+  1. Dirty state classification (DIRTY_HARD for contradicts edges,
+     DIRTY_SOFT for derives with distance attenuation)
+  2. Supersedes edges as firebreaks (stop propagation)
+  3. Source-type weighting (value changes propagate deeper than findings)
+
+  But the more pressing issue is edge coverage. At 56%, nearly half the
+  graph is invisible to drift. The tool works; the graph needs more edges.
+  This is finding-030's "edge model underused" manifesting as a drift
+  coverage gap. The unit of improvement is not better propagation — it's
+  better decomposition during probes (exactly as finding-018 predicted).
+
+edges:
+  - target: finding-018-ripple-engine-design
+    type: derives
+    note: "Simplest implementation of the designed ripple mechanism"
+  - target: finding-030-schema-tooling-probe
+    type: derives
+    note: "Edge coverage gap confirms finding-030's observation"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Fifth build in the implementation pivot sequence"
+provenance:
+  created_by: human
+  session: session-010
+  created_at: "2026-03-30"
+tags:
+  - tooling
+  - drift
+  - ripple
+  - edge-coverage

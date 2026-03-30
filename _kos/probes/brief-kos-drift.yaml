@@ -1,0 +1,72 @@
+id: brief-kos-drift
+type: brief
+confidence: frontier
+title: "Build kos drift — simplest possible ripple detection"
+content: |
+  Fifth implementation probe. Implements the simplest version of the
+  ripple engine designed in finding-018: hash each node's content,
+  walk derives/contradicts edges, flag nodes whose upstream dependencies
+  have changed since the last drift snapshot.
+
+  This is NOT the full ripple engine from finding-018. No dirty states
+  (DIRTY_HARD/SOFT/STALE), no source-type weighting, no cross-lens
+  propagation. Just: content hash + edge walk + dirty flag. The simplest
+  thing that detects staleness.
+
+  ## What we learn
+
+  Whether edge traversal at the current graph scale (25 nodes, 18 edges)
+  works with petgraph and YAML-in-git. Whether the existing edge model
+  is sufficient for basic drift detection, or whether the underused edges
+  (finding-030: 6/9 questions have no edges to bedrock) make drift
+  meaningless.
+
+  Also tests whether content hashing is a viable change detection
+  mechanism for YAML nodes, or whether it produces too many false
+  positives (any whitespace/formatting change triggers).
+
+  ## Design
+
+  1. `kos drift` reads all nodes and computes content hashes (SHA-256
+     of the `content` field).
+  2. Compares against a stored snapshot (.kos-drift.json or similar).
+  3. For nodes whose hash changed, walks derives edges downstream and
+     flags dependents as potentially stale.
+  4. Reports: which nodes changed, which dependents are stale, which
+     nodes have no edges (invisible to drift).
+
+  First run with no snapshot: establishes baseline, reports graph
+  coverage (how many nodes are reachable via edges vs isolated).
+
+edges:
+  - target: finding-018-ripple-engine-design
+    type: derives
+    note: "Simplest implementation of the designed ripple mechanism"
+  - target: finding-030-schema-tooling-probe
+    type: derives
+    note: "Graph revealed edge model underuse — drift tests this"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Fifth build in the implementation pivot"
+provenance:
+  created_by: human
+  session: session-010
+  created_at: "2026-03-30"
+brief:
+  hypothesis: |
+    Content hashing + edge walking detects meaningful staleness in a
+    25-node graph with 18 edges. At least 60% of nodes are reachable
+    via edges (not isolated). False positive rate from content hashing
+    is < 20% (formatting-only changes are rare in YAML nodes).
+  excluded_scope: |
+    - Full dirty state classification (DIRTY_HARD/SOFT/STALE)
+    - Source-type weighting
+    - Cross-lens propagation via correspondence
+    - Automatic remediation or fix suggestions
+    - Multi-graph (--merged) drift detection
+  success_signal: |
+    1. `kos drift` runs and reports baseline (all nodes, hashes, edge coverage)
+    2. After modifying one node, `kos drift` detects the change and flags dependents
+    3. Edge coverage report shows how many nodes are reachable vs isolated
+    4. The snapshot file is small, human-readable, and diffable
+  timebox: "Session-010 (one session)"

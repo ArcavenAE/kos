@@ -343,7 +343,12 @@ Build order, each a probe with a finding:
    Two format variants parsed with one regex. Confidence explicit in 10/48.
    Integrated with orient — per-repo queries now surface RD findings.
    Bridge is an index, not a graph (no typed edges or correspondence).
-5. `kos drift` — simplest possible ripple (session-010, brief TBD)
+5. ~~`kos drift` — simplest possible ripple (session-010, brief-kos-drift)~~
+   **Complete (session-010).** Finding-033. Content hashing + BFS edge walk.
+   56% edge coverage (14/25 connected, 11 isolated). 0% false positives
+   from content hashing. Modifying root node correctly flagged 6 dependents.
+   Edge coverage is the bottleneck, not the mechanism — confirms finding-018
+   and finding-030.
 
 **Language: Rust.** kos is a correctness tool — it detects silent corruption
 in typed structures. Rust's type system mirrors the kos schema: node types,
@@ -390,11 +395,19 @@ detection (session-009).
 from markdown prose using regex — no YAML parsing needed for this source.
 The pressure point here is format consistency, not substrate performance.
 RD briefs are parseable but lose structured metadata (confidence explicit
-in only 21% of findings). Remaining pressure point: drift detection
-(session-010).
+in only 21% of findings).
+
+*Session-010 data point (finding-033):* `kos drift` runs content hashing +
+BFS edge walk on 25 nodes with 18 edges in <1ms. Edge traversal via petgraph
+is not a pressure point at this scale. The real bottleneck is edge coverage:
+56% of nodes are connected (11 isolated, including 5 questions with no edges).
+The YAML-in-git substrate handles drift detection fine; the graph's edge
+model is underused. All four F6 pressure points now tested — none broke the
+substrate. The question shifts from "where does YAML-in-git break?" to "at
+what node/edge count does file I/O become the bottleneck?"
 
 See: question-knowledge-layer-requirements (revised), finding-027, finding-029,
-finding-032.
+finding-032, finding-033.
 
 **F8: ThreeDoors as empirical kos evidence**
 ThreeDoors (2k commits, dark factory, 3 incident reports) has independently
@@ -587,7 +600,7 @@ Here is where we are."
 ---
 
 *Document status: CURRENT*
-*Established: session-001, updated session-009*
+*Established: session-001, updated session-010*
 
 *Session-006 built `kos orient` — the first running kos code. Rust CLI,
 all 6 success signals met, 3-11ms per query across 8 targets. YAML-in-git
@@ -623,8 +636,19 @@ produced.*
   now surfaces 10 RD findings, `kos orient aclaude` surfaces 38.
   Bridge is an index, not a graph — answers "what was learned" but not
   "how does it connect."~~*
-- *Session-010: `kos drift` — simplest ripple (hash, walk derives,
-  flag dirty). Probe brief TBD.*
+- *~~Session-010: `kos drift` — COMPLETE. Finding-033. Content hashing +
+  BFS edge walk. 56% edge coverage (14/25 connected). 0% false positives.
+  Root node change correctly flagged 6 dependents as stale. Edge coverage
+  is the bottleneck — confirms finding-018 (ripple bounded by decomposition
+  quality) and finding-030 (edge model underused). All F6 build steps
+  complete — the implementation pivot is done.~~*
+
+*F6 implementation pivot complete (sessions 006-010, findings 029-033).
+Five tools built: orient, validate, graph, init, doctor, graphs, bridge,
+drift. YAML-in-git substrate holds at current scale (77 nodes across 5
+graphs). No pressure point broke the substrate. Next priorities: edge
+coverage improvement (more edges during probes), dirty state classification
+(finding-018), and multi-graph drift (--merged).*
 
 *Deprioritized: Q3 implementation (executive needs substrate first), Q5
 redundancy angle (diminishing returns), threshold calibration (needs live

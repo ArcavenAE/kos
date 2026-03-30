@@ -72,6 +72,9 @@ enum Commands {
         update: bool,
     },
 
+    /// Detect drift — content changes and stale dependents
+    Drift,
+
     /// Extract RD findings from sprint/rd/ briefs into structured format
     Bridge {
         /// Output as JSONL instead of human-readable text
@@ -173,6 +176,13 @@ fn main() -> anyhow::Result<()> {
                 let node_root = workspace.node_root();
                 kos::graph::run(&node_root, fmt)?;
             }
+        }
+
+        Commands::Drift => {
+            let cwd = std::env::current_dir()?;
+            let workspace = kos::workspace::Workspace::discover(&cwd)?;
+            let node_root = workspace.node_root();
+            kos::drift::run(&node_root)?;
         }
 
         Commands::Bridge { json } => {

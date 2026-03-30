@@ -4,6 +4,9 @@
 # macOS
 .DS_Store
 
+# kos drift snapshots (local state, not committed)
+.drift-snapshot.json
+
 # IDE
 .idea/
 .vscode/
