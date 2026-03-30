@@ -24,6 +24,10 @@ enum Commands {
         /// Output as JSONL instead of human-readable text
         #[arg(long)]
         json: bool,
+
+        /// Append usage metrics to ~/.local/share/kos/orient.jsonl
+        #[arg(long)]
+        log: bool,
     },
 }
 
@@ -31,10 +35,15 @@ fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Orient { target, json: _ } => {
-            let target = target.as_deref().unwrap_or("(current directory)");
-            println!("kos orient: {target}");
-            println!("(not yet implemented — session-006 probe)");
+        Commands::Orient { target, json, log } => {
+            let cwd = std::env::current_dir()?;
+            let workspace = kos::workspace::Workspace::discover(&cwd)?;
+
+            let target = target
+                .or_else(|| workspace.infer_target(&cwd))
+                .unwrap_or_else(|| "kos".to_string());
+
+            kos::orient::run(&workspace, &target, json, log)?;
         }
     }
 
