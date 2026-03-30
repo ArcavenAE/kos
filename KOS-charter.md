@@ -587,14 +587,18 @@ produced.*
 
 *Session roadmap:*
 - *~~Session-006: `kos orient` — COMPLETE. Finding-029.~~*
-- *Session-007: Build `kos validate` + `kos graph` — schema validator
-  and graph renderer. Probe: brief-schema-tooling. Tests schema v0.3
-  mechanically for the first time.*
-- *Session-008: Build `kos bridge` — extract RD findings into queryable
-  format. Probe: brief-rd-bridge. Tests whether RD briefs compose with
-  kos findings into a unified index.*
-- *Session-009: Build `kos drift` — simplest ripple (hash, walk derives,
-  flag dirty). Probe brief TBD. Tests finding-018's design empirically.*
+- *~~Session-007: `kos validate` + `kos graph` — COMPLETE. Finding-030.
+  Schema v0.3 holds at 100% pass rate. Graph reveals structural asymmetries.~~*
+- *~~Session-008: `kos init` + `kos doctor` + `kos graphs` + distributed
+  graph infrastructure — COMPLETE. Finding-031. `_kos/` convention,
+  kos.yaml manifests, ideas/ directory, ideation stage. Rolled out to
+  5 repos (aae-orc 35 nodes, kos 25, aclaude 6, marvel 6, spectacle 5 =
+  77 total). Moved kos graph to `_kos/` (dogfood). Upgraded aae-orc
+  charter to re-introduction format. Mermaid edge label fix.~~*
+- *Session-009: `kos bridge` — extract RD findings into queryable format.
+  Probe: brief-rd-bridge.*
+- *Session-010: `kos drift` — simplest ripple (hash, walk derives,
+  flag dirty). Probe brief TBD.*
 
 *Deprioritized: Q3 implementation (executive needs substrate first), Q5
 redundancy angle (diminishing returns), threshold calibration (needs live
