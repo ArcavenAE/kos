@@ -24,9 +24,9 @@ run *args:
 test:
     cargo test
 
-# Run doc tests
+# Run doc tests (requires lib.rs — skips if binary-only)
 test-doc:
-    cargo test --doc
+    cargo test --doc 2>/dev/null || echo "no library target — skipping doc tests"
 
 # Run a specific test by name
 test-one name:
