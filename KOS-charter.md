@@ -285,6 +285,15 @@ sufficient as the compression artifact?
 *Session-005 note:* `kos orient` (brief-kos-orient, session-006) is the first
 tooling answer to F5 — mechanical context surfacing across repos.
 
+*Session-006 update:* `kos orient` built and validated (finding-029). Works
+across 8 targets in 3-11ms. The tool's value tracks graph coverage — probed
+repos (kos 18, axiathon 13, ThreeDoors 10) get rich output; unprobed repos
+(switchboard 0, aclaude 1) get charter items only. Knowledge distribution
+across the ecosystem is uneven. External repos work via --workspace flag /
+KOS_WORKSPACE env var. Remaining F5 question sharpened: when does the
+charter stop being sufficient? orient partially answers — the charter is
+sufficient but the graph is sparse where probes haven't run.
+
 **F6: Implementation pivot — from theory to tooling**
 Session-005 reviewed the full kos corpus and the aae-orc ecosystem. Central
 finding (027): kos's process works through RD vocabulary (ADR-006) but lacks
@@ -295,7 +304,11 @@ diminishing returns from more theory probes. The evidence base (16 projects,
 to begin building.
 
 Build order, each a probe with a finding:
-1. `kos orient` — cross-repo orientation CLI (session-006, brief-kos-orient)
+1. ~~`kos orient` — cross-repo orientation CLI (session-006, brief-kos-orient)~~
+   **Complete (session-006).** Finding-029. All 6 success signals met. YAML-in-git
+   reads work at current scale (3-11ms). Knowledge distribution uneven across
+   ecosystem. External workspace support via --workspace / KOS_WORKSPACE.
+   Opt-in usage logging (JSONL) working.
 2. `kos validate` + `kos graph` — schema tooling (session-007, brief-schema-tooling)
 3. `kos bridge` — RD-to-node extraction (session-008, brief-rd-bridge)
 4. `kos drift` — simplest possible ripple (session-009, brief TBD)
@@ -334,7 +347,14 @@ propagation (designed, not implemented). The answer comes from building: each
 tool in F6 tests a pressure point. Failure modes discovered during building
 compose into the requirements list.
 
-See: question-knowledge-layer-requirements (revised), finding-027.
+*Session-006 data point (finding-029):* `kos orient` reads ~100 artifacts
+in 3-11ms. No indexing needed. String matching for relevance filtering is
+adequate but coarse (F4: RD brief matching too broad). The substrate is
+not the bottleneck at this scale. Remaining pressure points: schema
+validation (session-007), edge traversal (session-007 graph), drift
+detection (session-009).
+
+See: question-knowledge-layer-requirements (revised), finding-027, finding-029.
 
 **F8: ThreeDoors as empirical kos evidence**
 ThreeDoors (2k commits, dark factory, 3 incident reports) has independently
@@ -460,11 +480,13 @@ substrate for full rationale and reopener.
    External temporal inconsistencies are contradicts edges. KOS lifecycle
    is derived from graph topology. See finding-004. Reopener documented.
 8. At what scale and complexity does the YAML-in-git approach break, and
-   what's the minimum additional infrastructure needed? **Opened (session-005).**
-   Revised from the original theoretical framing. The answer comes from
-   building tools on the current substrate and observing failure modes.
-   Sessions 006-009 are the probe. See question-knowledge-layer-requirements,
-   finding-027.
+   what's the minimum additional infrastructure needed? **Partially answered
+   (session-006).** Orient reads ~100 artifacts in 3-11ms — no infrastructure
+   needed at this scale. Relevance filtering is coarse (string matching) but
+   adequate. Usage logging tracks duration_ms to detect degradation
+   empirically as the corpus grows. Three pressure points remain untested:
+   schema validation (session-007), edge traversal (session-007), drift
+   detection (session-009). See finding-029.
 
 ---
 
@@ -503,24 +525,27 @@ Here is where we are."
 ---
 
 *Document status: CURRENT*
-*Established: session-001, updated session-005*
-*Next action: SESSION-005 PIVOT — from theory to tooling.*
+*Established: session-001, updated session-006*
 
-*Session-005 reviewed the full kos corpus (28 findings, 25 nodes, 11
-probes, schema v0.3) and the aae-orc ecosystem (aclaude, marvel,
-ThreeDoors). Found that kos's process works through RD vocabulary
-(ADR-006) across the ecosystem, but kos-the-repo has zero running code.
-The project was violating its own G3 (waterfall front-loading). The
-evidence base — 16 projects, 26 findings, validated schema, designed
-ripple and executive — is sufficient to begin building.*
+*Session-006 built `kos orient` — the first running kos code. Rust CLI,
+all 6 success signals met, 3-11ms per query across 8 targets. YAML-in-git
+substrate works at current scale. Knowledge distribution across the
+ecosystem is uneven — probed repos get rich output, unprobed repos get
+charter items only. External workspace support added (--workspace /
+KOS_WORKSPACE). Opt-in usage logging (JSONL) operational. Finding-029
+produced.*
 
-*Findings 027-028 produced. question-knowledge-layer-requirements revised
-from theoretical ("what properties?") to empirical ("where does simple
-break?"). Three probe briefs written for the next three sessions.*
+*Key session-006 observations:*
+- *spike-ocsf-rs1 uses kos process (hypotheses, questions, findings F1-F19,
+  charter discipline) but non-standard format — orient can't read it.
+  Future: local artifact scanning mode.*
+- *RD brief relevance filtering is too broad (string matching body text).
+  Refinement: weight title/question/frontier over body.*
+- *Knowledge coverage gap is now visible and measurable — orient makes it
+  obvious which repos kos has examined and which it hasn't.*
 
 *Session roadmap:*
-- *Session-006: Build `kos orient` — cross-repo orientation CLI (Rust).
-  Probe: brief-kos-orient. Tests F5/F10 (context continuity).*
+- *~~Session-006: `kos orient` — COMPLETE. Finding-029.~~*
 - *Session-007: Build `kos validate` + `kos graph` — schema validator
   and graph renderer. Probe: brief-schema-tooling. Tests schema v0.3
   mechanically for the first time.*

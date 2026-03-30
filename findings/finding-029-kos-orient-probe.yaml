@@ -1,0 +1,119 @@
+id: finding-029-kos-orient-probe
+type: finding
+confidence: frontier
+title: "kos orient confirms: YAML-in-git reads work at current scale, knowledge distribution is uneven, external repos need a different mode"
+content: |
+  ## Summary
+
+  Session-006 built `kos orient` — a Rust CLI that reads the aae-orc
+  charter, RD briefs, kos findings, and frontier questions, filters by
+  target repo, and outputs human-readable text or JSONL. All 6 success
+  signals from brief-kos-orient met. Tested against 8 targets across
+  three tiers of usefulness.
+
+  ## Findings
+
+  ### F1: YAML-in-git reads work at current scale
+
+  Simple file I/O over the current corpus (~28 findings, ~25 nodes, 4 RD
+  briefs, 1 charter) runs in 3-11ms per orient call. No indexing needed.
+  No database needed. serde_yaml deserialization and string matching are
+  sufficient for relevance filtering. The YAML-in-git substrate is not
+  the bottleneck at current scale.
+
+  This partially answers question-knowledge-layer-requirements: the
+  simple approach works for read-only orientation at ~100 artifacts.
+  Remaining question: at what count does it degrade? The usage log
+  tracks duration_ms per call to detect this empirically.
+
+  ### F2: Knowledge distribution is uneven across the ecosystem
+
+  | Target      | Charter | Findings | RD Briefs | Questions |
+  |-------------|---------|----------|-----------|-----------|
+  | kos         | 15      | 18       | 2         | 9         |
+  | marvel      | 22      | 1        | 4         | 1         |
+  | aclaude     | 12      | 1        | 3         | 0         |
+  | ThreeDoors  | 1       | 10       | 1         | 2         |
+  | switchboard | 9       | 0        | 1         | 0         |
+  | axiathon    | 0       | 13       | 0         | 0         |
+  | atmos       | 0       | 2        | 0         | 0         |
+  | aae-orc     | 4       | 1        | 1         | 1         |
+
+  kos knows most about itself (18 findings) and projects it has probed
+  (axiathon 13, ThreeDoors 10). Marvel has heavy charter coverage (22
+  items) but only 1 kos finding — it's been designed but not probed.
+  Switchboard has 0 findings — kos has never examined it.
+
+  The tool's value tracks graph coverage: probed repos get rich output,
+  unprobed repos get charter items only. This is exactly what B5 (shadow
+  principle) and B7 (review gap) predict — you can only see what's been
+  declared. Orient makes the coverage gap visible.
+
+  ### F3: External repos need explicit workspace configuration
+
+  Repos outside the aae-orc tree fail workspace discovery. Fixed by
+  adding --workspace flag and KOS_WORKSPACE env var. But even with
+  workspace access, external repos only get what kos knows about them
+  from its own findings — they can't surface their own local artifacts.
+
+  spike-ocsf-rs1 is the strongest example: it has 19 findings (F1-F19),
+  a formal spike charter with 3 hypotheses and 8 questions, and a
+  structured review record — all using kos-like process but non-standard
+  format. kos orient shows nothing because the graph has never ingested
+  these artifacts.
+
+  This reveals a scope boundary: orient currently queries the kos graph
+  ABOUT a target. A future mode could also read the target's LOCAL
+  artifacts (CLAUDE.md, charter-shaped markdown, finding-shaped content)
+  and surface those alongside the graph query. That's the bridge between
+  "kos as ecosystem tool" and "kos as general-purpose tool."
+
+  ### F4: RD brief relevance filtering is too broad
+
+  String matching "marvel" anywhere in an RD brief body inflates results.
+  aclaude-distribution mentions marvel, switchboard, and ThreeDoors in
+  passing — all four briefs show up for every target. Relevance should
+  weight title/question/frontier fields more than body mentions. This is
+  a refinement, not a redesign.
+
+  ### F5: Opt-in usage logging works and is immediately useful
+
+  The --log flag appends JSONL to ~/.local/share/kos/orient.jsonl. Seven
+  runs in session-006 already show the knowledge distribution pattern
+  (F2 above). Duration tracking (3-11ms) provides baseline for substrate
+  pressure monitoring. The pattern follows ThreeDoors's retrospector
+  model (finding-028) — structured, local, opt-in.
+
+  ## Assessment against probe success signals
+
+  1. orient from marvel/ shows frontier items, RD findings, questions — PASS
+  2. orient from aclaude/ shows relevant context — PASS
+  3. orient from kos/ shows kos's own state — PASS
+  4. --json produces JSONL — PASS
+  5. Runs in < 2 seconds — PASS (3-11ms)
+  6. Surfaces knowledge missed by reading only CLAUDE.md — PASS
+     (marvel orient shows F9 organizational model, F10 cross-repo
+     continuity, RD brief status — none in marvel's CLAUDE.md)
+
+  Result: CONFIRMS. The YAML-in-git substrate is sufficient for read-only
+  orientation at current scale. The tool is useful where the graph has
+  coverage and correctly empty where it doesn't.
+
+edges:
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "First implementation following the session-005 pivot"
+  - target: finding-028-threedoors-empirical-patterns
+    type: derives
+    note: "JSONL logging pattern from ThreeDoors retrospector"
+  - target: question-knowledge-layer-requirements
+    type: derives
+    note: "Partially answers: simple approach works at ~100 artifacts"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-006
+  created_at: 2026-03-30
+  reviewed_by: null
+finding:
+  probe: brief-kos-orient
+  result: confirms
