@@ -1,5 +1,6 @@
 #![forbid(unsafe_code)]
 
+pub mod bridge;
 pub mod doctor;
 pub mod error;
 pub mod graph;

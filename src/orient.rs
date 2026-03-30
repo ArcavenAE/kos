@@ -1,6 +1,7 @@
 use std::path::Path;
 use std::time::Instant;
 
+use crate::bridge::RdFinding;
 use crate::error::{KosError, Result};
 use crate::model::{CharterItem, CharterSection, Finding, Node, RdBrief};
 use crate::workspace::Workspace;
@@ -12,6 +13,7 @@ pub struct Orientation {
     pub charter_items: Vec<CharterItem>,
     pub findings: Vec<Finding>,
     pub rd_briefs: Vec<RdBrief>,
+    pub rd_findings: Vec<RdFinding>,
     pub frontier_questions: Vec<Node>,
 }
 
@@ -41,6 +43,7 @@ fn gather(workspace: &Workspace, target: &str) -> Result<Orientation> {
     let charter_items = load_charter_items(&workspace.root.join("charter.md"), target)?;
     let findings = load_findings(&workspace.kos_root.join("findings"), target)?;
     let rd_briefs = load_rd_briefs(&workspace.root.join("sprint/rd"), target)?;
+    let rd_findings = load_rd_findings(&workspace.root.join("sprint/rd"), target)?;
     let frontier_questions =
         load_frontier_questions(&workspace.kos_root.join("nodes/frontier"), target)?;
 
@@ -49,6 +52,7 @@ fn gather(workspace: &Workspace, target: &str) -> Result<Orientation> {
         charter_items,
         findings,
         rd_briefs,
+        rd_findings,
         frontier_questions,
     })
 }
@@ -348,6 +352,52 @@ fn extract_field<'a>(content: &'a str, field: &str) -> Option<&'a str> {
     None
 }
 
+// ── RD finding loading (via bridge) ──────────────────────────
+
+fn load_rd_findings(rd_dir: &Path, target: &str) -> Result<Vec<RdFinding>> {
+    if !rd_dir.exists() {
+        return Ok(vec![]);
+    }
+
+    let target_lower = target.to_lowercase();
+
+    // Use bridge extraction, then filter by target repo
+    let mut all_findings = Vec::new();
+    for entry in walkdir::WalkDir::new(rd_dir)
+        .max_depth(1)
+        .into_iter()
+        .filter_map(std::result::Result::ok)
+    {
+        let path = entry.path();
+        if !path.is_file() || path.extension().and_then(|e| e.to_str()) != Some("md") {
+            continue;
+        }
+
+        let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
+        let slug = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("unknown")
+            .to_string();
+
+        let source_repo = crate::bridge::infer_repo(&slug);
+        let findings = crate::bridge::extract_findings(&content, &slug, &source_repo);
+        all_findings.extend(findings);
+    }
+
+    // Filter: include findings whose source_repo matches, or whose content mentions the target
+    let filtered: Vec<RdFinding> = all_findings
+        .into_iter()
+        .filter(|f| {
+            f.source_repo.to_lowercase() == target_lower
+                || f.title.to_lowercase().contains(&target_lower)
+                || f.body.to_lowercase().contains(&target_lower)
+        })
+        .collect();
+
+    Ok(filtered)
+}
+
 // ── Output formatting ────────────────────────────────────────
 
 fn print_human(o: &Orientation) {
@@ -379,6 +429,18 @@ fn print_human(o: &Orientation) {
         println!();
     }
 
+    if !o.rd_findings.is_empty() {
+        println!("## RD findings for {}\n", o.target);
+        for f in &o.rd_findings {
+            print!("  [{}] {}", f.id, f.title);
+            if let Some(ref conf) = f.confidence {
+                print!(" ({conf})");
+            }
+            println!("  ← {}", f.source_brief);
+        }
+        println!();
+    }
+
     if !o.findings.is_empty() {
         println!("## kos findings mentioning {}\n", o.target);
         for finding in &o.findings {
@@ -398,8 +460,11 @@ fn print_human(o: &Orientation) {
         println!();
     }
 
-    let total =
-        o.charter_items.len() + o.findings.len() + o.rd_briefs.len() + o.frontier_questions.len();
+    let total = o.charter_items.len()
+        + o.findings.len()
+        + o.rd_briefs.len()
+        + o.rd_findings.len()
+        + o.frontier_questions.len();
     if total == 0 {
         println!("  (no items found mentioning '{}')", o.target);
         println!("  Try: kos orient kos | kos orient marvel | kos orient aclaude");
@@ -427,6 +492,19 @@ fn print_jsonl(o: &Orientation) {
             "frontier": brief.frontier,
             "status": brief.status,
             "path": brief.path.display().to_string(),
+        });
+        println!("{json}");
+    }
+
+    for f in &o.rd_findings {
+        let json = serde_json::json!({
+            "type": "rd_finding",
+            "target": o.target,
+            "id": f.id,
+            "title": f.title,
+            "confidence": f.confidence,
+            "source_brief": f.source_brief,
+            "source_repo": f.source_repo,
         });
         println!("{json}");
     }
@@ -477,6 +555,7 @@ fn append_usage_log(
         "charter_items": o.charter_items.len(),
         "findings": o.findings.len(),
         "rd_briefs": o.rd_briefs.len(),
+        "rd_findings": o.rd_findings.len(),
         "questions": o.frontier_questions.len(),
         "duration_ms": duration.as_millis(),
         "json_output": json_output,
