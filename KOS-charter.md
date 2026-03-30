@@ -75,6 +75,15 @@ Orient → Question → Probe → Harvest → Promote. Probes are timeboxed. Dea
 go to graveyard. Bedrock requires evidence, not consensus. The cycle is the
 unit, not the sprint or the phase.
 
+*Session-008 note:* Ideation stage identified between Orient and Question.
+In science: Observe → Ideate → Hypothesize → Experiment → Analyze → Conclude.
+In kos: Orient → **Ideate** → Question → Probe → Harvest → Promote. Ideas
+live in ideas/ as markdown — generative, possibly contradictory, pre-hypothesis.
+They are part of the graph's memory (DAG): internal knowledge that springs
+into existence. Contrast with external research (RAG): referenced, queried,
+external information. Ideas crystallize into frontier questions and probe
+briefs. See ideas/dag-vs-rag-knowledge-topology.md.
+
 **B3: The Storage Model**
 A content-addressed immutable fact store with cryptographic integrity and
 distributed sync. Every fact is a datom: (entity, attribute, value,
@@ -315,8 +324,13 @@ Build order, each a probe with a finding:
    is the root, 3/4 graveyards disconnected, 6/9 questions have no edges to
    bedrock — edge model underused. Tool architecture splits naturally into
    outward (orient) and inward (validate, graph, drift).
-3. `kos bridge` — RD-to-node extraction (session-008, brief-rd-bridge)
-4. `kos drift` — simplest possible ripple (session-009, brief TBD)
+3. ~~`kos init` + `kos doctor` + `kos graphs` — distributed graph infrastructure~~
+   **Complete (session-008).** Finding-031. `_kos/` convention (private-not-hidden),
+   kos.yaml manifest, graph discovery, `kos init` (full onboarding: dirs + charter
+   + CLAUDE.md + commit rules), `kos doctor` (structure/content/process/cross-repo
+   health checks). Three-tier graph model: orchestrator, repo-local, tool.
+4. `kos bridge` — RD-to-node extraction (session-009, brief-rd-bridge)
+5. `kos drift` — simplest possible ripple (session-010, brief TBD)
 
 **Language: Rust.** kos is a correctness tool — it detects silent corruption
 in typed structures. Rust's type system mirrors the kos schema: node types,
@@ -371,6 +385,28 @@ They inform implementation choices — particularly the JSONL output format for
 kos tooling.
 
 See: finding-028.
+
+**F9: Distributed graphs across multi-repo orchestrators**
+Session-008 studied three orchestrator repos and designed the pattern for
+distributing kos graphs. Finding-031 confirms a three-tier model:
+(1) orchestrator graph (_kos/ at orchestrator root — cross-repo questions,
+platform architecture), (2) repo-local graphs (_kos/ in subrepos — scoped
+questions), (3) kos's own graph (_kos/ in kos repo — epistemological knowledge).
+
+Convention: `_kos/` (underscore prefix, private-not-hidden). Manifest: kos.yaml
+with graph_id, scope, schema_version, includes. Cross-graph refs: `::` separator
+(kos::val-uncertainty-first). Orchestrator composes; subrepos don't look up.
+
+New CLI commands: `kos init` (onboarding: dirs + charter + CLAUDE.md + commit
+rules), `kos doctor` (health checks: structure, content, process, cross-repo),
+`kos graphs` (list discovered graphs).
+
+Remaining questions: Does the _kos/ convention survive contact with CI/CD
+pipelines? Does the manifest-based composition scale beyond ~10 included graphs?
+Does charter-as-projection (shadow of the graph) stay in sync without tooling,
+or does `kos project` become necessary?
+
+Evidence: finding-031, brief-distributed-graph.
 
 ---
 

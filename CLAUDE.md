@@ -47,9 +47,21 @@ Probe work products (decomposed nodes, test artifacts) live in /probes/[probe-sl
 Findings live in /findings/finding-NNN-[slug].yaml (numbered sequentially)
 These are separate from /nodes/ — probe artifacts are evidence, not graph nodes.
 
+### Ideas (pre-hypothesis brainstorming)
+Ideas live in /ideas/ as markdown files. They are generative, possibly
+contradictory, and carry no commitment — the ideation stage between Orient
+and Question. Ideas are part of the graph's memory (the DAG): internal
+knowledge that springs into existence. Contrast with external research
+(RAG): referenced, queried, reranked — external information we cite but
+don't own.
+
+When an idea crystallizes into something testable, extract it into a
+frontier question node and a probe brief. The idea file gets a note
+pointing to what it became.
+
 ### Session Protocol
 1. Read KOS-charter.md
-2. Identify the highest-value open question
+2. Identify the highest-value open question — or capture new ideas in /ideas/
 3. Write an Exploration Brief in /probes/
 4. Do the probe work
 5. Write a finding in /findings/

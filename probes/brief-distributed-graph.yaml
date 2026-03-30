@@ -1,0 +1,92 @@
+id: brief-distributed-graph
+type: brief
+confidence: frontier
+title: "Design and implement distributed knowledge graphs across multi-repo orchestrators"
+content: |
+  Third implementation probe. kos currently assumes a single graph rooted at
+  kos_root/nodes/. The orchestrator (aae-orc) needs its own graph for
+  platform-level knowledge, and subrepos may need local graphs for repo-scoped
+  questions. This probe designs the distributed pattern and builds the CLI
+  infrastructure: graph discovery, `kos init`, `kos doctor`, `kos graphs`.
+
+  ## The problem
+
+  Charter F10 (Cross-Repo Knowledge Continuity): knowledge is scattered across
+  repos with no single index. Starting in a subrepo loses orchestrator context.
+  Starting in the orchestrator loses subrepo state. Questions, probes, and
+  findings can be orchestrator-scoped (multi-repo) or repo-scoped (local), but
+  there's no convention for where they live or how the CLI finds them.
+
+  ADR-004 chose lightweight charter + ADRs over full kos process, anticipating
+  migration "when kos matures." kos has now validated its process across 7
+  sessions and 16 projects. The schema holds (v0.3, 100% mechanical pass rate).
+  The CLI works (orient, validate, graph). Time to adopt.
+
+  ## What we build
+
+  1. `_kos/` directory convention — private-not-hidden (underscore prefix, like
+     Jekyll _layouts/, Sass _partials/). Resolves naming collision: aae-orc/kos/
+     is source code, aae-orc/_kos/ is the graph. Visible in ls, included in
+     cp *, never lost to dotfile-skipping.
+
+  2. `kos.yaml` manifest — graph identity (graph_id, scope, schema_version,
+     includes). Orchestrators compose subrepo graphs via includes.
+
+  3. Graph discovery in Workspace — CLI finds _kos/ directories, follows
+     includes, falls back to legacy nodes/ layout.
+
+  4. `kos init` — full onboarding: _kos/ directories, kos.yaml, charter.md
+     template, CLAUDE.md session protocol, .claude/rules/kos-commits.md.
+
+  5. `kos doctor` — health checks: structure, content, process, cross-repo.
+     Like brew doctor.
+
+  ## What we learn
+
+  Does the distributed pattern hold when implemented? Does _kos/ discovery
+  work across the orchestrator's subrepo layout? Does kos init produce a
+  graph that passes kos doctor? Are the charter and CLAUDE.md templates
+  sufficient for a new project to start the kos process without prior context?
+
+  ## Subrepo inventory (existing kos-like content)
+
+  HIGH: aclaude (design-questions.md → frontier nodes), marvel (docs/spec/ →
+  manual projections), spectacle (kos-bridge.md → explicit integration spec)
+  LOW: ThreeDoors (own governance), switchboard (mature, careful mode)
+  NONE: director (not initialized), ai, ourbot (unrelated)
+
+edges:
+  - target: finding-030-schema-tooling-probe
+    type: derives
+    note: "Third build in the implementation pivot sequence"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Continues the implementation pivot — theory sufficient, build tools"
+provenance:
+  created_by: human
+  session: session-008
+  created_at: 2026-03-30
+brief:
+  hypothesis: |
+    The _kos/ directory convention with kos.yaml manifests is sufficient to
+    support distributed knowledge graphs across a multi-repo orchestrator.
+    Graph discovery via manifest includes works without requiring a central
+    index beyond the orchestrator's kos.yaml. The init command produces
+    graphs that pass doctor checks. The templates are sufficient for cold-start
+    adoption of the kos process.
+  excluded_scope: |
+    - Migrating aae-orc charter items to nodes (separate session, Part A)
+    - Moving kos's own graph to _kos/ (separate session, B6)
+    - Subrepo opt-in (ongoing, per-repo)
+    - kos bridge (separate probe, session-008+)
+    - kos drift / ripple (separate probe, session-009)
+  success_signal: |
+    1. `kos init` creates _kos/ with valid kos.yaml, charter template, CLAUDE.md
+       session protocol, and commit rules
+    2. `kos init --update` is idempotent — running twice changes nothing
+    3. `kos doctor` reports clean on a freshly initialized graph
+    4. `kos doctor` catches real problems (missing dirs, broken edges, stale charter)
+    5. `kos graphs` lists discovered graphs with node counts
+    6. Backward compatibility: existing kos commands work with legacy nodes/ layout
+  timebox: "Session-008 (one session)"
+  status: complete

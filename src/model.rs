@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// A kos graph node, deserialized from nodes/**/*.yaml.
 /// Handles both v0.1 (depends_on) and v0.2+ (edges) formats.
@@ -232,4 +232,55 @@ pub struct RdBrief {
     pub frontier: Option<String>,
     pub status: Option<String>,
     pub path: PathBuf,
+}
+
+// ── Graph manifest and discovery types ──────────────────────
+
+/// The kos.yaml manifest that identifies a knowledge graph.
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct GraphManifest {
+    pub graph_id: String,
+    pub scope: GraphScope,
+    #[serde(default)]
+    pub description: Option<String>,
+    pub schema_version: String,
+    #[serde(default)]
+    pub includes: Vec<GraphInclude>,
+}
+
+/// A graph scope — orchestrator (composes subrepo graphs) or repo (standalone).
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+#[non_exhaustive]
+pub enum GraphScope {
+    Orchestrator,
+    Repo,
+}
+
+impl std::fmt::Display for GraphScope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            GraphScope::Orchestrator => write!(f, "orchestrator"),
+            GraphScope::Repo => write!(f, "repo"),
+        }
+    }
+}
+
+/// A reference to an included subrepo graph in an orchestrator manifest.
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct GraphInclude {
+    pub path: String,
+}
+
+/// A discovered graph source on the filesystem.
+#[derive(Debug, Clone)]
+pub struct GraphSource {
+    /// The graph_id from kos.yaml.
+    pub graph_id: String,
+    /// Absolute path to the _kos/ directory.
+    pub path: PathBuf,
+    /// The graph scope.
+    pub scope: GraphScope,
+    /// The full parsed manifest.
+    pub manifest: GraphManifest,
 }
