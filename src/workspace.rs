@@ -66,6 +66,38 @@ impl Workspace {
         })
     }
 
+    /// Construct a workspace from an explicit path (--workspace or KOS_WORKSPACE).
+    /// The path should be the aae-orc root (containing kos/ subdir) or the kos
+    /// root itself (containing KOS-charter.md).
+    pub fn from_explicit(path: &Path) -> Result<Self> {
+        let path = std::fs::canonicalize(path).map_err(KosError::Io)?;
+
+        // Is this the kos root directly?
+        if path.join("KOS-charter.md").exists() {
+            let kos_root = path.clone();
+            let orc_root = path
+                .parent()
+                .map(Path::to_path_buf)
+                .unwrap_or_else(|| kos_root.clone());
+            return Ok(Workspace {
+                root: orc_root,
+                kos_root,
+            });
+        }
+
+        // Is this the aae-orc root with a kos/ subdir?
+        if path.join("kos").is_dir() {
+            return Ok(Workspace {
+                root: path.clone(),
+                kos_root: path.join("kos"),
+            });
+        }
+
+        Err(KosError::InvalidWorkspace {
+            path: path.display().to_string(),
+        })
+    }
+
     /// Infer the target repo name from a path.
     /// If the path is inside a known subrepo, return its name.
     /// Otherwise return None.

@@ -8,7 +8,7 @@ description = "Knowledge Operating System — graph-based knowledge accumulation
 
 [dependencies]
 # CLI
-clap = { version = "4", features = ["derive"] }
+clap = { version = "4", features = ["derive", "env"] }
 
 # Serialization (the graph substrate is YAML)
 serde = { version = "1", features = ["derive"] }
