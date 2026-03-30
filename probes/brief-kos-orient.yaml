@@ -27,9 +27,23 @@ content: |
 
   ## Language decision
 
-  Go. Reasons: matches marvel and switchboard, fast binary, no runtime
-  deps, ldflags for version injection, the ecosystem already builds Go.
-  kos becomes a Go CLI alongside marvel, switchboard, ai, ourbot.
+  Rust. kos is a correctness tool — its job is detecting silent corruption
+  in typed structures. Rust's type system mirrors the kos schema: node types,
+  edge types, confidence states, and signal classifications become enums with
+  exhaustive pattern matching. A forgotten case is a compile error, not a
+  silent bug. This is the same property kos provides to spec documents —
+  structural correctness enforced by the system, not by convention.
+
+  The ecosystem leans Go (marvel, switchboard, ai, ourbot), but kos's nature
+  is different from those tools. Marvel manages processes. Switchboard relays
+  sessions. kos enforces typed structure — the problem Rust was built for.
+  Paying the startup cost now (cargo instead of just, new CI templates)
+  sidesteps a probable Go-to-Rust refactor after significant investment.
+
+  Prior art in the portfolio: project-alpha (mature Rust, excellent test patterns,
+  CI/CD templates), jira-cli (Rust, Homebrew distribution, Apple code signing).
+  Build infrastructure for Rust binaries with Homebrew tap and macOS packaging
+  already exists and can be adapted.
 
   ## Scope
 
@@ -52,11 +66,12 @@ provenance:
   created_at: 2026-03-30
 brief:
   hypothesis: |
-    A Go CLI that reads existing YAML/markdown artifacts across the
+    A Rust CLI that reads existing YAML/markdown artifacts across the
     aae-orc repo tree can provide useful cross-repo orientation without
     any new infrastructure. The YAML-in-git substrate is sufficient for
     a read-only tool at current scale (~25 nodes, ~48 RD findings, 1
-    charter, 8 subrepos).
+    charter, 8 subrepos). serde_yaml deserializes YAML directly into
+    typed Rust structs — the schema validation is partially free.
 
     If the tool is useful: confirms that simple file I/O is sufficient
     for the orientation use case at current scale.
@@ -69,7 +84,7 @@ brief:
     - Ripple / drift detection (separate probe)
     - Schema validation (separate probe)
     - Graph rendering (separate probe)
-    - Any infrastructure beyond Go + file I/O + git
+    - Any infrastructure beyond Rust + file I/O + git
   success_signal: |
     1. `kos orient` from aae-orc/marvel/ shows marvel's frontier items,
        RD findings, and open questions

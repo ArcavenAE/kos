@@ -300,6 +300,26 @@ Build order, each a probe with a finding:
 3. `kos bridge` — RD-to-node extraction (session-008, brief-rd-bridge)
 4. `kos drift` — simplest possible ripple (session-009, brief TBD)
 
+**Language: Rust.** kos is a correctness tool — it detects silent corruption
+in typed structures. Rust's type system mirrors the kos schema: node types,
+edge types, confidence states, and signal classifications become enums with
+exhaustive `match`. A forgotten case is a compile error, not a silent bug.
+This is the same structural guarantee kos provides to spec documents —
+correctness enforced by the system, not by convention.
+
+The aae-orc ecosystem leans Go (marvel, switchboard, ThreeDoors), but kos's
+nature differs from those tools. Marvel manages processes; switchboard relays
+sessions; kos enforces typed structure. Paying the Rust startup cost now
+sidesteps a probable Go-to-Rust refactor after significant investment. Prior
+art: project-alpha (mature Rust codebase, test patterns, CI/CD), jira-cli (Rust,
+Homebrew tap, Apple code signing). Build infrastructure for Rust binaries with
+Homebrew and macOS packaging already exists in the portfolio and can be adapted.
+
+Long-term benefits: serde_yaml gives typed deserialization (schema validation
+partially free at parse time), petgraph provides typed graph traversal for
+drift/ripple, exhaustive pattern matching over edge types prevents the exact
+class of silent bugs kos detects in other systems' documents.
+
 Each build tests the YAML-in-git substrate empirically. Where it breaks,
 those failures ARE the answer to question-knowledge-layer-requirements.
 
@@ -499,7 +519,7 @@ from theoretical ("what properties?") to empirical ("where does simple
 break?"). Three probe briefs written for the next three sessions.*
 
 *Session roadmap:*
-- *Session-006: Build `kos orient` — cross-repo orientation CLI (Go).
+- *Session-006: Build `kos orient` — cross-repo orientation CLI (Rust).
   Probe: brief-kos-orient. Tests F5/F10 (context continuity).*
 - *Session-007: Build `kos validate` + `kos graph` — schema validator
   and graph renderer. Probe: brief-schema-tooling. Tests schema v0.3
