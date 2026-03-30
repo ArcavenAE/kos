@@ -1,0 +1,94 @@
+# kos.yaml — Graph Manifest Schema
+#
+# Every _kos/ directory contains a kos.yaml that identifies the graph
+# and declares how it participates in the larger kos ecosystem.
+#
+# Version: 0.3 (matches node schema version)
+
+required_fields:
+  graph_id:
+    type: string
+    format: "[a-z][a-z0-9-]*"
+    description: |
+      Unique identifier for this graph. Used as namespace prefix in
+      cross-graph edge references (e.g., kos::val-uncertainty-first).
+      Conventionally the repository or directory name.
+
+  scope:
+    type: enum
+    values:
+      orchestrator: "Top-level graph that composes subrepo graphs via includes"
+      repo: "Repository-scoped standalone graph"
+    description: |
+      Determines whether this graph composes other graphs. Only
+      orchestrator-scoped graphs use the includes field.
+
+  schema_version:
+    type: string
+    description: |
+      The kos node schema version this graph targets. Used by
+      kos doctor to check compatibility and kos init --update
+      to bump versions.
+
+optional_fields:
+  description:
+    type: string
+    description: "Human-readable description of what knowledge this graph contains"
+
+  includes:
+    type: list
+    description: |
+      Only valid for scope: orchestrator. Relative paths from the
+      orchestrator root to subrepo _kos/ directories. The orchestrator
+      discovers and composes these graphs for --merged operations.
+    items:
+      path:
+        type: string
+        description: "Relative path to a subrepo _kos/ directory"
+
+# Directory structure:
+#
+# _kos/
+#   kos.yaml               manifest (this file's schema)
+#   nodes/                  typed YAML nodes (the graph)
+#     bedrock/              committed, evidence-based
+#     frontier/             active hypothesis
+#     graveyard/            ruled out, append-only
+#     placeholder/          honest unknown
+#   findings/               probe results (YAML)
+#   probes/                 exploration briefs (YAML)
+#   ideas/                  pre-hypothesis brainstorming (markdown)
+#                           Ideas are generative, possibly contradictory,
+#                           and carry no commitment. They are part of the
+#                           graph's memory (the DAG) — internal knowledge
+#                           that springs into existence. When an idea
+#                           crystallizes into something testable, it becomes
+#                           a frontier question node + probe brief.
+#                           Contrast with external research (RAG) which is
+#                           referenced, queried, reranked — external
+#                           information, not internal ideation.
+
+# Cross-graph edge references:
+#
+# Within a graph, edge targets are bare node IDs: val-uncertainty-first
+# Across graphs, edge targets use :: separator: kos::val-uncertainty-first
+# The prefix is the graph_id of the target graph.
+# Resolution: current graph first, then orchestrator, then includes in order.
+
+# Example: orchestrator manifest
+#
+# graph_id: aae-orc
+# scope: orchestrator
+# description: "Platform architecture knowledge graph"
+# schema_version: "0.3"
+# includes:
+#   - path: kos/_kos
+#   - path: marvel/_kos
+#   - path: aclaude/_kos
+
+# Example: repo-local manifest
+#
+# graph_id: kos
+# scope: repo
+# description: "Epistemological knowledge — kos's own design substrate"
+# schema_version: "0.3"

@@ -19,6 +19,15 @@ pub enum KosError {
 
     #[error("explicit workspace path does not contain a kos/ directory: {path}")]
     InvalidWorkspace { path: String },
+
+    #[error("manifest error in {path}: {message}")]
+    Manifest { path: String, message: String },
+
+    #[error("graph already exists at {path}")]
+    GraphExists { path: String },
+
+    #[error("init error: {message}")]
+    Init { message: String },
 }
 
 pub type Result<T> = std::result::Result<T, KosError>;

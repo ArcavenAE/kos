@@ -1,0 +1,132 @@
+id: finding-031-distributed-graph-pattern
+type: finding
+confidence: frontier
+title: "Distributed graph pattern validated by studying three orchestrator repos"
+content: |
+  ## Summary
+
+  Session-008 studied three orchestrator repos (aae-orc, alpha-orc, orc-penny)
+  and the kos ecosystem to design the pattern for distributing knowledge
+  graphs across multi-repo projects. The finding: a three-tier graph model
+  with orchestrator composition, repo-local graphs, and a naming convention
+  that resolves the kos/ naming collision.
+
+  ## Findings
+
+  ### F1: Three-tier graph model emerges naturally
+
+  Knowledge graphs need three tiers, matching how repos are organized:
+
+  1. **Orchestrator graph** (aae-orc/_kos/) — cross-repo questions, platform
+     architecture decisions, multi-repo probe findings. This is where charter
+     items F1-F18 belong as typed nodes.
+
+  2. **Repo-local graph** (aclaude/_kos/, marvel/_kos/) — repo-scoped
+     questions that don't escalate. aclaude's design-questions.md is exactly
+     this: local questions that currently restate charter frontier items
+     because there's no local graph to hold them.
+
+  3. **Tool graph** (kos/_kos/) — kos's own epistemological knowledge about
+     knowledge systems. Separate concern from the platform graph.
+
+  The orchestrator composes tier 2 and 3 graphs via `includes` in its
+  kos.yaml manifest. Subrepos don't look up — one-directional composition
+  preserves component independence (SOUL.md §2).
+
+  ### F2: _kos/ convention (private-not-hidden) resolves naming collision
+
+  The kos source code repo lives at aae-orc/kos/. The graph cannot also
+  be at aae-orc/kos/. Dotdir (.kos/) was considered but rejected:
+  `.kos/` would be invisible in `ls`, skipped by `cp *`, excluded by
+  many glob patterns. The most important files in a repo should never be
+  invisible.
+
+  Underscore prefix (_kos/) means private-not-hidden: visible in `ls`,
+  included in `cp *` and glob patterns, signals "infrastructure, not
+  primary content." Precedent: Jekyll `_layouts/`, Sass `_partials/`,
+  Next.js `_app/`, Python dunder `__init__`.
+
+  ### F3: alpha-orc demonstrates multi-source reconciliation at scale
+
+  alpha-orc (Project Alpha orchestrator) tracks status across 5 sources
+  simultaneously: YAML epic shards, Jira tickets, GitHub PRs (2 repos),
+  and an upstream orchestrator. The synk-ax skill reconciles drift across
+  sources without enforcing single truth.
+
+  Key insight: different systems naturally drift. Rather than enforce one
+  source of truth, track all versions and decide locally what to push.
+  kos's signal classification (error, evolution, drift) maps directly to
+  synk-ax's neutral language ("drift", "stale status", "version difference").
+
+  ### F4: Session records ARE probe artifacts
+
+  alpha-orc's sprint/archive/ stores full session records documenting the
+  journey, not just the outcome. These are functionally identical to kos
+  findings — they capture what was tried, what was learned, what changed.
+  The difference is format (prose markdown vs typed YAML) and structure
+  (no edges, no confidence tiers, no provenance fields).
+
+  This validates kos's finding format: structured findings with typed
+  metadata are strictly more useful than prose session records. The prose
+  is recoverable from the finding's content field; the structure is not
+  recoverable from prose.
+
+  ### F5: Existing kos-like content in subrepos needs migration paths
+
+  Subrepo inventory:
+  - aclaude: docs/design-questions.md cross-references charter F13/F14/F16/F18.
+    These should be frontier question nodes in aclaude/_kos/.
+  - marvel: docs/spec/ contains requirements.md, design.md, stories.md.
+    These are manual projections that kos will eventually generate.
+  - spectacle: docs/kos-bridge.md is the explicit specification for how
+    kos nodes map to spectacle templates. This is the bridge document.
+  - ThreeDoors: docs/decisions/ has ADRs, story-driven governance. Self-
+    contained, low migration priority.
+
+  `kos init` needs to handle repos that already have kos-like content:
+  detect existing charter.md, CLAUDE.md, design docs. Don't overwrite —
+  augment with session protocol and graph structure.
+
+  ### F6: kos init must create operational documents, not just directories
+
+  An init that only creates empty directories is barely more useful than
+  mkdir -p. The onboarding tool must create: kos.yaml manifest, charter.md
+  template (problem statement, values, non-goals, B/F/G, session log),
+  CLAUDE.md session protocol (Orient → Question → Probe → Harvest →
+  Promote), and commit convention rules. The templates must be sufficient
+  for a cold-start session to follow the kos process without prior context.
+
+  ### F7: kos doctor fills the gap between validate and process compliance
+
+  `kos validate` checks individual nodes against schema. `kos doctor`
+  checks the health of the entire kos installation: structure (dirs exist,
+  manifest parses), content (nodes valid, edges resolve), process (charter
+  recent, probes have briefs, findings reference probes), and cross-repo
+  (includes reachable, no ID collisions). Like brew doctor — run it when
+  something feels wrong or after migration.
+
+  ## Assessment
+
+  Result: CONFIRMS hypothesis. The three-tier model, _kos/ convention,
+  manifest-based composition, init onboarding, and doctor health checks
+  form a coherent pattern for distributing kos across multi-repo
+  orchestrators. Implementation follows.
+
+edges:
+  - target: finding-030-schema-tooling-probe
+    type: derives
+    note: "Builds on validated schema and graph rendering"
+  - target: finding-029-kos-orient-probe
+    type: derives
+    note: "Orient's workspace discovery is the foundation for graph discovery"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Third step in the implementation pivot"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-008
+  created_at: 2026-03-30
+  reviewed_by: null
+finding:
+  probe: brief-distributed-graph
+  result: confirms
