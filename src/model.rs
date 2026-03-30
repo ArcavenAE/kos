@@ -3,20 +3,78 @@ use std::path::PathBuf;
 use serde::Deserialize;
 
 /// A kos graph node, deserialized from nodes/**/*.yaml.
-/// Fields are optional where the schema allows absence.
+/// Handles both v0.1 (depends_on) and v0.2+ (edges) formats.
 #[derive(Debug, Deserialize)]
 pub struct Node {
     pub id: String,
     #[serde(rename = "type")]
-    pub node_type: String,
+    pub node_type: NodeType,
     pub confidence: Confidence,
     pub title: String,
     pub content: String,
+    /// v0.2+ typed edges
     #[serde(default)]
     pub edges: Vec<Edge>,
-    /// Source file path (not in YAML — populated after loading)
+    /// v0.1 compatibility — flat list of node IDs (treated as derives edges)
+    #[serde(default)]
+    pub depends_on: Vec<String>,
+    /// Type-specific graveyard section
+    #[serde(default)]
+    pub graveyard: Option<GraveyardSection>,
+    #[serde(default)]
+    pub provenance: Option<Provenance>,
+    #[serde(default)]
+    pub tags: Vec<String>,
+    #[serde(default)]
+    pub notes: Option<String>,
+    /// Source file path (populated after loading, not in YAML)
     #[serde(skip)]
     pub source_path: PathBuf,
+}
+
+impl Node {
+    /// Return all edges, unifying depends_on (v0.1) and edges (v0.2+).
+    pub fn all_edges(&self) -> Vec<Edge> {
+        let mut result = self.edges.clone();
+        for dep in &self.depends_on {
+            result.push(Edge {
+                target: dep.clone(),
+                edge_type: EdgeType::Derives,
+                signal: None,
+                note: None,
+            });
+        }
+        result
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+#[non_exhaustive]
+pub enum NodeType {
+    Value,
+    NonGoal,
+    Question,
+    Brief,
+    Finding,
+    Element,
+    Graveyard,
+    Correspondence,
+}
+
+impl std::fmt::Display for NodeType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            NodeType::Value => write!(f, "value"),
+            NodeType::NonGoal => write!(f, "non-goal"),
+            NodeType::Question => write!(f, "question"),
+            NodeType::Brief => write!(f, "brief"),
+            NodeType::Finding => write!(f, "finding"),
+            NodeType::Element => write!(f, "element"),
+            NodeType::Graveyard => write!(f, "graveyard"),
+            NodeType::Correspondence => write!(f, "correspondence"),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
@@ -29,29 +87,107 @@ pub enum Confidence {
     Graveyard,
 }
 
-impl std::fmt::Display for Confidence {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Confidence {
+    /// The directory name this confidence maps to.
+    pub fn directory(&self) -> &str {
         match self {
-            Confidence::Bedrock => write!(f, "bedrock"),
-            Confidence::Frontier => write!(f, "frontier"),
-            Confidence::Placeholder => write!(f, "placeholder"),
-            Confidence::Graveyard => write!(f, "graveyard"),
+            Confidence::Bedrock => "bedrock",
+            Confidence::Frontier => "frontier",
+            Confidence::Placeholder => "placeholder",
+            Confidence::Graveyard => "graveyard",
         }
     }
 }
 
-#[derive(Debug, Deserialize)]
+impl std::fmt::Display for Confidence {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.directory())
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
 pub struct Edge {
     pub target: String,
     #[serde(rename = "type")]
-    pub edge_type: String,
+    pub edge_type: EdgeType,
     #[serde(default)]
-    pub signal: Option<String>,
+    pub signal: Option<SignalType>,
     #[serde(default)]
     pub note: Option<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "lowercase")]
+#[non_exhaustive]
+pub enum EdgeType {
+    Derives,
+    Implements,
+    Contradicts,
+    Supersedes,
+}
+
+impl std::fmt::Display for EdgeType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            EdgeType::Derives => write!(f, "derives"),
+            EdgeType::Implements => write!(f, "implements"),
+            EdgeType::Contradicts => write!(f, "contradicts"),
+            EdgeType::Supersedes => write!(f, "supersedes"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "lowercase")]
+#[non_exhaustive]
+pub enum SignalType {
+    Error,
+    Evolution,
+    Drift,
+}
+
+impl std::fmt::Display for SignalType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SignalType::Error => write!(f, "error"),
+            SignalType::Evolution => write!(f, "evolution"),
+            SignalType::Drift => write!(f, "drift"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct GraveyardSection {
+    #[serde(default)]
+    pub approach: Option<String>,
+    #[serde(default)]
+    pub context: Option<String>,
+    #[serde(default)]
+    pub finding: Option<String>,
+    #[serde(default)]
+    pub ruling: Option<String>,
+    #[serde(default)]
+    pub reopener: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct Provenance {
+    #[serde(default)]
+    pub created_by: Option<String>,
+    #[serde(default)]
+    pub session: Option<String>,
+    #[serde(default)]
+    pub created_at: Option<String>,
+    #[serde(default)]
+    pub derived_from: Vec<String>,
+    #[serde(default)]
+    pub reviewed_by: Option<String>,
+}
+
+// ── Types used by orient (lighter, for findings/charter) ─────
+
 /// A kos finding, deserialized from findings/finding-NNN-*.yaml.
+/// Uses String types for fields that orient only displays, not validates.
 #[derive(Debug, Deserialize)]
 pub struct Finding {
     pub id: String,
@@ -63,7 +199,6 @@ pub struct Finding {
 }
 
 /// A charter section extracted from markdown.
-/// Not deserialized from YAML — parsed from charter.md.
 #[derive(Debug)]
 pub struct CharterItem {
     pub id: String,
@@ -89,7 +224,7 @@ impl std::fmt::Display for CharterSection {
     }
 }
 
-/// An RD brief header, extracted from sprint/rd/*.md frontmatter.
+/// An RD brief header, extracted from sprint/rd/*.md.
 #[derive(Debug)]
 pub struct RdBrief {
     pub slug: String,
