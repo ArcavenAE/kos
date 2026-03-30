@@ -309,7 +309,12 @@ Build order, each a probe with a finding:
    reads work at current scale (3-11ms). Knowledge distribution uneven across
    ecosystem. External workspace support via --workspace / KOS_WORKSPACE.
    Opt-in usage logging (JSONL) working.
-2. `kos validate` + `kos graph` — schema tooling (session-007, brief-schema-tooling)
+2. ~~`kos validate` + `kos graph` — schema tooling (session-007, brief-schema-tooling)~~
+   **Complete (session-007).** Finding-030. 25 nodes, 0 failures, 2 warnings.
+   Schema v0.3 holds at 100% pass rate. Graph reveals: val-uncertainty-structural
+   is the root, 3/4 graveyards disconnected, 6/9 questions have no edges to
+   bedrock — edge model underused. Tool architecture splits naturally into
+   outward (orient) and inward (validate, graph, drift).
 3. `kos bridge` — RD-to-node extraction (session-008, brief-rd-bridge)
 4. `kos drift` — simplest possible ripple (session-009, brief TBD)
 
@@ -525,7 +530,7 @@ Here is where we are."
 ---
 
 *Document status: CURRENT*
-*Established: session-001, updated session-006*
+*Established: session-001, updated session-007*
 
 *Session-006 built `kos orient` — the first running kos code. Rust CLI,
 all 6 success signals met, 3-11ms per query across 8 targets. YAML-in-git
