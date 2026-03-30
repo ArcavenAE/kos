@@ -12,6 +12,7 @@ clap = { version = "4", features = ["derive"] }
 
 # Serialization (the graph substrate is YAML)
 serde = { version = "1", features = ["derive"] }
+# TODO: serde_yaml is archived/deprecated — migrate to serde_yml before v1.0
 serde_yaml = "0.9"
 serde_json = "1"
 
