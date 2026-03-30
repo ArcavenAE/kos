@@ -1,0 +1,82 @@
+id: brief-kos-orient
+type: brief
+confidence: frontier
+title: "Build kos orient — cross-repo orientation CLI"
+content: |
+  First implementation probe. Build a CLI tool that, from any directory
+  in the aae-orc ecosystem, surfaces relevant knowledge: open frontier
+  questions, findings, RD briefs, and charter items for the current repo.
+
+  This serves charter F10 (cross-repo knowledge continuity) and marvel
+  F-08 ("this is kos's problem"). The tool doesn't need a graph database.
+  It needs to read existing artifacts (charter, RD briefs, CLAUDE.md files,
+  kos nodes) and present the relevant subset.
+
+  ## What the tool does
+
+  `kos orient` (or `kos orient marvel`) reads:
+  1. aae-orc charter (bedrock, frontier, graveyard) — filters items
+     mentioning the target repo
+  2. sprint/rd/*.md — finds RD briefs involving the target repo
+  3. kos findings — finds findings that reference the target repo
+  4. subrepo CLAUDE.md — reads the target repo's own context
+  5. kos frontier questions — surfaces open questions relevant to target
+
+  Output: human-readable summary (default) and JSONL (--json flag),
+  following the ThreeDoors retrospector pattern for machine consumption.
+
+  ## Language decision
+
+  Go. Reasons: matches marvel and switchboard, fast binary, no runtime
+  deps, ldflags for version injection, the ecosystem already builds Go.
+  kos becomes a Go CLI alongside marvel, switchboard, ai, ourbot.
+
+  ## Scope
+
+  MVP is read-only orientation. No graph mutations, no node creation,
+  no ripple. Just: "given where I am, what should I know?"
+
+  Later: `kos validate` (schema), `kos graph` (render), `kos drift`
+  (ripple). These are separate probes.
+
+edges:
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "This probe implements the pivot's first recommendation"
+  - target: question-knowledge-layer-requirements
+    type: derives
+    note: "Building this tool tests the YAML-in-git substrate empirically"
+provenance:
+  created_by: human
+  session: session-005
+  created_at: 2026-03-30
+brief:
+  hypothesis: |
+    A Go CLI that reads existing YAML/markdown artifacts across the
+    aae-orc repo tree can provide useful cross-repo orientation without
+    any new infrastructure. The YAML-in-git substrate is sufficient for
+    a read-only tool at current scale (~25 nodes, ~48 RD findings, 1
+    charter, 8 subrepos).
+
+    If the tool is useful: confirms that simple file I/O is sufficient
+    for the orientation use case at current scale.
+    If reading is too slow or the relevance filtering is too noisy:
+    partial — needs indexing or structured metadata.
+    If the artifact formats are too inconsistent to parse reliably:
+    redirects — the RD briefs need standardization before tooling.
+  excluded_scope: |
+    - Graph mutations (no node creation or editing)
+    - Ripple / drift detection (separate probe)
+    - Schema validation (separate probe)
+    - Graph rendering (separate probe)
+    - Any infrastructure beyond Go + file I/O + git
+  success_signal: |
+    1. `kos orient` from aae-orc/marvel/ shows marvel's frontier items,
+       RD findings, and open questions
+    2. `kos orient` from aae-orc/aclaude/ shows aclaude's relevant context
+    3. `kos orient` from aae-orc/kos/ shows kos's own state
+    4. --json flag produces JSONL consumable by agents
+    5. The tool runs in < 2 seconds on the current repo tree
+    6. At least one instance where the tool surfaces knowledge that
+       would have been missed by reading only the subrepo's CLAUDE.md
+  timebox: "Session-006 (one session)"

@@ -1,0 +1,95 @@
+id: finding-027-implementation-pivot
+type: finding
+confidence: frontier
+title: "kos process works through RD vocabulary but lacks mechanical connection — the theory-practice gap"
+content: |
+  ## Summary
+
+  Session-005 reviewed the full kos corpus (26 findings, 25 nodes, 11
+  probes, schema v0.3, 4 sessions of git history) alongside the aae-orc
+  ecosystem (aclaude 37k lines, marvel 3.6k lines, 4 RD briefs, 6 ADRs,
+  ThreeDoors 2k commits with dark factory infrastructure).
+
+  Central finding: kos's process (Orient → Question → Probe → Harvest →
+  Promote) IS being used across the ecosystem — formalized as ADR-006
+  "Rapid Development as kos probe cycle applied to code." Marvel produced
+  10 findings with explicit confidence classification. Aclaude produced
+  38 distribution findings. Commit messages use kos vocabulary (probe,
+  finding, harvest). The process works.
+
+  But kos-the-repo has zero running code. The process runs on manual
+  conventions (RD briefs in markdown, commit message prefixes, charter
+  items) that don't compose mechanically. No tool reads RD briefs and
+  surfaces relevant findings. No tool traverses edges between nodes.
+  No tool validates the schema that's been revised three times.
+
+  The gap: kos has spent 4 sessions establishing that it's right (26
+  findings, 16 projects, 45% consequential signal) without building
+  anything that makes the knowledge usable. The project's own graveyard
+  entry G3 (waterfall front-loading) says "code is now cheap enough to
+  be a learning instrument" — but the project has been front-loading
+  theory before building.
+
+  ## Evidence
+
+  SETUP.md (session-001) laid out 7 implementation steps after schema
+  validation. Steps 2-8 have not started:
+  - CLI tooling (not started)
+  - Graph rendering (not started)
+  - Drift detection (not started)
+  - Document ingestion (not started)
+  - Correspondence layer (not started)
+  - Agent contracts (not started)
+  - Ripple engine (designed in finding-018, not implemented)
+
+  Meanwhile, the ecosystem has a concrete problem kos could solve:
+  - Marvel F-08: "Cross-repo knowledge continuity is a real problem.
+    This is kos's problem."
+  - Charter F10: Starting work in a subrepo loses orchestrator context.
+  - ThreeDoors INC-003: Four parallel agents collided on Epic 42 because
+    no tool checked cross-document consistency at agent speed.
+
+  ## The pivot
+
+  Stop probing the theory. Start building tools.
+
+  Build order (each is a probe with a finding):
+  1. `kos orient` — cross-repo orientation CLI (serves F10)
+  2. Schema validator + graph renderer (serves F4, validates schema v0.3)
+  3. RD-to-node bridge (connects RD briefs to kos graph)
+  4. Drift detector (simplest possible ripple: hash, walk, flag)
+
+  Each build is itself a kos probe: it asks a question, produces code,
+  and generates findings about where the current approach breaks. The
+  findings from building ARE the answer to question-knowledge-layer-
+  requirements — the requirements list emerges from implementation
+  failures, not from theoretical analysis.
+
+  ## Assessment
+
+  This is not a finding from a formal probe. It is a meta-finding from
+  reviewing the project's own trajectory against its principles. The
+  project's stated values (G3: code as learning instrument, B2: probes
+  are timeboxed) predict that more probing without building produces
+  diminishing returns. The evidence base (16 projects, 26 findings,
+  validated schema, designed ripple and executive) is sufficient to
+  begin implementation.
+
+edges:
+  - target: question-knowledge-layer-requirements
+    type: derives
+    note: "This finding grounds the knowledge-layer question in ecosystem needs"
+  - target: finding-022-executive-twelve-project-synthesis
+    type: derives
+    note: "The theory base is sufficient — 12-project validation complete"
+  - target: finding-023-signal-to-noise-four-projects
+    type: derives
+    note: "Signal-to-noise measured — 45% consequential"
+provenance:
+  created_by: human
+  session: session-005
+  created_at: 2026-03-30
+  reviewed_by: null
+finding:
+  probe: null
+  result: redirects

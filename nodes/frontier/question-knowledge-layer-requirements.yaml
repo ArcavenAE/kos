@@ -1,35 +1,42 @@
 id: question-knowledge-layer-requirements
 type: question
 confidence: frontier
-title: "What properties must the knowledge layer have that no current architecture fully provides?"
+title: "Where does YAML-in-git break, and what's the minimum additional infrastructure needed?"
 content: |
-  The cognitive architecture (B6) describes three layers: inference,
-  knowledge, and executive. The knowledge layer is currently implemented
-  as a typed node graph in YAML over a git substrate.
+  Revised from session-005's initial framing ("what properties must the
+  knowledge layer have?"). The original question asked for theoretical
+  requirements before evaluating architectures — an approach that violates
+  G3 (waterfall front-loading) and delays building indefinitely.
 
-  As the system scales beyond single-repo, single-session, single-human
-  operation, the knowledge layer will need properties the current
-  implementation doesn't have. Before evaluating candidate architectures
-  (RAG, DAG, graph databases, vector stores, hybrid approaches), we need
-  to state what we're evaluating against.
+  The revised question: the knowledge layer is currently YAML nodes in git,
+  read by humans and agents via file I/O. The aae-orc ecosystem already
+  uses this approach through RD briefs (sprint/rd/*.md), charter items,
+  and CLAUDE.md files. ThreeDoors uses JSONL (retrospector-findings.jsonl)
+  for structured per-PR metrics. These are working at current scale.
 
-  Specifically unknown:
-  - What retrieval properties are required? (semantic, structural, temporal, all three?)
-  - What write properties are required? (append-only, versioned, content-addressed?)
-  - What composition properties are required? (how does the knowledge layer
-    interface with inference and executive layers?)
-  - What is the minimum viable architecture that supports the promotion
-    of tacit to explicit — the property current graph models constitutionally lack?
+  At what scale and complexity does this approach break, and what is the
+  minimum additional infrastructure needed when it does?
 
-  Candidate architectures to evaluate once requirements are stated:
-  RAG (retrieval-augmented generation), DAG-based stores, property graph
-  databases (Neo4j class), vector stores with metadata filtering,
-  git-as-DAG used directly without file presentation layer, hybrid
-  approaches combining two or more of the above.
+  Known pressure points (from session-005 analysis):
+  - Cross-repo orientation: starting in a subrepo loses orchestrator
+    context (marvel F-08, charter F10). Requires reading multiple files
+    across repos and filtering by relevance. Currently manual.
+  - Finding retrieval: 48 RD findings across 2 repos + 26 kos findings
+    in a third. No unified query. Grep works today; won't at 200+.
+  - Edge traversal: schema has typed edges but no tooling follows them.
+    Checking whether a finding's dependencies are still valid requires
+    manual YAML reading.
+  - Ripple propagation: designed (finding-018) but never implemented.
+    The simplest version (hash content, walk derives edges, flag dirty
+    consumers) doesn't need infrastructure beyond what exists.
 
-  This question cannot be answered by reasoning alone. It requires
-  a probe against real KOS material — ideally the KOS graph itself
-  used as test subject.
+  The answer comes from building: implement the simplest tools (orient
+  CLI, schema validator, graph renderer, drift detector) on the current
+  YAML-in-git substrate. Where they hit limits, those limits ARE the
+  requirements list — discovered empirically, not theorized.
+
+  Candidate architectures remain relevant but are evaluated AFTER the
+  simple approach demonstrates its failure modes, not before.
 edges:
   - target: elem-cognitive-architecture
     type: derives
@@ -40,7 +47,11 @@ edges:
   - target: elem-shadow-principle
     type: derives
     note: "The knowledge layer must hold what projections lose"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Session-005 analysis grounded this question in ecosystem needs"
 provenance:
   created_by: human
   session: session-005
   created_at: 2026-03-29
+  reviewed_by: null
