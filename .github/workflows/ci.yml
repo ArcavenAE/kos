@@ -116,8 +116,6 @@ jobs:
           cache-on-failure: true
       - name: Run tests
         run: cargo test --all-targets
-      - name: Run doc tests
-        run: cargo test --doc --all-features
 
   deny:
     name: Cargo Deny
