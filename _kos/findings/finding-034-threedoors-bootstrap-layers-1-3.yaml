@@ -1,0 +1,97 @@
+id: finding-034-threedoors-bootstrap-layers-1-3
+type: finding
+confidence: frontier
+title: "ThreeDoors bootstrap layers 1-3: 65 nodes, incident convergence on adr-0026, BOARD drift"
+content: |
+  ## Summary
+
+  Session-011 began bootstrapping ThreeDoors (~800 docs, 2k commits) into
+  a kos graph. Three layers processed: ADRs (35 nodes), BOARD open questions
+  and research (26 nodes), incident reports (4 nodes). 65 nodes total, 0
+  validation warnings, all edges resolve within the graph.
+
+  This is the first real-scale kos bootstrap. Previous largest graph: 35
+  nodes (aae-orc orchestrator). ThreeDoors immediately surfaced cross-document
+  signal that the existing documentation does not make visible.
+
+  ## Findings
+
+  F1: adr-0026 (self-driving development pipeline) is contradicted by 3 of
+  4 incidents. INC-001 (shared checkout contamination), INC-002 (cargo-culted
+  git sync), INC-004 (silent message drops) all violate assumptions baked
+  into the pipeline: that agents operate in isolation, that platform
+  abstractions are trusted, and that inter-agent messaging works. The
+  pipeline was designed before multi-agent failures were experienced. The
+  incidents are architectural feedback that the ADR hasn't absorbed.
+
+  F2: All 4 incidents share a structural pattern — assumptions about
+  isolation, atomicity, or message routing that were never architecturally
+  enforced. INC-001: filesystem isolation by convention. INC-002: platform
+  abstraction overridden by memory. INC-003: serial allocation via advisory
+  registry. INC-004: tool routing by name similarity. Each time, a soft
+  constraint (agent definition text, memory entry, markdown table, tool
+  name) was expected to enforce a hard property (mutual exclusion, message
+  delivery, branch isolation). This is a pattern, not four separate bugs.
+
+  F3: 15 of 18 open BOARD questions are dark-factory concerns. Only 3
+  relate to the app itself. The app half of ThreeDoors has largely settled
+  its architecture through ADRs; the dark factory is in active exploration.
+  The two-project seam from the probe brief is real and visible in the
+  question distribution.
+
+  F4: 16 of 34 BOARD questions are marked "open" but already resolved.
+  The BOARD's own maintenance has drifted — resolved items haven't been
+  archived. This is exactly the kind of drift kos is designed to detect:
+  a document that claims to represent current state but hasn't been
+  maintained.
+
+  F5: Duplicate IDs in BOARD: ADR-0030 has two files, P-009 has two
+  entries, P-010 has three entries, P-015 has two entries, R-016 appears
+  twice. The BOARD's ID system has drifted. Q-022 already asks about CI
+  enforcement for this — the question is answered by the evidence.
+
+  F6: The ADR layer reveals two disconnected trees. The app tree
+  (adr-0001/Go → architecture → adapters → sync) and the dark factory
+  tree (adr-0025/stories → pipeline → governance → sprints) share no
+  edges. They are architecturally independent in the graph even though
+  they share infrastructure in practice. Wiring cross-tree edges is a
+  Layer 4 task.
+
+  F7: Platform extraction (board-p-014) is the biggest cross-cutting
+  concern. It connects to licensing (board-r-013: MIT intent but no
+  LICENSE file), consolidation (board-r-012), and Marvel (aae-orc
+  platform). It's blocked by a legal question about a missing LICENSE
+  file in an upstream dependency. This is the kind of cross-repo signal
+  that kos orient should surface.
+
+  ## Status
+
+  Partial — layers 1-3 of 6 complete. Layers 4-6 (architecture specs,
+  PRD, dark factory governance) pending in future sessions.
+
+  ## Probe brief signals (partial assessment)
+
+  1. >100 nodes — 65 so far, on track (3 layers of 6)
+  2. >10 cross-document findings — 7 findings from layers 1-3 alone
+  3. orient surfaces meaningful context — not yet tested for ThreeDoors
+  4. drift detects staleness — not yet tested at ThreeDoors scale
+  5. 3+ actionable findings — F1 (adr-0026 stale), F4 (BOARD drift),
+     F5 (duplicate IDs) are all actionable
+  6. substrate holds — 65 nodes, 0 warnings, <100ms validation
+
+edges:
+  - target: finding-028-threedoors-empirical-patterns
+    type: derives
+    note: "Bootstrap of the project finding-028 identified as having kos patterns"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "First real-scale test of the implementation pivot toolchain"
+provenance:
+  created_by: human
+  session: session-011
+  created_at: "2026-03-30"
+tags:
+  - threedoors
+  - bootstrap
+  - cross-document
+  - incidents
