@@ -281,6 +281,19 @@ is an index (queryable with grep/jq), not a graph. This partially answers F4:
 automated extraction from prose works when the prose has consistent structure.
 The remaining gap is edge inference — knowing what a finding *connects to*.
 
+*Session-011 update:* Full-scale bootstrap of ThreeDoors (finding-035). 104
+nodes across 6 layers from ~800 existing documents. Human+agent decomposition
+produced 104 nodes with all edges resolving, 0 validation warnings. The
+bootstrap confirmed: manual decomposition works at real project scale when
+guided by layer-by-layer strategy (ADRs → BOARD → incidents → architecture →
+PRD → dark factory). The process took one session. Key insight: the value
+isn't in individual findings (most were knowable) — it's in cross-layer
+connections (adr-0026 contradicted by 3 incidents, SOUL.md contradicted by
+scope, dark factory produces all incidents while app produces none). These
+patterns are invisible to document-by-document reading. F4 is now substantially
+answered for manual bootstrap at doc scale. Automated bootstrap (code analysis,
+embedding similarity) remains untested.
+
 **F5: The collaboration model**
 Human provides continuity, direction, judgment, and graveyard maintenance.
 Agent provides inference, synthesis, and reasoning within sessions. The
@@ -406,8 +419,14 @@ model is underused. All four F6 pressure points now tested — none broke the
 substrate. The question shifts from "where does YAML-in-git break?" to "at
 what node/edge count does file I/O become the bottleneck?"
 
+*Session-011 data point (finding-035):* ThreeDoors bootstrap: 104 nodes
+validated in <1s. YAML-in-git substrate holds at 4x the previous largest
+graph. File I/O is not the bottleneck at 104 nodes. The ecosystem total
+is 181 nodes across 6 graphs. The question is now: at what point (500?
+1000? nodes) does validation time or graph rendering become noticeable?
+
 See: question-knowledge-layer-requirements (revised), finding-027, finding-029,
-finding-032, finding-033.
+finding-032, finding-033, finding-035.
 
 **F8: ThreeDoors as empirical kos evidence**
 ThreeDoors (2k commits, dark factory, 3 incident reports) has independently
@@ -418,7 +437,18 @@ These are practical solutions at one-repo scale, not validated principles.
 They inform implementation choices — particularly the JSONL output format for
 kos tooling.
 
-See: finding-028.
+*Session-011 update:* Full 6-layer bootstrap complete (finding-035). 104
+nodes, ~800 source documents, 0 validation warnings. ThreeDoors' kos-like
+patterns (provenance, retrospector) are now nodes in a real kos graph with
+typed edges to the incidents they were designed to prevent. Central finding:
+"codify as infrastructure, not instructions" — all 4 incidents are failures
+of instruction-based enforcement. The dark factory produces all incidents;
+the app produces none. 8 actionable findings identified. The YAML-in-git
+substrate holds at 104 nodes without performance issues. ThreeDoors is
+now the largest kos graph and the first evidence of kos adding value to
+a project with existing, disciplined documentation.
+
+See: finding-028, finding-035.
 
 **F9: Distributed graphs across multi-repo orchestrators**
 Session-008 studied three orchestrator repos and designed the pattern for
@@ -600,7 +630,7 @@ Here is where we are."
 ---
 
 *Document status: CURRENT*
-*Established: session-001, updated session-010*
+*Established: session-001, updated session-011*
 
 *Session-006 built `kos orient` — the first running kos code. Rust CLI,
 all 6 success signals met, 3-11ms per query across 8 targets. YAML-in-git
@@ -643,12 +673,26 @@ produced.*
   quality) and finding-030 (edge model underused). All F6 build steps
   complete — the implementation pivot is done.~~*
 
+- *~~Session-011: ThreeDoors bootstrap — COMPLETE. Findings 034-035. First
+  real-scale bootstrap: 104 nodes from ~800 docs across 6 layers (ADRs,
+  BOARD, incidents, architecture, PRD, dark factory). Central finding:
+  codify as infrastructure not instructions — all 4 incidents are failures
+  of instruction-based enforcement. 8 actionable findings for ThreeDoors.
+  YAML-in-git holds at 104 nodes. Ecosystem: 181 nodes across 6 graphs.
+  F4 (bootstrap from existing artifacts) substantially answered for manual
+  doc-scale bootstrap.~~*
+
 *F6 implementation pivot complete (sessions 006-010, findings 029-033).
-Five tools built: orient, validate, graph, init, doctor, graphs, bridge,
-drift. YAML-in-git substrate holds at current scale (77 nodes across 5
-graphs). No pressure point broke the substrate. Next priorities: edge
-coverage improvement (more edges during probes), dirty state classification
-(finding-018), and multi-graph drift (--merged).*
+Eight subcommands built: orient, validate, graph, graphs, init, doctor,
+bridge, drift. Session-011 proved the toolchain works at real project
+scale (104 nodes, 0 modifications needed). YAML-in-git substrate holds
+at 181 nodes across 6 graphs.*
+
+*Next phase: applying findings. ThreeDoors has 8 actionable items from
+the bootstrap. The kos toolchain needs multi-graph drift (--merged) and
+a --graph flag for running drift on specific repo graphs. The edge
+coverage bottleneck (finding-033) is partially addressed by ThreeDoors'
+denser graph but remains a systemic issue.*
 
 *Deprioritized: Q3 implementation (executive needs substrate first), Q5
 redundancy angle (diminishing returns), threshold calibration (needs live
