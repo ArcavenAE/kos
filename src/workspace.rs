@@ -135,6 +135,15 @@ impl Workspace {
         })
     }
 
+    /// Returns `true` when the workspace is standalone — a repo with
+    /// `_kos/kos.yaml` that is NOT under an aae-orc orchestrator.
+    ///
+    /// In standalone mode, `root == kos_root` because there is no parent
+    /// orchestrator to separate them.
+    pub fn is_standalone(&self) -> bool {
+        self.root == self.kos_root
+    }
+
     /// Infer the target repo name from a path.
     /// If the path is inside a known subrepo, return its name.
     /// Otherwise return None.

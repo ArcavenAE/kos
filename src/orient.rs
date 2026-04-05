@@ -1,10 +1,10 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use crate::bridge::RdFinding;
 use crate::error::{KosError, Result};
-use crate::model::{CharterItem, CharterSection, Finding, Node, RdBrief};
-use crate::workspace::Workspace;
+use crate::model::{CharterItem, CharterSection, Confidence, Finding, Node, RdBrief};
+use crate::workspace::{KOS_DIR, Workspace};
 
 /// Collected orientation data for a target repo.
 #[derive(Debug)]
@@ -15,12 +15,34 @@ pub struct Orientation {
     pub rd_briefs: Vec<RdBrief>,
     pub rd_findings: Vec<RdFinding>,
     pub frontier_questions: Vec<Node>,
+    /// Standalone-specific: bedrock nodes from `_kos/nodes/bedrock/`.
+    pub bedrock_nodes: Vec<Node>,
+    /// Standalone-specific: graveyard nodes from `_kos/nodes/graveyard/`.
+    pub graveyard_nodes: Vec<Node>,
+    /// Standalone-specific: active probes from `_kos/probes/`.
+    pub probes: Vec<ProbeEntry>,
+    /// Standalone-specific: idea filenames from `_kos/ideas/`.
+    pub ideas: Vec<String>,
+    /// Whether this orientation is for a standalone repo (no orchestrator).
+    pub is_standalone: bool,
+}
+
+/// A probe entry loaded from `_kos/probes/`.
+#[derive(Debug)]
+pub struct ProbeEntry {
+    pub slug: String,
+    pub title: Option<String>,
+    pub path: PathBuf,
 }
 
 /// Run the orient subcommand.
 pub fn run(workspace: &Workspace, target: &str, json: bool, log: bool) -> Result<()> {
     let start = Instant::now();
-    let orientation = gather(workspace, target)?;
+    let orientation = if workspace.is_standalone() {
+        gather_standalone(workspace, target)?
+    } else {
+        gather(workspace, target)?
+    };
     let duration = start.elapsed();
 
     if json {
@@ -54,7 +76,376 @@ fn gather(workspace: &Workspace, target: &str) -> Result<Orientation> {
         rd_briefs,
         rd_findings,
         frontier_questions,
+        bedrock_nodes: vec![],
+        graveyard_nodes: vec![],
+        probes: vec![],
+        ideas: vec![],
+        is_standalone: false,
     })
+}
+
+/// Gather orientation data for a standalone repo (no orchestrator).
+///
+/// In standalone mode, everything lives under `_kos/`:
+/// - Charter items from a local charter file (unfiltered — all are relevant)
+/// - Nodes from `_kos/nodes/{bedrock,frontier,graveyard,placeholder}/`
+/// - Findings from `_kos/findings/`
+/// - Probes from `_kos/probes/`
+/// - Ideas from `_kos/ideas/`
+///
+/// No RD briefs or RD findings (those are aae-orc orchestrator artifacts).
+fn gather_standalone(workspace: &Workspace, target: &str) -> Result<Orientation> {
+    let kos_dir = workspace.root.join(KOS_DIR);
+
+    // Charter: check local charter files (unfiltered — all items are relevant)
+    let charter_items = load_standalone_charter(&workspace.root)?;
+
+    // Findings from _kos/findings/
+    let findings = load_findings_unfiltered(&kos_dir.join("findings"))?;
+
+    // Nodes by confidence tier
+    let nodes_dir = kos_dir.join("nodes");
+    let frontier_questions = load_nodes_by_confidence(&nodes_dir, &Confidence::Frontier)?;
+    let bedrock_nodes = load_nodes_by_confidence(&nodes_dir, &Confidence::Bedrock)?;
+    let graveyard_nodes = load_nodes_by_confidence(&nodes_dir, &Confidence::Graveyard)?;
+
+    // Probes from _kos/probes/
+    let probes = load_probes(&kos_dir.join("probes"))?;
+
+    // Ideas from _kos/ideas/
+    let ideas = load_ideas(&kos_dir.join("ideas"))?;
+
+    Ok(Orientation {
+        target: target.to_string(),
+        charter_items,
+        findings,
+        rd_briefs: vec![],
+        rd_findings: vec![],
+        frontier_questions,
+        bedrock_nodes,
+        graveyard_nodes,
+        probes,
+        ideas,
+        is_standalone: true,
+    })
+}
+
+/// Load charter items from a standalone repo's charter file, unfiltered.
+///
+/// Checks for `KOS-charter.md` first (kos repo convention), then `charter.md`.
+fn load_standalone_charter(root: &Path) -> Result<Vec<CharterItem>> {
+    // Try KOS-charter.md first (the kos repo itself), then charter.md
+    let charter_path = if root.join("KOS-charter.md").exists() {
+        root.join("KOS-charter.md")
+    } else if root.join("charter.md").exists() {
+        root.join("charter.md")
+    } else {
+        return Ok(vec![]);
+    };
+
+    load_charter_items_unfiltered(&charter_path)
+}
+
+/// Load charter items without filtering by target — all items are relevant.
+fn load_charter_items_unfiltered(charter_path: &Path) -> Result<Vec<CharterItem>> {
+    if !charter_path.exists() {
+        return Ok(vec![]);
+    }
+
+    let content = std::fs::read_to_string(charter_path).map_err(KosError::Io)?;
+    let mut items = Vec::new();
+    let mut current_section: Option<CharterSection> = None;
+    let mut current_id = String::new();
+    let mut current_title = String::new();
+    let mut current_body = String::new();
+
+    for line in content.lines() {
+        // Detect section headers
+        if line.starts_with("## Bedrock") {
+            flush_item_unfiltered(
+                &mut items,
+                &current_section,
+                &current_id,
+                &current_title,
+                &current_body,
+            );
+            current_section = Some(CharterSection::Bedrock);
+            current_id.clear();
+            current_title.clear();
+            current_body.clear();
+            continue;
+        }
+        if line.starts_with("## Frontier") {
+            flush_item_unfiltered(
+                &mut items,
+                &current_section,
+                &current_id,
+                &current_title,
+                &current_body,
+            );
+            current_section = Some(CharterSection::Frontier);
+            current_id.clear();
+            current_title.clear();
+            current_body.clear();
+            continue;
+        }
+        if line.starts_with("## Graveyard") {
+            flush_item_unfiltered(
+                &mut items,
+                &current_section,
+                &current_id,
+                &current_title,
+                &current_body,
+            );
+            current_section = Some(CharterSection::Graveyard);
+            current_id.clear();
+            current_title.clear();
+            current_body.clear();
+            continue;
+        }
+        // Other ## headers end the current section
+        if line.starts_with("## ") && current_section.is_some() && !line.starts_with("## Research")
+        {
+            flush_item_unfiltered(
+                &mut items,
+                &current_section,
+                &current_id,
+                &current_title,
+                &current_body,
+            );
+            current_section = None;
+            current_id.clear();
+            current_title.clear();
+            current_body.clear();
+            continue;
+        }
+
+        if current_section.is_none() {
+            continue;
+        }
+
+        // Detect item headers (### B1: ..., ### F1: ..., ### G1: ...)
+        if let Some(header) = line.strip_prefix("### ") {
+            flush_item_unfiltered(
+                &mut items,
+                &current_section,
+                &current_id,
+                &current_title,
+                &current_body,
+            );
+            if let Some((id, title)) = header.split_once(':') {
+                current_id = id.trim().to_string();
+                current_title = title.trim().to_string();
+            } else {
+                current_id = header.trim().to_string();
+                current_title = header.trim().to_string();
+            }
+            current_body.clear();
+        } else {
+            current_body.push_str(line);
+            current_body.push('\n');
+        }
+    }
+
+    // Flush last item
+    flush_item_unfiltered(
+        &mut items,
+        &current_section,
+        &current_id,
+        &current_title,
+        &current_body,
+    );
+
+    Ok(items)
+}
+
+fn flush_item_unfiltered(
+    items: &mut Vec<CharterItem>,
+    section: &Option<CharterSection>,
+    id: &str,
+    title: &str,
+    body: &str,
+) {
+    if id.is_empty() {
+        return;
+    }
+    let Some(section) = section else { return };
+
+    items.push(CharterItem {
+        id: id.to_string(),
+        section: section.clone(),
+        title: title.to_string(),
+        body: body.trim().to_string(),
+    });
+}
+
+/// Load findings without filtering by target — all findings are relevant.
+fn load_findings_unfiltered(findings_dir: &Path) -> Result<Vec<Finding>> {
+    if !findings_dir.exists() {
+        return Ok(vec![]);
+    }
+
+    let mut results = Vec::new();
+
+    for entry in walkdir::WalkDir::new(findings_dir)
+        .max_depth(1)
+        .into_iter()
+        .filter_map(std::result::Result::ok)
+    {
+        let path = entry.path();
+        if !path.is_file() || path.extension().and_then(|e| e.to_str()) != Some("yaml") {
+            continue;
+        }
+
+        let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
+
+        match serde_yaml::from_str::<Finding>(&content) {
+            Ok(mut finding) => {
+                finding.source_path = path.to_path_buf();
+                results.push(finding);
+            }
+            Err(e) => {
+                eprintln!("warning: skipping {}: {e}", path.display());
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+/// Load all nodes from a specific confidence tier directory.
+fn load_nodes_by_confidence(nodes_dir: &Path, confidence: &Confidence) -> Result<Vec<Node>> {
+    let tier_dir = nodes_dir.join(confidence.directory());
+    if !tier_dir.exists() {
+        return Ok(vec![]);
+    }
+
+    let mut results = Vec::new();
+
+    for entry in walkdir::WalkDir::new(&tier_dir)
+        .max_depth(1)
+        .into_iter()
+        .filter_map(std::result::Result::ok)
+    {
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        let ext = path.extension().and_then(|e| e.to_str());
+        if ext != Some("yaml") && ext != Some("yml") {
+            continue;
+        }
+
+        let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
+
+        match serde_yaml::from_str::<Node>(&content) {
+            Ok(mut node) => {
+                node.source_path = path.to_path_buf();
+                results.push(node);
+            }
+            Err(e) => {
+                eprintln!("warning: skipping {}: {e}", path.display());
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+/// Load probe entries from `_kos/probes/`.
+fn load_probes(probes_dir: &Path) -> Result<Vec<ProbeEntry>> {
+    if !probes_dir.exists() {
+        return Ok(vec![]);
+    }
+
+    let mut results = Vec::new();
+
+    for entry in walkdir::WalkDir::new(probes_dir)
+        .max_depth(1)
+        .into_iter()
+        .filter_map(std::result::Result::ok)
+    {
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        let ext = path.extension().and_then(|e| e.to_str());
+        if ext != Some("yaml") && ext != Some("yml") && ext != Some("md") {
+            continue;
+        }
+
+        let slug = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("unknown")
+            .to_string();
+
+        // Try to extract a title from the file
+        let title = std::fs::read_to_string(path)
+            .ok()
+            .and_then(|content| extract_probe_title(&content));
+
+        results.push(ProbeEntry {
+            slug,
+            title,
+            path: path.to_path_buf(),
+        });
+    }
+
+    Ok(results)
+}
+
+/// Extract a title from a probe file.
+/// For YAML: looks for a `title:` field.
+/// For Markdown: looks for a `# ` heading.
+fn extract_probe_title(content: &str) -> Option<String> {
+    for line in content.lines() {
+        // YAML title field
+        if let Some(rest) = line.strip_prefix("title:") {
+            let value = rest.trim().trim_matches('"').trim_matches('\'');
+            if !value.is_empty() {
+                return Some(value.to_string());
+            }
+        }
+        // Markdown heading
+        if let Some(rest) = line.strip_prefix("# ") {
+            let value = rest.trim();
+            if !value.is_empty() {
+                return Some(value.to_string());
+            }
+        }
+    }
+    None
+}
+
+/// Load idea filenames from `_kos/ideas/`.
+fn load_ideas(ideas_dir: &Path) -> Result<Vec<String>> {
+    if !ideas_dir.exists() {
+        return Ok(vec![]);
+    }
+
+    let mut results = Vec::new();
+
+    for entry in walkdir::WalkDir::new(ideas_dir)
+        .max_depth(1)
+        .into_iter()
+        .filter_map(std::result::Result::ok)
+    {
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+
+        let name = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .unwrap_or("unknown")
+            .to_string();
+
+        results.push(name);
+    }
+
+    Ok(results)
 }
 
 // ── Charter parsing ──────────────────────────────────────────
@@ -401,12 +792,28 @@ fn load_rd_findings(rd_dir: &Path, target: &str) -> Result<Vec<RdFinding>> {
 // ── Output formatting ────────────────────────────────────────
 
 fn print_human(o: &Orientation) {
-    println!("=== kos orient: {} ===\n", o.target);
+    if o.is_standalone {
+        println!("=== kos orient: {} (standalone) ===\n", o.target);
+    } else {
+        println!("=== kos orient: {} ===\n", o.target);
+    }
 
     if !o.charter_items.is_empty() {
-        println!("## Charter items mentioning {}\n", o.target);
+        if o.is_standalone {
+            println!("## Charter\n");
+        } else {
+            println!("## Charter items mentioning {}\n", o.target);
+        }
         for item in &o.charter_items {
             println!("  [{}/{}] {}", item.section, item.id, item.title);
+        }
+        println!();
+    }
+
+    if !o.bedrock_nodes.is_empty() {
+        println!("## Bedrock nodes\n");
+        for node in &o.bedrock_nodes {
+            println!("  [{}] {} ({})", node.id, node.title, node.node_type);
         }
         println!();
     }
@@ -442,7 +849,11 @@ fn print_human(o: &Orientation) {
     }
 
     if !o.findings.is_empty() {
-        println!("## kos findings mentioning {}\n", o.target);
+        if o.is_standalone {
+            println!("## Findings\n");
+        } else {
+            println!("## kos findings mentioning {}\n", o.target);
+        }
         for finding in &o.findings {
             println!(
                 "  [{}] {} ({})",
@@ -453,9 +864,37 @@ fn print_human(o: &Orientation) {
     }
 
     if !o.frontier_questions.is_empty() {
-        println!("## Open questions\n");
+        println!("## Open questions (frontier)\n");
         for q in &o.frontier_questions {
             println!("  [{}] {}", q.id, q.title);
+        }
+        println!();
+    }
+
+    if !o.probes.is_empty() {
+        println!("## Active probes\n");
+        for probe in &o.probes {
+            if let Some(ref title) = probe.title {
+                println!("  [{}] {title}", probe.slug);
+            } else {
+                println!("  [{}]", probe.slug);
+            }
+        }
+        println!();
+    }
+
+    if !o.ideas.is_empty() {
+        println!("## Ideas\n");
+        for idea in &o.ideas {
+            println!("  - {idea}");
+        }
+        println!();
+    }
+
+    if !o.graveyard_nodes.is_empty() {
+        println!("## Graveyard nodes\n");
+        for node in &o.graveyard_nodes {
+            println!("  [{}] {} ({})", node.id, node.title, node.node_type);
         }
         println!();
     }
@@ -464,14 +903,33 @@ fn print_human(o: &Orientation) {
         + o.findings.len()
         + o.rd_briefs.len()
         + o.rd_findings.len()
-        + o.frontier_questions.len();
+        + o.frontier_questions.len()
+        + o.bedrock_nodes.len()
+        + o.graveyard_nodes.len()
+        + o.probes.len()
+        + o.ideas.len();
     if total == 0 {
-        println!("  (no items found mentioning '{}')", o.target);
-        println!("  Try: kos orient kos | kos orient marvel | kos orient aclaude");
+        println!("  (no items found)");
+        if o.is_standalone {
+            println!("  Hint: add nodes to _kos/nodes/, findings to _kos/findings/,");
+            println!("        or create a charter file (charter.md or KOS-charter.md).");
+        } else {
+            println!("  Try: kos orient kos | kos orient marvel | kos orient aclaude");
+        }
     }
 }
 
 fn print_jsonl(o: &Orientation) {
+    // Emit standalone marker as first line when applicable
+    if o.is_standalone {
+        let json = serde_json::json!({
+            "type": "orient_meta",
+            "target": o.target,
+            "standalone": true,
+        });
+        println!("{json}");
+    }
+
     for item in &o.charter_items {
         let json = serde_json::json!({
             "type": "charter",
@@ -479,6 +937,18 @@ fn print_jsonl(o: &Orientation) {
             "section": item.section.to_string(),
             "id": item.id,
             "title": item.title,
+        });
+        println!("{json}");
+    }
+
+    for node in &o.bedrock_nodes {
+        let json = serde_json::json!({
+            "type": "node",
+            "target": o.target,
+            "id": node.id,
+            "title": node.title,
+            "node_type": node.node_type.to_string(),
+            "confidence": node.confidence.to_string(),
         });
         println!("{json}");
     }
@@ -530,6 +1000,38 @@ fn print_jsonl(o: &Orientation) {
         });
         println!("{json}");
     }
+
+    for probe in &o.probes {
+        let json = serde_json::json!({
+            "type": "probe",
+            "target": o.target,
+            "slug": probe.slug,
+            "title": probe.title,
+            "path": probe.path.display().to_string(),
+        });
+        println!("{json}");
+    }
+
+    for idea in &o.ideas {
+        let json = serde_json::json!({
+            "type": "idea",
+            "target": o.target,
+            "name": idea,
+        });
+        println!("{json}");
+    }
+
+    for node in &o.graveyard_nodes {
+        let json = serde_json::json!({
+            "type": "node",
+            "target": o.target,
+            "id": node.id,
+            "title": node.title,
+            "node_type": node.node_type.to_string(),
+            "confidence": node.confidence.to_string(),
+        });
+        println!("{json}");
+    }
 }
 
 // ── Usage logging (opt-in via --log) ─────────────────────────
@@ -552,11 +1054,16 @@ fn append_usage_log(
     let entry = serde_json::json!({
         "timestamp": chrono::Utc::now().to_rfc3339(),
         "target": o.target,
+        "standalone": o.is_standalone,
         "charter_items": o.charter_items.len(),
         "findings": o.findings.len(),
         "rd_briefs": o.rd_briefs.len(),
         "rd_findings": o.rd_findings.len(),
         "questions": o.frontier_questions.len(),
+        "bedrock_nodes": o.bedrock_nodes.len(),
+        "graveyard_nodes": o.graveyard_nodes.len(),
+        "probes": o.probes.len(),
+        "ideas": o.ideas.len(),
         "duration_ms": duration.as_millis(),
         "json_output": json_output,
     });
