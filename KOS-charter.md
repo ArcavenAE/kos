@@ -700,3 +700,16 @@ graph), more probing on the 20-project lineup (evidence base sufficient).*
 
 *Charter priority encoding still under observation (question-charter-priority-
 encoding).*
+
+- *Session-012: Distribution pipeline and org hardening. Bootstrapped kos
+  in switchboard and ftc (standalone, outside aae-orc). Fixed workspace
+  discovery to support standalone repos. Built full CI/CD: per-commit signed
+  releases from main, `kos update` self-updater, Homebrew formula, cross-
+  platform builds (darwin-arm64, linux-amd64, linux-arm64). Made kos public.
+  Org-wide security hardening: SHA-pinned all GitHub Actions across 5 repos,
+  scoped permissions, persist-credentials, branch protection rulesets, MIT
+  LICENSE files, SECURITY.md, Apple signing runbook. Three frontier questions
+  opened: charter scaling, subrepo kos workflow, standalone distribution.
+  Findings 037 (bootstrap seeding gap) and 038 (distribution pipeline).
+  181+ nodes across 7 graphs (switchboard added). `brew install arcavenae/tap/kos`
+  works.*
