@@ -1,0 +1,126 @@
+id: finding-041-charter-inflation-as-graph-gap
+type: finding
+confidence: frontier
+title: "Charter inflation is empirical evidence of what the graph isn't providing"
+content: |
+  ## Summary
+
+  The KOS-charter.md reached 884 lines / 50,785 bytes across 13 sessions.
+  The instinct is to compress it. The finding is: the charter's growth IS
+  the signal. Compressing treats the symptom while leaving the root cause
+  untouched.
+
+  ## Measurement
+
+  Section sizes at session-014 start:
+
+    Bedrock:            228 lines (26%)
+    Frontier:           316 lines (36%)
+    Open Questions:      81 lines (9%)
+    Collaboration Model:130 lines (15%)
+    Graveyard:           62 lines (7%)
+    Known Prior Art:     19 lines (2%)
+    Preamble:            48 lines (5%)
+
+  Total: 884 lines. The charter is 51KB — over half the context budget
+  for some models.
+
+  ## Root cause analysis
+
+  Each section is inflated for a specific reason:
+
+  **Frontier (316 lines, 36%):** Frontier questions carry narrative,
+  evidence trails, and session-by-session update notes that should live
+  in question nodes and finding nodes in the graph. F4 alone has 5
+  session updates inline. F6 has a full build order with completion
+  status. These are graph traversal results being hand-maintained in
+  prose.
+
+  **Collaboration Model (130 lines, 15%):** Session continuity being
+  maintained in the charter instead of in the graph. The graph has no
+  mechanism for encoding collaboration patterns, so the charter holds
+  them.
+
+  **Open Questions (81 lines, 9%):** Questions that should be frontier
+  question nodes. They exist in the charter because the charter predates
+  the graph tooling. Some have been promoted to nodes; many haven't.
+
+  **Bedrock (228 lines, 26%):** Each bedrock item carries its own
+  evidence trail and session-by-session revision notes. This is the
+  most defensible inflation — bedrock items need their reasoning
+  accessible. But the inline revision history is a projection of the
+  graph's finding → promote chain, maintained manually.
+
+  ## The two things that are off
+
+  ### 1. The symptom is being treated as the problem
+
+  Compressing the charter to 25k makes the symptom more manageable.
+  Without a parallel move toward the graph holding that content, the
+  charter will be back at 50k within a few sessions. The pressure that
+  inflated it doesn't go away by pruning.
+
+  The charter is doing work the graph should be doing:
+  - Evidence trails → should be finding nodes with edges to questions
+  - Session update notes → should be graph state, queryable by orient
+  - Build order status → should be node confidence changes
+  - Open questions → should be frontier question nodes
+
+  ### 2. The sequence buries the most important work
+
+  Treating charter compression as "unblocking every subsequent session"
+  is true at the symptom level. But the work that actually unblocks
+  everything is the predictor layer (F6) and the substrate question (F7).
+
+  Every session will continue to hit context ceilings until the charter
+  stops being the primary orientation mechanism. Compressing buys time.
+  It doesn't change the trajectory. The reactive-query model is
+  graveyarded (grv-reactive-query-model) but the charter still embodies
+  it — the charter IS the reactive query mechanism. It's the thing
+  you read when you don't have a predictor.
+
+  ## Implications
+
+  1. Compression is valid short-term and should be done.
+  2. The compression itself should be guided by what moves to the graph
+     vs what stays in the charter.
+  3. The charter's target state is a THIN orientation document that
+     points into the graph, not a prose projection of the graph.
+  4. Process subcommands (kos idea, kos question, kos finding) are
+     prerequisite infrastructure — they lower the ceremony floor so
+     content can move to the graph without increasing friction.
+  5. The finding goes IN the graph, so the system learns from this
+     observation instead of repeating the compress/inflate cycle.
+
+  ## The cycle without this finding
+
+  Compress → continue → inflate → compress → continue → inflate.
+  The system doesn't learn from the compression because the
+  compression isn't recorded as a finding with edges to the root
+  cause. This finding breaks the cycle by making the pattern visible
+  in the graph.
+
+edges:
+  - target: grv-reactive-query-model
+    type: derives
+    note: "Charter inflation is downstream of the reactive-query model"
+  - target: question-predictor-layer
+    type: derives
+    note: "Predictor layer would replace charter as primary orientation"
+  - target: grv-flat-file-context-scaling
+    type: derives
+    note: "Charter hitting context ceiling is an instance of flat-file scaling failure"
+  - target: elem-predictor-layer
+    type: derives
+    note: "The charter IS the forward model placeholder — a static document doing a dynamic system's job"
+  - target: question-fractal-process-ceremony
+    type: derives
+    note: "Process subcommands are prerequisite to moving content from charter to graph"
+provenance:
+  created_by: human
+  session: session-014
+  created_at: "2026-04-05"
+finding:
+  probe: null
+  result: redirects
+  surprise_magnitude: low
