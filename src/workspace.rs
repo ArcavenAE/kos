@@ -22,13 +22,15 @@ pub struct Workspace {
 impl Workspace {
     /// Discover the workspace by walking up from `start` looking for markers.
     ///
-    /// The kos repo can be found in two ways:
-    /// 1. We're already inside the kos directory (has KOS-charter.md)
-    /// 2. We're in aae-orc or a sibling subrepo (kos/ is a subdirectory of aae-orc)
+    /// Discovery order (first match wins):
+    /// 1. KOS-charter.md — we're inside the kos repo itself
+    /// 2. charter.md + kos/ subdir — we're at the aae-orc orchestrator root
+    /// 3. Parent has charter.md + kos/ — we're in a sibling subrepo of aae-orc
+    /// 4. _kos/kos.yaml — standalone repo with its own knowledge graph
     pub fn discover(start: &Path) -> Result<Self> {
         let start = std::fs::canonicalize(start).map_err(KosError::Io)?;
 
-        // Walk up looking for either aae-orc root or kos root
+        // Walk up looking for workspace markers
         let mut current = start.as_path();
         let (root, kos_root) = loop {
             // Are we in the kos repo itself?
@@ -53,6 +55,21 @@ impl Workspace {
                 if parent.join("charter.md").exists() && parent.join("kos").is_dir() {
                     break (parent.to_path_buf(), parent.join("kos"));
                 }
+            }
+
+            // Standalone repo with _kos/kos.yaml?
+            let standalone_kos = current.join(KOS_DIR);
+            if standalone_kos.join(MANIFEST_FILE).exists() {
+                let root = current.to_path_buf();
+                let graphs = discover_graphs(&root);
+                return Ok(Workspace {
+                    root: root.clone(),
+                    kos_root: root,
+                    graphs,
+                });
+            }
+
+            if let Some(parent) = current.parent() {
                 current = parent;
             } else {
                 return Err(KosError::WorkspaceNotFound {
@@ -71,8 +88,10 @@ impl Workspace {
     }
 
     /// Construct a workspace from an explicit path (--workspace or KOS_WORKSPACE).
-    /// The path should be the aae-orc root (containing kos/ subdir) or the kos
-    /// root itself (containing KOS-charter.md).
+    /// The path can be:
+    /// 1. The kos repo root (containing KOS-charter.md)
+    /// 2. The aae-orc root (containing kos/ subdir)
+    /// 3. A standalone repo with _kos/kos.yaml
     pub fn from_explicit(path: &Path) -> Result<Self> {
         let path = std::fs::canonicalize(path).map_err(KosError::Io)?;
 
@@ -97,6 +116,16 @@ impl Workspace {
             return Ok(Workspace {
                 root: path.clone(),
                 kos_root: path.join("kos"),
+                graphs,
+            });
+        }
+
+        // Is this a standalone repo with _kos/kos.yaml?
+        if path.join(KOS_DIR).join(MANIFEST_FILE).exists() {
+            let graphs = discover_graphs(&path);
+            return Ok(Workspace {
+                root: path.clone(),
+                kos_root: path,
                 graphs,
             });
         }
