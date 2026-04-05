@@ -1,0 +1,54 @@
+id: question-vsm-mapping-to-kos
+type: question
+confidence: frontier
+title: "Does Beer's Viable System Model map to kos's architecture — and should it?"
+content: |
+  The lifecycle tier definitions map Beer's VSM S1-S5 to agent roles
+  in a tiered development system. The mapping is structural:
+
+  | VSM System | Function | kos Equivalent? |
+  |---|---|---|
+  | S1 (Operations) | Units doing work | Probe execution |
+  | S2 (Coordination) | Anti-oscillation, preventing clashes | Edges (typed relationships, contracts) |
+  | S3 (Control) | Internal monitoring, resource allocation | Orient + drift detection |
+  | S3* (Audit) | Ground truth verification, sporadic | Validate (schema check), doctor (health) |
+  | S4 (Intelligence) | External eye, adaptation | Ideas, frontier questions, bridge (external sources) |
+  | S5 (Identity) | What we fundamentally are | Bedrock nodes, SOUL.md, values |
+
+  The S3/S4 homeostat (tension between optimizing current work and
+  adapting to change) maps to the Orient → Ideate → Question flow:
+  orient is S3 (what do we know?), ideate/question is S4 (what should
+  we explore?), and S5 (bedrock values) mediates which direction to go.
+
+  Hypothesis: if this mapping is structural (not just analogical), then
+  kos's architecture should explicitly implement all five systems. A
+  kos graph that's missing S2 (coordination/contracts) or S4
+  (intelligence/external scanning) would be incomplete in Beer's
+  terms — it would lack regulatory capacity.
+
+  Currently kos is strong on S5 (identity — bedrock values), S3
+  (control — orient/drift), and S3* (audit — validate/doctor). It's
+  weaker on S2 (edges don't enforce constraints, they just describe
+  relationships) and S4 (no external scanning — ideas are manual,
+  the bridge framework is unbuilt).
+
+  Testable by: evaluating whether kos graphs that are "VSM-complete"
+  (all five systems represented) produce better orientation and fewer
+  surprises than graphs that are missing one or more systems.
+edges:
+  - target: elem-conant-ashby-regulator
+    type: derives
+    note: "VSM is Beer's instantiation of Conant-Ashby"
+  - target: elem-seven-channel-protocol
+    type: derives
+    note: "The seven channels implement VSM communication paths"
+  - target: elem-fractal-lifecycle
+    type: derives
+    note: "VSM is recursive — same five systems at every tier"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "Beer 1972, 1979, 1985 — Brain of the Firm, Heart of Enterprise, Diagnosing the System"
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-tier-definitions.md"

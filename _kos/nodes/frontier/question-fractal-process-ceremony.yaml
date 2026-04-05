@@ -1,0 +1,45 @@
+id: question-fractal-process-ceremony
+type: question
+confidence: frontier
+title: "Should kos's process cycle be explicitly fractal — same pattern, depth-appropriate ceremony?"
+content: |
+  The fractal lifecycle principle (elem-fractal-lifecycle) says the same
+  pattern repeats at different scales with inherited structure and reduced
+  ceremony. kos's process cycle (Orient → Ideate → Question → Probe →
+  Harvest → Promote) currently uses uniform ceremony regardless of scale.
+
+  A 104-node ThreeDoors bootstrap uses the same probe brief template as
+  a single CLI flag fix. The success_signal field asks for the same
+  structure whether the probe is a multi-session research initiative or
+  a 20-minute code change.
+
+  Hypothesis: kos should have explicit scale variants of its process:
+
+  | Scale | Ceremony | Example |
+  |---|---|---|
+  | Project | Full: brief with hypothesis, timebox, success signal, finding | ThreeDoors bootstrap, project-alpha audit |
+  | Feature | Medium: question node + inline finding, abbreviated brief | orient standalone fix |
+  | Fix | Light: commit message with kos action vocabulary, no brief | CLI flag fix, typo correction |
+  | Idea | None: markdown file in _kos/ideas/, no structure required | prediction engine brainstorm |
+
+  Each inherits the parent pattern. A feature-scale probe still has a
+  hypothesis and success signal — just shorter. A fix-scale change still
+  records what changed and why — just in a commit, not a YAML finding.
+
+  Testable by: applying different ceremony levels to the orient standalone
+  work (feature scale) vs. the lifecycle extraction (project scale) and
+  comparing whether the reduced ceremony loses signal or just noise.
+edges:
+  - target: elem-fractal-lifecycle
+    type: derives
+    note: "Direct application of fractal principle to kos's own process"
+  - target: grv-single-workflow-type
+    type: derives
+    note: "Single workflow type is graveyarded; fractal process is the replacement"
+  - target: brief-orient-standalone
+    type: derives
+    note: "The orient probe is the first test of feature-scale ceremony"
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"

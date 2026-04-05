@@ -1,0 +1,43 @@
+id: elem-conways-law-modularity
+type: element
+confidence: bedrock
+title: "Conway's Law validated: organization structure determines code modularity by factor of 8x"
+content: |
+  Conway's Law (1967): organizations design systems that mirror their
+  own communication structures. Empirically validated by MacCormack
+  et al. (2012): tightly coupled organizations produce tightly coupled
+  code; loosely coupled organizations produce modular code. Modularity
+  differences can be a factor of eight.
+
+  Applied to kos and the aae-orc platform:
+  - The independence matrix (CLAUDE.md) is a Conway's Law statement:
+    each component must be usable without every other component
+  - The graph structure (nodes with typed edges) mirrors the desired
+    code architecture (modules with typed interfaces)
+  - If kos models cross-component relationships, and those relationships
+    determine how agents work, then the graph structure IS the
+    organizational structure for AI agent teams
+
+  Applied to marvel's organizational model (F9):
+  - Workspace/Group/Team/Session hierarchy mirrors code architecture
+  - Conway's Law predicts: agent team structure should mirror the
+    desired code modularity, not the other way around
+  - If agents are organized by component (aclaude team, switchboard
+    team), the code will be modular. If organized by function (all
+    devs, all reviewers), cross-component coupling increases.
+
+  The lifecycle research adds: for agent-driven development, agent
+  organization must mirror desired code architecture. This is
+  prescriptive Conway's Law — design the org to get the code you want.
+edges:
+  - target: elem-fractal-lifecycle
+    type: derives
+    note: "Fractal organization produces fractal code structure"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "Conway 1967 — How Do Committees Invent?"
+    - "MacCormack et al. 2012 — empirical validation, 8x modularity factor"
+    - "penny-orc research-track-2-organizational-structure.md"

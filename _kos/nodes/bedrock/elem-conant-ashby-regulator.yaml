@@ -1,0 +1,53 @@
+id: elem-conant-ashby-regulator
+type: element
+confidence: bedrock
+title: "Every good regulator must contain a model of the system it regulates (Conant-Ashby)"
+content: |
+  The Conant-Ashby Good Regulator Theorem (1970) establishes that every
+  good regulator of a system must be a model of that system. Extended
+  by Ashby's Law of Requisite Variety (1956): a controller must have at
+  least as much variety (flexibility/responsiveness) as the system being
+  controlled.
+
+  Applied to kos: the knowledge graph IS the model. An orchestrator
+  (human or agent) that works without the graph is regulating without
+  a model. The graph must contain sufficient variety to represent the
+  system being regulated — which means the graph must model not just
+  what's known (nodes) but relationships (edges), confidence (tiers),
+  and change history (provenance).
+
+  Applied to orient: the gathering-vs-interpreting question is a
+  Conant-Ashby question. If orient gathers incomplete data (string
+  matching, filtered subset), the LLM regulates with an incomplete
+  model. If orient gathers complete structured data (--json, all
+  nodes/edges/confidence), the LLM has a sufficient model.
+
+  Applied to the lifecycle: an orchestrator agent cannot be a simple
+  state machine. It must maintain a live model of all subordinate
+  agents' current capabilities, constraints, and context. This is
+  why flat-file context loading fails (grv-flat-file-context-scaling)
+  — the model exceeds the context window.
+
+  This theorem grounds multiple kos design decisions:
+  - The graph must be complete enough to be a model (not just an index)
+  - Orient must gather enough data for the LLM to regulate
+  - Drift detection must be comprehensive (model must track changes)
+  - The bridge framework must maintain model fidelity across formats
+edges:
+  - target: question-orient-gathering-vs-interpreting
+    type: derives
+    note: "Gathering vs interpreting is a Conant-Ashby question"
+  - target: grv-flat-file-context-scaling
+    type: derives
+    note: "Flat-file loading fails because the model exceeds context"
+  - target: elem-context-ceiling
+    type: derives
+    note: "Context ceiling limits the model's variety"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "Conant & Ashby 1970 — Every Good Regulator of a System Must Be a Model of That System"
+    - "Ashby 1956 — An Introduction to Cybernetics"
+    - "penny-orc lifecycle research synthesis — 130 sources across 5 tracks"

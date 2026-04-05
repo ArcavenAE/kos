@@ -1,0 +1,58 @@
+id: elem-seven-channel-protocol
+type: element
+confidence: bedrock
+title: "Seven communication channels for tiered systems: Intent, Coordination, Status, Finding, Audit, Query, Alert"
+content: |
+  The lifecycle tier communication protocol defines seven channels
+  derived from Beer's VSM, McChrystal's shared consciousness, and
+  gap analysis of real projects:
+
+  | Channel | Direction | Mode | Purpose |
+  |---|---|---|---|
+  | Intent | Down | Async | Specs, contracts, design rules, ACs |
+  | Coordination | Lateral | Structural | Contracts, CI, type system, branch strategy |
+  | Status | Up | Async | Progress, completion, metrics |
+  | Finding | Up | Async | Discoveries challenging specs (delivery findings, SCRs) |
+  | Audit | Down (sporadic) | Async/Sync | Fitness functions, spot checks, drift detection |
+  | Query | Both | Sync | Clarification/decision requests requiring judgment |
+  | Alert | Up (bypass) | Sync | Emergency escalation (algedonic signals) |
+
+  Design principles:
+  - Structural over conversational (mechanisms > meetings)
+  - Upward flow must equal downward flow
+  - Algedonic signals bypass normal channels
+  - Async default, sync by exception
+  - All decisions captured in specs, not left in chat
+
+  kos mapping:
+  - Intent → kos nodes (bedrock decisions, requirements, architecture)
+  - Coordination → kos edges (derives, implements, contracts)
+  - Status → not in kos (operational, not knowledge)
+  - Finding → kos findings (the upward channel)
+  - Audit → kos drift + validate (sporadic integrity checks)
+  - Query → kos questions (frontier nodes awaiting resolution)
+  - Alert → not in kos yet (no emergency/algedonic mechanism)
+
+  The Coordination channel is particularly important: it's structural,
+  not conversational. CI pipelines, type systems, git branch strategy,
+  cross-domain contracts — these are S2 (anti-oscillation) mechanisms.
+  kos edges could serve this role if they enforce constraints rather
+  than merely document relationships.
+edges:
+  - target: elem-bidirectional-feedback-underimplemented
+    type: derives
+    note: "The seven channels implement bidirectional feedback"
+  - target: question-delivery-finding-channel
+    type: derives
+    note: "The Finding channel is the delivery finding mechanism"
+  - target: elem-fractal-lifecycle
+    type: derives
+    note: "Channels repeat at every tier of the fractal"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-tier-comm-protocol.md"
+    - "Beer 1979, 1985 — VSM S1-S5"
+    - "McChrystal et al. — shared consciousness"

@@ -1,0 +1,57 @@
+id: elem-bidirectional-feedback-underimplemented
+type: element
+confidence: bedrock
+title: "Bidirectional feedback is critical and systematically under-implemented"
+content: |
+  Beer, Boyd, McChrystal, Argyris, and the NIST Risk Management Framework
+  converge on a single insight: single-loop feedback (did we execute
+  correctly?) must be paired with double-loop feedback (is the spec
+  correct?). Execution-tier findings must flow upward to trigger
+  strategy/tactic adjustments.
+
+  Single-loop: "we didn't hit velocity because we didn't estimate well"
+  Double-loop: "our story definition process breaks for >5-point stories;
+  let's change the PRD validation gate"
+
+  The research synthesis (171 sources across 5 tracks) validates this as
+  the most consistently under-implemented principle. Everyone agrees
+  feedback should flow both ways. Almost nobody builds the upward channel.
+
+  Evidence:
+  - Beer's recursive viability theorem requires feedback at every level
+  - McChrystal's military operations research validates rapid course
+    correction through upward feedback
+  - Argyris's organizational learning studies show double-loop learning
+    outperforms single-loop by addressing root causes
+  - NIST three-tier model explicitly emphasizes bidirectionality
+  - xMP project: 17-finding audit existed but wasn't in execution path
+
+  kos connection: kos's finding type IS the upward feedback channel —
+  findings flow from probe work back to the graph, potentially changing
+  bedrock. But kos currently has no mechanism for code-to-graph feedback
+  (the delivery finding channel question). The bridge framework would
+  implement the missing upward channel.
+
+  The research claims implementing double-loop learning at every tier
+  will reduce iteration count to acceptable output by 40-60% compared
+  to single-loop feedback. Testable.
+edges:
+  - target: question-delivery-finding-channel
+    type: derives
+    note: "Delivery findings are the missing upward channel"
+  - target: elem-gate-enforcement
+    type: derives
+    note: "Gates enforce feedback checkpoints"
+  - target: elem-fractal-lifecycle
+    type: derives
+    note: "Feedback must be fractal — at every tier"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc lifecycle research synthesis"
+    - "Beer 1972, 1979, 1985 — viable systems and recursive organization"
+    - "Argyris & Schon — double-loop learning"
+    - "McChrystal et al. — Team of Teams"
+    - "NIST Risk Management Framework — three-tier bidirectional model"

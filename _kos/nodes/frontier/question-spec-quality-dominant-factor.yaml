@@ -1,0 +1,47 @@
+id: question-spec-quality-dominant-factor
+type: question
+confidence: frontier
+title: "Is specification quality the dominant process factor for AI agent output quality?"
+content: |
+  The lifecycle research synthesis claims: improving specification quality
+  (reducing ambiguity per Femmer et al.'s framework) will reduce
+  implementation defects by at least 300% compared to status quo, similar
+  to human development.
+
+  This is directly relevant to kos because kos nodes ARE specifications —
+  typed, confidence-tiered, edge-connected descriptions of what's known.
+  If spec quality is the dominant factor, then improving graph node quality
+  (clearer content, more precise edges, better confidence classification)
+  matters more than improving the tooling around the graph.
+
+  Testable by: measuring defect rates (incorrect implementations,
+  misunderstood requirements, rework cycles) with poor vs. well-structured
+  specifications. Compare projects where kos nodes are sparse/vague vs.
+  projects where kos nodes are precise/well-connected.
+
+  The five-project cross-document audit (kos sessions 001-004) provides
+  partial evidence: signal appeared at document seams in every project,
+  and 45% of issues found were consequential. But that measured detection,
+  not prevention. The hypothesis is about prevention — does better spec
+  quality prevent the issues from arising?
+
+  Related claims from the research:
+  - Context-window-sized specs improve agent correct-first-time output
+    from 40-50% to 85%+ (Skelton's cognitive load principle applied to AI)
+  - Contract-first specification prevents integration failures by 80%+
+  - Specification decomposition quality predicts parallel development success
+edges:
+  - target: elem-context-ceiling
+    type: derives
+    note: "Context-window-sized specs are a response to the ceiling"
+  - target: elem-conant-ashby-regulator
+    type: derives
+    note: "Spec quality determines regulator model quality"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc lifecycle research synthesis — testable claim #1, #7"
+    - "Femmer et al. — requirements ambiguity framework"
+    - "Skelton — cognitive load principle"
