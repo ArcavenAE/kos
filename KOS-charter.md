@@ -84,6 +84,16 @@ into existence. Contrast with external research (RAG): referenced, queried,
 external information. Ideas crystallize into frontier questions and probe
 briefs. See _kos/ideas/dag-vs-rag-knowledge-topology.md.
 
+*Session-013 note:* "Fractal" validated with external evidence. The lifecycle
+composition research (penny-orc, 171 sources) established that viable systems
+require structurally identical processes at every tier (Beer's recursive viability
+theorem, Ashby's requisite variety). The same lifecycle pattern repeats at
+product/feature/bug/spike scale. kos's cycle IS a lifecycle variant — same
+structure, parameterized for knowledge exploration. The process should have
+explicit scale variants with depth-appropriate ceremony: project (full brief),
+feature (abbreviated), fix (commit convention), idea (no structure). See
+elem-fractal-lifecycle, question-fractal-process-ceremony.
+
 **B3: The Storage Model**
 A content-addressed immutable fact store with cryptographic integrity and
 distributed sync. Every fact is a datom: (entity, attribute, value,
@@ -204,6 +214,62 @@ reasons about the reasoning. "Broaden before deepening" and the recursive
 projection pattern are both meta-epistemological: judgments about how to
 investigate, not what to investigate. The priority function cannot reach
 this level. See finding-022.
+
+*Session-013 revision:* A fourth element identified: the PREDICTOR. A
+continuous forward model running orthogonally to the cycle, generating
+predictions about graph state before events occur, weighting by confidence,
+updating on surprise. Without it the system is reactive — gets eaten while
+thinking. The brief hypothesis is already a prediction; the finding is the
+outcome. Adding predicted_confidence before and surprise_magnitude after
+turns the existing brief→finding structure into a calibration instrument.
+The reactive-query model is graveyarded (G9). See elem-predictor-layer,
+question-predictor-layer, question-brief-as-prediction-record.
+
+The Conant-Ashby Good Regulator Theorem (1970) grounds this: every good
+regulator must contain a model of the system it regulates. The graph IS
+that model. Orient-as-gathering-layer (kos orient --json) provides the
+model to the LLM. See elem-conant-ashby-regulator.
+
+**B8: Bidirectional Feedback and Double-Loop Learning**
+Single-loop feedback (did we execute correctly?) must be paired with
+double-loop feedback (is the spec correct?). Beer, Boyd, McChrystal,
+Argyris, and the NIST Risk Management Framework converge on this.
+Systematically under-implemented across all studied systems.
+
+kos's process IS double-loop: findings can change bedrock, not just
+record what happened. The graveyard is the strongest double-loop
+mechanism — it records not just what was tried but WHY it was ruled out.
+Gate enforcement (43%→100% compliance from xMP data) shows that
+structural constraints outperform advisory constraints. AI agents
+improvise past broken references (236 bugs in BMAD-METHOD, 25% from
+broken refs) — they don't fail, they confabulate.
+
+Evidence: elem-bidirectional-feedback-underimplemented,
+elem-double-loop-learning, elem-gate-enforcement,
+elem-ai-improvisation-past-broken-refs. Source: lifecycle composition
+research, 171 sources across 5 tracks.
+
+**B9: Change Propagation Taxonomy**
+When a spec change ripples, the TYPE of change matters. Four
+classifications for how agents should handle existing patterns:
+Extend (copy this pattern), Integrate (work with, don't replicate),
+Deprecate (no new dependencies), Target (new code follows this).
+Without classification, agents extend stale patterns into new work.
+kos edges lack this — derives/implements/contradicts/supersedes
+describe relationship but not propagation intent.
+
+Evidence: elem-drift-propagation-taxonomy. Source: xMP PRD validation.
+
+**B10: Conway's Law — Organization Mirrors Architecture at 8x**
+Tightly coupled organizations produce tightly coupled code; loosely
+coupled organizations produce modular code. Modularity differences
+can be a factor of eight (MacCormack et al. 2012). For agent-driven
+development, agent organization must mirror desired code architecture.
+The aae-orc independence matrix is a prescriptive Conway's Law
+statement.
+
+Evidence: elem-conways-law-modularity. Source: Conway 1967,
+MacCormack et al. 2012.
 
 ---
 
@@ -472,6 +538,55 @@ or does `kos project` become necessary?
 
 Evidence: finding-031, brief-distributed-graph.
 
+**F6: The predictor layer — fourth element of the cognitive architecture**
+LLM (spark) + KOS (memory) + Executive (cycle) = three elements. The fourth
+is a continuous forward model that generates predictions about graph state,
+weights them by confidence, and updates on surprise. Without it the system
+is reactive — queries when prompted, reasons when asked. The predictor runs
+orthogonally to the cycle: current state → forward model → predicted next
+states → watch for deviation → update on surprise.
+
+The brief already contains the seed: hypothesis is a prediction, finding is
+the outcome. The gap between them is the prediction error signal being
+discarded. Two optional schema fields (predicted_confidence on briefs,
+surprise_magnitude on findings) turn the existing structure into a
+calibration instrument. No new architecture — one measurement discipline.
+
+Evidence: question-predictor-layer, question-brief-as-prediction-record,
+elem-predictor-layer, grv-reactive-query-model. Schema v0.3+ additions.
+
+**F7: Fractal process ceremony — same pattern at different scales**
+The process cycle uses uniform ceremony regardless of scale. A 104-node
+bootstrap uses the same probe brief template as a CLI flag fix. The fractal
+lifecycle principle (elem-fractal-lifecycle, validated through lifecycle
+composition research) says the process should have explicit scale variants:
+project/feature/fix/idea, each inheriting structure but reducing depth.
+Success signals (gates) should be depth-appropriate.
+
+Evidence: question-fractal-process-ceremony, question-fractal-gates,
+grv-single-workflow-type. Lifecycle composition extraction (finding-039).
+
+**F8: kos as the lifecycle's knowledge layer**
+The lifecycle composition brief (penny-orc) identifies eight structural
+problems with linear pipelines. All eight map to kos capabilities —
+built, question-stage, or unbuilt. kos and the lifecycle composition engine
+describe the same system from different projections: workflows vs knowledge
+substrate. If true, the universal bridge framework is how kos connects to
+lifecycle workflows, and kos orient is the LEARN phase's ingest step.
+
+Evidence: finding-039-lifecycle-composition-extraction,
+finding-040-substrate-ceiling-convergence, question-kos-as-learn-phase.
+
+**F9: Intent persistence across context breaks**
+How does commander's intent survive session boundaries without the human
+carrying it? Auftragstaktik (Moltke) solved the analogous military problem:
+push intent down, not instructions. Actors know WHY, not just WHAT. kos's
+version: can intent be encoded in the graph at a level that survives context
+breaks? The substrate hypothesis meets the lifecycle research here.
+
+Evidence: question-intent-under-context-break, elem-auftragstaktik-intent-specs,
+grv-human-as-integration-bus.
+
 ---
 
 ## Graveyard
@@ -511,6 +626,28 @@ workflows will become limiting. The required properties (content-addressing,
 immutability, cryptographic integrity, distributed sync) are substrate-
 agnostic. Git remains valid at current scale. See grv-git-as-sufficient-
 substrate for full rationale and reopener.
+
+**G6: Flat-file context loading as a scaling strategy**
+Any spec-driven approach that loads project artifacts into a single context
+window hits a hard ceiling. Measured across 5 projects: axiathon consumed
+97% of effective capacity before any work began. Structural, not fixable
+by better sharding. Evidence: elem-context-ceiling, grv-flat-file-context-scaling.
+
+**G7: Single workflow type for all activities**
+One process shape (sequential step list) for planning, implementation,
+review, and exploration. These activities have fundamentally different
+structures. Evidence: grv-single-workflow-type.
+
+**G8: Human-as-integration-bus for session continuity**
+The human carrying context between sessions doesn't scale past simple
+projects. Evidence: grv-human-as-integration-bus. Downstream of G6.
+
+**G9: Reactive query as primary orientation mechanism**
+The system orients by reading the graph when asked. By the time the query
+forms, the moment has passed. The charter grew to 43k because the reactive
+model required increasingly complete context to compensate for having no
+forward model. G6 and G8 are both downstream symptoms. Evidence:
+grv-reactive-query-model.
 
 ---
 
@@ -713,3 +850,35 @@ encoding).*
   Findings 037 (bootstrap seeding gap) and 038 (distribution pipeline).
   181+ nodes across 7 graphs (switchboard added). `brew install arcavenae/tap/kos`
   works.*
+
+- *Session-013: Orient standalone, lifecycle composition extraction, predictor
+  layer. Built orient for standalone repos (not under aae-orc) — separate
+  gather_standalone() codepath, unfiltered charter items, nodes by confidence
+  tier, probes/ideas display, JSONL with standalone flag. FAT issue filed
+  (kos#1).
+
+  Extracted 34 graph artifacts from penny-orc lifecycle composition research
+  (~171 sources across 5 tracks): 11 bedrock elements (context ceiling, gate
+  enforcement, AI improvisation, fractal lifecycle, drift propagation taxonomy,
+  Conant-Ashby regulator, bidirectional feedback, seven-channel protocol,
+  Conway's law modularity, double-loop learning, Auftragstaktik intent specs),
+  4 graveyard entries (flat-file scaling, single workflow type, human-as-bus,
+  reactive query model), 12 frontier questions, 6 ideas, 2 findings (039
+  lifecycle composition extraction, 040 substrate ceiling convergence).
+
+  Key insight: kos and the lifecycle composition engine describe the same
+  system from different projections — workflows vs knowledge substrate.
+  All eight structural problems in the lifecycle document map to kos
+  capabilities.
+
+  Predictor layer identified as fourth cognitive architecture element:
+  continuous forward model running orthogonally to the cycle, generating
+  predictions, updating on surprise. The brief hypothesis is already a
+  prediction — adding predicted_confidence before and surprise_magnitude
+  after turns the existing structure into a calibration instrument. Schema
+  v0.3+ updated with two optional fields.
+
+  Updater improvements: alpha channel tagging, version-specific `kos update
+  [VERSION]`, channel filtering, 7 tests. Adapted from aclaude learnings.
+
+  210+ nodes across 7 graphs.*
