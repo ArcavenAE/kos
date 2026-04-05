@@ -1,0 +1,80 @@
+id: finding-038-distribution-pipeline
+type: finding
+confidence: bedrock
+title: "kos distribution pipeline operational — per-commit releases from main"
+content: |
+  ## Summary
+
+  Session-012 built the full distribution pipeline for kos: per-commit
+  signed releases from main, self-update command, Homebrew formula, and
+  cross-platform builds. This directly addresses question-standalone-kos-
+  distribution — kos is now installable outside aae-orc via
+  `brew install arcavenae/tap/kos` or `kos update`.
+
+  ## Findings
+
+  ### F1: Trunk-based per-commit releases work for early-stage tools
+
+  Tag format `main-YYYYMMDD-HHMMSS-{commit}` with pre-release flag.
+  Single channel, no alpha/stable split. Every push to main produces
+  signed binaries for darwin-arm64, linux-amd64, linux-arm64. Homebrew
+  formula auto-updated. 30 releases retained, older cleaned automatically.
+
+  ### F2: Private repos can't access org secrets for signing
+
+  kos was private when the signing pipeline was first triggered. Org
+  secrets with "selected" visibility showed as empty in the CI environment.
+  Making the repo public resolved it immediately. switchboard (also
+  private at the time) had the same issue but was made public
+  independently. This is a GitHub platform behavior, not a configuration
+  error.
+
+  ### F3: Self-update follows aclaude's atomic swap pattern
+
+  `kos update` downloads from GitHub releases API, detects platform
+  (darwin/linux, arm64/amd64), performs atomic binary swap with rollback
+  (current→.old, .new→current, cleanup). Detects Homebrew and Linux
+  package manager installs and directs users to their package manager
+  instead of self-updating.
+
+  ### F4: Org-wide security hardening applied alongside distribution
+
+  While building kos's pipeline, audited and hardened all ArcavenAE
+  repos: SHA-pinned all GitHub Actions (supply chain protection), added
+  persist-credentials:false to all checkouts, scoped contents:write to
+  release jobs only, created branch protection rulesets for kos and
+  tmux-cmc, added develop protection for gitflow repos, added MIT
+  LICENSE to repos missing it, added SECURITY.md with GitHub Advisory
+  reporting, created Apple signing key compromise runbook.
+
+  ### F5: Gitflow workflows on main lag behind develop
+
+  Security hardening committed to develop didn't protect main. PRs
+  targeting main and tag-triggered release workflows use main's workflow
+  files. Required cherry-picking hardening commits to main on all three
+  gitflow repos (aclaude, switchboard, ThreeDoors). This is a recurring
+  maintenance cost of gitflow — workflow changes must be applied to both
+  branches.
+
+  ## Assessment
+
+  Result: CONFIRMS. kos is distributable. The pipeline pattern is proven
+  across 5 repos (aclaude, switchboard, ThreeDoors, jira-cli, kos).
+  question-standalone-kos-distribution is partially resolved — the
+  binary is installable, but the Workspace abstraction still needs
+  cleanup for standalone repos (root == kos_root hack).
+
+edges:
+  - target: question-standalone-kos-distribution
+    type: derives
+    note: "Distribution pipeline directly answers this question"
+  - target: finding-037-bootstrap-seeding-gap
+    type: derives
+    note: "Distribution was blocked by the same session's bootstrap work"
+provenance:
+  created_by: human
+  session: session-012
+  created_at: "2026-04-05"
+finding:
+  probe: null
+  result: confirms
