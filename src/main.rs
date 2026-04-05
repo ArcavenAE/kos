@@ -10,7 +10,7 @@ use clap::Parser;
 /// Reads typed YAML nodes, validates schema, renders graphs,
 /// and detects drift across the knowledge substrate.
 #[derive(Parser)]
-#[command(name = "kos", version, about)]
+#[command(name = "kos", version = env!("KOS_LONG_VERSION"), about)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -92,6 +92,12 @@ enum Commands {
         #[arg(long)]
         fix: bool,
     },
+
+    /// Update kos to the latest release
+    Update,
+
+    /// Show version, commit, build time, and channel
+    Version,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -231,6 +237,47 @@ fn main() -> anyhow::Result<()> {
             let cwd = std::env::current_dir()?;
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
             kos::doctor::run(&workspace, &cwd, merged, fix)?;
+        }
+
+        Commands::Update => {
+            let method = kos::updater::detect_install_method()?;
+            match method {
+                kos::updater::InstallMethod::Homebrew => {
+                    println!("kos was installed via Homebrew. Run: brew upgrade kos");
+                    return Ok(());
+                }
+                kos::updater::InstallMethod::LinuxPackageManager { manager } => {
+                    println!(
+                        "kos was installed via {manager}. Use your package manager to update."
+                    );
+                    return Ok(());
+                }
+                kos::updater::InstallMethod::DirectBinary => {}
+            }
+
+            let current_tag = env!("KOS_TAG");
+            match kos::updater::check_for_update()? {
+                Some(latest) if latest == current_tag => {
+                    println!("Already up to date: {current_tag}");
+                }
+                Some(latest) => {
+                    println!("Current: {current_tag}");
+                    println!("Latest:  {latest}");
+                    let new_tag = kos::updater::download_and_install()?;
+                    println!("Updated to {new_tag}. Restart kos to use the new version.");
+                }
+                None => {
+                    println!("No releases found.");
+                }
+            }
+        }
+
+        Commands::Version => {
+            println!("kos {}", env!("KOS_LONG_VERSION"));
+            println!("  version:    {}", env!("KOS_VERSION"));
+            println!("  commit:     {}", env!("KOS_COMMIT"));
+            println!("  build time: {}", env!("KOS_BUILD_TIME"));
+            println!("  channel:    {}", env!("KOS_CHANNEL"));
         }
     }
 

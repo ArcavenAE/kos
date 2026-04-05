@@ -14,5 +14,9 @@ allow = [
   "CC0-1.0",
 ]
 
+[[licenses.exceptions]]
+allow = ["CDLA-Permissive-2.0"]
+name = "webpki-roots"
+
 [bans]
 multiple-versions = "warn"

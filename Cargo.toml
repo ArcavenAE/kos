@@ -36,6 +36,12 @@ regex = "1"
 # Content hashing for drift detection
 sha2 = "0.10"
 
+# Self-update (GitHub releases API)
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+
+[build-dependencies]
+chrono = "0.4"
+
 [dev-dependencies]
 insta = { version = "1", features = ["yaml", "json"] }
 tempfile = "3"

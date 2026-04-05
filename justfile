@@ -14,6 +14,12 @@ build:
 build-release:
     cargo build --release
 
+# Install to ~/.local/bin
+install: build-release
+    mkdir -p ~/.local/bin
+    cp target/release/kos ~/.local/bin/kos
+    @echo "Installed kos to ~/.local/bin/kos"
+
 # Run kos with arguments
 run *args:
     cargo run -- {{args}}
