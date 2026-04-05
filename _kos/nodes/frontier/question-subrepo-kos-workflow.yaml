@@ -1,0 +1,40 @@
+id: question-subrepo-kos-workflow
+type: question
+confidence: frontier
+title: "How do subrepo sessions orient and harvest when working inside the subrepo?"
+content: |
+  kos things for aae-orc subrepos (switchboard, aclaude, marvel, etc.) are
+  initiated from the orchestrator directory. But actual development happens
+  inside the subrepo: `cd switchboard && claude`. From there, how does the
+  developer orient? How do they harvest?
+
+  Current state: `kos orient` from a subrepo discovers the workspace by
+  walking up to aae-orc. It works. But the session protocol in each repo's
+  CLAUDE.md says "read charter.md" — which charter? The repo's own (thin,
+  empty after bootstrap) or the orchestrator's (rich, 40k+)? Cross-repo
+  questions "belong in the orchestrator's _kos/" but the developer is in
+  the subrepo.
+
+  Concrete workflow gaps:
+  - `kos orient` from switchboard/ works (finds aae-orc) but shows the
+    full orchestrator context, not switchboard-scoped knowledge
+  - Harvesting a finding in switchboard means writing to switchboard/_kos/
+    findings/ but also potentially updating the orchestrator charter
+  - The subrepo CLAUDE.md references charter.md which is a thin stub —
+    should it @-reference the orchestrator charter instead?
+  - `kos doctor` from a subrepo checks the nearest graph (subrepo's own)
+    but the developer may want to check cross-repo consistency
+
+  Questions: Should `kos orient` have a --scope flag (local vs. merged)?
+  Should subrepo charters @-reference the orchestrator charter? Should
+  harvesting from a subrepo automatically notify the orchestrator graph?
+  Is the two-charter model (orchestrator + repo) the right abstraction,
+  or should subrepos just use the orchestrator's charter directly?
+edges:
+  - target: question-charter-scaling
+    type: derives
+    note: "Subrepo orientation depends on what the charter contains"
+provenance:
+  created_by: human
+  session: session-012
+  created_at: "2026-04-04"

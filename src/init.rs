@@ -296,12 +296,17 @@ fn update_claude_md(target: &Path, scope: &GraphScope) -> Result<bool> {
     }
 }
 
-/// Create .claude/rules/kos-commits.md if .claude/rules/ exists and rule is missing.
+/// Create .claude/rules/kos-commits.md if .claude/ exists and rule is missing.
+/// Creates .claude/rules/ if .claude/ exists but rules/ doesn't.
 /// Returns true if created.
 fn create_commit_rules(target: &Path) -> Result<bool> {
-    let rules_dir = target.join(".claude/rules");
-    if !rules_dir.exists() {
+    let claude_dir = target.join(".claude");
+    if !claude_dir.exists() {
         return Ok(false);
+    }
+    let rules_dir = claude_dir.join("rules");
+    if !rules_dir.exists() {
+        std::fs::create_dir_all(&rules_dir).map_err(KosError::Io)?;
     }
     let rules_file = rules_dir.join("kos-commits.md");
     if rules_file.exists() {
