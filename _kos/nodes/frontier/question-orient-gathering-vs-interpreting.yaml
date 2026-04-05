@@ -1,0 +1,65 @@
+id: question-orient-gathering-vs-interpreting
+type: question
+confidence: frontier
+title: "Should kos orient be a gathering layer (structured data for LLM consumption) rather than an interpretation layer (filtered human summary)?"
+content: |
+  kos orient currently does two things in one command: it gathers data
+  (reads charter, findings, nodes, RD briefs) and interprets it (filters
+  by target name via string matching, formats for humans). The gathering
+  is mechanical and reliable. The interpretation is shallow — string
+  contains() is not relevance judgment.
+
+  Meanwhile, when an LLM "orients" by reading the charter and graph
+  directly, it makes connections, notices what's missing, judges relevance
+  by meaning, and synthesizes across sources. It's inconsistent and
+  sometimes wrong, but it does the thing orientation actually requires:
+  understanding.
+
+  The concern: as we build orient into a CLI command, we replace flexible
+  contextual synthesis with fixed programmed action. We gain consistency
+  and lose understanding. The muscles work but there's no proprioception.
+
+  Hypothesis: orient should be split into two layers:
+
+  1. **Gathering layer (CLI)** — consistent, complete, mechanical. Reads
+     all nodes, edges, findings, charter sections, probes, ideas. Outputs
+     structured JSONL. No relevance filtering. No interpretation. This is
+     the nervous system — it senses everything and reports faithfully.
+
+  2. **Interpretation layer (LLM)** — consumes structured output. Makes
+     connections. Judges relevance. Notices gaps. Synthesizes. This is
+     the brain — it does the actual orienting.
+
+  The human-readable `kos orient` output becomes a convenience summary,
+  not the primary interface. The primary interface is `kos orient --json`
+  feeding an LLM session.
+
+  This reframes what "orient" means: not "CLI that orients you" but
+  "CLI that gives the LLM what it needs to orient you."
+
+  If true, this changes:
+  - What the standalone fix should produce (structured data, not just
+    better human output)
+  - What the FATs measure (completeness of gathering, not quality of
+    filtering)
+  - How process subcommands should work (scaffolding that feeds back
+    into the graph for the LLM to consume)
+  - Whether the prediction engine (F19) is a separate concept or just
+    "an LLM with graph access"
+
+  If false — if a well-tuned CLI filter is sufficient for orientation
+  and the LLM layer adds cost without value — then the current approach
+  (better string matching, richer human output) is correct.
+
+  Testable by implementing both outputs and comparing orientation quality.
+edges:
+  - target: question-standalone-kos-distribution
+    type: derives
+    note: "Standalone orient is the first test of this question"
+  - target: question-subrepo-kos-workflow
+    type: derives
+    note: "Subrepo orientation quality depends on gathering vs interpreting"
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"
