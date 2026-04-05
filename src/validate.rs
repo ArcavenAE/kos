@@ -29,10 +29,19 @@ pub fn run(kos_root: &Path) -> Result<()> {
     // First pass: load all nodes and collect IDs
     let (nodes, known_ids) = load_all_nodes(&nodes_dir)?;
 
-    // Second pass: validate each node
+    // Second pass: validate parsed nodes, skip parse errors
     let mut results: Vec<ValidationResult> = Vec::new();
-    for (node, rel_path) in &nodes {
-        results.push(validate_node(node, rel_path, &known_ids));
+    let mut parse_error_count = 0;
+
+    for loaded in &nodes {
+        match loaded {
+            LoadedNode::Parsed(node, rel_path) => {
+                results.push(validate_node(node, rel_path, &known_ids));
+            }
+            LoadedNode::ParseError => {
+                parse_error_count += 1;
+            }
+        }
     }
 
     // Output
@@ -62,26 +71,27 @@ pub fn run(kos_root: &Path) -> Result<()> {
         }
     }
 
+    let total = results.len() + parse_error_count;
     println!();
     println!(
-        "{} nodes: {} passed, {} warnings, {} failed",
-        results.len(),
-        pass_count,
-        warn_count,
-        fail_count
+        "{total} nodes: {pass_count} passed, {warn_count} warnings, {fail_count} failed, {parse_error_count} parse errors",
     );
 
-    if fail_count > 0 {
+    if fail_count > 0 || parse_error_count > 0 {
         std::process::exit(1);
     }
 
     Ok(())
 }
 
-type NodeWithPath = (Node, String);
+/// A loaded node: either successfully parsed or failed to parse.
+enum LoadedNode {
+    Parsed(Box<Node>, String),
+    ParseError,
+}
 
-/// Load all YAML files from nodes/**/*.yaml, returning (Node, relative_path) pairs.
-fn load_all_nodes(nodes_dir: &Path) -> Result<(Vec<NodeWithPath>, HashSet<String>)> {
+/// Load all YAML files from nodes/**/*.yaml.
+fn load_all_nodes(nodes_dir: &Path) -> Result<(Vec<LoadedNode>, HashSet<String>)> {
     let mut nodes = Vec::new();
     let mut known_ids = HashSet::new();
 
@@ -105,28 +115,12 @@ fn load_all_nodes(nodes_dir: &Path) -> Result<(Vec<NodeWithPath>, HashSet<String
             Ok(mut node) => {
                 node.source_path = path.to_path_buf();
                 known_ids.insert(node.id.clone());
-                nodes.push((node, rel_path));
+                nodes.push(LoadedNode::Parsed(Box::new(node), rel_path));
             }
             Err(e) => {
-                // Can't parse — report as a failed node
-                nodes.push((
-                    Node {
-                        id: rel_path.clone(),
-                        node_type: NodeType::Element,
-                        confidence: crate::model::Confidence::Frontier,
-                        title: String::new(),
-                        content: String::new(),
-                        edges: vec![],
-                        depends_on: vec![],
-                        graveyard: None,
-                        provenance: None,
-                        tags: vec![],
-                        notes: None,
-                        source_path: path.to_path_buf(),
-                    },
-                    rel_path.clone(),
-                ));
-                eprintln!("  PARSE ERROR  {rel_path}: {e}");
+                // Parse error is the complete report — no further validation
+                println!("  PARSE ERROR  {rel_path}: {e}");
+                nodes.push(LoadedNode::ParseError);
             }
         }
     }

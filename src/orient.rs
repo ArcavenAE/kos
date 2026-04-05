@@ -38,10 +38,11 @@ pub struct ProbeEntry {
 /// Run the orient subcommand.
 pub fn run(workspace: &Workspace, target: &str, json: bool, log: bool) -> Result<()> {
     let start = Instant::now();
+    let cwd = std::env::current_dir().map_err(KosError::Io)?;
     let orientation = if workspace.is_standalone() {
         gather_standalone(workspace, target)?
     } else {
-        gather(workspace, target)?
+        gather(workspace, &cwd, target)?
     };
     let duration = start.elapsed();
 
@@ -61,25 +62,46 @@ pub fn run(workspace: &Workspace, target: &str, json: bool, log: bool) -> Result
 }
 
 /// Gather all orientation data for a target repo.
-fn gather(workspace: &Workspace, target: &str) -> Result<Orientation> {
+///
+/// Loads charter items, RD briefs/findings (orchestrator-level), PLUS
+/// _kos/ graph content from the nearest graph to cwd (nodes by tier,
+/// findings, probes, ideas).
+fn gather(workspace: &Workspace, cwd: &Path, target: &str) -> Result<Orientation> {
     let charter_items = load_charter_items(&workspace.root.join("charter.md"), target)?;
-    let findings = load_findings(&workspace.kos_root.join("findings"), target)?;
     let rd_briefs = load_rd_briefs(&workspace.root.join("sprint/rd"), target)?;
     let rd_findings = load_rd_findings(&workspace.root.join("sprint/rd"), target)?;
-    let frontier_questions =
-        load_frontier_questions(&workspace.kos_root.join("nodes/frontier"), target)?;
+
+    // Load _kos/ graph content from nearest graph to cwd
+    let nearest = workspace.nearest_graph(cwd);
+    let (bedrock_nodes, frontier_questions, graveyard_nodes, graph_findings, probes, ideas) =
+        if let Some(graph) = nearest {
+            let nodes_dir = graph.path.join("nodes");
+            let bedrock = load_nodes_by_confidence(&nodes_dir, &Confidence::Bedrock)?;
+            let frontier = load_nodes_by_confidence(&nodes_dir, &Confidence::Frontier)?;
+            let graveyard = load_nodes_by_confidence(&nodes_dir, &Confidence::Graveyard)?;
+            let findings = load_findings_unfiltered(&graph.path.join("findings"))?;
+            let probes = load_probes(&graph.path.join("probes"))?;
+            let ideas = load_ideas(&graph.path.join("ideas"))?;
+            (bedrock, frontier, graveyard, findings, probes, ideas)
+        } else {
+            // Fall back to legacy kos subrepo layout (findings/ and nodes/ at kos_root)
+            let findings = load_findings(&workspace.kos_root.join("findings"), target)?;
+            let frontier =
+                load_frontier_questions(&workspace.kos_root.join("nodes/frontier"), target)?;
+            (vec![], frontier, vec![], findings, vec![], vec![])
+        };
 
     Ok(Orientation {
         target: target.to_string(),
         charter_items,
-        findings,
+        findings: graph_findings,
         rd_briefs,
         rd_findings,
         frontier_questions,
-        bedrock_nodes: vec![],
-        graveyard_nodes: vec![],
-        probes: vec![],
-        ideas: vec![],
+        bedrock_nodes,
+        graveyard_nodes,
+        probes,
+        ideas,
         is_standalone: false,
     })
 }

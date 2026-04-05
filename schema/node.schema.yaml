@@ -103,10 +103,21 @@ edges:
       supersedes:   "This node replaces the target. The target remains
                      readable but is no longer authoritative. Directional:
                      the newer node supersedes the older."
+      supports:     "This node enables or contributes to the target.
+                     Weaker than implements — the node doesn't realize
+                     the target's specification, but makes it possible
+                     or easier. Example: a library supports a platform."
+      instantiates: "This node is a concrete example of the target
+                     principle, pattern, or value. The target is abstract;
+                     this node demonstrates it in practice."
+      partially_resolves: "This node addresses some aspects of the target
+                     question without fully resolving it. The target
+                     remains open but this node contributes evidence
+                     or partial answers."
 
   format:
     - target: node-id
-      type: derives | implements | contradicts | supersedes
+      type: derives | implements | contradicts | supersedes | supports | instantiates | partially_resolves
       signal: "Optional. error | evolution | drift"
       note: "Optional. One-line explanation of the relationship."
 

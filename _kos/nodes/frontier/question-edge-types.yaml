@@ -33,7 +33,15 @@ content: |
   FURTHER VALIDATED in twelve-project broadening probe. Four edge types
   plus signal classification (error/evolution/drift, added in v0.3)
   covered all twelve projects. No additional edge types needed.
-  This question is answered.
+
+  REOPENED session-014: Three additional edge types added after
+  aae-orc orchestrator nodes needed them: supports (enables/contributes,
+  weaker than implements), instantiates (concrete example of a principle),
+  partially_resolves (addresses some aspects of a question). Schema v0.3
+  updated, model updated, validate passes. The original four covered
+  spec-to-spec relationships; the new three cover knowledge-graph-level
+  relationships (components supporting platforms, code instantiating
+  principles, findings partially resolving questions). Total: 7 edge types.
 depends_on:
   - question-mvg-bootstrap
   - elem-correspondence-layer

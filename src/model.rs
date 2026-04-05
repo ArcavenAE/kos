@@ -117,13 +117,19 @@ pub struct Edge {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum EdgeType {
     Derives,
     Implements,
     Contradicts,
     Supersedes,
+    /// Enables or contributes to the target (weaker than implements).
+    Supports,
+    /// A concrete example of the target principle or pattern.
+    Instantiates,
+    /// Addresses some aspects of the target question without fully resolving it.
+    PartiallyResolves,
 }
 
 impl std::fmt::Display for EdgeType {
@@ -133,6 +139,9 @@ impl std::fmt::Display for EdgeType {
             EdgeType::Implements => write!(f, "implements"),
             EdgeType::Contradicts => write!(f, "contradicts"),
             EdgeType::Supersedes => write!(f, "supersedes"),
+            EdgeType::Supports => write!(f, "supports"),
+            EdgeType::Instantiates => write!(f, "instantiates"),
+            EdgeType::PartiallyResolves => write!(f, "partially_resolves"),
         }
     }
 }
@@ -191,11 +200,20 @@ pub struct Provenance {
 #[derive(Debug, Deserialize)]
 pub struct Finding {
     pub id: String,
+    /// Optional — some findings (e.g., in aae-orc) omit this field.
+    #[serde(default = "Finding::default_confidence")]
     pub confidence: Confidence,
     pub title: String,
+    #[serde(default)]
     pub content: String,
     #[serde(skip)]
     pub source_path: PathBuf,
+}
+
+impl Finding {
+    fn default_confidence() -> Confidence {
+        Confidence::Frontier
+    }
 }
 
 /// A charter section extracted from markdown.

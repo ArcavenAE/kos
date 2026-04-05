@@ -29,6 +29,14 @@ content: |
   Testable by: applying different ceremony levels to the orient standalone
   work (feature scale) vs. the lifecycle extraction (project scale) and
   comparing whether the reduced ceremony loses signal or just noise.
+
+  Session-014 update: Four process subcommands built — kos idea (zero
+  ceremony), kos question (light), kos finding (medium, auto-numbered,
+  includes surprise_magnitude), kos probe (medium, includes
+  predicted_confidence). These implement the ceremony scale table above.
+  Each writes to the nearest _kos/ graph, creating schema-valid artifacts
+  in the correct directory. The subcommands ARE the fractal ceremony
+  mechanism — same pattern, different depth, tooling-enforced structure.
 edges:
   - target: elem-fractal-lifecycle
     type: derives

@@ -52,6 +52,15 @@ content: |
   (better string matching, richer human output) is correct.
 
   Testable by implementing both outputs and comparing orientation quality.
+
+  Session-014 update: orient now shows _kos/ graph content in all modes
+  (orchestrator, subrepo, kos repo), not just standalone. The gathering
+  layer became substantially more complete — nodes by confidence tier,
+  findings, probes, ideas all visible. The interpretation layer (string
+  matching, target filtering) is unchanged. This strengthens the hypothesis:
+  the gathering is getting richer while the interpretation stays shallow.
+  The --json output now emits node/finding/probe/idea types alongside
+  charter/rd_brief/rd_finding types.
 edges:
   - target: question-standalone-kos-distribution
     type: derives
