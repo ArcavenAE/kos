@@ -145,13 +145,13 @@ jobs:
         id: version
         run: |
           VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/')
-          TAG="main-$(date -u +%Y%m%d-%H%M%S)-$(echo ${{ github.sha }} | head -c 7)"
+          TAG="alpha-$(date -u +%Y%m%d-%H%M%S)-$(echo ${{ github.sha }} | head -c 7)"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Build release binary
         env:
-          KOS_CHANNEL: main
+          KOS_CHANNEL: alpha
           KOS_TAG: ${{ steps.version.outputs.tag }}
         run: |
           cargo build --release --target ${{ matrix.target }}
@@ -332,7 +332,7 @@ jobs:
             --prerelease \
             --title "$TAG" \
             --notes "$(cat <<NOTES
-          Automated release from main.
+          Automated alpha release.
 
           **Version:** ${{ needs.build-release.outputs.version }}
           **Commit:** ${{ github.sha }}
