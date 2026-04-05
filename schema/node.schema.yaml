@@ -249,6 +249,18 @@ brief:
   timebox:
     type: string
     description: "Hard stop. Findings get harvested regardless of completeness."
+  predicted_confidence:
+    type: float (0.0 - 1.0)
+    required: false
+    description: >
+      Experimenter's confidence in the hypothesis BEFORE the probe runs.
+      Recorded at brief creation time, not revised afterward.
+      The before-measurement that makes the after-measurement meaningful.
+      If the finding surprises — outcome deviates significantly from
+      predicted_confidence — that surprise magnitude is the primary
+      learning signal. Do not update this field after the probe runs.
+      Its value is in being wrong.
+      Added: session-013. See question-brief-as-prediction-record.
 
 # For type: finding
 finding:
@@ -262,6 +274,21 @@ finding:
       disconfirms:  "Hypothesis disconfirmed. Consider graveyarding."
       partial:      "Partial answer. Spawns new questions."
       redirects:    "Found something more important than the original question."
+  surprise_magnitude:
+    type: enum
+    required: false
+    values:
+      none:     "Outcome matched prediction. Model confirmed."
+      low:      "Minor deviation. Model needs small adjustment."
+      medium:   "Significant deviation. Model needs revision."
+      high:     "Prediction was substantially wrong. Strong update signal."
+      inverted: "Outcome was opposite of prediction. Strongest signal."
+    description: >
+      How much did the outcome deviate from the brief's predicted_confidence?
+      Inverted is the most valuable signal — the system was confidently wrong.
+      Record honestly. A string of 'none' entries means either the probes
+      are too safe or the predictions are too vague to be falsifiable.
+      Added: session-013. See question-brief-as-prediction-record.
 
 # For type: correspondence
 correspondence:

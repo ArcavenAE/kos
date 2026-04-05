@@ -1,0 +1,52 @@
+id: grv-reactive-query-model
+type: element
+confidence: graveyard
+title: "Query-when-prompted as the primary orientation mechanism"
+content: |
+  Approach: the system orients by reading the graph when asked. The executive
+  cycle triggers orientation. Agents query KOS at session start. The charter
+  provides context on cold-start.
+
+  Context: reasonable for a system where human triggers every cycle. The
+  charter-as-context model worked at small scale. The cycle's orient step
+  assumed a patient, prompted orientation phase.
+
+  Finding: reactive query is always behind the event. By the time the system
+  is querying, the moment requiring prediction has passed. The charter grew
+  to 43k because the reactive model required increasingly complete context
+  to compensate for having no forward model. grv-flat-file-context-scaling
+  and grv-human-as-integration-bus are both downstream symptoms of this
+  root failure. The system that survives doesn't query — it has already
+  modeled the likely next state before anything asks it to.
+
+  Ruling: reactive-only orientation is insufficient for a system operating
+  at real scale with multiple agents and context breaks. The cycle's orient
+  step remains valid as a structured check. It cannot be the only
+  orientation mechanism. A continuous predictor running orthogonally to
+  the cycle is required.
+
+  Reopener: if the predictor layer proves too expensive to run continuously
+  at practical scale, a triggered-but-anticipatory model — predictor runs
+  at cycle boundaries rather than continuously — may be sufficient. Test
+  against question-predictor-layer findings before concluding continuous
+  operation is required.
+edges:
+  - target: grv-flat-file-context-scaling
+    type: derives
+    note: "Charter growth is a symptom of reactive-only orientation"
+  - target: grv-human-as-integration-bus
+    type: derives
+    note: "Human compensating for missing predictor"
+  - target: elem-predictor-layer
+    type: supersedes
+    note: "Predictor replaces reactive query as primary orientation"
+  - target: question-predictor-layer
+    type: derives
+    note: "Graveyard ruling motivates the predictor question"
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"
+graveyard:
+  ruling: "Reactive query insufficient at scale; predictor required"
+  date: "2026-04-05"
