@@ -13,11 +13,11 @@ pub enum KosError {
     },
 
     #[error(
-        "workspace not found: could not locate aae-orc root from {start}\n  hint: use --workspace <path> or set KOS_WORKSPACE to point to the aae-orc root"
+        "workspace not found: no _kos/ graph or aae-orc root found from {start}\n  hint: run `kos init` to create a graph, or use --workspace <path>"
     )]
     WorkspaceNotFound { start: String },
 
-    #[error("explicit workspace path does not contain a kos/ directory: {path}")]
+    #[error("explicit workspace path does not contain a _kos/ graph or kos/ directory: {path}")]
     InvalidWorkspace { path: String },
 
     #[error("manifest error in {path}: {message}")]
