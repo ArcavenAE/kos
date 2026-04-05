@@ -93,8 +93,11 @@ enum Commands {
         fix: bool,
     },
 
-    /// Update kos to the latest release
-    Update,
+    /// Update kos to the latest release, or to a specific version
+    Update {
+        /// Target version tag (e.g., alpha-20260405-075244-abc1234). Omit for latest.
+        version: Option<String>,
+    },
 
     /// Show version, commit, build time, and channel
     Version,
@@ -239,11 +242,12 @@ fn main() -> anyhow::Result<()> {
             kos::doctor::run(&workspace, &cwd, merged, fix)?;
         }
 
-        Commands::Update => {
+        Commands::Update { version } => {
             let method = kos::updater::detect_install_method()?;
             match method {
                 kos::updater::InstallMethod::Homebrew => {
-                    println!("kos was installed via Homebrew. Run: brew upgrade kos");
+                    let formula = kos::updater::brew_formula_name();
+                    println!("kos was installed via Homebrew. Run: brew upgrade {formula}");
                     return Ok(());
                 }
                 kos::updater::InstallMethod::LinuxPackageManager { manager } => {
@@ -256,18 +260,28 @@ fn main() -> anyhow::Result<()> {
             }
 
             let current_tag = env!("KOS_TAG");
-            match kos::updater::check_for_update()? {
-                Some(latest) if latest == current_tag => {
+            let target = version.as_deref();
+
+            match kos::updater::check_for_update(target)? {
+                Some(tag) if tag == current_tag => {
                     println!("Already up to date: {current_tag}");
                 }
-                Some(latest) => {
+                Some(tag) => {
                     println!("Current: {current_tag}");
-                    println!("Latest:  {latest}");
-                    let new_tag = kos::updater::download_and_install()?;
+                    if target.is_some() {
+                        println!("Target:  {tag}");
+                    } else {
+                        println!("Latest:  {tag}");
+                    }
+                    let new_tag = kos::updater::download_and_install(target)?;
                     println!("Updated to {new_tag}. Restart kos to use the new version.");
                 }
                 None => {
-                    println!("No releases found.");
+                    if let Some(v) = target {
+                        println!("No release matching '{v}' found.");
+                    } else {
+                        println!("No releases found.");
+                    }
                 }
             }
         }

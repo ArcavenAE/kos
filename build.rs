@@ -21,7 +21,7 @@ fn main() {
 
     let build_time = chrono::Utc::now().to_rfc3339();
 
-    let channel = env::var("KOS_CHANNEL").unwrap_or_else(|_| "main".to_string());
+    let channel = env::var("KOS_CHANNEL").unwrap_or_else(|_| "alpha".to_string());
     let tag = env::var("KOS_TAG").unwrap_or_else(|_| format!("{version}-{commit}"));
 
     let long_version = format!("{tag} ({commit}, {channel})");
