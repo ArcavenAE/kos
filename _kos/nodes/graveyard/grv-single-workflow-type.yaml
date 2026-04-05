@@ -1,0 +1,39 @@
+id: grv-single-workflow-type
+type: element
+confidence: graveyard
+title: "Single workflow type for all activities — different activities need different structures"
+content: |
+  BMAD uses one workflow type (sequential step lists) for planning,
+  implementation, review, and exploration. These activities have
+  fundamentally different structures:
+
+  - PRD creation: progressive disclosure, decision gates, user approval
+  - Architecture: collaborative exploration, multiple viewpoints
+  - TDD implementation: agent handoffs (TEA → Dev → Reviewer)
+  - Code review: flexible checklist, agent discretion on order
+  - Brainstorming: non-linear exploration, no fixed order
+
+  Pennyfarthing identified three distinct workflow types:
+  - Stepped: planning/discovery (user drives progression)
+  - Phased: implementation (automated agent handoffs)
+  - Procedural: reviews/exploration (flexible checklists)
+
+  kos connection: kos's process cycle is currently one type — the same
+  Orient → Question → Probe → Harvest ceremony for everything. The
+  fractal lifecycle principle (elem-fractal-lifecycle) implies kos
+  should have process variants: full ceremony for project-scale
+  exploration, reduced ceremony for feature-scale work, minimal
+  ceremony for bug-scale fixes.
+edges:
+  - target: elem-fractal-lifecycle
+    type: derives
+    note: "Fractal lifecycle implies process variants at different scales"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md §3c"
+graveyard:
+  ruling: "Validated through Pennyfarthing's three workflow types and BMAD's observed limitations"
+  date: "2026-02-14"

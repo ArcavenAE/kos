@@ -1,0 +1,38 @@
+id: elem-ai-improvisation-past-broken-refs
+type: element
+confidence: bedrock
+title: "AI agents improvise past broken references instead of failing — 236 bugs, 25% from broken refs"
+content: |
+  In traditional software, a broken reference causes a compile error, a
+  runtime exception, or a 404 — the system stops. In AI-driven systems,
+  a broken reference causes the agent to improvise. The output looks
+  plausible, nobody is blocked, and the error propagates silently.
+
+  Evidence from BMAD-METHOD repository:
+  - Forensic analysis of 422 closed issues found 236 bugs
+  - Broken file references and path handling: zero automated prevention,
+    accounted for 25% of all bugs
+  - Cross-file reference validator replayed across 26 release tags tracked
+    289 broken references accumulated over four months
+  - Almost all fixed manually without systematic detection
+
+  This is why kos treats documents as lossy projections and why drift
+  detection matters. When an agent encounters stale or broken knowledge,
+  it doesn't error — it confabulates. The only defense is systematic
+  integrity validation at the knowledge layer.
+
+  kos connection: kos validate checks node schema integrity. kos drift
+  checks content hash staleness. Neither checks cross-projection
+  integrity (does the code match what the graph says?). The bridge
+  framework would close this gap.
+edges:
+  - target: elem-gate-enforcement
+    type: derives
+    note: "AI improvisation is why gates must be automated, not advisory"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md §5"
+    - "pursifull_2026a — xMP lessons learned, Finding #9, Theme 10"

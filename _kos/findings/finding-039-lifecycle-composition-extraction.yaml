@@ -1,0 +1,131 @@
+id: finding-039-lifecycle-composition-extraction
+type: finding
+confidence: frontier
+title: "Lifecycle composition research maps structurally to kos — eight problems, eight capabilities"
+content: |
+  ## Summary
+
+  Session-013 extracted knowledge from the penny-orc lifecycle composition
+  initiative (lifecycle-improvement-rs.md and linked documents). The
+  lifecycle composition brief identifies eight structural problems with
+  BMAD's linear pipeline. Every problem maps to a kos capability that
+  either exists, is at question stage, or is unbuilt.
+
+  This is not coincidence — kos and the lifecycle composition engine
+  describe the same system from different projections. The lifecycle
+  document describes workflows, agents, gates, and feedback loops. kos
+  describes the knowledge substrate those workflows operate on.
+
+  ## The mapping
+
+  | Lifecycle Problem | kos Capability | Status |
+  |---|---|---|
+  | §1: No feedback loop | Orient → Drift → Harvest (the loop) | Partially built |
+  | §2: One scale only | Fractal process ceremony | Question stage |
+  | §3a: Hub-and-spoke divergence | Cross-repo knowledge graph | Partially built |
+  | §3b: Human-as-integration-bus | Gathering layer (orient --json) | Question stage |
+  | §3c: Single workflow type | Composable process variants | Idea stage |
+  | §4: No post-1.0 channels | Seed = sync (all inputs are graph updates) | Idea stage |
+  | §5: Drift invisible | Delivery finding channel | Question stage |
+  | §6: Ripple untracked | Ripple engine + propagation taxonomy | Basic impl exists |
+  | §7: Not composable | Variants, overlays, chains | Idea stage |
+  | §8: Context doesn't fit | Knowledge graph as retrieval layer | Graveyarded flat-file; orient exists |
+
+  ## Key extractions
+
+  ### Bedrock nodes created (10)
+  - elem-context-ceiling: measured across 5 projects with external citations
+  - elem-gate-enforcement: 43%→100% from xMP, single project
+  - elem-ai-improvisation-past-broken-refs: 236 bugs, 25% from broken refs
+  - elem-fractal-lifecycle: validated through spike lifecycle, theory grounding
+  - elem-drift-propagation-taxonomy: extend/integrate/deprecate/target
+  - elem-conant-ashby-regulator: every good regulator must model its system
+  - elem-bidirectional-feedback-underimplemented: converged across 5 frameworks
+  - elem-seven-channel-protocol: Intent/Coordination/Status/Finding/Audit/Query/Alert
+  - elem-conways-law-modularity: 8x modularity factor, empirically validated
+  - elem-double-loop-learning: questioning specs outperforms adjusting execution
+  - elem-auftragstaktik-intent-specs: specify WHAT not HOW, bounded autonomy
+
+  ### Graveyard nodes created (3)
+  - grv-flat-file-context-scaling: measured ceiling at ~20 epics
+  - grv-single-workflow-type: different activities need different structures
+  - grv-human-as-integration-bus: doesn't scale past simple projects
+
+  ### Frontier questions created (8)
+  - question-fractal-process-ceremony: should kos be scale-invariant?
+  - question-kos-as-learn-phase: is kos the lifecycle's knowledge layer?
+  - question-fractal-gates: should success signals be depth-appropriate?
+  - question-delivery-finding-channel: upward flow from implementation to spec
+  - question-spec-quality-dominant-factor: is spec quality the dominant factor?
+  - question-fitness-functions-from-graph: can kos generate executable checks?
+  - question-vsm-mapping-to-kos: does Beer's VSM map to kos architecture?
+  - question-orient-gathering-vs-interpreting: (created earlier in session)
+
+  ### Ideas created (5)
+  - kos-as-lifecycle-knowledge-layer: the unified system hypothesis
+  - composable-process-variants: variants, overlays, chains for process
+  - eight-lifecycle-problems-as-kos-roadmap: the lifecycle doc as kos requirements
+  - finding-type-taxonomy: gap/conflict/question/improvement + SCRs + urgency
+  - cli-maturity-for-external-use: process subcommands, built-in docs, LLM help
+
+  ## The fractal insight
+
+  The most significant extraction: kos's process cycle is itself a
+  lifecycle variant. Orient → Ideate → Question → Probe → Harvest →
+  Promote maps to the lifecycle's Discover → Design → Plan → Build →
+  Ship → Learn. The fractal principle says these should be explicitly
+  recognized as the same pattern at different scales, with depth-
+  appropriate ceremony at each level.
+
+  This means the success_signal field in probe briefs is the fractal
+  equivalent of the lifecycle's gates. The finding node is the fractal
+  equivalent of the delivery finding. The harvest step is the fractal
+  equivalent of the LEARN phase's fold-back.
+
+  ## Assessment
+
+  Result: CONFIRMS — the lifecycle composition research is structurally
+  relevant to kos, not just thematically related. The eight problems
+  provide a requirements specification for what kos needs to become.
+  The document was not written for kos, but it describes kos's future.
+
+  ## Source attribution
+
+  Primary source: lifecycle-improvement-rs.md (penny-orc), authored by
+  Michael Pursifull with BA discovery by Avasarala, 2026-02-14. Draws
+  on 171 sources across five research tracks, measured data from 5
+  projects, and external citations (Beer 1972, Ashby 1956, An et al.
+  2024, Hsieh et al. 2024, Chroma Research 2024).
+
+edges:
+  - target: elem-fractal-lifecycle
+    type: derives
+    note: "Central finding: fractal lifecycle applies to kos"
+  - target: elem-context-ceiling
+    type: derives
+    note: "Context ceiling motivates kos as retrieval layer"
+  - target: question-kos-as-learn-phase
+    type: derives
+    note: "Finding raises the question of kos's role in the lifecycle"
+  - target: question-fractal-process-ceremony
+    type: derives
+    note: "Finding raises the question of fractal ceremony"
+  - target: question-orient-gathering-vs-interpreting
+    type: derives
+    note: "Gathering layer is the kos implementation of LEARN ingest"
+  - target: finding-037-bootstrap-seeding-gap
+    type: derives
+    note: "Seed=sync insight confirmed by lifecycle's multiple input channels"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md"
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-tier-comm-protocol.md"
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-tier-definitions.md"
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-research-synthesis.md"
+  reviewed_by: null
+finding:
+  probe: null
+  result: confirms

@@ -1,0 +1,53 @@
+id: elem-fractal-lifecycle
+type: element
+confidence: bedrock
+title: "Lifecycles are fractal — same pattern at product, feature, bug, spike scale"
+content: |
+  The same lifecycle pattern repeats at different scales. Each level
+  inherits structure and validators from the parent but operates at
+  reduced scope and speed. Validated through multiple instances:
+
+  Product scale: full lifecycle (Brief → PRD → Architecture → Build → Ship → Learn)
+  Feature scale: inherits product context, produces deltas
+  Bug scale: lightest — inherits everything, produces fix + drift signal
+  Spike scale: structured exploration with fold-back to parent
+
+  Key principle: a feature lifecycle is not a COPY of the product
+  lifecycle — it's a VARIANT that inherits context and produces deltas.
+  When any scale's output diverges from the parent's specs, the ripple
+  mechanism updates upstream.
+
+  Validated instances:
+  - OCSF spike in poller-orchestrator followed the spike lifecycle
+    retroactively, producing charter, findings, review, fold-back
+  - xMP project's cross-track divergence demonstrated the need for
+    fractal gates at each scale
+  - kos's own process (Orient → Question → Probe → Harvest → Promote)
+    is a lifecycle variant — same structure as the product lifecycle
+    but parameterized for knowledge exploration
+
+  This principle is supported by Beer's recursive viability theorem
+  (viable systems contain models of themselves at every level) and
+  Ashby's law of requisite variety (regulatory capacity must match
+  disturbance variety).
+
+  Implication for kos: the process cycle should be explicitly fractal.
+  A 104-node bootstrap and a single-question probe should use the same
+  pattern but different depth and ceremony. Success signals (gates)
+  should be depth-appropriate — not the same template for every scale.
+edges:
+  - target: question-orient-gathering-vs-interpreting
+    type: derives
+    note: "Fractal orient means different depth at different scales"
+  - target: elem-gate-enforcement
+    type: derives
+    note: "Gates are the fractal mechanism — same validation at each scale"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md §C"
+    - "Beer 1972 — recursive viability theorem"
+    - "Ashby 1956 — law of requisite variety"
+    - "pursifull_2026d — OCSF spike lifecycle validation"

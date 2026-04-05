@@ -1,0 +1,54 @@
+id: question-fitness-functions-from-graph
+type: question
+confidence: frontier
+title: "Can executable fitness functions be derived from kos graph structure?"
+content: |
+  The lifecycle research synthesis claims: encoding specification
+  architectural constraints as executable fitness functions (Ford-Parsons-
+  Kua framework, "Building Evolutionary Architectures") will detect drift
+  violations before merge, reducing post-ship architecture violations
+  by 90%+.
+
+  The lifecycle tier definitions propose that design rules (architectural
+  invariants per Baldwin & Clark) should be verifiable — ideally through
+  fitness functions. Examples from axiathon: acyclic crate dependencies,
+  all public APIs accept TenantContext first, all errors implement
+  std::error::Error, no crate directly accesses another's storage.
+
+  Hypothesis: kos bedrock nodes that describe architectural constraints
+  could generate executable checks. A bedrock node that says "all HTTP
+  handlers must validate auth tokens" could generate a grep/AST check
+  that runs in CI. The graph becomes not just a knowledge store but a
+  source of executable validation.
+
+  This would close the gap between kos (knowledge) and enforcement
+  (gates). Currently kos describes what should be true. Fitness functions
+  verify that it IS true. The bridge from description to verification
+  is the fitness function derivation.
+
+  Testable by: taking 5 bedrock architectural constraint nodes from a
+  real project and attempting to generate executable checks from their
+  content. Measure: how many can be automated? How many require human
+  interpretation?
+
+  Open question: is this a kos feature (kos generates checks) or a
+  bridge feature (kos exports to CI tooling that generates checks)?
+edges:
+  - target: elem-gate-enforcement
+    type: derives
+    note: "Fitness functions are the automated form of gates"
+  - target: elem-drift-propagation-taxonomy
+    type: derives
+    note: "Fitness functions detect drift before it propagates"
+  - target: question-delivery-finding-channel
+    type: derives
+    note: "Fitness function failures are delivery findings flowing upward"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc lifecycle research synthesis — testable claim #5"
+    - "Ford, Parsons, Kua — Building Evolutionary Architectures"
+    - "Baldwin & Clark 2000 — Design Rules"
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-tier-definitions.md"
