@@ -1,0 +1,53 @@
+id: question-maps-from-edge-type
+type: question
+confidence: frontier
+title: "Does the graph need a directed maps_from edge type for external vocabulary translation?"
+content: |
+  Session-013 created 11 bedrock nodes that translate between kos
+  vocabulary and established fields (Beer, Ashby, Argyris, Conway,
+  Moltke). These translation nodes use `derives` edges, but derives
+  is symmetric in connotation — it doesn't encode which term is
+  canonical.
+
+  The risk: future agents reading the graph encounter both vocabularies
+  and start reasoning in Beer's terms (S2, S3, S4) rather than kos's
+  terms (edges, orient, ideate). The translation layer becomes an
+  import layer. The vocabulary independence that produced the S2 gap
+  observation (coordination-as-description vs coordination-as-enforcement)
+  erodes.
+
+  Proposed edge type:
+
+    type: maps_from
+    direction: external_concept → kos_term
+    meaning: "this established term from another field corresponds to
+    our term, but ours is canonical. Reasoning should proceed from our
+    term outward, not from this term inward."
+
+  The directionality encodes the methodology. It tells future agents:
+  traverse this edge in one direction for translation (what does the
+  outside world call this?), the other direction for thought (what is
+  this in kos terms?).
+
+  Testable by: examining whether agents that encounter both vocabularies
+  drift toward external terms when maps_from is absent vs. when it's
+  present with directional traversal guidance.
+
+  Schema implications: this would be a new edge type in node.schema.yaml
+  alongside derives, implements, contradicts, supersedes. It's the first
+  edge type that's explicitly about vocabulary rather than knowledge
+  structure.
+edges:
+  - target: question-edge-types
+    type: derives
+    note: "Extends the edge type question with a translation-specific type"
+  - target: elem-auftragstaktik-intent-specs
+    type: derives
+    note: "One of the translation nodes that needs this edge type"
+  - target: elem-conant-ashby-regulator
+    type: derives
+    note: "Another translation node"
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"
