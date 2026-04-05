@@ -1,0 +1,46 @@
+id: question-standalone-kos-distribution
+type: question
+confidence: frontier
+title: "How do standalone repos (outside aae-orc) run kos?"
+content: |
+  ftc is at ~/work/ftc, not under aae-orc. It has _kos/ now (bootstrapped
+  session-012). The workspace discovery fix lets kos doctor and kos graphs
+  work from ftc. But the kos binary lives at aae-orc/kos/target/debug/kos
+  — there's no installed binary.
+
+  To use kos from ftc, the developer currently needs the full path to the
+  debug binary. This doesn't scale to other machines or other developers.
+
+  Distribution options:
+  - Symlink from ~/.local/bin/kos to the debug or release binary
+  - `cargo install --path .` to put kos in ~/.cargo/bin/
+  - Homebrew formula (like aclaude, ThreeDoors)
+  - `just install` recipe that copies to ~/.local/bin/
+
+  Environment configuration:
+  - KOS_WORKSPACE env var exists but points to an orchestrator root —
+    standalone repos don't have one
+  - Should there be a KOS_HOME or similar for the kos tool's own config
+    (schema definitions, templates)?
+  - Or is kos fully self-contained (schema baked into binary, templates
+    generated from code) with no external config needed?
+
+  The workspace concept itself needs revisiting for standalone repos.
+  Currently Workspace has root, kos_root, and graphs — but kos_root
+  is meaningless for standalone repos (set to same as root). The
+  abstraction was designed for aae-orc's layout. Standalone repos
+  need a lighter model: just "here's my _kos/ graph."
+
+  Questions: What's the minimum viable distribution for kos outside
+  aae-orc? Is a symlink sufficient for now? Should kos have a
+  `kos install` self-install command? Does the Workspace abstraction
+  need to formally distinguish orchestrator-workspace from
+  standalone-graph, or is the current "root == kos_root" hack adequate?
+edges:
+  - target: question-subrepo-kos-workflow
+    type: derives
+    note: "Both questions concern kos outside its home directory"
+provenance:
+  created_by: human
+  session: session-012
+  created_at: "2026-04-04"

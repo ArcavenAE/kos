@@ -1,0 +1,35 @@
+id: question-charter-scaling
+type: question
+confidence: frontier
+title: "Charter document has grown past LLM context performance thresholds"
+content: |
+  The aae-orc charter.md is over 40k characters. Claude warns of potential
+  performance degradation at this size. The charter is loaded via @charter.md
+  in CLAUDE.md, meaning it consumes context tokens in every session regardless
+  of which part is relevant.
+
+  The charter is a prose projection of the _kos/nodes/ graph. Both exist.
+  The graph is authoritative; the charter is for human and agent orientation.
+  But the graph is not yet queryable in a way that replaces the charter for
+  cold-start orientation.
+
+  Questions: Should the charter be split (e.g., bedrock.md, frontier.md,
+  graveyard.md)? Should it be trimmed to a summary with pointers to the
+  graph? Should kos orient replace the charter entirely — and if so, does
+  orient produce output concise enough for context-constrained sessions?
+  Is the right answer different for the orchestrator charter (which covers
+  the whole platform) vs. repo charters (which are scoped)?
+
+  The tension: a shorter charter loses the prose narrative that makes
+  cold-start orientation effective. A longer charter wastes tokens on
+  settled questions during sessions focused on one frontier item. The
+  graph has the data but not the narrative. The charter has the narrative
+  but not the selectivity.
+edges:
+  - target: question-knowledge-layer-requirements
+    type: derives
+    note: "Charter scaling is a knowledge surfacing problem"
+provenance:
+  created_by: human
+  session: session-012
+  created_at: "2026-04-04"
