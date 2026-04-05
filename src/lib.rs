@@ -8,5 +8,6 @@ pub mod graph;
 pub mod init;
 pub mod model;
 pub mod orient;
+pub mod updater;
 pub mod validate;
 pub mod workspace;
