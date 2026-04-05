@@ -1,0 +1,97 @@
+id: finding-037-bootstrap-seeding-gap
+type: finding
+confidence: frontier
+title: "kos process has no vocabulary for seeding existing repos — three gaps found"
+content: |
+  ## Summary
+
+  Session-012 bootstrapped two repos with kos: switchboard (aae-orc subrepo)
+  and ftc (standalone at ~/work/ftc). The bootstrap exposed three gaps: a
+  code bug (workspace discovery), a missing process step (seeding), and an
+  undefined workflow (where do you run kos from?).
+
+  ## Findings
+
+  ### F1: Workspace discovery assumed aae-orc layout (fixed)
+
+  Workspace::discover() walked up looking for charter.md + kos/ (aae-orc
+  root) or KOS-charter.md (kos repo). Standalone repos with _kos/kos.yaml
+  but no orchestrator parent couldn't use doctor, graphs, orient, or any
+  command that needs a workspace. Fixed by adding _kos/kos.yaml as a
+  fourth discovery check after the aae-orc-specific checks. Standalone
+  repos now get a workspace where root == kos_root.
+
+  ### F2: kos init skipped commit rules when .claude/rules/ didn't exist (fixed)
+
+  create_commit_rules() checked for .claude/rules/ existence but didn't
+  create it. If .claude/ existed without rules/, the file was silently
+  skipped. Fixed: now creates .claude/rules/ when .claude/ is present.
+
+  ### F3: The process has no "seed" step
+
+  After kos init, both repos had empty graphs and stub charters. The
+  kos process cycle is Orient → Ideate → Question → Probe → Harvest →
+  Promote. None of these fit the act of encoding pre-existing knowledge
+  into a new graph:
+
+  - Orient presupposes a populated graph to read
+  - Harvest presupposes a probe was run
+  - Probe presupposes a question was formulated
+  - Ideate presupposes orientation context
+
+  Both repos have rich existing knowledge (switchboard: Go codebase, CI,
+  CLAUDE.md conventions, bmad docs; ftc: project-context.md, game design,
+  architecture decisions). This knowledge needs to become nodes — bedrock
+  decisions, frontier questions, possibly graveyard entries. But the
+  process doesn't name this activity.
+
+  Session-008 did this for aclaude/marvel/spectacle ("6 nodes from
+  design-questions.md") but called it part of the init rollout, not a
+  named process step. The init output says "edit charter.md, add your
+  first frontier question" — correct practical guidance, but the
+  activity of surveying existing knowledge and encoding it is different
+  from starting fresh.
+
+  ### F4: Where you run kos from is undefined for non-kos repos
+
+  We were in aae-orc/kos when we noticed: should we seed switchboard
+  from here? No — wrong directory, wrong context loaded. But from
+  switchboard/, how do you run kos? The binary isn't on PATH. From
+  ftc/, same problem plus no orchestrator to walk up to (now fixed
+  by F1, but still needs the binary).
+
+  The process says "read charter.md (orient)" but doesn't say where
+  you physically are when you do it. For aae-orc subrepos, the answer
+  depends on whether you want orchestrator context or repo-scoped
+  context. For standalone repos, you must be in the repo but the tool
+  must be reachable.
+
+  ## Assessment
+
+  Result: three bugs found, two fixed in code, one is a process gap.
+  The seeding gap (F3) may not need formal process vocabulary — it may
+  just be "fill the charter and write your first nodes." But the
+  workflow gap (F4) needs resolution before kos can be used outside
+  its home directory. See frontier questions: question-charter-scaling,
+  question-subrepo-kos-workflow, question-standalone-kos-distribution.
+
+edges:
+  - target: question-charter-scaling
+    type: derives
+    note: "Charter size problem discovered in same session"
+  - target: question-subrepo-kos-workflow
+    type: derives
+    note: "Workflow gap for subrepo sessions"
+  - target: question-standalone-kos-distribution
+    type: derives
+    note: "Distribution gap for standalone repos"
+  - target: finding-031-distributed-graph-pattern
+    type: derives
+    note: "Builds on the distributed graph pattern — tests it on two new repos"
+provenance:
+  created_by: human
+  session: session-012
+  created_at: "2026-04-04"
+finding:
+  probe: null
+  result: partial
