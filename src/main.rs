@@ -75,6 +75,21 @@ enum Commands {
     /// Detect drift — content changes and stale dependents
     Drift,
 
+    /// Scan a repo for knowledge artifacts and SDD systems
+    Seed {
+        /// Subcommand: scan (default)
+        #[arg(default_value = "scan")]
+        action: String,
+
+        /// Output as JSONL instead of human-readable text
+        #[arg(long)]
+        json: bool,
+
+        /// Target directory (defaults to cwd)
+        #[arg(long)]
+        dir: Option<PathBuf>,
+    },
+
     /// Extract RD findings from sprint/rd/ briefs into structured format
     Bridge {
         /// Output as JSONL instead of human-readable text
@@ -230,6 +245,25 @@ fn main() -> anyhow::Result<()> {
             let node_root = workspace.node_root();
             kos::drift::run(&node_root)?;
         }
+
+        Commands::Seed { action, json, dir } => match action.as_str() {
+            "scan" => {
+                let target = dir.unwrap_or_else(|| {
+                    std::env::current_dir().expect("cannot determine current directory")
+                });
+                let result = kos::seed::scan(&target)?;
+                if json {
+                    kos::seed::print_jsonl(&result);
+                } else {
+                    kos::seed::print_human(&result);
+                }
+            }
+            other => {
+                eprintln!("unknown seed action: {other}");
+                eprintln!("available: scan");
+                std::process::exit(1);
+            }
+        },
 
         Commands::Bridge { json } => {
             let cwd = std::env::current_dir()?;
