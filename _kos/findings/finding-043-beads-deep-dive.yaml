@@ -1,0 +1,475 @@
+id: finding-043-beads-deep-dive
+type: finding
+confidence: frontier
+title: "Beads deep dive — compaction, edge types, gates, ready-work, Dolt substrate"
+content: |
+  ## Summary
+
+  Deep source-code analysis of gastownhall/beads (distributed graph issue
+  tracker for AI agents) across five areas: compaction/semantic memory decay,
+  edge types/dependency model, gate/await primitives, ready-work computation,
+  and Dolt as substrate. Goal: extract concrete design lessons for kos.
+
+  beads is a Go CLI backed by Dolt (version-controlled SQL database). It
+  treats issues as graph nodes with typed dependency edges. The system is
+  designed for multi-agent workflows — hash-based IDs prevent merge collisions,
+  JSON output is optimized for machine parsing, and dependency-aware ready-work
+  detection tells agents what to do next.
+
+  ## 1. Compaction / Semantic Memory Decay
+
+  ### How it works
+
+  `bd compact` uses a two-tier, time-gated, LLM-powered summarization system.
+
+  **Tier 1 (30 days):** After an issue has been closed for 30 days
+  (configurable via `compact_tier1_days` in config table), it becomes eligible.
+  The compactor:
+  1. Checks eligibility: must be closed, have a closed_at timestamp,
+     compaction_level < 1, and age exceeds threshold
+  2. Calculates original size: len(description) + len(design) + len(notes)
+     + len(acceptance_criteria)
+  3. Calls Claude Haiku via the Anthropic API with a structured prompt
+  4. The prompt instructs the LLM to produce three sections: Summary (2-3
+     sentences), Key Decisions (bullet points), Resolution (single sentence)
+  5. If the summary is shorter than the original, it replaces the description
+     field and clears design, notes, and acceptance_criteria
+  6. Records compaction metadata: compaction_level=1, compacted_at timestamp,
+     compacted_at_commit (git hash), original_size
+  7. A pre-compaction snapshot is saved to issue_snapshots and
+     compaction_snapshots tables (original content preserved as blob)
+
+  **Tier 2 (90 days):** After 90 days closed AND already tier-1 compacted,
+  eligible for further reduction. Same flow but compaction_level goes to 2.
+  Implementation exists as interface + candidate selection but the tier-2
+  summarizer method is not yet built beyond tier-1.
+
+  **Key design choices:**
+  - Size guard: if compacted text >= original, compaction is skipped and a
+    comment records why. No destructive summarization.
+  - Dry-run mode: if no API key, falls back to dry-run automatically.
+  - Batch processing: CompactTier1Batch runs concurrent compactions with
+    configurable concurrency (default 5), bounded by semaphore.
+  - Audit trail: compaction events are recorded as comments on the issue.
+  - OTEL telemetry: input/output token counters and duration histogram.
+  - Retry logic: exponential backoff (1s * 2^attempt), max 3 retries,
+    retries on timeouts and 429/5xx only.
+
+  ### What a compacted issue looks like
+
+  Before compaction, an issue has full description, design notes, acceptance
+  criteria, and notes fields populated. After tier-1 compaction:
+  - description: structured summary (Summary / Key Decisions / Resolution)
+  - design: empty string
+  - notes: empty string
+  - acceptance_criteria: empty string
+  - compaction_level: 1
+  - compacted_at: timestamp
+  - original_size: byte count of original content
+  The original content is preserved in the compaction_snapshots table as a
+  JSON blob, recoverable but not in the hot path.
+
+  ### kos relevance
+
+  kos doesn't have "closed issues" but it has graveyard nodes, completed
+  probes, and findings that age. The compaction pattern maps to:
+  - Graveyard nodes older than N days could have their content summarized
+    while preserving the original in a snapshot
+  - Findings from early sessions could be compacted to reduce charter bloat
+  - The size-guard (don't compact if summary >= original) is worth adopting
+  - The tiered model (light summary at 30d, deeper at 90d) maps to kos's
+    confidence tiers: a node demoted to graveyard could compact on a schedule
+
+  ## 2. Edge Types / Dependency Model
+
+  beads defines 19 dependency types in its type system:
+
+  ### Blocking types (affect `bd ready` computation)
+
+  | Type | Semantics |
+  |------|-----------|
+  | `blocks` | A must close before B can start. Default type. |
+  | `parent-child` | Hierarchical containment. Child blocked while parent blocked. |
+  | `conditional-blocks` | B executes only if A fails. Error-handling path. |
+  | `waits-for` | B waits for all (or any) of A's children to close. Gate pattern. |
+
+  ### Non-blocking types (graph annotations)
+
+  | Type | Semantics |
+  |------|-----------|
+  | `related` / `relates-to` | Bidirectional "see also" link. |
+  | `discovered-from` | Found during work on another issue. Provenance link. |
+  | `caused-by` | Root cause relationship. |
+  | `validates` | Test or confirmation link. |
+  | `supersedes` | Replaces another issue. Old issue auto-closed. |
+  | `duplicates` | Marks as duplicate. Duplicate auto-closed. |
+  | `tracks` | Monitors another item's progress. |
+  | `replies-to` | Conversation threading (agent-to-agent messages). |
+  | `authored-by` | Attribution. |
+  | `assigned-to` | Assignment relationship. |
+  | `approved-by` | Approval attestation. |
+  | `attests` | Skill/capability attestation with metadata. |
+  | `until` | Time-bounded relationship. |
+  | `delegated-from` | Work delegation provenance. |
+
+  ### How `discovered-from` works
+
+  When an agent is working on issue A and discovers new work, it creates
+  the new issue with `--deps discovered-from:A`. This creates a non-blocking
+  edge recording provenance — "this work was found while doing that work."
+  It doesn't create a blocking dependency; the discovered work is independent
+  but traceable.
+
+  ### Graph link types (separate from dependencies)
+
+  beads also has four "graph link" types stored as fields on issues:
+  - `replies_to`: conversation threading (string field)
+  - `relates_to`: bidirectional associations (array field)
+  - `duplicate_of`: deduplication (string field)
+  - `superseded_by`: version chains (string field)
+
+  ### kos edge type comparison
+
+  kos currently has 7 edge types: derives, implements, contradicts,
+  supersedes, supports, instantiates, partially_resolves.
+
+  **Direct mappings:**
+  - beads `supersedes` = kos `supersedes` (identical semantics)
+  - beads `validates` ≈ kos `implements` (confirmation relationship)
+  - beads `relates-to` ≈ no kos equivalent (kos requires typed edges)
+
+  **Types kos should consider adopting:**
+
+  1. **`discovered-from`** — kos has no provenance edge. When a probe
+     produces a finding that spawns a new question, the link between
+     the finding and the new question is implicit (mentioned in content).
+     A `discovered-from` edge would make this explicit and traversable.
+     Low cost to add: it's a non-blocking annotation edge.
+
+  2. **`caused-by`** — kos has no root-cause edge. When a finding reveals
+     why something in the graveyard failed, there's no edge type for
+     "this explains that." `caused-by` or a renamed `explains` would
+     fill this gap.
+
+  3. **`blocks`** — kos has no blocking/ordering semantics at all. All
+     kos edges are informational. If kos ever computes "ready frontier
+     questions" (see section 4), it needs a blocking edge type or must
+     derive blocking from existing types (e.g., a question with an
+     unanswered `derives` target is blocked).
+
+  ## 3. Gate/Await Primitives
+
+  ### What gates are
+
+  Gates are special issues (type=gate) that bridge external conditions into
+  the dependency graph. A gate blocks dependents until its condition resolves.
+
+  ### Gate types
+
+  | Type | Condition | Resolution |
+  |------|-----------|------------|
+  | `gh:pr` | GitHub PR merge status | Auto-resolves when PR merges |
+  | `gh:run` | CI pipeline completion | Auto-resolves when run succeeds |
+  | `timer` | Time elapsed | Auto-resolves when timer expires |
+  | `bead` | Cross-repo issue closure | Auto-resolves when remote issue closes |
+  | `human` | Manual approval | Resolved via `bd gate resolve` command |
+
+  ### How the system polls/checks conditions
+
+  `bd gate check` evaluates all open gates:
+  1. Queries all issues where type=gate and status=open
+  2. For each gate, checks the condition based on await_type:
+     - gh:pr/gh:run: calls GitHub API to check PR/run status
+     - timer: compares current time against timeout_ns
+     - bead: queries remote beads instance for issue status
+     - human: no auto-check, requires explicit `bd gate resolve`
+  3. If condition is met, closes the gate issue
+  4. Closing the gate triggers GetNewlyUnblockedByClose, which finds
+     all issues that were blocked solely by this gate and unblocks them
+
+  Gates are stored as regular issues with extra fields:
+  - await_type: the gate type (gh:pr, timer, etc.)
+  - await_id: the external reference (PR URL, run ID, etc.)
+  - timeout_ns: timeout duration in nanoseconds
+  - waiters: comma-separated list of waiting issue IDs
+
+  ### waits-for gate semantics
+
+  The `waits-for` dependency type implements a fanout gate pattern:
+  - Issue B depends on issue A with type=waits-for
+  - Gate metadata specifies either "all-children" or "any-children"
+  - The system queries all parent-child edges from A's spawner
+  - For "all-children": B is blocked until ALL of A's children are closed
+  - For "any-children": B is blocked until ANY of A's children closes
+  - If the spawner has no children, B is not blocked
+
+  ### Could kos probes use gates?
+
+  kos probes have implicit gates today: a probe timebox is a timer gate,
+  "wait for CI" before harvesting is a gh:run gate, "wait for user
+  confirmation" is a human gate. Making these explicit would let kos
+  compute which probes are actionable vs. waiting on external conditions.
+
+  Concrete application: a probe brief could declare:
+  ```yaml
+  gates:
+    - type: human
+      description: "user confirms fix works"
+    - type: timer
+      duration: 48h
+      description: "timebox for exploration"
+  ```
+  The kos orient command could then filter probes by gate status:
+  ready (all gates resolved), blocked (waiting on gates), timed-out
+  (timer gate expired without resolution).
+
+  ## 4. Ready-Work Computation
+
+  ### How `bd ready` computes actionable work
+
+  The ready-work algorithm (GetReadyWorkInTx) applies a multi-step filter:
+
+  1. **Compute all blocked IDs** (ComputeBlockedIDsInTx):
+     a. Get all active (non-closed, non-pinned) issues
+     b. Get all dependencies of types: blocks, waits-for, conditional-blocks
+     c. For blocks/conditional-blocks: issue is blocked if blocker is active
+     d. For waits-for: evaluate gate metadata (all-children vs any-children)
+     e. Return sorted list of blocked IDs
+
+  2. **Exclude blocked issues AND their children** — transitive blocking
+     through parent-child edges
+
+  3. **Exclude deferred issues** — where defer_until > now()
+
+  4. **Exclude children of deferred parents** — recursive
+
+  5. **Filter by criteria:**
+     - Status: open or in_progress (configurable)
+     - Not pinned, not ephemeral (unless requested)
+     - Excludes types: merge-request, gate, molecule, message, agent, role, rig
+     - Optional: priority, assignee, labels, parent, metadata key/value
+
+  6. **Sort by policy:**
+     - **Oldest**: created_at ASC (FIFO)
+     - **Priority**: priority ASC, created_at DESC (highest priority first,
+       newest within same priority)
+     - **Hybrid** (default): issues ≤48 hours old sorted by priority;
+       older issues sorted by created_at. Prevents old low-priority items
+       from being permanently buried.
+
+  ### Could kos orient compute "ready frontier questions"?
+
+  Yes. The mapping:
+  - kos frontier questions = beads open issues
+  - kos edges (derives, implements) = beads dependencies
+  - A question whose `derives` targets are all resolved (have findings
+    or are bedrock) = ready
+  - A question whose `derives` targets include unresolved questions = blocked
+  - kos `orient` could output: "These 3 questions are ready to probe.
+    These 5 are blocked by unresolved dependencies."
+
+  Implementation sketch for kos:
+  ```
+  kos orient --ready
+  ```
+  Algorithm:
+  1. Load all frontier question nodes
+  2. For each, traverse `derives` edges to targets
+  3. If all targets are bedrock or have associated findings → ready
+  4. If any target is itself a frontier question without findings → blocked
+  5. Sort ready questions by: number of dependents (impact), age, session
+  6. Output: ready questions with reason, blocked questions with blockers
+
+  Cost: moderate. Requires graph traversal at orient time. kos already
+  loads the full graph for validation; adding a ready-work pass is
+  incremental. The edge types already exist; no schema change needed.
+
+  ## 5. Dolt as Substrate
+
+  ### How beads uses Dolt
+
+  Dolt is a MySQL-compatible database with git-style version control built in.
+  beads uses it as both the query engine and the version control system for
+  issue data.
+
+  **Key Dolt features beads leverages:**
+  - Cell-level diffs and merges (not line-based like git)
+  - Every write auto-commits to Dolt history
+  - SQL queries against any point in history: `SELECT ... AS OF 'commit-hash'`
+  - Branch support independent of git branches
+  - Push/pull to remotes (DoltHub, S3, GCS) for sync
+  - Embedded mode (in-process, no server) and server mode (multi-writer)
+  - Conflict detection and resolution via SQL
+
+  **Embedded vs server mode:**
+  - Embedded: single-writer, in-process Go library. Data in `.beads/dolt/`.
+    File locking via flock for concurrency safety. No server process needed.
+    This is the default for solo users.
+  - Server: `dolt sql-server` on port 3307. Multi-writer support. Required
+    for concurrent agents. Auto-start logic with 6-level priority hierarchy.
+    Connection via standard MySQL driver.
+
+  **Version control operations exposed:**
+  - `bd vc log` — Dolt commit history
+  - `bd vc diff HEAD~1 HEAD` — cell-level diff between commits
+  - `bd vc commit -m "msg"` — explicit checkpoint
+  - `bd show <id> --as-of <commit>` — point-in-time query
+  - `bd dolt push` / `bd dolt pull` — remote sync
+
+  **Schema:** 14+ SQL tables including issues, dependencies, labels, comments,
+  events, config, metadata, child_counters, issue_snapshots,
+  compaction_snapshots, repo_mtimes, routes, interactions (audit), and
+  federation_peers. Schema version tracking with migrations.
+
+  ### kos substrate comparison
+
+  kos uses YAML files in git. beads uses SQL tables in Dolt.
+
+  **What beads gains from Dolt that kos lacks:**
+  1. Queryable graph: SQL queries across the full issue set without loading
+     everything into memory. kos loads all YAML into petgraph.
+  2. Cell-level merge: two agents editing different fields of the same issue
+     merge cleanly. kos would have YAML merge conflicts.
+  3. Point-in-time queries: "what did this node look like 3 commits ago?"
+     kos requires `git show <commit>:path/to/node.yaml`.
+  4. Embedded database: no server needed for single-user. kos has no database.
+  5. Concurrent writes: server mode enables multi-agent writes. kos relies
+     on git's conflict model (whole-file, line-based).
+
+  **What kos has that beads sacrifices:**
+  1. Human-readable files: YAML nodes are directly readable/editable. Dolt
+     tables require the CLI or SQL client.
+  2. Git history: node changes show up in git log, git blame, PR diffs.
+     Dolt history is separate from git history.
+  3. No additional dependency: kos needs only git. beads requires Dolt
+     (either embedded Go library or external binary).
+  4. Composability: YAML files work with any tool. SQL tables require Dolt.
+
+  ## Design Recommendations for kos
+
+  ### R1: Add `discovered-from` edge type (LOW COST, HIGH VALUE)
+
+  **What:** Add `discovered-from` to kos's edge type vocabulary.
+  **How:** Add to schema/node.schema.yaml edge types list. Non-blocking,
+  annotation-only. Used when a probe finding spawns a new question.
+  **Change:** One line in schema, no code change needed.
+  **Benefit:** Makes provenance traversable. "Why does this question exist?"
+  becomes answerable by graph query. Currently this is buried in content text.
+  **Cost:** Near zero. It's a new enum value.
+
+  ### R2: Add ready-work computation to `kos orient` (MEDIUM COST, HIGH VALUE)
+
+  **What:** `kos orient --ready` outputs frontier questions that have no
+  unresolved dependencies, sorted by impact (number of downstream dependents).
+  **How:** After loading the graph (already done), traverse derives edges
+  from each frontier question. If all targets are bedrock or have findings,
+  the question is ready. Otherwise it's blocked. Sort ready by downstream
+  dependent count descending.
+  **Change:** ~100-200 lines of Rust in orient module. Uses existing
+  petgraph traversal. No schema change.
+  **Benefit:** Answers "what should I probe next?" mechanically instead of
+  requiring a human to read the charter and figure it out. This is the
+  single highest-value feature beads has that kos lacks.
+  **Cost:** Medium. Requires defining what "resolved" means for a derives
+  target (has a finding? is bedrock? has been superseded?). Edge cases in
+  cycle detection. But the graph is already loaded and traversable.
+
+  ### R3: Adopt tiered compaction for graveyard nodes (MEDIUM COST, MEDIUM VALUE)
+
+  **What:** After a graveyard node has been unchanged for 30 days, optionally
+  summarize its content using an LLM. Preserve original in a parallel file.
+  **How:** `kos compact --tier 1` scans graveyard nodes older than threshold.
+  For each, calls an LLM to produce a 2-3 sentence summary. Writes summary
+  to node content, saves original to `_kos/snapshots/<node-id>.yaml`.
+  Records compaction_level and compacted_at in node metadata.
+  **Change:** New `compact` subcommand. New snapshots directory convention.
+  Optional metadata fields (compaction_level, compacted_at) in schema.
+  **Benefit:** Reduces graph size over time without losing information.
+  Charter inflation (finding-041) is partly caused by accumulated graveyard
+  nodes. Compaction addresses this directly.
+  **Cost:** Requires LLM dependency (could use the same Anthropic API beads
+  uses). Size guard (don't compact if summary >= original) is essential.
+  Snapshot storage is cheap. Main cost is the LLM API call.
+  **Risk:** kos graphs are small today (~80 nodes). Compaction may be
+  premature. But the charter is already 500+ lines and growing. The mechanism
+  is worth designing even if execution waits.
+
+  ### R4: Consider gate primitives for probe briefs (LOW COST, MEDIUM VALUE)
+
+  **What:** Allow probe briefs to declare gates: conditions that must be met
+  before the probe is actionable or conditions that end the probe.
+  **How:** Optional `gates` field in brief nodes. Types: timer (timebox),
+  human (confirmation), finding (another probe must complete first).
+  **Change:** Optional field in schema. Orient command checks gate status
+  when computing ready probes. No code change needed for storage — gates
+  are just YAML fields on brief nodes.
+  **Benefit:** Makes probe lifecycle explicit. A probe with an expired timer
+  gate is overdue. A probe waiting on a human gate is blocked. Orient can
+  report this. Currently, timebox enforcement is purely manual.
+  **Cost:** Low for schema. Medium for orient to evaluate gates (timer is
+  trivial, human requires a status field, finding requires graph lookup).
+
+  ### R5: Do NOT adopt Dolt as substrate (HIGH COST, UNCERTAIN VALUE)
+
+  **What:** Keep YAML-over-git. Do not switch to Dolt.
+  **Why not:** kos's value proposition includes human-readable files, git
+  integration (diffs in PRs, blame, log), and zero dependencies beyond git.
+  Dolt solves problems kos doesn't have yet: concurrent writes (kos is
+  single-agent today), cell-level merge (kos nodes are small, conflicts
+  rare), and SQL queries (kos loads the full graph, which is <100 nodes).
+  **When to reconsider:** If kos graphs exceed ~1000 nodes and full-graph
+  load becomes expensive, or if multi-agent concurrent writes to the same
+  graph become a requirement. Neither is true today or in the near term.
+  **What to steal instead:** The *pattern* of version-controlled structured
+  data is worth preserving. kos already has this via git. The specific
+  features to steal: point-in-time queries (`kos show <node> --as-of <commit>`)
+  could be implemented via `git show <commit>:path` without Dolt.
+
+  ### R6: Adopt beads' blocking-type distinction (LOW COST, HIGH VALUE)
+
+  **What:** Classify kos edge types as "blocking" or "non-blocking" for
+  ready-work computation purposes.
+  **How:** Add an optional `blocking: true` field to edges, or define which
+  edge types are inherently blocking. Recommendation: `derives` is blocking
+  (if your basis hasn't been established, you can't build on it).
+  All other types are non-blocking annotations.
+  **Change:** One optional field in schema, or a hardcoded list in orient
+  code. No migration needed — existing edges without the field default to
+  non-blocking.
+  **Benefit:** Enables R2 (ready-work computation) without requiring all
+  edges to participate in blocking logic. Keeps the graph rich with
+  annotation edges while letting orient focus on the critical path.
+  **Cost:** Near zero. The decision of which types block is a design
+  choice, not an implementation challenge.
+
+  ## Summary Table
+
+  | Rec | What | Schema Change | Code Change | Value | Cost |
+  |-----|------|--------------|-------------|-------|------|
+  | R1 | discovered-from edge | 1 enum value | none | high | low |
+  | R2 | ready-work in orient | none | ~200 LOC | high | medium |
+  | R3 | graveyard compaction | optional fields | new subcommand | medium | medium |
+  | R4 | gate primitives for briefs | optional field | orient changes | medium | low |
+  | R5 | keep YAML, skip Dolt | none | none | n/a | avoided |
+  | R6 | blocking edge distinction | optional field | orient logic | high | low |
+
+  Recommended priority: R1 + R6 first (near-zero cost, unblock R2),
+  then R2 (the real payoff), then R4, then R3 when graph size warrants it.
+edges:
+  - target: val-uncertainty-first
+    type: supports
+    note: "ready-work computation reduces uncertainty about what to probe next"
+  - target: question-executive-mechanism
+    type: partially_resolves
+    note: "beads ready-work is an executive mechanism — surfaces next action from graph state"
+  - target: finding-042-sdd-system-survey
+    type: derives
+    note: "deep dive follows the initial survey that identified beads as key prior art"
+provenance:
+  created_by: human
+  session: session-014
+  created_at: "2026-04-06"
+finding:
+  probe: brief-seed-scan
+  result: partial
+  surprise_magnitude: medium
