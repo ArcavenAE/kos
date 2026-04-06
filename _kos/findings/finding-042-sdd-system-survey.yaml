@@ -1,0 +1,180 @@
+id: finding-042-sdd-system-survey
+type: finding
+confidence: frontier
+title: "Survey of 12 SDD systems — artifact models, fingerprints, and bridge profile requirements"
+content: |
+  ## Summary
+
+  Surveyed 12 SDD/orchestration systems to understand artifact models,
+  storage patterns, fingerprints, and version detection. Goal: inform
+  the bridge profile format for kos seed scan, distributed via sideshow.
+
+  Systems surveyed: speckit, bmad, chainlink, beads, VSDD (methodology),
+  multiclaude, OpenClaudia, gastown, pennyfarthing, spectacle, ThreeDoors,
+  kos itself. Plus sideshow as the distribution mechanism.
+
+  ## Findings
+
+  ### F1: Every system has a unique directory fingerprint
+
+  Detection is straightforward — each system creates a uniquely-named
+  dot-directory or underscore-directory:
+
+  | System | Primary fingerprint | Confirmation |
+  |--------|-------------------|-------------|
+  | speckit | .specify/ | .specify/init-options.json |
+  | bmad | _bmad/ | _bmad/_config/manifest.yaml |
+  | chainlink | .chainlink/ | .chainlink/issues.db |
+  | beads | .beads/ | .beads/embeddeddolt/ |
+  | multiclaude | .multiclaude/ | ~/.multiclaude/state.json |
+  | OpenClaudia | .openclaudia/ | .openclaudia/config.yaml |
+  | gastown | .gastown/ | .gastown/config.toml |
+  | pennyfarthing | .pennyfarthing/ | .pennyfarthing/config.local.yaml |
+  | spectacle | spectacle.yaml | .claude/commands/spectacle/ |
+  | kos | _kos/ | _kos/kos.yaml |
+
+  No ambiguity between systems. A scanner can identify all 10 with
+  simple directory/file existence checks. No content parsing needed
+  for detection — only for version extraction.
+
+  ### F2: Version detection mechanisms vary but are all parseable
+
+  - bmad: _config/manifest.yaml → installation.version (YAML)
+  - speckit: .specify/init-options.json → speckit_version (JSON)
+  - spectacle: spectacle.yaml → version (YAML)
+  - pennyfarthing: workflow YAML → version field
+  - gastown: formula files → version field (TOML)
+  - multiclaude, chainlink, beads, OpenClaudia: CLI --version only
+  - ThreeDoors: inherits bmad version from _bmad/core/config.yaml
+
+  Bridge profiles should declare which file to parse and which field
+  contains the version. Systems without file-based versions get
+  "detected" without a version number.
+
+  ### F3: Three storage paradigms across the systems
+
+  1. **Files over git** (speckit, spectacle, pennyfarthing, kos,
+     multiclaude agents): Markdown/YAML files committed to the repo.
+     Version control via git. Human-readable, grep-able, mergeable.
+
+  2. **Embedded database** (chainlink: SQLite, beads: Dolt, gastown:
+     SQLite convoy.db): Structured storage with query capability.
+     Not human-readable without tooling. Richer relationships.
+
+  3. **Hybrid** (bmad: files + CSV manifests, gastown: TOML + SQLite +
+     JSONL, OpenClaudia: YAML config + JSON state + JSON memory):
+     Config/definition as files, runtime state in structured storage.
+
+  kos is currently paradigm 1. The substrate hypothesis (finding-036)
+  asks whether it should move toward paradigm 2 or 3. Beads' Dolt
+  choice is the strongest evidence that paradigm 2 works for this
+  class of tool.
+
+  ### F4: Artifact-to-kos-node mapping is consistent across systems
+
+  Despite different formats, the same knowledge types appear everywhere:
+
+  | Knowledge type | speckit | bmad | pennyfarthing | ThreeDoors | beads |
+  |---------------|---------|------|---------------|------------|-------|
+  | Decisions | — | — | ADRs (docs/adr/) | BOARD.md | decision type |
+  | Specifications | spec.md | workflows | workflows | PRD/epics | — |
+  | Work items | tasks.md | stories | sprint YAML | stories | issues |
+  | Principles | constitution.md | — | SOUL-like | SOUL.md | pinned beads |
+  | Agent defs | — | agents/*.md | agents/*.md | agents/ | — |
+  | Evidence | — | _bmad-output/ | benchmarks/ | validation reports | findings in spike |
+  | Ruled-out | — | — | — | BOARD rejected | — |
+  | Exploration | research.md | — | — | experiments | spike type |
+
+  A bridge profile's artifact map should use these universal categories,
+  not system-specific terminology.
+
+  ### F5: sideshow is the right distribution mechanism
+
+  sideshow is pack-agnostic — copies files, manages versions, symlinks.
+  Registry at ~/.local/share/sideshow/registry.yaml is trivial YAML.
+  kos reads it directly to discover installed packs.
+
+  Two distribution models:
+  - Bundled: each pack ships its own kos-bridge.yaml
+  - Separate: a kos-bridge-profiles pack collects all profiles
+  - Hybrid: packs ship profiles, meta-pack indexes them
+
+  Bundled is best: profile stays current with the pack version.
+  When sideshow updates bmad, the profile updates too.
+
+  ### F6: beads has solved problems kos hasn't reached yet
+
+  Most significant prior art finding. Beads has:
+  - Compaction (semantic memory decay) — kos has no graceful forgetting
+  - discovered-from edge type — kos lacks probe-generates-question lineage
+  - Gate/await primitives — kos can't encode "waiting on external event"
+  - Ready-work computation — kos orient doesn't compute actionability
+  - Doctor cross-referencing git — kos doctor checks structure, not code-knowledge drift
+  - spike type = kos probe (same structure, different name)
+  - Pinned context = kos bedrock (explicit "always surface this")
+
+  These are not features to copy. They're design decisions that answered
+  questions kos is still asking. See idea: beads-as-kos-prior-art.
+
+  ### F7: VSDD ties chainlink into a traceability pipeline
+
+  VSDD (Verified Spec-Driven Development) uses chainlink as "The
+  Tracker" in a six-phase pipeline: Spec → Test → Adversary → Feedback
+  → Formal → Convergence. Chainlink provides hierarchical issue
+  decomposition with full traceability: spec → verification → tests →
+  implementation → review → proofs.
+
+  This reframes chainlink from "task tracker" to "traceability
+  instrument." kos's correspondence layer (spec-to-code links) serves
+  a similar role but without the work-tracking dimension.
+
+  ### F8: Universal conventions exist independent of any system
+
+  These appear across most projects regardless of SDD system:
+  - ADR directories: decisions/, docs/adr/, docs/decisions/
+  - README, CONTRIBUTING, CODE_OF_CONDUCT, LICENSE, SECURITY
+  - CHANGELOG, ROADMAP (used by multiclaude and ThreeDoors)
+  - SOUL.md (aae-orc convention, also in ThreeDoors)
+  - .claude/, CLAUDE.md, .cursor/, .github/
+  - justfile, Makefile, package.json
+  - docs/ trees, tests/ directories
+  - CI/CD: .github/workflows/, .gitlab-ci.yml
+
+  The scanner should detect these built-in, no bridge profile needed.
+
+  ## Assessment
+
+  The survey answered the probe's Phase 1 question: we now know what
+  artifacts exist across 12 systems, how they store state, how to
+  detect them, and what maps to kos node types.
+
+  Key design decisions for the bridge profile format:
+  1. Fingerprints are directory/file existence checks (simple, fast)
+  2. Version detection points to a specific file + field
+  3. Artifact maps use universal knowledge categories, not system names
+  4. Profiles ship with packs via sideshow (bundled model)
+  5. Universal conventions are built into the scanner, not profiles
+  6. The scanner outputs annotated JSONL for agent consumption
+
+  The research should be shared with sideshow — most of the system
+  knowledge (fingerprints, version detection, artifact layouts) is
+  sideshow's concern as the distribution mechanism.
+
+edges:
+  - target: question-fractal-process-ceremony
+    type: partially_resolves
+    note: "Survey informs ceremony levels for seed process variant"
+  - target: finding-037-bootstrap-seeding-gap
+    type: derives
+    note: "Survey is prerequisite research for the seed mechanism"
+  - target: finding-041-charter-inflation-as-graph-gap
+    type: derives
+    note: "Seed mechanism moves knowledge from docs to graph"
+provenance:
+  created_by: human
+  session: session-014
+  created_at: "2026-04-06"
+finding:
+  probe: brief-seed-scan
+  result: partial
+  surprise_magnitude: medium

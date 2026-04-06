@@ -1,0 +1,93 @@
+id: brief-seed-scan
+type: brief
+confidence: frontier
+title: "What are we scanning for? Survey SDD systems and universal conventions before building the scanner."
+content: |
+  ## Question
+
+  Before building kos seed scan, we need to know what we're detecting.
+  What artifacts do real SDD systems create? How do they store them?
+  What do they look like in a git log? What are the universal conventions
+  (ADRs, READMEs, CHANGELOGs) that exist independent of any system?
+
+  The scanner needs two layers of knowledge:
+  1. Built-in detection of universal conventions (ADRs, README, CHANGELOG,
+     docs/, .claude/, CLAUDE.md, etc.) — things that exist across all
+     projects regardless of SDD system
+  2. Extensible detection via bridge profiles for specific systems —
+     things that only make sense if you know what bmad, spectacle,
+     gitspec, etc. look like
+
+  We can't design layer 2 without understanding the systems. We can't
+  even design layer 1 well without knowing what "universal" actually
+  means across the projects in our portfolio.
+
+  ## Approach
+
+  **Phase 1: Deep dive survey (research, no code)**
+  For each system, document:
+  - What artifacts it creates (file types, directory structure)
+  - How it stores state (files, git branches, databases, APIs)
+  - What tools update those artifacts (CLI, agent, manual editing)
+  - What a git log looks like for a project using it (commit patterns,
+    branch patterns, tag conventions)
+  - How versions differ (v4 vs v6 bmad, etc.)
+  - What knowledge is explicit (in files) vs implicit (in conventions,
+    naming, directory structure)
+
+  Systems to survey:
+  - bmad (multiple versions in portfolio)
+  - spectacle (our own, can read directly)
+  - gitspec
+  - pennyfarthing (predecessor to aclaude)
+  - multiclaude (ROADMAP convention)
+  - gastown
+  - dollspace-gay/chainlink and related systems
+  - openclaw
+  - ThreeDoors (BOARD, experiments, L0-L4 provenance)
+  - VSDD
+  - kos itself (dogfood — what does a kos-using project look like?)
+
+  Universal conventions to catalog:
+  - ADR variants (MADR, nygard, etc.) — directory names, file patterns
+  - README / CONTRIBUTING / CODE_OF_CONDUCT / LICENSE
+  - CHANGELOG / HISTORY / release notes
+  - docs/ tree patterns
+  - .claude/ / CLAUDE.md / .cursor/ / .github/
+  - Makefile / justfile / taskfile / package.json scripts
+  - CI/CD patterns (.github/workflows/, .gitlab-ci.yml)
+  - Test conventions (tests/, __tests__/, *_test.go, *_test.rs)
+
+  **Phase 2: Bridge profile format design (from evidence)**
+  After surveying, design the profile format to fit what actually exists.
+  The format should emerge from the data, not be designed in advance.
+
+  **Phase 3: Build the scanner with built-in universals + profile loading**
+  Only after Phase 1 and 2 are we ready to write Rust.
+
+  ## Excluded scope
+
+  - Building anything in Phase 1 (research only)
+  - Agent seeding workflow (separate probe after scanner exists)
+  - project-out / sync directions (read-in only for now)
+
+edges:
+  - target: question-fractal-process-ceremony
+    type: derives
+    note: "Seed is a process variant — the bootstrap chain"
+  - target: finding-037-bootstrap-seeding-gap
+    type: derives
+    note: "Directly addresses the missing seed step"
+  - target: finding-041-charter-inflation-as-graph-gap
+    type: derives
+    note: "Seed moves knowledge from docs to graph"
+provenance:
+  created_by: human
+  session: session-014
+  created_at: "2026-04-06"
+brief:
+  hypothesis: "Surveying 10+ SDD systems and universal conventions will reveal a natural taxonomy of artifact types that can be expressed as a bridge profile format, with a core set of universal patterns suitable for built-in detection."
+  excluded_scope: "building the scanner, agent workflow, project-out, sync"
+  success_signal: "Produce an artifact catalog covering 10+ systems with enough detail to (1) identify 15+ universal patterns worth building in, (2) write bridge profiles for at least 3 systems, and (3) design a profile format that handles version ranges and artifact-to-node mapping."
+  timebox: "2-3 sessions of research"
+  predicted_confidence: 0.6
