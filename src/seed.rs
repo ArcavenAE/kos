@@ -336,6 +336,23 @@ fn detect_systems(root: &Path, systems: &mut Vec<DetectedSystem>) {
         });
     }
 
+    // VSDD Factory
+    if root.join(".factory/STATE.md").exists() {
+        systems.push(DetectedSystem {
+            name: "vsdd-factory".to_string(),
+            version: None,
+            fingerprint: ".factory/STATE.md".to_string(),
+            note: "Verified Spec-Driven Development — L1-L4 specs, behavioral contracts, verification properties".to_string(),
+        });
+    } else if root.join(".factory").is_dir() {
+        systems.push(DetectedSystem {
+            name: "vsdd-factory".to_string(),
+            version: None,
+            fingerprint: ".factory/".to_string(),
+            note: "VSDD pipeline directory (no STATE.md found)".to_string(),
+        });
+    }
+
     // pennyfarthing
     if root.join(".pennyfarthing").is_dir() {
         systems.push(DetectedSystem {
