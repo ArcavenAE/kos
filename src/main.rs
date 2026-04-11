@@ -79,6 +79,17 @@ enum Commands {
     /// Detect drift — content changes and stale dependents
     Drift,
 
+    /// List nodes by size or compact a node with a provided summary
+    Compact {
+        /// Compact a specific node (requires --summary)
+        #[arg(long)]
+        node: Option<String>,
+
+        /// Path to file containing the summary to replace content with
+        #[arg(long)]
+        summary: Option<PathBuf>,
+    },
+
     /// Scan a repo for knowledge artifacts and SDD systems
     Seed {
         /// Subcommand: scan (default)
@@ -249,6 +260,24 @@ fn main() -> anyhow::Result<()> {
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
             let node_root = workspace.node_root();
             kos::drift::run(&node_root)?;
+        }
+
+        Commands::Compact { node, summary } => {
+            let cwd = std::env::current_dir()?;
+            let workspace = kos::workspace::Workspace::discover(&cwd)?;
+
+            if let Some(ref node_id) = node {
+                let summary_path = summary.as_deref().unwrap_or_else(|| {
+                    eprintln!("--node requires --summary <file>");
+                    std::process::exit(1);
+                });
+                let summary_text =
+                    std::fs::read_to_string(summary_path).expect("cannot read summary file");
+                kos::compact::apply_compaction(&workspace, &cwd, node_id, &summary_text)?;
+            } else {
+                let entries = kos::compact::list_by_size(&workspace, &cwd)?;
+                kos::compact::print_size_listing(&entries);
+            }
         }
 
         Commands::Seed { action, json, dir } => match action.as_str() {
