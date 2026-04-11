@@ -34,7 +34,7 @@ dirs-next = "2"
 regex = "1"
 
 # Content hashing for drift detection
-sha2 = "0.10"
+sha2 = "0.11"
 
 # Self-update (GitHub releases API)
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
