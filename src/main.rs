@@ -131,6 +131,10 @@ enum Commands {
         /// Optional title (defaults to slug)
         #[arg(long)]
         title: Option<String>,
+
+        /// Target directory (defaults to cwd). Use when cwd differs from the target repo.
+        #[arg(long)]
+        dir: Option<PathBuf>,
     },
 
     /// Create a frontier question node — the unit of work
@@ -140,6 +144,10 @@ enum Commands {
 
         /// Title for the question node
         title: String,
+
+        /// Target directory (defaults to cwd)
+        #[arg(long)]
+        dir: Option<PathBuf>,
     },
 
     /// Create a finding — probe result with auto-numbered ID
@@ -149,6 +157,10 @@ enum Commands {
 
         /// Title for the finding
         title: String,
+
+        /// Target directory (defaults to cwd)
+        #[arg(long)]
+        dir: Option<PathBuf>,
     },
 
     /// Create an exploration brief — plan for a probe
@@ -158,6 +170,10 @@ enum Commands {
 
         /// Title for the probe brief
         title: String,
+
+        /// Target directory (defaults to cwd)
+        #[arg(long)]
+        dir: Option<PathBuf>,
     },
 
     /// Update kos to the latest release, or to a specific version
@@ -347,26 +363,26 @@ fn main() -> anyhow::Result<()> {
             kos::doctor::run(&workspace, &cwd, merged, fix)?;
         }
 
-        Commands::Idea { slug, title } => {
-            let cwd = std::env::current_dir()?;
+        Commands::Idea { slug, title, dir } => {
+            let cwd = dir.unwrap_or(std::env::current_dir()?);
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
             kos::process::idea(&workspace, &cwd, &slug, title.as_deref())?;
         }
 
-        Commands::Question { slug, title } => {
-            let cwd = std::env::current_dir()?;
+        Commands::Question { slug, title, dir } => {
+            let cwd = dir.unwrap_or(std::env::current_dir()?);
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
             kos::process::question(&workspace, &cwd, &slug, &title)?;
         }
 
-        Commands::Finding { slug, title } => {
-            let cwd = std::env::current_dir()?;
+        Commands::Finding { slug, title, dir } => {
+            let cwd = dir.unwrap_or(std::env::current_dir()?);
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
             kos::process::finding(&workspace, &cwd, &slug, &title)?;
         }
 
-        Commands::Probe { slug, title } => {
-            let cwd = std::env::current_dir()?;
+        Commands::Probe { slug, title, dir } => {
+            let cwd = dir.unwrap_or(std::env::current_dir()?);
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
             kos::process::probe(&workspace, &cwd, &slug, &title)?;
         }
