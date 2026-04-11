@@ -12,20 +12,20 @@ content: |
 
   The bridge also integrates with `kos orient`, so `kos orient marvel` now
   surfaces 10 marvel-specific RD findings alongside charter items and kos
-  findings. `kos orient aclaude` surfaces 38 aclaude findings. `kos orient kos`
+  findings. `kos orient forestage` surfaces 38 forestage findings. `kos orient kos`
   surfaces F-08 (cross-repo knowledge continuity).
 
   ## Findings
 
   F1: Two distinct finding formats exist and both parse cleanly.
   marvel-mvp-probe uses `**F-01: Title.**` (dash in ID, period-terminated,
-  confidence stated in body). aclaude-distribution uses `**F1: Title (date)**`
+  confidence stated in body). forestage-distribution uses `**F1: Title (date)**`
   (no dash, date in parens, no explicit confidence). A single regex with
   optional dash handles both: `**F-?\d+: ...**`.
 
-  F2: aclaude-distribution findings lack explicit confidence declarations.
+  F2: forestage-distribution findings lack explicit confidence declarations.
   marvel-mvp-probe consistently states "Confidence: frontier" or
-  "Confidence: bedrock" in the body text. aclaude-distribution findings
+  "Confidence: bedrock" in the body text. forestage-distribution findings
   have no such marker — confidence is implicit (the brief's harvest section
   classifies them). This means bridge extraction captures confidence for
   10/48 findings (21%). The remaining 38 are null. This is a finding about
@@ -34,7 +34,7 @@ content: |
 
   F3: Repo attribution works via slug inference plus content analysis.
   Brief slug determines the default repo (marvel-mvp-probe → marvel,
-  aclaude-distribution → aclaude). Content analysis refines attribution:
+  forestage-distribution → forestage). Content analysis refines attribution:
   F-08 in marvel-mvp-probe explicitly says "this is kos's problem" and is
   correctly attributed to kos. This two-level approach (slug default +
   content override) avoids false negatives.
@@ -45,8 +45,8 @@ content: |
   loader that calls bridge::extract_findings and filters by target repo,
   and output formatting. Total change: ~40 lines in orient.rs.
 
-  F5: The two briefs without numbered findings (aclaude-bootstrap,
-  marvel-workspace-team-shift) are correctly skipped. aclaude-bootstrap
+  F5: The two briefs without numbered findings (forestage-bootstrap,
+  marvel-workspace-team-shift) are correctly skipped. forestage-bootstrap
   has confidence classifications but no F-numbered findings.
   marvel-workspace-team-shift is a hypothesis document. The bridge
   doesn't force findings where none exist.

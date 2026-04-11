@@ -3,7 +3,7 @@ type: question
 confidence: frontier
 title: "How do subrepo sessions orient and harvest when working inside the subrepo?"
 content: |
-  kos things for aae-orc subrepos (switchboard, aclaude, marvel, etc.) are
+  kos things for aae-orc subrepos (switchboard, forestage, marvel, etc.) are
   initiated from the orchestrator directory. But actual development happens
   inside the subrepo: `cd switchboard && claude`. From there, how does the
   developer orient? How do they harvest?

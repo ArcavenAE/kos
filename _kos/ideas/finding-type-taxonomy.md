@@ -31,7 +31,7 @@ kos findings could adopt a similar taxonomy:
 | question | Investigation surfaced a new unknown | Does the parser handle nested structures? |
 | improvement | Something works but could be better | Config loading could use env overlays |
 | confirmation | Hypothesis validated | The spike lifecycle maps to kos probes |
-| redirect | Probe went wrong direction | TypeScript was wrong choice for aclaude |
+| redirect | Probe went wrong direction | TypeScript was wrong choice for forestage |
 
 This maps to kos's existing signal classification (error, evolution,
 drift from schema v0.3) but at a higher level — signal type tells you

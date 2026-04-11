@@ -12,7 +12,7 @@
 ## Still to survey
 
 ### Local repos available
-- **pennyfarthing** — penny-orc/ (aclaude predecessor, TypeScript)
+- **pennyfarthing** — penny-orc/ (forestage predecessor, TypeScript)
 - **spectacle** — aae-orc/spectacle/ (our own IEEE templates)
 - **ThreeDoors** — aae-orc/ThreeDoors/ (BOARD, experiments, L0-L4)
 - **kos** — itself (dogfood: what does a kos-using project look like?)

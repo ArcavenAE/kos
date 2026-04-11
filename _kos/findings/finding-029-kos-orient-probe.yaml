@@ -32,7 +32,7 @@ content: |
   |-------------|---------|----------|-----------|-----------|
   | kos         | 15      | 18       | 2         | 9         |
   | marvel      | 22      | 1        | 4         | 1         |
-  | aclaude     | 12      | 1        | 3         | 0         |
+  | forestage     | 12      | 1        | 3         | 0         |
   | ThreeDoors  | 1       | 10       | 1         | 2         |
   | switchboard | 9       | 0        | 1         | 0         |
   | axiathon    | 0       | 13       | 0         | 0         |
@@ -71,7 +71,7 @@ content: |
   ### F4: RD brief relevance filtering is too broad
 
   String matching "marvel" anywhere in an RD brief body inflates results.
-  aclaude-distribution mentions marvel, switchboard, and ThreeDoors in
+  forestage-distribution mentions marvel, switchboard, and ThreeDoors in
   passing — all four briefs show up for every target. Relevance should
   weight title/question/frontier fields more than body mentions. This is
   a refinement, not a redesign.
@@ -87,7 +87,7 @@ content: |
   ## Assessment against probe success signals
 
   1. orient from marvel/ shows frontier items, RD findings, questions — PASS
-  2. orient from aclaude/ shows relevant context — PASS
+  2. orient from forestage/ shows relevant context — PASS
   3. orient from kos/ shows kos's own state — PASS
   4. --json produces JSONL — PASS
   5. Runs in < 2 seconds — PASS (3-11ms)

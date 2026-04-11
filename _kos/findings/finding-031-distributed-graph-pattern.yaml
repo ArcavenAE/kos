@@ -21,8 +21,8 @@ content: |
      architecture decisions, multi-repo probe findings. This is where charter
      items F1-F18 belong as typed nodes.
 
-  2. **Repo-local graph** (aclaude/_kos/, marvel/_kos/) — repo-scoped
-     questions that don't escalate. aclaude's design-questions.md is exactly
+  2. **Repo-local graph** (forestage/_kos/, marvel/_kos/) — repo-scoped
+     questions that don't escalate. forestage's design-questions.md is exactly
      this: local questions that currently restate charter frontier items
      because there's no local graph to hold them.
 
@@ -74,8 +74,8 @@ content: |
   ### F5: Existing kos-like content in subrepos needs migration paths
 
   Subrepo inventory:
-  - aclaude: docs/design-questions.md cross-references charter F13/F14/F16/F18.
-    These should be frontier question nodes in aclaude/_kos/.
+  - forestage: docs/design-questions.md cross-references charter F13/F14/F16/F18.
+    These should be frontier question nodes in forestage/_kos/.
   - marvel: docs/spec/ contains requirements.md, design.md, stories.md.
     These are manual projections that kos will eventually generate.
   - spectacle: docs/kos-bridge.md is the explicit specification for how

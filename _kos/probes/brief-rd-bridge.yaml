@@ -10,7 +10,7 @@ content: |
   ADR-006 says RD briefs are "proto-kos artifacts" — same structure,
   less ceremony. This tool makes the connection mechanical: it reads
   the lighter-form findings (F-01 through F-10 in marvel-mvp-probe.md,
-  F1 through F38 in aclaude-distribution.md) and produces structured
+  F1 through F38 in forestage-distribution.md) and produces structured
   records with: id, title, confidence, source_brief, source_repo,
   date, and content.
 

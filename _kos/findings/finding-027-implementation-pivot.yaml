@@ -7,7 +7,7 @@ content: |
 
   Session-005 reviewed the full kos corpus (26 findings, 25 nodes, 11
   probes, schema v0.3, 4 sessions of git history) alongside the aae-orc
-  ecosystem (aclaude 37k lines, marvel 3.6k lines, 4 RD briefs, 6 ADRs,
+  ecosystem (forestage 37k lines, marvel 3.6k lines, 4 RD briefs, 6 ADRs,
   ThreeDoors 2k commits with dark factory infrastructure).
 
   Central finding: kos's process (Orient → Question → Probe → Harvest →

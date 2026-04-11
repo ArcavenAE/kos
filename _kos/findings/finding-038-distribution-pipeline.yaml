@@ -29,7 +29,7 @@ content: |
   independently. This is a GitHub platform behavior, not a configuration
   error.
 
-  ### F3: Self-update follows aclaude's atomic swap pattern
+  ### F3: Self-update follows forestage's atomic swap pattern
 
   `kos update` downloads from GitHub releases API, detects platform
   (darwin/linux, arm64/amd64), performs atomic binary swap with rollback
@@ -52,14 +52,14 @@ content: |
   Security hardening committed to develop didn't protect main. PRs
   targeting main and tag-triggered release workflows use main's workflow
   files. Required cherry-picking hardening commits to main on all three
-  gitflow repos (aclaude, switchboard, ThreeDoors). This is a recurring
+  gitflow repos (forestage, switchboard, ThreeDoors). This is a recurring
   maintenance cost of gitflow — workflow changes must be applied to both
   branches.
 
   ## Assessment
 
   Result: CONFIRMS. kos is distributable. The pipeline pattern is proven
-  across 5 repos (aclaude, switchboard, ThreeDoors, jira-cli, kos).
+  across 5 repos (forestage, switchboard, ThreeDoors, jira-cli, kos).
   question-standalone-kos-distribution is partially resolved — the
   binary is installable, but the Workspace abstraction still needs
   cleanup for standalone repos (root == kos_root hack).
