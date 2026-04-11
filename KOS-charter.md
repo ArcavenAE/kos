@@ -41,6 +41,11 @@ Three principles resolved every design tradeoff in this session:
 - Replacing existing SDD processes (this runs alongside them)
 - A better document format
 - A project management system
+- A task tracker. kos does not track what work needs doing, who is doing it,
+  or whether tasks are complete. Frontier questions are knowledge questions
+  (uncertainty to investigate), not work items. beads (bd) is the designated
+  task tracker alongside kos. Probe findings create bd tasks; task completion
+  creates kos findings. See grv-kos-as-task-tracker.
 - Solving the problem permanently (this is a moment in time, useful for a time)
 
 ---

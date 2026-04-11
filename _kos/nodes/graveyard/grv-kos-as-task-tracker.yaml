@@ -1,0 +1,42 @@
+id: grv-kos-as-task-tracker
+type: graveyard
+confidence: graveyard
+title: "Using kos frontier questions as task tracker entries"
+content: |
+  Evaluated whether kos frontier questions could serve as task tracking
+  items — assigning them to people, marking them blocked, computing ready
+  work, tracking completion state. The use case is real: ~62 work items
+  were scattered across charter.md, sprint/rd/, _kos/findings/, and
+  session logs with no unified query interface. "What should I work on
+  next?" required reading 15 files.
+
+  Frontier questions are epistemic — they represent knowledge uncertainty
+  that needs investigation. Task items are operational — they represent
+  work commitments. A frontier question may stay open for months while
+  its uncertainty is explored; a task should close when work is done.
+  These are different lifecycles with different closure semantics.
+
+  Merging them would: (1) pollute the knowledge graph with operational
+  noise (priorities, assignees, deadlines), (2) create pressure to close
+  questions prematurely when work is done but the knowledge gap remains,
+  (3) make orient output unreadable by mixing knowledge state with task
+  state, (4) undermine confidence tiers — "bedrock" would conflate
+  "we're confident about this knowledge" with "this task is complete."
+
+  The alternative: use beads (bd) alongside kos. kos drives bd (probe
+  findings create tasks). bd drives kos (task completion creates findings).
+  The bridge is the integration point, not the merge.
+graveyard:
+  approach: "Repurpose kos frontier questions as actionable task items"
+  ruling: |
+    Frontier questions are epistemic, not operational. Different lifecycles,
+    different closure semantics. beads (bd) adopted as complementary task
+    tracker. See question-kos-task-tracker-relationship for the bridge probe.
+  reopener: |
+    If bd is abandoned, no viable alternative exists, AND kos gains
+    task-specific fields without polluting the knowledge model. Unlikely —
+    the concerns are genuinely different.
+provenance:
+  created_by: human
+  session: session-014
+  created_at: "2026-04-11"
