@@ -36,9 +36,14 @@ pub struct ProbeEntry {
 }
 
 /// Run the orient subcommand.
-pub fn run(workspace: &Workspace, target: &str, json: bool, log: bool) -> Result<()> {
+pub fn run(workspace: &Workspace, target: &str, json: bool, log: bool, ready: bool) -> Result<()> {
     let start = Instant::now();
     let cwd = std::env::current_dir().map_err(KosError::Io)?;
+
+    if ready {
+        return run_ready(workspace, &cwd, json);
+    }
+
     let orientation = if workspace.is_standalone() {
         gather_standalone(workspace, target)?
     } else {
@@ -59,6 +64,256 @@ pub fn run(workspace: &Workspace, target: &str, json: bool, log: bool) -> Result
     }
 
     Ok(())
+}
+
+/// A frontier question classified as ready or blocked.
+#[derive(Debug)]
+pub struct ReadyQuestion {
+    pub node: Node,
+    pub status: ReadyStatus,
+    /// Number of other nodes that derive from this question (impact score).
+    pub dependents: usize,
+}
+
+#[derive(Debug)]
+pub enum ReadyStatus {
+    /// All blocking dependencies are resolved (bedrock or have findings).
+    Ready,
+    /// One or more blocking dependencies are unresolved frontier questions.
+    Blocked { blockers: Vec<String> },
+}
+
+/// Run the --ready computation: which frontier questions are actionable?
+fn run_ready(workspace: &Workspace, cwd: &Path, json: bool) -> Result<()> {
+    let nearest = workspace.nearest_graph(cwd);
+    let graph_root = if let Some(graph) = nearest {
+        graph.path.clone()
+    } else {
+        workspace.node_root()
+    };
+
+    let nodes_dir = graph_root.join("nodes");
+    if !nodes_dir.exists() {
+        println!("No nodes/ directory found.");
+        return Ok(());
+    }
+
+    // Load ALL nodes (all confidence tiers)
+    let all_nodes = load_all_nodes(&nodes_dir)?;
+
+    // Build ID sets for resolution checking
+    let bedrock_ids: std::collections::HashSet<&str> = all_nodes
+        .iter()
+        .filter(|n| n.confidence == Confidence::Bedrock)
+        .map(|n| n.id.as_str())
+        .collect();
+
+    let graveyard_ids: std::collections::HashSet<&str> = all_nodes
+        .iter()
+        .filter(|n| n.confidence == Confidence::Graveyard)
+        .map(|n| n.id.as_str())
+        .collect();
+
+    // Load findings to check which questions have findings
+    let findings_dir = graph_root.join("findings");
+    let finding_ids = load_finding_ids(&findings_dir);
+
+    // Count dependents (how many nodes have blocking edges TO each node)
+    let mut dependent_counts: std::collections::HashMap<String, usize> =
+        std::collections::HashMap::new();
+    for node in &all_nodes {
+        for edge in node.all_edges() {
+            if edge.edge_type.is_blocking() {
+                *dependent_counts.entry(edge.target.clone()).or_default() += 1;
+            }
+        }
+    }
+
+    // Classify frontier questions
+    let mut ready_questions: Vec<ReadyQuestion> = Vec::new();
+
+    for node in &all_nodes {
+        if node.confidence != Confidence::Frontier {
+            continue;
+        }
+        if node.node_type != crate::model::NodeType::Question {
+            continue;
+        }
+
+        let all_edges_owned = node.all_edges();
+        let blocking: Vec<&crate::model::Edge> = all_edges_owned
+            .iter()
+            .filter(|e| e.edge_type.is_blocking())
+            .collect();
+
+        let mut blockers = Vec::new();
+        for edge in &blocking {
+            let target = &edge.target;
+            // Resolved if: target is bedrock, graveyard, or has a finding
+            let is_resolved = bedrock_ids.contains(target.as_str())
+                || graveyard_ids.contains(target.as_str())
+                || finding_ids.contains(target.as_str());
+            if !is_resolved {
+                blockers.push(target.clone());
+            }
+        }
+
+        let dependents = dependent_counts.get(&node.id).copied().unwrap_or(0);
+
+        let status = if blockers.is_empty() {
+            ReadyStatus::Ready
+        } else {
+            ReadyStatus::Blocked { blockers }
+        };
+
+        ready_questions.push(ReadyQuestion {
+            node: Node {
+                id: node.id.clone(),
+                node_type: node.node_type.clone(),
+                confidence: node.confidence.clone(),
+                title: node.title.clone(),
+                content: String::new(), // Don't carry full content
+                edges: node.edges.clone(),
+                depends_on: node.depends_on.clone(),
+                graveyard: None,
+                brief: None,
+                finding: None,
+                compaction: None,
+                provenance: None,
+                tags: vec![],
+                notes: None,
+                source_path: node.source_path.clone(),
+            },
+            status,
+            dependents,
+        });
+    }
+
+    // Sort: ready first, then by dependents descending
+    ready_questions.sort_by(|a, b| {
+        let a_ready = matches!(a.status, ReadyStatus::Ready);
+        let b_ready = matches!(b.status, ReadyStatus::Ready);
+        b_ready.cmp(&a_ready).then(b.dependents.cmp(&a.dependents))
+    });
+
+    if json {
+        print_ready_jsonl(&ready_questions);
+    } else {
+        print_ready_human(&ready_questions);
+    }
+
+    Ok(())
+}
+
+fn load_all_nodes(nodes_dir: &Path) -> Result<Vec<Node>> {
+    let mut results = Vec::new();
+    for entry in walkdir::WalkDir::new(nodes_dir)
+        .into_iter()
+        .filter_map(std::result::Result::ok)
+    {
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        let ext = path.extension().and_then(|e| e.to_str());
+        if ext != Some("yaml") && ext != Some("yml") {
+            continue;
+        }
+        let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
+        match serde_yaml::from_str::<Node>(&content) {
+            Ok(mut node) => {
+                node.source_path = path.to_path_buf();
+                results.push(node);
+            }
+            Err(e) => {
+                eprintln!("warning: skipping {}: {e}", path.display());
+            }
+        }
+    }
+    Ok(results)
+}
+
+fn load_finding_ids(findings_dir: &Path) -> std::collections::HashSet<String> {
+    let mut ids = std::collections::HashSet::new();
+    if !findings_dir.exists() {
+        return ids;
+    }
+    if let Ok(entries) = std::fs::read_dir(findings_dir) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name = name.to_string_lossy();
+            if name.ends_with(".yaml") || name.ends_with(".yml") {
+                // Extract finding ID from filename
+                if let Some(stem) = name.strip_suffix(".yaml").or(name.strip_suffix(".yml")) {
+                    ids.insert(stem.to_string());
+                }
+            }
+        }
+    }
+    ids
+}
+
+fn print_ready_human(questions: &[ReadyQuestion]) {
+    let ready_count = questions
+        .iter()
+        .filter(|q| matches!(q.status, ReadyStatus::Ready))
+        .count();
+    let blocked_count = questions.len() - ready_count;
+
+    println!("=== kos orient --ready ===\n");
+
+    if ready_count > 0 {
+        println!("## Ready to probe ({ready_count})\n");
+        for q in questions
+            .iter()
+            .filter(|q| matches!(q.status, ReadyStatus::Ready))
+        {
+            print!("  [{}] {}", q.node.id, q.node.title);
+            if q.dependents > 0 {
+                print!("  ({} dependents)", q.dependents);
+            }
+            println!();
+        }
+        println!();
+    }
+
+    if blocked_count > 0 {
+        println!("## Blocked ({blocked_count})\n");
+        for q in questions
+            .iter()
+            .filter(|q| matches!(q.status, ReadyStatus::Blocked { .. }))
+        {
+            println!("  [{}] {}", q.node.id, q.node.title);
+            if let ReadyStatus::Blocked { ref blockers } = q.status {
+                for b in blockers {
+                    println!("    ← blocked by: {b}");
+                }
+            }
+        }
+        println!();
+    }
+
+    if questions.is_empty() {
+        println!("  (no frontier questions found)");
+    }
+}
+
+fn print_ready_jsonl(questions: &[ReadyQuestion]) {
+    for q in questions {
+        let (status, blockers) = match &q.status {
+            ReadyStatus::Ready => ("ready", vec![]),
+            ReadyStatus::Blocked { blockers } => ("blocked", blockers.clone()),
+        };
+        let json = serde_json::json!({
+            "type": "ready_question",
+            "id": q.node.id,
+            "title": q.node.title,
+            "status": status,
+            "blockers": blockers,
+            "dependents": q.dependents,
+        });
+        println!("{json}");
+    }
 }
 
 /// Gather all orientation data for a target repo.

@@ -114,10 +114,25 @@ edges:
                      question without fully resolving it. The target
                      remains open but this node contributes evidence
                      or partial answers."
+      discovered_from: "Found during work on the target. Provenance link
+                     for probe→question lineage. Non-blocking — records
+                     that this node was discovered while investigating
+                     the target, but doesn't create a dependency.
+                     Added: session-014. See finding-043 (beads deep dive)."
+
+    Blocking classification (for ready-work computation):
+      BLOCKING:     derives, implements
+                    If the target is unresolved, the source cannot be
+                    probed. Used by `kos orient --ready` to compute
+                    which frontier questions are actionable.
+      NON-BLOCKING: contradicts, supersedes, supports, instantiates,
+                    partially_resolves, discovered_from
+                    Informational/annotation edges. Do not affect
+                    ready-work computation.
 
   format:
     - target: node-id
-      type: derives | implements | contradicts | supersedes | supports | instantiates | partially_resolves
+      type: derives | implements | contradicts | supersedes | supports | instantiates | partially_resolves | discovered_from
       signal: "Optional. error | evolution | drift"
       note: "Optional. One-line explanation of the relationship."
 
@@ -272,6 +287,24 @@ brief:
       learning signal. Do not update this field after the probe runs.
       Its value is in being wrong.
       Added: session-013. See question-brief-as-prediction-record.
+  gates:
+    type: list of gate objects
+    required: false
+    description: >
+      Conditions that must be met before/during the probe.
+      Gate types: timer (timebox enforcement), human (manual confirmation),
+      finding (another probe must complete), gh_run (CI), gh_pr (PR merge).
+      Each gate has: type, description, duration (for timer), target (for
+      finding), resolved (boolean). Gates make probe lifecycle explicit —
+      overdue timeboxes, blocked-on-human, waiting-for-other-probe.
+      Orient --ready checks gate status when computing actionable probes.
+      Added: session-014. See finding-043 (beads deep dive, R4).
+    format:
+      - type: timer | human | finding | gh_run | gh_pr
+        description: "What this gate is waiting for"
+        duration: "For timer gates: e.g., 48h, 7d"
+        target: "For finding gates: the probe/finding ID"
+        resolved: false
 
 # For type: finding
 finding:
@@ -348,6 +381,32 @@ notes:
     Scratchpad. Not part of the node's formal content.
     Does not trigger ripple propagation when changed.
     Does not affect content hash.
+
+compaction:
+  type: object
+  required: false
+  description: >
+    Tiered compaction metadata. Tracks whether a node's content has
+    been summarized for space savings. Original content is preserved
+    in a snapshot file.
+    Tier 0: uncompacted (default, no compaction field needed).
+    Tier 1 (30+ days): LLM-summarized. Summary replaces content.
+    Tier 2 (90+ days): Further reduction of tier-1 summary.
+    Size guard: compaction is skipped if summary >= original size.
+    Added: session-014. See finding-043 (beads deep dive, R3).
+  fields:
+    level:
+      type: integer (0, 1, 2)
+      description: "Compaction tier. 0 = uncompacted."
+    compacted_at:
+      type: ISO date string
+      description: "When compaction was last applied."
+    original_size:
+      type: integer
+      description: "Original content size in bytes before compaction."
+    snapshot:
+      type: string
+      description: "Path to snapshot of original content (relative to _kos/)."
 
 # ─────────────────────────────────────────────
 # WHAT IS NOT IN THIS SCHEMA (intentionally)
