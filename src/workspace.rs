@@ -165,7 +165,7 @@ impl Workspace {
     /// List known subrepo directories that exist.
     pub fn subrepos(&self) -> Vec<String> {
         let known = [
-            "aclaude",
+            "forestage",
             "switchboard",
             "marvel",
             "specticle",

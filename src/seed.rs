@@ -359,7 +359,7 @@ fn detect_systems(root: &Path, systems: &mut Vec<DetectedSystem>) {
             name: "pennyfarthing".to_string(),
             version: None,
             fingerprint: ".pennyfarthing/".to_string(),
-            note: "Legacy AI console framework (predecessor to aclaude)".to_string(),
+            note: "Legacy AI console framework (predecessor to forestage)".to_string(),
         });
     }
 

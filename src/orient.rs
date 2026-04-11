@@ -1191,7 +1191,7 @@ fn print_human(o: &Orientation) {
             println!("  Hint: add nodes to _kos/nodes/, findings to _kos/findings/,");
             println!("        or create a charter file (charter.md or KOS-charter.md).");
         } else {
-            println!("  Try: kos orient kos | kos orient marvel | kos orient aclaude");
+            println!("  Try: kos orient kos | kos orient marvel | kos orient forestage");
         }
     }
 }
