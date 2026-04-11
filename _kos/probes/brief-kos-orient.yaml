@@ -88,7 +88,7 @@ brief:
   success_signal: |
     1. `kos orient` from aae-orc/marvel/ shows marvel's frontier items,
        RD findings, and open questions
-    2. `kos orient` from aae-orc/aclaude/ shows aclaude's relevant context
+    2. `kos orient` from aae-orc/forestage/ shows forestage's relevant context
     3. `kos orient` from aae-orc/kos/ shows kos's own state
     4. --json flag produces JSONL consumable by agents
     5. The tool runs in < 2 seconds on the current repo tree

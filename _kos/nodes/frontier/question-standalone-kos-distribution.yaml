@@ -14,7 +14,7 @@ content: |
   Distribution options:
   - Symlink from ~/.local/bin/kos to the debug or release binary
   - `cargo install --path .` to put kos in ~/.cargo/bin/
-  - Homebrew formula (like aclaude, ThreeDoors)
+  - Homebrew formula (like forestage, ThreeDoors)
   - `just install` recipe that copies to ~/.local/bin/
 
   Environment configuration:

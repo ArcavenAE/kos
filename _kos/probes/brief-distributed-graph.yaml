@@ -50,7 +50,7 @@ content: |
 
   ## Subrepo inventory (existing kos-like content)
 
-  HIGH: aclaude (design-questions.md → frontier nodes), marvel (docs/spec/ →
+  HIGH: forestage (design-questions.md → frontier nodes), marvel (docs/spec/ →
   manual projections), spectacle (kos-bridge.md → explicit integration spec)
   LOW: ThreeDoors (own governance), switchboard (mature, careful mode)
   NONE: director (not initialized), ai, ourbot (unrelated)

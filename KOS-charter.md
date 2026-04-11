@@ -385,7 +385,7 @@ tooling answer to F5 — mechanical context surfacing across repos.
 *Session-006 update:* `kos orient` built and validated (finding-029). Works
 across 8 targets in 3-11ms. The tool's value tracks graph coverage — probed
 repos (kos 18, project-alpha 13, ThreeDoors 10) get rich output; unprobed repos
-(switchboard 0, aclaude 1) get charter items only. Knowledge distribution
+(switchboard 0, forestage 1) get charter items only. Knowledge distribution
 across the ecosystem is uneven. External repos work via --workspace flag /
 KOS_WORKSPACE env var. Remaining F5 question sharpened: when does the
 charter stop being sufficient? orient partially answers — the charter is
@@ -793,14 +793,14 @@ produced.*
 - *~~Session-008: `kos init` + `kos doctor` + `kos graphs` + distributed
   graph infrastructure — COMPLETE. Finding-031. `_kos/` convention,
   kos.yaml manifests, ideas/ directory, ideation stage. Rolled out to
-  5 repos (aae-orc 35 nodes, kos 25, aclaude 6, marvel 6, spectacle 5 =
+  5 repos (aae-orc 35 nodes, kos 25, forestage 6, marvel 6, spectacle 5 =
   77 total). Moved kos graph to `_kos/` (dogfood). Upgraded aae-orc
   charter to re-introduction format. Mermaid edge label fix.~~*
 - *~~Session-009: `kos bridge` — COMPLETE. Finding-032. 48/48 RD findings
   extracted (100% parse rate) from 2 briefs. Two format variants parsed
   with one regex. Confidence explicit in only 10/48 (marvel brief has it,
-  aclaude brief doesn't). Integrated with orient — `kos orient marvel`
-  now surfaces 10 RD findings, `kos orient aclaude` surfaces 38.
+  forestage brief doesn't). Integrated with orient — `kos orient marvel`
+  now surfaces 10 RD findings, `kos orient forestage` surfaces 38.
   Bridge is an index, not a graph — answers "what was learned" but not
   "how does it connect."~~*
 - *~~Session-010: `kos drift` — COMPLETE. Finding-033. Content hashing +
@@ -879,6 +879,6 @@ encoding).*
   v0.3+ updated with two optional fields.
 
   Updater improvements: alpha channel tagging, version-specific `kos update
-  [VERSION]`, channel filtering, 7 tests. Adapted from aclaude learnings.
+  [VERSION]`, channel filtering, 7 tests. Adapted from forestage learnings.
 
   210+ nodes across 7 graphs.*

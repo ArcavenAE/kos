@@ -84,7 +84,7 @@ optional_fields:
 # includes:
 #   - path: kos/_kos
 #   - path: marvel/_kos
-#   - path: aclaude/_kos
+#   - path: forestage/_kos
 
 # Example: repo-local manifest
 #

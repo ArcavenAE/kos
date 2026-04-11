@@ -1,5 +1,8 @@
 # KOS — Knowledge Operating System
 
+> Note: The "aclaude" project has been renamed to "forestage."
+> Historical references in findings may use the old name.
+
 ## What This Is
 A graph-based knowledge accumulation system for designed systems.
 Rust CLI tool + knowledge graph in YAML over git.

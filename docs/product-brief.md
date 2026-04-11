@@ -60,7 +60,7 @@ Probe: brief-schema-tooling. Session-007.
 
 Extract findings from aae-orc RD briefs (sprint/rd/*.md) into structured
 YAML or JSONL. Connects the RD process (ADR-006) to the kos graph
-mechanically. The 48 RD findings across marvel and aclaude become
+mechanically. The 48 RD findings across marvel and forestage become
 queryable by `kos orient`.
 
 Probe: brief-rd-bridge. Session-008.

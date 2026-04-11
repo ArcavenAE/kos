@@ -22,7 +22,7 @@ content: |
   - Workspace/Group/Team/Session hierarchy mirrors code architecture
   - Conway's Law predicts: agent team structure should mirror the
     desired code modularity, not the other way around
-  - If agents are organized by component (aclaude team, switchboard
+  - If agents are organized by component (forestage team, switchboard
     team), the code will be modular. If organized by function (all
     devs, all reviewers), cross-component coupling increases.
 
