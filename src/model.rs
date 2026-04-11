@@ -21,6 +21,15 @@ pub struct Node {
     /// Type-specific graveyard section
     #[serde(default)]
     pub graveyard: Option<GraveyardSection>,
+    /// Type-specific brief section (probes)
+    #[serde(default)]
+    pub brief: Option<BriefSection>,
+    /// Type-specific finding section
+    #[serde(default)]
+    pub finding: Option<FindingSection>,
+    /// Compaction metadata (R3: tiered compaction)
+    #[serde(default)]
+    pub compaction: Option<CompactionMeta>,
     #[serde(default)]
     pub provenance: Option<Provenance>,
     #[serde(default)]
@@ -130,6 +139,17 @@ pub enum EdgeType {
     Instantiates,
     /// Addresses some aspects of the target question without fully resolving it.
     PartiallyResolves,
+    /// Found during work on the target. Provenance link for probe→question lineage.
+    DiscoveredFrom,
+}
+
+impl EdgeType {
+    /// Whether this edge type represents a blocking dependency for ready-work
+    /// computation. Blocking means: if the target is unresolved, the source
+    /// cannot be probed/acted on.
+    pub fn is_blocking(&self) -> bool {
+        matches!(self, EdgeType::Derives | EdgeType::Implements)
+    }
 }
 
 impl std::fmt::Display for EdgeType {
@@ -142,6 +162,7 @@ impl std::fmt::Display for EdgeType {
             EdgeType::Supports => write!(f, "supports"),
             EdgeType::Instantiates => write!(f, "instantiates"),
             EdgeType::PartiallyResolves => write!(f, "partially_resolves"),
+            EdgeType::DiscoveredFrom => write!(f, "discovered_from"),
         }
     }
 }
@@ -177,6 +198,71 @@ pub struct GraveyardSection {
     pub ruling: Option<String>,
     #[serde(default)]
     pub reopener: Option<String>,
+}
+
+/// Type-specific section for brief (probe) nodes.
+#[derive(Debug, Clone, Deserialize)]
+pub struct BriefSection {
+    #[serde(default)]
+    pub hypothesis: Option<String>,
+    #[serde(default)]
+    pub excluded_scope: Option<String>,
+    #[serde(default)]
+    pub success_signal: Option<String>,
+    #[serde(default)]
+    pub timebox: Option<String>,
+    #[serde(default)]
+    pub predicted_confidence: Option<f64>,
+    /// Gate primitives — conditions that must be met before/during the probe.
+    #[serde(default)]
+    pub gates: Vec<Gate>,
+}
+
+/// A gate/await primitive on a probe brief.
+#[derive(Debug, Clone, Deserialize)]
+pub struct Gate {
+    /// Gate type: timer, human, finding, gh_run, gh_pr
+    #[serde(rename = "type")]
+    pub gate_type: String,
+    #[serde(default)]
+    pub description: Option<String>,
+    /// For timer gates: duration string (e.g., "48h", "7d")
+    #[serde(default)]
+    pub duration: Option<String>,
+    /// For finding gates: the finding or probe ID that must complete
+    #[serde(default)]
+    pub target: Option<String>,
+    /// Whether this gate has been resolved
+    #[serde(default)]
+    pub resolved: bool,
+}
+
+/// Type-specific section for finding nodes.
+#[derive(Debug, Clone, Deserialize)]
+pub struct FindingSection {
+    #[serde(default)]
+    pub probe: Option<String>,
+    #[serde(default)]
+    pub result: Option<String>,
+    #[serde(default)]
+    pub surprise_magnitude: Option<String>,
+}
+
+/// Compaction metadata (R3: tiered compaction for aging nodes).
+#[derive(Debug, Clone, Deserialize)]
+pub struct CompactionMeta {
+    /// 0 = uncompacted, 1 = tier-1 (30d summary), 2 = tier-2 (90d ultra)
+    #[serde(default)]
+    pub level: u8,
+    /// When compaction was last applied
+    #[serde(default)]
+    pub compacted_at: Option<String>,
+    /// Original content size before compaction (bytes)
+    #[serde(default)]
+    pub original_size: Option<u64>,
+    /// Path to snapshot of original content
+    #[serde(default)]
+    pub snapshot: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]

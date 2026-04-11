@@ -34,6 +34,10 @@ enum Commands {
         /// Append usage metrics to ~/.local/share/kos/orient.jsonl
         #[arg(long)]
         log: bool,
+
+        /// Show only ready frontier questions (unblocked, dependencies resolved)
+        #[arg(long)]
+        ready: bool,
     },
 
     /// Validate all nodes against the schema
@@ -164,6 +168,7 @@ fn main() -> anyhow::Result<()> {
             workspace: workspace_path,
             json,
             log,
+            ready,
         } => {
             let cwd = std::env::current_dir()?;
 
@@ -184,7 +189,7 @@ fn main() -> anyhow::Result<()> {
                 })
                 .unwrap_or_else(|| "kos".to_string());
 
-            kos::orient::run(&workspace, &target, json, log)?;
+            kos::orient::run(&workspace, &target, json, log, ready)?;
         }
 
         Commands::Validate { merged } => {
