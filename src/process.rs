@@ -265,7 +265,7 @@ fn today_iso() -> String {
 }
 
 /// Convert days since Unix epoch to (year, month, day).
-fn days_to_date(days_since_epoch: u64) -> (u64, u64, u64) {
+pub fn days_to_date(days_since_epoch: u64) -> (u64, u64, u64) {
     // Algorithm from http://howardhinnant.github.io/date_algorithms.html
     let z = days_since_epoch + 719_468;
     let era = z / 146_097;
