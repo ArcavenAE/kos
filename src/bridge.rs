@@ -103,7 +103,7 @@ fn extract_all(rd_dir: &Path) -> Result<BridgeResult> {
 ///
 /// Matches two patterns:
 /// 1. `**F-01: Title.**` (marvel-mvp-probe style, dash in ID)
-/// 2. `**F1: Title (date)**` (aclaude-distribution style, no dash)
+/// 2. `**F1: Title (date)**` (forestage-distribution style, no dash)
 pub fn extract_findings(content: &str, slug: &str, default_repo: &str) -> Vec<RdFinding> {
     // Match **F-01: ...** or **F1: ...** at start of line
     let header_re =
@@ -195,8 +195,8 @@ fn extract_confidence(body: &str) -> Option<String> {
 pub fn infer_repo(slug: &str) -> String {
     if slug.starts_with("marvel") {
         "marvel".to_string()
-    } else if slug.starts_with("aclaude") {
-        "aclaude".to_string()
+    } else if slug.starts_with("forestage") {
+        "forestage".to_string()
     } else if slug.starts_with("switchboard") {
         "switchboard".to_string()
     } else if slug.starts_with("spectacle") {
