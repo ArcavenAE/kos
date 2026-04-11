@@ -21,7 +21,7 @@ anyhow = "1"
 thiserror = "2"
 
 # Graph traversal (drift detection, ripple propagation)
-petgraph = "0.7"
+petgraph = "0.8"
 
 # File system traversal
 walkdir = "2"
