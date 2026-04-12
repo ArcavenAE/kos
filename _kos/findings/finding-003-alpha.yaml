@@ -21,7 +21,7 @@ content: |
   These are cases where two documents claim different things about the same concept.
 
   **1. query DSL parser technology (ax-detection-dsl-parser)**
-  CLAUDE.md says "custom PEG grammar (parser-A)." Architecture says "parser-B."
+  CLAUDE.md says "custom PEG grammar (parser-A)." Architecture says "parser-B parser."
   These are different parsing frameworks. An AI agent following CLAUDE.md would implement
   the wrong parser.
 

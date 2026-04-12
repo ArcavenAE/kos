@@ -24,7 +24,7 @@ content: |
   ## What was rediscovered from code alone
 
   **Issue #1 (parser technology): REDISCOVERED**
-  Finding-003 caught CLAUDE.md saying pest vs architecture saying parser-B.
+  Finding-003 caught CLAUDE.md saying parser-A vs architecture saying parser-B.
   Code-only bootstrap found the same contradiction from a different source:
   spike/Cargo.toml uses parser-A + parser-A-derive; main/Cargo.toml uses parser-B
   with explicit comment "architecture decision: parser-B over parser-A."

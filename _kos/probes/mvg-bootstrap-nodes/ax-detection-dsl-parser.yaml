@@ -7,7 +7,7 @@ content: |
     "Rules use a custom PEG grammar (parser-A)"
 
   The architecture-validation-results.md states:
-    "parser-B + serde YAML: Complementary (parser-B for DSL, serde for structure)"
+    "parser-B parser + serde YAML: Complementary (parser-B for DSL, serde for structure)"
 
   The architecture's implementation handoff says:
     "Create detection engine with parser-B DSL parser"

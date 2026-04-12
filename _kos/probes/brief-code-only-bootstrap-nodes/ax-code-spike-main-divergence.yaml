@@ -11,7 +11,7 @@ content: |
   7 stubs (2 LOC each — just a lib.rs with a module declaration).
 
   The two codebases share a name and domain but use different technologies
-  (pest vs parser-B), different architectures, and are not linked by any
+  (parser-A vs parser-B), different architectures, and are not linked by any
   import or dependency. The spike is not a library consumed by main; it is
   a parallel implementation.
 

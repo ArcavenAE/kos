@@ -98,7 +98,7 @@ content: |
   Would threshold fire? YES. 3 paths, same structural region.
 
   CLUSTER B: Technology contradictions (3 issues converge)
-  - ax-detection-dsl-parser: pest vs parser-B
+  - ax-detection-dsl-parser: parser-A vs parser-B
   - ax-realtime-comms-conflict: SSE vs WebSocket vs HTTP/JSON+SSE
   - ax-http-timeout-conflict: 60s vs 30s in same document
 

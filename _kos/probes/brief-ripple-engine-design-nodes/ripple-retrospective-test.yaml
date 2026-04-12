@@ -14,7 +14,7 @@ content: |
 
   | #  | Issue                    | Detected? | Severity    | Condition           |
   |----|--------------------------|-----------|-------------|---------------------|
-  | 1  | Parser (pest/parser-B)    | YES       | DIRTY_HARD  | contradicts edge    |
+  | 1  | Parser (parser-A/parser-B)    | YES       | DIRTY_HARD  | contradicts edge    |
   | 2  | Latency (p95/p99)        | YES       | DIRTY_HARD  | contradicts edges   |
   | 3  | data catalog (SQLite/PG)      | COND.     | DIRTY_HARD  | separate nodes req. |
   | 4  | Comms (SSE/WS)           | YES       | DIRTY_HARD  | contradicts edges   |
