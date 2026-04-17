@@ -1,6 +1,7 @@
 id: finding-013-autogen
 type: finding
 confidence: frontier
+title: "AutoGen V0.2-to-V0.4 transition: macro seam handled well, micro seams within v0.4 spec docs remain"
 finding:
   probe: brief-mvg-bootstrap
   result: partial
