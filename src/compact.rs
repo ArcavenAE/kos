@@ -75,7 +75,7 @@ pub fn list_by_size(workspace: &Workspace, cwd: &Path) -> Result<Vec<NodeSizeEnt
     }
 
     // Sort by content size descending (largest first)
-    entries.sort_by(|a, b| b.content_size.cmp(&a.content_size));
+    entries.sort_by_key(|e| std::cmp::Reverse(e.content_size));
 
     Ok(entries)
 }
