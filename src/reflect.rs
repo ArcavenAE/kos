@@ -35,6 +35,21 @@ struct Reflection {
     charter_deltas: Vec<CharterDelta>,
     un_updated: Vec<UnUpdated>,
     calibration: CalibrationStats,
+    working_tree: WorkingTree,
+}
+
+/// Uncommitted changes in the working tree — staged adds, untracked files,
+/// and unstaged modifications. Separate from the committed diff so the
+/// operator can see what they wrote this session but haven't yet committed.
+#[derive(Debug, Default, Serialize)]
+struct WorkingTree {
+    nodes_new: Vec<String>,      // untracked or staged-added node yamls
+    nodes_modified: Vec<String>, // existing nodes with unstaged edits
+    briefs_new: Vec<String>,
+    findings_new: Vec<String>,
+    ideas_new: Vec<String>,
+    charter_modified: Vec<String>,
+    other: Vec<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -249,6 +264,8 @@ fn build_reflection(
 
     let calibration = running_calibration(graph_root, &all_nodes);
 
+    let working_tree = detect_working_tree(repo_root, &graph_rel);
+
     Ok(Reflection {
         since: since.to_string(),
         head: head.to_string(),
@@ -263,6 +280,7 @@ fn build_reflection(
         charter_deltas,
         un_updated,
         calibration,
+        working_tree,
     })
 }
 
@@ -294,6 +312,61 @@ fn git_commits_in_range(repo_root: &Path, since: &str) -> Vec<CommitInfo> {
             })
         })
         .collect()
+}
+
+fn detect_working_tree(repo_root: &Path, scope_path: &str) -> WorkingTree {
+    let mut wt = WorkingTree::default();
+    let out = match run_git(repo_root, &["status", "--porcelain", "--", scope_path]) {
+        Some(s) => s,
+        None => return wt,
+    };
+    for line in out.lines() {
+        // Porcelain v1: XY<space>path   (XY = 2-char status, then path)
+        // Renames / copies use "XY old -> new"; rare in working tree, ignore specially.
+        if line.len() < 4 {
+            continue;
+        }
+        let status = &line[0..2];
+        let path = line[3..].trim().to_string();
+        // Classify by path regardless of exact status; untracked (??),
+        // staged-added (A ), and modified ( M / M ) all surface as uncommitted.
+        let is_new = status.starts_with("??") || status.starts_with('A');
+        let is_modified = !is_new && (status.contains('M') || status.contains('T'));
+
+        // Skip ignored files (!! status) and unusual states.
+        if status.starts_with("!!") {
+            continue;
+        }
+
+        match classify_path(&path) {
+            PathKind::Node => {
+                if is_new {
+                    wt.nodes_new.push(path);
+                } else if is_modified {
+                    wt.nodes_modified.push(path);
+                }
+            }
+            PathKind::Brief if is_new => wt.briefs_new.push(path),
+            PathKind::Finding if is_new => wt.findings_new.push(path),
+            PathKind::Idea if is_new => wt.ideas_new.push(path),
+            PathKind::Charter if is_modified || is_new => wt.charter_modified.push(path),
+            _ if is_new || is_modified => wt.other.push(path),
+            _ => {}
+        }
+    }
+    wt
+}
+
+impl WorkingTree {
+    fn is_empty(&self) -> bool {
+        self.nodes_new.is_empty()
+            && self.nodes_modified.is_empty()
+            && self.briefs_new.is_empty()
+            && self.findings_new.is_empty()
+            && self.ideas_new.is_empty()
+            && self.charter_modified.is_empty()
+            && self.other.is_empty()
+    }
 }
 
 #[derive(Debug)]
@@ -1005,6 +1078,55 @@ fn render_markdown(r: &Reflection) {
             println!("  (need >=3 pairs before trend claims are meaningful)");
         }
     });
+
+    if !r.working_tree.is_empty() {
+        section("Working tree (uncommitted)", || {
+            let wt = &r.working_tree;
+            if !wt.ideas_new.is_empty() {
+                println!("  new ideas:");
+                for p in &wt.ideas_new {
+                    println!("    + {p}");
+                }
+            }
+            if !wt.briefs_new.is_empty() {
+                println!("  new briefs:");
+                for p in &wt.briefs_new {
+                    println!("    + {p}");
+                }
+            }
+            if !wt.findings_new.is_empty() {
+                println!("  new findings:");
+                for p in &wt.findings_new {
+                    println!("    + {p}");
+                }
+            }
+            if !wt.nodes_new.is_empty() {
+                println!("  new nodes:");
+                for p in &wt.nodes_new {
+                    println!("    + {p}");
+                }
+            }
+            if !wt.nodes_modified.is_empty() {
+                println!("  modified nodes:");
+                for p in &wt.nodes_modified {
+                    println!("    ~ {p}");
+                }
+            }
+            if !wt.charter_modified.is_empty() {
+                println!("  charter edits:");
+                for p in &wt.charter_modified {
+                    println!("    ~ {p}");
+                }
+            }
+            if !wt.other.is_empty() {
+                println!("  other:");
+                for p in &wt.other {
+                    println!("    · {p}");
+                }
+            }
+            println!("  (commit to promote into the session diff)");
+        });
+    }
 }
 
 fn section(title: &str, body: impl FnOnce()) {
