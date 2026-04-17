@@ -79,6 +79,17 @@ enum Commands {
     /// Detect drift — content changes and stale dependents
     Drift,
 
+    /// Session-close retrospection audit — what changed, predicted vs actual, harvest debt
+    Reflect {
+        /// Git ref to compare against. Default: most recent harvest/charter commit.
+        #[arg(long)]
+        since: Option<String>,
+
+        /// Output as JSON instead of human-readable markdown
+        #[arg(long)]
+        json: bool,
+    },
+
     /// List nodes by size or compact a node with a provided summary
     Compact {
         /// Compact a specific node (requires --summary)
@@ -276,6 +287,12 @@ fn main() -> anyhow::Result<()> {
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
             let node_root = workspace.node_root();
             kos::drift::run(&node_root)?;
+        }
+
+        Commands::Reflect { since, json } => {
+            let cwd = std::env::current_dir()?;
+            let workspace = kos::workspace::Workspace::discover(&cwd)?;
+            kos::reflect::run(&workspace, &cwd, since.as_deref(), json)?;
         }
 
         Commands::Compact { node, summary } => {
