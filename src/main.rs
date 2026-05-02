@@ -215,6 +215,18 @@ enum CharterAction {
         #[arg(long, env = "KOS_WORKSPACE")]
         workspace: Option<PathBuf>,
     },
+
+    /// Diff the rendered output against current charter.md
+    /// (exit 0 if identical, exit 1 if they differ)
+    Diff {
+        /// Path to the workspace root (env: KOS_WORKSPACE)
+        #[arg(long, env = "KOS_WORKSPACE")]
+        workspace: Option<PathBuf>,
+
+        /// Quiet mode — print nothing, just exit 0/1
+        #[arg(long, short)]
+        quiet: bool,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -444,6 +456,26 @@ fn main() -> anyhow::Result<()> {
                     eprintln!("wrote {}", target.display());
                 } else {
                     print!("{rendered}");
+                }
+            }
+            CharterAction::Diff {
+                workspace: ws_path,
+                quiet,
+            } => {
+                let cwd = std::env::current_dir()?;
+                let workspace = kos::workspace::Workspace::discover(&cwd).or_else(|err| {
+                    if let Some(ref p) = ws_path {
+                        kos::workspace::Workspace::from_explicit(p)
+                    } else {
+                        Err(err)
+                    }
+                })?;
+                let (diff, differs) = kos::charter::diff(&workspace)?;
+                if !quiet {
+                    print!("{diff}");
+                }
+                if differs {
+                    std::process::exit(1);
                 }
             }
         },

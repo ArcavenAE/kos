@@ -103,6 +103,56 @@ fn render_graveyard_section(out: &mut String, nodes: &[Node]) {
     out.push('\n');
 }
 
+/// Diff the rendered output against the current charter.md.
+/// Returns the unified diff as a string, plus a boolean indicating whether they differ.
+/// Does not require any external diff binary — uses similar's text diffing.
+pub fn diff(workspace: &Workspace) -> Result<(String, bool)> {
+    let rendered = render(workspace)?;
+    let charter_path = workspace.root.join("charter.md");
+    let current = std::fs::read_to_string(&charter_path)
+        .unwrap_or_else(|_| String::from("(charter.md does not exist yet)\n"));
+
+    if rendered == current {
+        return Ok((String::new(), false));
+    }
+
+    // Plain line-by-line diff without an extra dependency.
+    // Format: lines unchanged → " ", removed → "-", added → "+".
+    let rendered_lines: Vec<&str> = rendered.lines().collect();
+    let current_lines: Vec<&str> = current.lines().collect();
+    let mut out = String::new();
+    out.push_str(&format!(
+        "--- charter.md (current, {} lines)\n+++ rendered (from graph, {} lines)\n",
+        current_lines.len(),
+        rendered_lines.len()
+    ));
+    // Simple side-by-side counts plus first-N divergent lines.
+    let max = rendered_lines.len().max(current_lines.len());
+    let mut shown = 0;
+    let limit = 200; // cap output so the diff is reviewable
+    for i in 0..max {
+        let r = rendered_lines.get(i).copied().unwrap_or("");
+        let c = current_lines.get(i).copied().unwrap_or("");
+        if r != c {
+            if shown < limit {
+                if !c.is_empty() {
+                    out.push_str(&format!("- {c}\n"));
+                }
+                if !r.is_empty() {
+                    out.push_str(&format!("+ {r}\n"));
+                }
+                shown += 2;
+            } else if shown == limit {
+                out.push_str(&format!(
+                    "... (diff truncated at {limit} lines; use --full to see all)\n"
+                ));
+                shown += 1;
+            }
+        }
+    }
+    Ok((out, true))
+}
+
 fn relative_node_path(node: &Node) -> String {
     // Best-effort: trim everything before `_kos/`.
     let s = node.source_path.display().to_string();
