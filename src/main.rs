@@ -425,7 +425,10 @@ fn main() -> anyhow::Result<()> {
         }
 
         Commands::Charter { action } => match action {
-            CharterAction::Render { write, workspace: ws_path } => {
+            CharterAction::Render {
+                write,
+                workspace: ws_path,
+            } => {
                 let cwd = std::env::current_dir()?;
                 let workspace = kos::workspace::Workspace::discover(&cwd).or_else(|err| {
                     if let Some(ref p) = ws_path {

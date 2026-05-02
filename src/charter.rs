@@ -82,7 +82,10 @@ fn render_frontier_section(out: &mut String, nodes: &[Node]) {
     out.push_str("*Open. Each links to its full body in `_kos/nodes/frontier/`.*\n\n");
     for node in nodes {
         let rel = relative_node_path(node);
-        out.push_str(&format!("- **{}** — {} ([detail]({}))\n", node.id, node.title, rel));
+        out.push_str(&format!(
+            "- **{}** — {} ([detail]({}))\n",
+            node.id, node.title, rel
+        ));
     }
     out.push('\n');
 }
@@ -92,7 +95,10 @@ fn render_graveyard_section(out: &mut String, nodes: &[Node]) {
     out.push_str("*Ruled out. Kept for the reasoning.*\n\n");
     for node in nodes {
         let rel = relative_node_path(node);
-        out.push_str(&format!("- **{}** — {} ([detail]({}))\n", node.id, node.title, rel));
+        out.push_str(&format!(
+            "- **{}** — {} ([detail]({}))\n",
+            node.id, node.title, rel
+        ));
     }
     out.push('\n');
 }
