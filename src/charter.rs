@@ -12,13 +12,45 @@ Backdrop blocks (between `<!-- backdrop:start -->` and
 `<!-- backdrop:end -->` markers) are preserved verbatim.
 -->\n\n";
 
+/// Extract backdrop blocks from charter.md if present.
+/// Backdrop blocks are wrapped in `<!-- backdrop:start -->` / `<!-- backdrop:end -->`
+/// markers. The renderer preserves their content verbatim — this is the
+/// authored content (preamble, design values, non-goals, framing) that has
+/// no graph-node home and is hand-maintained inline.
+fn extract_backdrops(charter_path: &Path) -> Vec<String> {
+    let Ok(content) = std::fs::read_to_string(charter_path) else {
+        return vec![];
+    };
+    let mut blocks = Vec::new();
+    let mut current: Option<String> = None;
+    for line in content.lines() {
+        let trimmed = line.trim();
+        if trimmed == "<!-- backdrop:start -->" {
+            current = Some(String::new());
+            continue;
+        }
+        if trimmed == "<!-- backdrop:end -->" {
+            if let Some(b) = current.take() {
+                blocks.push(b);
+            }
+            continue;
+        }
+        if let Some(buf) = current.as_mut() {
+            buf.push_str(line);
+            buf.push('\n');
+        }
+    }
+    blocks
+}
+
 /// Render the orchestrator charter from the kos graph.
 ///
-/// First-pass implementation per `_kos/probes/brief-charter-as-projection-renderer.md`:
+/// Per `_kos/probes/brief-charter-as-projection-renderer.md`:
+/// - Backdrop blocks: extracted verbatim from charter.md's
+///   `<!-- backdrop:start -->`/`<!-- backdrop:end -->` markers, emitted before bedrock
 /// - Bedrock: full content per node, sorted by id
 /// - Frontier: title only, sorted by id
 /// - Graveyard: title only, sorted by id
-/// - No backdrop-marker handling yet (phase-1 extraction must complete first)
 /// - No "current_state" field projection yet (sub-question A on the brief)
 pub fn render(workspace: &Workspace) -> Result<String> {
     // Find the orchestrator graph (the orc's own _kos/, not a subrepo's).
@@ -48,6 +80,9 @@ pub fn render(workspace: &Workspace) -> Result<String> {
     frontier.sort_by(|a, b| a.id.cmp(&b.id));
     graveyard.sort_by(|a, b| a.id.cmp(&b.id));
 
+    let charter_path = workspace.root.join("charter.md");
+    let backdrops = extract_backdrops(&charter_path);
+
     let mut out = String::new();
     out.push_str(HEADER);
     out.push_str("# aae-orc Charter (Rendered)\n\n");
@@ -56,6 +91,12 @@ pub fn render(workspace: &Workspace) -> Result<String> {
          Source: `_kos/nodes/`. \
          Regenerate with `kos charter render --write`.\n\n",
     );
+
+    for block in &backdrops {
+        out.push_str("<!-- backdrop:start -->\n");
+        out.push_str(block);
+        out.push_str("<!-- backdrop:end -->\n\n");
+    }
 
     render_bedrock_section(&mut out, &bedrock);
     render_frontier_section(&mut out, &frontier);
