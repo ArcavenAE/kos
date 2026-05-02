@@ -187,6 +187,12 @@ enum Commands {
         dir: Option<PathBuf>,
     },
 
+    /// Render the charter from the kos graph
+    Charter {
+        #[command(subcommand)]
+        action: CharterAction,
+    },
+
     /// Update kos to the latest release, or to a specific version
     Update {
         /// Target version tag (e.g., alpha-20260405-075244-abc1234). Omit for latest.
@@ -195,6 +201,20 @@ enum Commands {
 
     /// Show version, commit, build time, and channel
     Version,
+}
+
+#[derive(clap::Subcommand)]
+enum CharterAction {
+    /// Render the charter to stdout (or write to charter.md with --write)
+    Render {
+        /// Write the rendered output to charter.md instead of stdout
+        #[arg(long)]
+        write: bool,
+
+        /// Path to the workspace root (env: KOS_WORKSPACE)
+        #[arg(long, env = "KOS_WORKSPACE")]
+        workspace: Option<PathBuf>,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -403,6 +423,27 @@ fn main() -> anyhow::Result<()> {
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
             kos::process::probe(&workspace, &cwd, &slug, &title)?;
         }
+
+        Commands::Charter { action } => match action {
+            CharterAction::Render { write, workspace: ws_path } => {
+                let cwd = std::env::current_dir()?;
+                let workspace = kos::workspace::Workspace::discover(&cwd).or_else(|err| {
+                    if let Some(ref p) = ws_path {
+                        kos::workspace::Workspace::from_explicit(p)
+                    } else {
+                        Err(err)
+                    }
+                })?;
+                let rendered = kos::charter::render(&workspace)?;
+                if write {
+                    let target = workspace.root.join("charter.md");
+                    std::fs::write(&target, &rendered)?;
+                    eprintln!("wrote {}", target.display());
+                } else {
+                    print!("{rendered}");
+                }
+            }
+        },
 
         Commands::Update { version } => {
             let method = kos::updater::detect_install_method()?;

@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 
 pub mod bridge;
+pub mod charter;
 pub mod compact;
 pub mod doctor;
 pub mod drift;
