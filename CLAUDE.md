@@ -68,8 +68,11 @@ pointing to what it became.
 3. Write an Exploration Brief in _kos/probes/
 4. Do the probe work
 5. Write a finding in _kos/findings/
-6. Harvest: update affected nodes, move files if confidence changed
-7. Update KOS-charter.md if bedrock changed significantly
+6. Harvest: update affected NODES (`_kos/nodes/{bedrock,frontier,graveyard}/*.yaml`),
+   move files if confidence changed. KOS-charter.md is renderer output
+   (per orc F22, `kos charter render`); do NOT hand-edit charter prose
+   outside `<!-- backdrop -->` blocks. Subrepo charter renderer extension
+   tracked in aae-orc-gezz.
 
 ### Harvest Verification (before starting the next cycle)
 # Arose: session-002, cycle boundary drift
@@ -86,7 +89,13 @@ skipped.
 
 - [ ] Finding node written and committed
 - [ ] Schema changes committed if implied by finding
-- [ ] Charter updated if bedrock changed
+- [ ] Bedrock/frontier/graveyard NODES updated if state changed —
+      edit `_kos/nodes/{bedrock,frontier,graveyard}/*.yaml`, NOT charter
+      prose. KOS-charter.md is renderer output (per orc F22,
+      `brief-charter-as-projection-renderer.md`, `kos charter render`).
+      Subrepo extension tracked in aae-orc-gezz; until it ships, treat
+      charter sections outside `<!-- backdrop -->` blocks as read-only
+      and edit the underlying nodes.
 - [ ] Frontier questions updated (closed, opened, or revised)
 - [ ] Exploration briefs marked complete or carried forward
 
