@@ -1,0 +1,29 @@
+id: question-projection-seam
+type: question
+confidence: frontier
+title: "The projection seam: kos owns graph<->documents in both directions — inbound harvest-parse, outbound `kos project`"
+content: |
+  Filed 2026-07-02 from orc finding-052. The `bridge` verb and
+  spectacle's kos-bridge design are two directions of one seam:
+
+  - INBOUND today: `bridge` (src/bridge.rs) scrapes RD findings from
+    sprint/rd prose into JSONL — ingest that never touches the graph.
+    Wants a harvest-flavored name when this code is next touched.
+  - OUTBOUND designed: `kos project --format <fmt>` renders graph
+    nodes through format templates (spectacle's kos-bridge.md maps
+    tiers -> 29148 cascade, node types -> sections; its ops table
+    already reserves the verb).
+
+  Design direction: one seam subsystem; formats are projection PACKS
+  (spectacle/IEEE, BMAD, vsdd-factory specs/, spec-kit, raw JSONL)
+  whose machine-readable section maps drive both the outbound renderer
+  and a future inbound parser (reading an existing SRS into nodes —
+  the brownfield story). Questions: pack schema for formats; fidelity
+  contract (round-trip? lossy-with-provenance?); where does the
+  degenerate JSONL projection fold in; sequencing vs harvest/promote
+  verbs.
+edges: []
+provenance:
+  created_by: human
+  session: session-052
+  created_at: "2026-07-02"
