@@ -124,9 +124,41 @@ jobs:
         with:
           command: check advisories licenses bans
 
+  # Mint the release tag ONCE, before the build matrix. The embedded
+  # KOS_TAG is a REFERENCE to the release (kos update compares it to the
+  # release tag_name by string equality), so every matrix leg must embed
+  # the identical value. Minting inside the matrix gave each leg its own
+  # timestamp with last-writer-wins outputs — a dangling reference that
+  # trapped direct-install binaries in a permanent update loop (kos#2).
+  mint-version:
+    name: Mint version
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Extract version
+        id: version
+        run: |
+          VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          TAG="alpha-$(date -u +%Y%m%d-%H%M%S)-$(echo ${{ github.sha }} | head -c 7)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
   build-release:
     name: Build (${{ matrix.target }})
-    needs: [check-fmt, check-clippy, test, deny]
+    needs: [check-fmt, check-clippy, test, deny, mint-version]
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     permissions:
       contents: write
@@ -143,9 +175,11 @@ jobs:
             os: ubuntu-24.04-arm
             artifact_name: kos-linux-arm64
     runs-on: ${{ matrix.os }}
+    # Forwarded from mint-version so downstream jobs keep reading
+    # needs.build-release.outputs unchanged.
     outputs:
-      version: ${{ steps.version.outputs.version }}
-      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ needs.mint-version.outputs.version }}
+      tag: ${{ needs.mint-version.outputs.tag }}
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
@@ -166,18 +200,10 @@ jobs:
         with:
           cache-on-failure: true
 
-      - name: Extract version
-        id: version
-        run: |
-          VERSION=$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)".*/\1/')
-          TAG="alpha-$(date -u +%Y%m%d-%H%M%S)-$(echo ${{ github.sha }} | head -c 7)"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-
       - name: Build release binary
         env:
           KOS_CHANNEL: alpha
-          KOS_TAG: ${{ steps.version.outputs.tag }}
+          KOS_TAG: ${{ needs.mint-version.outputs.tag }}
         run: |
           cargo build --release --target ${{ matrix.target }}
           cp target/${{ matrix.target }}/release/kos ${{ matrix.artifact_name }}
@@ -417,6 +443,24 @@ jobs:
         with:
           name: signed-binaries-darwin-arm64
           path: dist/
+
+      # Homebrew's FormulaAudit/Desc enforces an 80-char max on desc. An
+      # over-long desc breaks `brew style` for EVERY formula in the tap
+      # (see kos#6), so fail here before anything is pushed.
+      - name: Validate formula desc length
+        run: |
+          set -euo pipefail
+          DESC=$(sed -n 's/^ *desc "\(.*\)"$/\1/p' Formula/kos.rb)
+          if [[ -z "$DESC" ]]; then
+            echo "::error::no desc found in Formula/kos.rb"
+            exit 1
+          fi
+          LEN=${#DESC}
+          if (( LEN > 80 )); then
+            echo "::error::Formula desc is ${LEN} chars (max 80): ${DESC}"
+            exit 1
+          fi
+          echo "desc OK (${LEN}/80 chars)"
 
       - name: Update Homebrew formula
         env:
