@@ -1,8 +1,8 @@
 use std::path::Path;
 
 use crate::error::Result;
-use crate::model::{GraphScope, GraphSource, Node};
-use crate::workspace::{MANIFEST_FILE, Workspace};
+use crate::model::{Confidence, GraphScope, GraphSource, Node};
+use crate::workspace::{KOS_DIR, MANIFEST_FILE, Workspace};
 
 /// Run the doctor subcommand.
 pub fn run(workspace: &Workspace, cwd: &Path, merged: bool, fix: bool) -> Result<()> {
@@ -131,6 +131,44 @@ fn check_graph(graph: &GraphSource, workspace: &Workspace, fix: bool) -> Result<
                 warnings += 1;
             }
         }
+
+        // Reverse direction: _kos/ graphs on disk that the manifest doesn't
+        // declare. Undeclared graphs still show up in filesystem-globbing
+        // tools (kos-viz) but are invisible to doctor/validate from the
+        // orchestrator root — silent fleet drift.
+        let declared: std::collections::HashSet<&str> = graph
+            .manifest
+            .includes
+            .iter()
+            .map(|i| i.path.as_str())
+            .collect();
+        let mut undeclared: Vec<String> = Vec::new();
+        if let Ok(entries) = std::fs::read_dir(&workspace.root) {
+            for entry in entries.filter_map(std::result::Result::ok) {
+                let name = entry.file_name().to_string_lossy().to_string();
+                if name.starts_with('.') || !entry.path().is_dir() {
+                    continue;
+                }
+                let rel = format!("{name}/{KOS_DIR}");
+                if entry.path().join(KOS_DIR).join(MANIFEST_FILE).exists()
+                    && !declared.contains(rel.as_str())
+                {
+                    undeclared.push(rel);
+                }
+            }
+        }
+        undeclared.sort();
+        if undeclared.is_empty() {
+            ok("no undeclared _kos/ graphs on disk");
+        } else {
+            for rel in &undeclared {
+                warn(&format!(
+                    "_kos/ graph on disk but missing from kos.yaml includes: {rel}"
+                ));
+                warnings += 1;
+            }
+            hint("add the missing `- path:` entries to the includes list in _kos/kos.yaml");
+        }
     }
 
     // ── Content checks ──────────────────────────────────────
@@ -237,6 +275,36 @@ fn check_graph(graph: &GraphSource, workspace: &Workspace, fix: bool) -> Result<
         ));
         hint("add edges from nodes that reference these concepts");
         warnings += orphans.len();
+    }
+
+    // Frontier nodes whose prose carries a resolution marker but were never
+    // promoted (finding-049: curtain F2/F4, forestage F7 sat resolved-in-text
+    // in frontier/). Heuristic, not a gate — the marker may be discussing
+    // another node's resolution.
+    let mut resolved_markers: Vec<&str> = Vec::new();
+    for node in &nodes {
+        if node.confidence != Confidence::Frontier {
+            continue;
+        }
+        if let Ok(raw) = std::fs::read_to_string(&node.source_path) {
+            if raw.to_lowercase().contains("[resolved]")
+                || raw.contains("RESOLVED →")
+                || raw.contains("RESOLVED ->")
+            {
+                resolved_markers.push(node.id.as_str());
+            }
+        }
+    }
+    if !resolved_markers.is_empty() {
+        warn(&format!(
+            "{} frontier node(s) carry a resolution marker: {}",
+            resolved_markers.len(),
+            resolved_markers.join(", ")
+        ));
+        hint(
+            "if genuinely resolved, promote to bedrock/ (or graveyard/); the move IS the promotion",
+        );
+        warnings += resolved_markers.len();
     }
 
     // ── Process checks ──────────────────────────────────────
