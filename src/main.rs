@@ -203,7 +203,7 @@ enum Commands {
         version: Option<String>,
     },
 
-    /// Show version, commit, build time, and channel
+    /// Show version, commit, tag (release reference), build time, and channel
     Version,
 }
 
@@ -556,7 +556,11 @@ fn main() -> anyhow::Result<()> {
             println!("kos {}", env!("KOS_LONG_VERSION"));
             println!("  version:    {}", env!("KOS_VERSION"));
             println!("  commit:     {}", env!("KOS_COMMIT"));
-            println!("  build time: {}", env!("KOS_BUILD_TIME"));
+            // tagged and built are two distinct events; the delta between
+            // them (CI queue latency, build duration) is real data. The tag
+            // is the release reference the updater compares against.
+            println!("  tagged:     {}  (release reference)", env!("KOS_TAG"));
+            println!("  built:      {}  (compile event)", env!("KOS_BUILD_TIME"));
             println!("  channel:    {}", env!("KOS_CHANNEL"));
         }
     }
