@@ -40,10 +40,14 @@ enum Commands {
         ready: bool,
     },
 
-    /// Validate all nodes against the schema
+    /// Validate nodes against the schema (nearest graph by default)
+    ///
+    /// Validates the graph nearest to the current directory: the local
+    /// subrepo graph when run inside one, the orchestrator graph at the
+    /// orc root. Use --merged to validate every discovered graph.
     Validate {
-        /// Validate all discovered graphs (orchestrator + includes)
-        #[arg(long)]
+        /// Validate all discovered graphs (orchestrator + includes + subrepos)
+        #[arg(long, alias = "all")]
         merged: bool,
     },
 
@@ -267,26 +271,50 @@ fn main() -> anyhow::Result<()> {
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
 
             if merged {
-                // Validate all discovered graphs
-                let mut total_errors = 0;
+                // Validate every discovered graph, accumulating results —
+                // one failing graph must not mask the others (aae-orc-z67m).
+                let mut combined = kos::validate::Summary::default();
+                let mut io_errors = 0;
                 for graph in &workspace.graphs {
                     eprintln!("Validating graph: {} ({})", graph.graph_id, graph.scope);
-                    if let Err(e) = kos::validate::run(&graph.path) {
-                        eprintln!("  error: {e}");
-                        total_errors += 1;
+                    match kos::validate::run(&graph.path) {
+                        Ok(summary) => combined.merge(&summary),
+                        Err(e) => {
+                            eprintln!("  error: {e}");
+                            io_errors += 1;
+                        }
                     }
                 }
                 // Also validate legacy layout if no _kos/ graphs found
                 if workspace.graphs.is_empty() {
-                    kos::validate::run(&workspace.kos_root)?;
+                    combined.merge(&kos::validate::run(&workspace.kos_root)?);
                 }
-                if total_errors > 0 {
+                eprintln!();
+                eprintln!(
+                    "all graphs: {} nodes, {} passed, {} warnings, {} failed, {} parse errors",
+                    combined.total,
+                    combined.passed,
+                    combined.warnings,
+                    combined.failed,
+                    combined.parse_errors
+                );
+                if !combined.clean() || io_errors > 0 {
                     std::process::exit(1);
                 }
             } else {
-                // Validate nearest graph or legacy layout
-                let node_root = workspace.node_root();
-                kos::validate::run(&node_root)?;
+                // Validate the graph nearest to cwd — the local subrepo graph
+                // when inside one, the orchestrator graph at orc root.
+                // Previously this always resolved to the kos repo's own graph
+                // regardless of cwd (aae-orc-z67m / finding-060 anomaly 1).
+                let summary = if let Some(graph) = workspace.nearest_graph(&cwd) {
+                    eprintln!("Validating graph: {} ({})", graph.graph_id, graph.scope);
+                    kos::validate::run(&graph.path)?
+                } else {
+                    kos::validate::run(&workspace.node_root())?
+                };
+                if !summary.clean() {
+                    std::process::exit(1);
+                }
             }
         }
 

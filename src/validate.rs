@@ -18,12 +18,38 @@ impl ValidationResult {
     }
 }
 
+/// Aggregate outcome of validating one graph. The caller decides the
+/// process exit code — `run` never exits, so multi-graph validation
+/// can accumulate results across graphs (kos#54 / aae-orc-z67m).
+#[derive(Debug, Default, Clone, Copy)]
+pub struct Summary {
+    pub total: usize,
+    pub passed: usize,
+    pub warnings: usize,
+    pub failed: usize,
+    pub parse_errors: usize,
+}
+
+impl Summary {
+    pub fn clean(&self) -> bool {
+        self.failed == 0 && self.parse_errors == 0
+    }
+
+    pub fn merge(&mut self, other: &Summary) {
+        self.total += other.total;
+        self.passed += other.passed;
+        self.warnings += other.warnings;
+        self.failed += other.failed;
+        self.parse_errors += other.parse_errors;
+    }
+}
+
 /// Run the validate subcommand against all nodes in the kos root.
-pub fn run(kos_root: &Path) -> Result<()> {
+pub fn run(kos_root: &Path) -> Result<Summary> {
     let nodes_dir = kos_root.join("nodes");
     if !nodes_dir.exists() {
         println!("no nodes/ directory found at {}", kos_root.display());
-        return Ok(());
+        return Ok(Summary::default());
     }
 
     // First pass: load all nodes and collect IDs
@@ -77,11 +103,13 @@ pub fn run(kos_root: &Path) -> Result<()> {
         "{total} nodes: {pass_count} passed, {warn_count} warnings, {fail_count} failed, {parse_error_count} parse errors",
     );
 
-    if fail_count > 0 || parse_error_count > 0 {
-        std::process::exit(1);
-    }
-
-    Ok(())
+    Ok(Summary {
+        total,
+        passed: pass_count,
+        warnings: warn_count,
+        failed: fail_count,
+        parse_errors: parse_error_count,
+    })
 }
 
 /// A loaded node: either successfully parsed or failed to parse.

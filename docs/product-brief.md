@@ -41,9 +41,12 @@ Probe: brief-kos-orient. Session-006.
 
 ### `kos validate`
 
-Validate all nodes against the schema. Checks: required fields, confidence
-values, edge targets exist, filename matches node ID, file in correct
-confidence directory. Reports pass/fail per node.
+Validate nodes against the schema. Scopes to the graph nearest the
+current directory (the local subrepo graph when inside one, the
+orchestrator graph at the orc root); `--merged` validates every
+discovered graph and reports a combined summary. Checks: required
+fields, confidence values, edge targets exist, filename matches node
+ID, file in correct confidence directory. Reports pass/fail per node.
 
 First mechanical test of schema v0.3 (revised three times, never tooled).
 Probe: brief-schema-tooling. Session-007.
