@@ -91,7 +91,7 @@ graphs, detects drift, and surfaces relevant knowledge per-repo:
 
 ```
 kos orient <repo>     # what does the graph know about this repo?
-kos validate          # schema check all nodes
+kos validate          # schema check the nearest graph (--merged for all)
 kos graph             # render node graph (mermaid or dot)
 kos drift             # content hash + edge walk → flag stale dependents
 kos bridge            # extract findings from prose briefs
