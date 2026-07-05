@@ -1,3 +1,11 @@
+> **SUPERSEDED — historical primary source.** This is roadmap v1
+> (unversioned original). Revised by [kos-roadmap-v2.md](kos-roadmap-v2.md)
+> (items 1, 4, 10, 11 revised; 17–19 added), reassessed by
+> [kos-roadmap-v3.md](kos-roadmap-v3.md), amended by
+> [kos-roadmap-v3_1.md](kos-roadmap-v3_1.md). Authoritative for original
+> intent only; do NOT work from this document. Current scope lives in
+> v3/v3.1 and the GitHub issues (kos#51–80).
+
 # KOS: Assessment and Recovery Roadmap
 
 > Produced from the founding conversation (sessions 001–present) plus review of

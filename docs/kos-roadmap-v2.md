@@ -1,3 +1,11 @@
+> **SUPERSEDED — historical primary source.** This is roadmap v2
+> (primary-source edition; supersedes [kos-roadmap.md](kos-roadmap.md)).
+> Reassessed by [kos-roadmap-v3.md](kos-roadmap-v3.md), amended by
+> [kos-roadmap-v3_1.md](kos-roadmap-v3_1.md). Authoritative for original
+> intent only; do NOT work from this document — its Part 5 import script
+> was never run and is superseded by scripts/create-roadmap-issues.sh.
+> Current scope lives in v3/v3.1 and the GitHub issues (kos#51–80).
+
 # KOS Assessment & Roadmap v2 — Primary-Source Edition
 
 > Supersedes `kos-roadmap.md` (v1). v1 was built from README, a truncated
