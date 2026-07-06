@@ -211,6 +211,36 @@ semantics.
 
 That's the frontier. See [KOS-charter.md](KOS-charter.md) for the full state.
 
+## Install with mise
+
+[mise](https://mise.jdx.dev/) is a polyglot version manager. It reads a per-project `mise.toml`, pulls the exact binary from GitHub Releases, and verifies GitHub Artifact Attestations natively — no Homebrew tap required.
+
+**Stable** — no stable `v*` release exists yet; all current builds ship on the alpha channel below. Once the first stable release is cut, this will resolve:
+
+```bash
+mise use github:ArcavenAE/kos@latest
+kos --version
+```
+
+**Alpha channel** (prereleases from `main`) — add `prerelease = true` to opt in per-tool. kos's release binaries are named `kos-<os>-<arch>` (no `-a` infix), so alpha and stable share the `kos` shim; only one channel is installed at a time per config:
+
+```toml
+# mise.toml
+[tools]
+"github:ArcavenAE/kos" = { version = "latest", prerelease = true }
+```
+
+```bash
+mise install
+kos --version
+```
+
+**macOS troubleshooting** — mise downloads over HTTP libraries that do not set `com.apple.quarantine`, so notarized binaries launch without a Gatekeeper prompt in the common case. If a quarantine-aware host propagates the xattr into the mise install, clear it once:
+
+```bash
+xattr -d com.apple.quarantine "$(mise which kos)"
+```
+
 ## Quick start
 
 Requires Rust 1.85+.

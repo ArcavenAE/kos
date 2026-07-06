@@ -420,6 +420,46 @@ jobs:
               gh release delete "$tag" --repo "${{ github.repository }}" --yes --cleanup-tag
             done
 
+  attest-release:
+    name: Attest release provenance
+    needs: [build-release, sign-and-notarize, create-release]
+    # Attest the FINAL bytes published on the release — post-notarization
+    # binary + .pkg + .dmg from sign-and-notarize (when it runs), plus the
+    # linux binaries from build-release. Tolerate skipped signing so
+    # unsigned builds still get provenance.
+    if: |
+      !cancelled() &&
+      needs.build-release.result == 'success' &&
+      needs.create-release.result == 'success' &&
+      (needs.sign-and-notarize.result == 'success' || needs.sign-and-notarize.result == 'skipped')
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - name: Download final release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ needs.build-release.outputs.tag }}"
+          mkdir -p release-assets
+          gh release download "$TAG" \
+            --repo "${{ github.repository }}" \
+            --dir release-assets
+          echo "Assets to be attested:"
+          ls -la release-assets/
+
+      - name: Attest release artifacts
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
+        with:
+          subject-path: 'release-assets/*'
+
   update-homebrew:
     name: Update Homebrew Tap
     needs: [build-release, sign-and-notarize, create-release]
