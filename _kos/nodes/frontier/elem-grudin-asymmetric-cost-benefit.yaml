@@ -1,0 +1,57 @@
+id: elem-grudin-asymmetric-cost-benefit
+type: element
+confidence: frontier
+title: "Asymmetric cost/benefit is the number-one killer of knowledge-capture systems (Grudin)"
+content: |
+  Five decades of adjacent research — design rationale capture,
+  requirements traceability, knowledge management, model-driven engineering,
+  the Semantic Web, lessons-learned systems — all died primarily from the
+  same wound: the people paying the capture cost are not the people
+  reaping the retrieval benefit [@grudin1996evaluating; @gotel1994analysis;
+  @hutchinson2014model; @marshall2003which].
+
+  Concrete graveyards:
+  - Design rationale (gIBIS/QOC): heavy capture cost for uncertain
+    downstream benefit; contributors resisted fitting fluid ideas into
+    rigid node/link types [@shum1994argumentation; @shipman1997design].
+  - Requirements traceability (DOORS-class): link maintainers rarely
+    benefit; the "traceability benefit problem" (Arkley & Riddle) is
+    the pattern name for this decay [@gotel1994analysis].
+  - NASA Lessons Learned Information System: 192 managers overseeing
+    ~240 programs reported LLIS "is not the primary source for lessons
+    learning"; chief barriers were "lack of time to capture or submit
+    lessons and a perception of intolerance for mistakes" [@gao2002nasa;
+    @weber2001intelligent].
+  - MDE in industry: 450 practitioners surveyed; success/failure driven
+    by "complex organizational, managerial and social factors," not
+    technical merit [@hutchinson2014model; @whittle2014state].
+  - Knowledge management: multi-case failure studies find lack of
+    incentives and absent/unusable systems the most significant
+    barriers [@walsh1991organizational].
+
+  Prescriptive consequence: any KOS design requiring humans to manually
+  author graph content will replicate these deaths. Capture must be
+  a by-product of existing developer workflow (commits, PRs, incidents,
+  agent traces) — or capture must be paid by agents whose incentives
+  align with the retrieval side.
+
+  Source: docs/kos-prior-work-survey.md §Key Findings #1, §1–4,
+  §7, §13; roadmap v3 L1 (@grudin1996evaluating as master risk);
+  reassessed as the *survival predictor* — see elem-who-pays-survival-predictor.
+edges:
+  - target: val-agents-bear-capture-cost
+    type: supports
+    note: "The literature's number-one lesson is the ground for the master guardrail."
+  - target: val-retrieval-before-capture
+    type: supports
+    note: "The Grudin rule (roadmap v3.1 standing rule 2) is derived from this finding."
+  - target: elem-gate-enforcement
+    type: supports
+    note: "Machine-paid infrastructure gates are Grudin-safe; instruction-based enforcement is not."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md — Key Findings #1; §1–4, §7, §13"
+    - "docs/kos-roadmap-v3.md §Part 0 L1"

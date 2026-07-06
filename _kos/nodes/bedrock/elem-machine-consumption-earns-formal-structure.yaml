@@ -1,0 +1,55 @@
+id: elem-machine-consumption-earns-formal-structure
+type: element
+confidence: bedrock
+title: "Formal structure earns admission only when a machine consumes it"
+content: |
+  The sharpened lesson from the reassessment of Improvement #4
+  (Toulmin argumentation fields). Structure for human readers alone
+  is dead weight — authors will skip it, universally, across four
+  decades of documented attempts [@shipman1997design; @conklin1988gibis;
+  @shipman1999formality]. Structure the tooling acts on is
+  infrastructure — its cost is paid by the machine, its benefit
+  arrives at the moment the machine reads it.
+
+  Test to apply to any proposed schema field, node subsection, or
+  authoring ceremony:
+  1. Name the specific tool or query that consumes this field.
+  2. Verify the tool is built or on the roadmap (roadmap v3.1
+     issue number or better).
+  3. If the answer is "so a future human reader can understand,"
+     the field fails. Prose in `content:` is where that goes.
+
+  Applied cases:
+  - `rebuttal_conditions` on bedrock survives because `kos stale` /
+    Issue 24's machine-checkable reopener triggers consume it. It is
+    not argumentation ceremony; it is trigger vocabulary.
+  - `warrant` and `grounds` from Toulmin: no machine consumes them.
+    Killed. Prose only. See grv-toulmin-argumentation-fields.
+  - `predicted_confidence` and `surprise_magnitude`: calibration
+    pipeline consumes them (roadmap v3 Issue 10). Kept.
+  - Edge types beyond `derives`: `kos orient --ready` consumes
+    BLOCKING vs. NON-BLOCKING classification. Kept. But the 92%-
+    derives monoculture is a live datum — Issue 17 tests whether
+    the richer edge types earn their cost.
+
+  This is the rule that connects val-incremental-formalization to
+  operational judgment. Incremental formalization says "don't demand
+  structure upfront"; this rule says "and don't accept it just because
+  it's proposed — require a consumer." Together they operationalize
+  Shipman & Marshall's escape hatch.
+
+  Source: docs/kos-nine-improvements-reassessed.md §Partially Killed
+  #4 (the sharpened generalization from the Toulmin analysis).
+edges:
+  - target: val-incremental-formalization
+    type: supports
+    note: "The operational form of the incremental-formalization guardrail."
+  - target: grv-toulmin-argumentation-fields
+    type: supports
+    note: "The concrete case that produced the sharpened rule."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-nine-improvements-reassessed.md §Partially Killed #4"

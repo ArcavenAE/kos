@@ -1,0 +1,59 @@
+id: elem-hindsight-lookahead-contamination
+type: element
+confidence: frontier
+title: "Retrodictive validation is contaminated by hindsight and look-ahead bias unless strictly blinded (Fischhoff)"
+content: |
+  Fischhoff's "Hindsight ≠ Foresight" [@fischhoff1975hindsight] is the
+  essential warning for any KOS claim about *early detection*. Outcome
+  knowledge inflates judged prior likelihood, and judges are "largely
+  unaware" of the effect. Dekker [@dekker2014field; @dekker2002field]
+  shows hindsight bias systematically corrupts accident investigation —
+  observers with outcome knowledge wrongly conclude operators "should
+  have seen it." Backtesting in finance is plagued by overfitting and
+  look-ahead bias — accidentally using information unavailable at the
+  replayed time [@bailey2014pseudo].
+
+  KOS exposure: the strongest KOS claim is a counterfactual — "the
+  graph would have caught incident X before it happened"
+  (finding-023). Retrodictive replay ("kos asof <date>" + seam
+  detection over the pre-incident document state) is the *right*
+  method to test this claim, but the method is methodologically
+  fragile — hindsight leakage flows through the operator's choices
+  of what to seed, what to replay, and what to count as a hit.
+
+  Prescriptive consequence for retrodiction (roadmap v3 M3 Issue 25):
+  - Blinding is not mitigation — it *is* the experiment. The operator
+    who bootstraps the historical state must not know which incidents
+    are being tested.
+  - Adopt backtesting hygiene against look-ahead bias
+    [@bailey2014pseudo].
+  - Adopt hindsight-bias controls from accident-investigation
+    methodology [@dekker2014field].
+  - Pre-register the prediction (e.g., ≥2 of 4 detectable at
+    T-minus-one-sprint) before running the replay.
+  - Adopt the registered-reports discipline [@nosek2014registered]
+    that briefs already implement via `predicted_confidence`.
+
+  Cross-refs: val-locked-predictions (locking predictions is the
+  anti-HARKing complement); question-valid-retrodictive-protocol
+  (the open methodological question).
+
+  Source: docs/kos-prior-work-survey.md §Key Findings #6, §16;
+  docs/kos-roadmap-v3.md §Part 0 (implicit), §Issue 25, §Issue 10;
+  docs/kos-nine-improvements.md §#5;
+  docs/kos-nine-improvements-reassessed.md §#5 strengthened.
+edges:
+  - target: val-locked-predictions
+    type: supports
+    note: "Locking predictions post-harvest is the anti-HARKing complement."
+  - target: question-valid-retrodictive-protocol
+    type: supports
+    note: "Open question for the blinded-retrodiction methodology."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md — Key Findings #6; §16"
+    - "docs/kos-roadmap-v3.md §Issue 25, §Issue 10"
+    - "docs/kos-nine-improvements-reassessed.md §#5"

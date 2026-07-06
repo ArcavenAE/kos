@@ -1,0 +1,59 @@
+id: elem-metrics-become-targets
+type: element
+confidence: frontier
+title: "Metrics on knowledge become targets — Goodhart/Austin measurement dysfunction"
+content: |
+  Any incentive attached to node counts, finding velocity, coverage
+  percentages, contribution scores, or calibration ranks will be gamed.
+  Goodhart's law and Campbell's law formalize the pattern; Austin's
+  *Measuring and Managing Performance in Organizations* [@austin1996measuring]
+  is the key text — when any important dimension is unmeasured,
+  incentive-linked measurement is doomed to dysfunction as people
+  optimize the measured at the expense of the unmeasured. Ridgway's
+  classic "dysfunctional consequences of performance measurements"
+  predates it.
+
+  Concrete graveyards:
+  - CMM/CMMI maturity efforts spawned "process theater" — compliance
+    activity satisfying auditors without improving outcomes.
+  - KM contribution scoring systems produced token contributions
+    optimized for count rather than value [@walsh1991organizational].
+  - Traceability coverage metrics produced stale but "complete" link
+    graphs [@gotel1994analysis].
+
+  KOS exposure: node counts, finding velocity, calibration rank,
+  brief-to-finding ratio, retrieval rate — all gameable the moment
+  they carry status.
+
+  Prescriptive consequence: use knowledge metrics only for process
+  feedback and diagnostic visibility. Never attach incentives; never
+  gate on them; never rank operators. The only game-resistant health
+  metric identified in the survey is *canary detection rate* — you
+  cannot game detection of corruption you don't know exists (see
+  question-epistemic-chaos-engineering, elem-context-ceiling for
+  the general pattern of measured-not-managed instruments).
+
+  This is the parent bedrock for the Goodhart rule
+  (val-diagnostic-never-gate, roadmap v3.1 standing rule 3) and its
+  behavior-trigger sibling in the orc rules directory
+  (.claude/rules/diagnostic-not-gate.md, ADR-007 clause 3).
+
+  Source: docs/kos-prior-work-survey.md §Key Findings #3, §14;
+  docs/kos-roadmap-v3.md §Part 0 L5, §Issue 26 (canaries), §Part 4;
+  docs/kos-roadmap-v3_1.md standing rule 3;
+  docs/kos-nine-improvements-reassessed.md §#7 modified, §#2 constrained.
+edges:
+  - target: val-no-incentive-linked-metrics
+    type: supports
+    note: "This is the ground for the no-incentive-linked-metrics guardrail."
+  - target: val-diagnostic-never-gate
+    type: supports
+    note: "Diagnostic-never-gate is the operational form."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md — Key Findings #3; §14"
+    - "docs/kos-roadmap-v3.md §Part 0 L5"
+    - "docs/kos-roadmap-v3_1.md standing rule 3"

@@ -1,0 +1,61 @@
+id: val-diagnostic-never-gate
+type: value
+confidence: bedrock
+title: "Process metrics are diagnostic, never gates (Goodhart rule — roadmap v3.1 standing rule 3)"
+content: |
+  Vital signs surface information to the human pawl; they never
+  automatically gate a commit, merge, promotion, or release. The
+  only gated checks are machine-payable and structural (schema
+  validity, hashes, dangling refs, illegal edge types). Everything
+  measuring "how much / how fast / how stale / how used" stays
+  diagnostic.
+
+  Rationale: Austin's measurement-dysfunction finding
+  [@austin1996measuring] — when a knowledge metric becomes a target,
+  contributors optimize for the measured at the expense of the
+  unmeasured. Ridgway's classic name for the pattern predates the
+  KM literature; CMM/CMMI's "process theater" is the case study;
+  KM contribution scoring is another. The instrument dies the
+  moment its numbers gate anything.
+
+  Structural validity vs. vital signs (ADR-007 clause 3, orc):
+  - **May gate:** `kos validate` (schema errors, illegal edge types,
+    misfiled confidence directories), test suites, linters,
+    compilers, `bd lint` shape checks.
+  - **Diagnostic only:** node counts, finding velocity, brief-to-
+    finding ratio, retrieval-rate, staleness metrics, briefless-probe
+    counts, session-close-with-artifact rate. `kos doctor` surfaces
+    these; the human interprets.
+  - **Exception path for turning vital signs into gates:** ratified
+    written decision (ADR, charter bedrock, or explicit user
+    ratification) that scopes the gate, names the metric, and states
+    why gating is correct for that specific case. Not by accretion.
+
+  The one game-resistant health metric identified in the reassessed
+  #2: canary detection rate (roadmap v3 Issue 26). Detection of
+  corruption you don't know exists cannot be gamed. See
+  question-epistemic-chaos-engineering.
+
+  Behavior-trigger sibling: `.claude/rules/diagnostic-not-gate.md`
+  (orc) is the keystroke-intercept form that catches gate-by-
+  accretion when the metric is typed into a required check.
+
+  Source: docs/kos-roadmap-v3.md §Part 0 L5, §Part 3 standing rules,
+  §Part 4; docs/kos-roadmap-v3_1.md §Standing rules #3.
+  Derived from: elem-metrics-become-targets,
+  val-no-incentive-linked-metrics.
+edges:
+  - target: val-no-incentive-linked-metrics
+    type: supports
+    note: "The gate-side operational form of no-incentive-linked-metrics."
+  - target: elem-metrics-become-targets
+    type: derives
+    note: "The literature finding that grounds the rule."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-roadmap-v3.md §Part 0 L5"
+    - "docs/kos-roadmap-v3_1.md §Standing rules #3"
+    - "aae-orc/decisions/adr-007-bainbridge-automation-boundary.md clause 3"

@@ -1,0 +1,73 @@
+id: question-valid-retrodictive-protocol
+type: question
+confidence: frontier
+title: "What is a valid retrodictive protocol free of hindsight and look-ahead bias?"
+content: |
+  KOS's highest-credibility experiment (roadmap v3 Issue 25) is
+  retrodictive: reconstruct the graph at a historical commit, replay
+  seam detection over the documents as they existed then, and test
+  whether known-later incidents were predictable at that state
+  (finding-023's counterfactual claim, measured on the four
+  ThreeDoors incidents). This is *also* the experiment most
+  vulnerable to hindsight and look-ahead bias
+  [@fischhoff1975hindsight; @dekker2014field; @bailey2014pseudo].
+
+  Elements a valid protocol must include (survey §16, roadmap v3
+  Issue 25, kos-nine-improvements-reassessed §#5):
+  1. **Point-in-time reconstruction.** The historical graph must be
+     bootstrapped from documents that existed at the target commit
+     only. No later commits, later findings, later ADRs may leak in.
+  2. **Blinding.** The operator who bootstraps the historical state
+     must not know which incidents are being tested. Blinding is
+     not a mitigation; it is the experiment.
+  3. **Pre-registered prediction.** The prediction (e.g., "≥2 of 4
+     incidents detectable at T-minus-one-sprint") must be filed
+     before the replay runs. See val-locked-predictions and
+     [@nosek2014registered].
+  4. **Adjudication protocol.** What counts as a "hit"? Must be
+     defined ex ante, not by the operator retrospectively.
+  5. **Overfitting controls.** Backtesting-hygiene lessons from
+     finance [@bailey2014pseudo] apply: parameter search over the
+     historical state is look-ahead by the back door.
+  6. **Reporting the negatives.** Failed retrodictions must be
+     published with the same weight as successful ones (registered-
+     reports discipline).
+
+  What is not yet resolved:
+  - How to blind an operator who is also the person building the
+    replay tooling. A single-operator project may need a two-person
+    protocol (operator A builds tooling; operator B seeds the
+    historical state without knowing the incident set) that KOS
+    cannot currently staff.
+  - How much of the graph-at-commit is stateful vs. reconstructible.
+    `kos asof` requires deterministic reconstruction; nondeterminism
+    (LLM classification during rebuild) leaks the outcome.
+  - Whether the four ThreeDoors incidents are enough to draw any
+    conclusion, or whether the project needs a corpus of pre-
+    registered predictions across projects (Issue 11's baseline
+    across two projects is a start).
+
+  This is where KOS is methodologically most exposed and where a
+  rigorous protocol would be a genuinely novel contribution.
+
+  Depends on: elem-hindsight-lookahead-contamination,
+  val-locked-predictions.
+
+  Source: docs/kos-prior-work-survey.md §Recommendations Stage 3,
+  Open Question 3 ("What is a valid retrodictive protocol free of
+  hindsight/look-ahead bias?"); §16 further research; roadmap v3
+  §Issue 25.
+edges:
+  - target: elem-hindsight-lookahead-contamination
+    type: derives
+    note: "The literature ground for the methodological hazard."
+  - target: val-locked-predictions
+    type: derives
+    note: "Pre-registration is a required protocol element."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md §Recommendations Stage 3, Open Question 3"
+    - "docs/kos-roadmap-v3.md §Issue 25"

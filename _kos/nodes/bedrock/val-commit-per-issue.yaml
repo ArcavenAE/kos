@@ -1,0 +1,38 @@
+id: val-commit-per-issue
+type: value
+confidence: bedrock
+title: "Each issue closes with a commit (roadmap v3.1 standing rule 1)"
+content: |
+  Every roadmap issue closes with a commit that is the artifact of
+  the closure. This ties knowledge state to git history: harvest
+  actions, promotions, graveyard entries, and schema changes are all
+  observable in the git log and reviewable as diffs.
+
+  Consequences:
+  - Confidence transitions (bedrock ↔ frontier ↔ graveyard) happen
+    by file move; the git-history-of-that-move IS the promotion
+    record (see schema/node.schema.yaml, "FILE CONVENTIONS").
+  - Commit messages follow the kos action vocabulary
+    (harvest/promote/graveyard/probe/finding/schema/charter). See
+    `.claude/rules/kos-commits.md`.
+  - `kos status` and `kos doctor` read the workspace, but the *audit
+    trail* of what changed and when is git.
+  - No unclosed issues without a commit-shaped artifact. If an issue
+    resolved to "no action," the closure itself is a commit that
+    graveyards the approach or updates the issue register.
+
+  This is the operational discipline that makes the graph a
+  version-controlled document rather than a live database — and it
+  is the reason cross-project archival + Reflexion-style drift
+  detection are cheap.
+
+  Source: docs/kos-roadmap-v3.md §Part 3 standing rules;
+  docs/kos-roadmap-v3_1.md §Standing rules #1.
+edges: []
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-roadmap-v3.md §Part 3"
+    - "docs/kos-roadmap-v3_1.md §Standing rules"

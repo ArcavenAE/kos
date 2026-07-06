@@ -1,0 +1,68 @@
+id: question-automate-incremental-formalization
+type: question
+confidence: frontier
+title: "Can incremental formalization be automated so structure emerges without user overhead?"
+content: |
+  Shipman & Marshall's escape hatch [@shipman1999formality;
+  @marshall2003which] — let structure emerge on demand rather than
+  demanding it up front — is the operational form of the guardrail
+  val-incremental-formalization. The open question is whether
+  automation can carry the emergence itself: an LLM promotes a
+  paragraph of prose into a typed node with edges when tooling is
+  about to act on the structure, then presents the promotion for
+  human confirmation.
+
+  Concrete probe candidates:
+  - `kos capture` (roadmap v3.1 Issue 31) proposes id/type/tier/edges
+    as defaults; human confirms or overrides. This is a promising
+    starting shape but requires the human to initiate.
+  - Post-hoc structure emergence: an agent notices that a series of
+    findings has been referenced together five times in different
+    orient runs and *proposes* a typed edge that would have surfaced
+    them as a cluster the first time.
+  - Auto-classifying inbox observations (`_kos/inbox/`, Issue 23
+    extended) into candidate id/type/tier + edges.
+  - Charter-inflation reversal: when a paragraph in KOS-charter.md
+    is detected as duplicating a node's content, propose a lift into
+    the node (see finding-041-charter-inflation-as-graph-gap).
+
+  Risks named by the literature:
+  - Auto-classification is a semantic-web trap when the ontology
+    demands more than the corpus actually needs [@marshall2003which].
+  - LLM-generated internal tree nodes are indistinguishable from
+    editorial omission at drill-down [@lattice2025] — automated
+    structure emergence must preserve verbatim source at some level
+    the human can inspect (see elem-classification-residual-categories
+    and the stage-rig capture at orc for backdrops-as-authored).
+  - "Industrialized forgetting" — recursive dilution of already-
+    summary material dressed up as cleanup [@cogcanvas2026]. The
+    fix: props (findings, nodes) stay at full fidelity; backdrops
+    (charter sections, orient summaries) are authored, never
+    auto-summarized in place.
+
+  Requires: telemetry (Issue 20) to know which structures the tooling
+  actually uses; a machine consumer for whatever the automation
+  produces (per elem-machine-consumption-earns-formal-structure); and
+  human triage in the pipeline (per val-tool-drives-operator-decides).
+
+  Depends on: val-incremental-formalization,
+  elem-formality-considered-harmful,
+  elem-machine-consumption-earns-formal-structure.
+
+  Source: docs/kos-prior-work-survey.md §Recommendations Stage 3,
+  Open Question 2 ("Can incremental formalization be automated so
+  structure emerges without user overhead?"); §3, §13 (further
+  research on LLM-assisted, post-hoc rationale reconstruction).
+edges:
+  - target: val-incremental-formalization
+    type: derives
+    note: "The guardrail this question is exploring the automation limit of."
+  - target: elem-machine-consumption-earns-formal-structure
+    type: derives
+    note: "The rule any automation output must satisfy to earn its cost."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md §Recommendations Stage 3, Open Question 2"

@@ -1,0 +1,80 @@
+id: question-epistemic-chaos-engineering
+type: question
+confidence: frontier
+title: "What does epistemic chaos engineering look like as a discipline?"
+content: |
+  The survey's headline "genuinely novel contribution" candidate.
+  Mutation testing for knowledge — deliberately injecting known-false
+  but plausible nodes (a fabricated bedrock claim, a subtly wrong
+  dependency, a stale-but-confident finding) under sealed
+  registration, then measuring time-to-detection and detection
+  channel (drift? contradiction? human? never?).
+
+  Prior art the discipline can draw on:
+  - Mutation testing [@demillo1978hints]: the "coupling effect"
+    hypothesizes that if a test suite catches simple faults it will
+    also catch complex ones. Directly applicable — inject simple
+    corruption and measure detection.
+  - Chaos engineering [@basiri2016chaos]: Netflix's Chaos Monkey/Kong
+    validate resilience by inducing failures in production. The
+    analogue is inducing epistemic failures in a live knowledge graph.
+  - Red-teaming and data-poisoning-detection literature complete the
+    surface.
+
+  The novelty is that no prior discipline exists for knowledge-graph
+  epistemics specifically. KOS could define it.
+
+  Open sub-questions the probe (roadmap v3 Issue 26) must answer:
+  1. **Taxonomy of canary templates.** kos-nine-improvements-reassessed
+     #2 flagged that canaries test detection of *corruption* but not
+     detection of *staleness or gaps* — different failure classes
+     need different canary templates. What taxonomy of canaries
+     matches the six signal types (error/evolution/drift +
+     staleness/gap/miscoding)?
+  2. **Provenance and rollback discipline.** Injecting false
+     knowledge into a shared graph risks contaminating it if the
+     canary isn't perfectly tracked and removed. `kos canary plant`
+     writes a hash-committed sealed record to `_kos/.canaries/`
+     (gitignored). What is the provable-planting-plus-provable-removal
+     protocol? Equivalent to mutation testing's "equivalent mutants"
+     problem — mutations that don't change behavior, wasting
+     analysis.
+  3. **Hawthorne mitigation.** Operators who know canaries exist
+     change behavior. Random long delays and low base rate help,
+     but do not eliminate. Is there a two-population design (single
+     project has canaries, second project doesn't; compare
+     detection rates on shared incidents)?
+  4. **Metric properties.** Canary detection rate is the one
+     game-resistant health metric identified (roadmap v3 L5). Under
+     what conditions does that guarantee hold? If canary templates
+     become common knowledge (e.g., leaked to LLMs training on the
+     public graph), does the metric degrade?
+
+  Cost posture: machine-paid (per elem-who-pays-survival-predictor),
+  so eligible for M3 admission without Grudin risk.
+
+  Depends on: elem-metrics-become-targets,
+  val-diagnostic-never-gate.
+
+  Source: docs/kos-prior-work-survey.md §Recommendations Stage 3
+  ("Formalize epistemic chaos engineering — no prior discipline
+  exists; KOS could define it"), Open Question 5; §15 further
+  research; docs/kos-nine-improvements.md §#2;
+  docs/kos-nine-improvements-reassessed.md §#2 constrained;
+  docs/kos-roadmap-v3.md §Issue 26.
+edges:
+  - target: elem-metrics-become-targets
+    type: derives
+    note: "Canary detection rate is the game-resistant metric class this question tests."
+  - target: val-diagnostic-never-gate
+    type: derives
+    note: "The rule the metric must satisfy to be usable."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md §Recommendations Stage 3, Open Question 5"
+    - "docs/kos-nine-improvements.md §Improvement #2"
+    - "docs/kos-nine-improvements-reassessed.md §#2"
+    - "docs/kos-roadmap-v3.md §Issue 26"

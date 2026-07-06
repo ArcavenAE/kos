@@ -1,0 +1,54 @@
+id: val-retrieval-before-capture
+type: value
+confidence: bedrock
+title: "No new author-side capture requirement ships before MR demonstrates retrieval value (Grudin rule — roadmap v3.1 standing rule 2)"
+content: |
+  Retrieval before discipline. This is the milestone-ordering
+  enforcement of val-agents-bear-capture-cost. Capture discipline
+  that arrives before retrieval value is the pattern the literature
+  says kills knowledge systems [@grudin1996evaluating;
+  @marshall2003which; @weber2001intelligent]. KOS defends against
+  this by sequencing MR (Retrieval-First) ahead of any milestone
+  that demands new author-side work.
+
+  Operational form:
+  - Gates that are zero-cost to authors (CI validation, schema
+    checking, dangling-target rejection) may ship early — the
+    machine pays.
+  - Anything that taxes the author at write time — Toulmin fields,
+    warrant sentences, structured triggers beyond `rebuttal_conditions`,
+    dissent votes, source-reliability grades — waits until retrieval
+    telemetry (Issue 20) proves the graph earns its maintenance cost.
+  - The MCP server (Issue 23) is prioritized in MR precisely because
+    it delivers retrieval benefit inside the agent's task loop
+    [@horvitz1999principles] — the "retrieval at the moment of need"
+    that LLIS lacked.
+  - Reopener triggers (Issue 24) are cost-posture-neutral: the small
+    structured-authoring cost falls at graveyard time (the cheapest
+    moment — the finding is fresh) and the retrieval benefit is
+    delivered automatically. This is what MR-eligible capture looks
+    like.
+
+  Test: for any proposed schema field or ceremony, apply
+  elem-who-pays-survival-predictor. If the cost falls on the author
+  and the benefit falls on a different actor, defer until MR
+  telemetry justifies it.
+
+  Source: docs/kos-roadmap-v3.md §Part 0 L1, §Part 3 standing rules;
+  docs/kos-roadmap-v3_1.md §Standing rules #2.
+  Derived from: val-agents-bear-capture-cost,
+  elem-grudin-asymmetric-cost-benefit, elem-who-pays-survival-predictor.
+edges:
+  - target: val-agents-bear-capture-cost
+    type: derives
+    note: "The operational milestone-ordering enforcement."
+  - target: elem-who-pays-survival-predictor
+    type: derives
+    note: "Feature-proposal test the rule enforces."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-roadmap-v3.md §Part 0 L1, §Part 3"
+    - "docs/kos-roadmap-v3_1.md §Standing rules #2"

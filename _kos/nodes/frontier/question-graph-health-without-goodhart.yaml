@@ -1,0 +1,87 @@
+id: question-graph-health-without-goodhart
+type: question
+confidence: frontier
+title: "How can knowledge-graph health be measured without Goodhart dysfunction?"
+content: |
+  The Goodhart/Austin literature [@austin1996measuring] predicts that
+  any KOS metric attached to status will be gamed. Yet the platform
+  needs *some* way to distinguish a healthy quiet graph from a
+  rotting silent graph — that is exactly the detection surface
+  elem-knowledge-decay-stale-worse-than-absent creates and roadmap
+  v3.1 R10 (vital signs, not virtue metrics) asks to fill.
+
+  The tension is real. Diagnostic-only signals are subject to human
+  drift ("we're not looking at those numbers"). Gated signals are
+  subject to Goodhart. Between them lies the design question this
+  node holds open.
+
+  Candidate signal types (roadmap v3.1 R10) that plausibly resist
+  Goodhart *if* left diagnostic:
+  - Schema-valid %. Structural. Machine-checkable. Cannot be gamed
+    by editing behavior; only by editing schema. Already partially
+    gated (see val-diagnostic-never-gate, ADR-007 clause: structural
+    validity may gate).
+  - Dangling edges. Structural. Same properties.
+  - Fired-but-unaddressed reopeners. Semi-structural — the trigger
+    was declared machine-checkable at graveyard authorship.
+  - Charter/graph render-diff (renderer diff ≠ 0). Detects hand-
+    editing of rendered charter sections (orc F22 territory) —
+    structural.
+  - **Decay signature**: days-since-last-graph-touch relative to git
+    activity. Code moving while the graph is frozen = decay; both
+    quiet = dormant, fine. Detectable from git alone at zero author
+    cost — the Reflexion pattern [@murphy1995software] applied to
+    onboarding itself. Cannot be trivially gamed without also
+    gaming git activity, which the operator is not incented to do.
+
+  Candidate signal types that fail Goodhart under status pressure:
+  - Node counts (gameable by node subdivision).
+  - Finding velocity (gameable by finding subdivision, or by
+    filing shallow findings).
+  - Brief-to-finding ratio (gameable by filing shallow briefs).
+  - Calibration rank (gameable by narrowing prediction confidence
+    intervals).
+
+  The reassessment identified *canary detection rate* as the one
+  game-resistant health metric (roadmap v3 L5). See
+  question-epistemic-chaos-engineering — you cannot game detection
+  of corruption you don't know exists. If canaries become common
+  knowledge (leaked templates, LLM training on the public graph),
+  the metric degrades.
+
+  Open sub-questions:
+  1. Is there a general theory of *what makes a knowledge metric
+     game-resistant*, beyond "hidden ground truth"?
+  2. Are decay-signature and canary-detection sufficient by
+     themselves for a fleet-level "is this graph healthy" verdict,
+     or do we need a third signal class?
+  3. How do we prevent the diagnostic-not-gate rule from being
+     eroded by accretion — a "just this once" gate wired in during
+     a fire drill? (Partial answer: `.claude/rules/diagnostic-not-gate.md`
+     is the behavior-trigger form; requires user ratification per
+     ADR-007 for exceptions.)
+
+  Depends on: elem-metrics-become-targets, val-diagnostic-never-gate,
+  elem-knowledge-decay-stale-worse-than-absent.
+
+  Source: docs/kos-prior-work-survey.md §Recommendations Stage 3,
+  Open Question 6 ("How can knowledge-graph health be measured
+  without Goodhart dysfunction?"); §14 further research;
+  docs/kos-use-assessment.md §R10.
+edges:
+  - target: elem-metrics-become-targets
+    type: derives
+    note: "The literature ground for the tension this question holds."
+  - target: val-diagnostic-never-gate
+    type: derives
+    note: "The rule under pressure — this question is where erosion pressure lives."
+  - target: question-epistemic-chaos-engineering
+    type: supports
+    note: "Canary detection is one candidate signal class this question is exploring."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md §Recommendations Stage 3, Open Question 6"
+    - "docs/kos-use-assessment.md §R10"

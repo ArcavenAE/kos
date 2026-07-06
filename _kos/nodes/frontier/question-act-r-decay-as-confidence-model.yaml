@@ -1,0 +1,70 @@
+id: question-act-r-decay-as-confidence-model
+type: question
+confidence: frontier
+title: "Can ACT-R base-level activation serve as a principled confidence-decay model for a project knowledge graph?"
+content: |
+  ACT-R base-level activation [@anderson1991reflections;
+  @anderson2004integrated] models memory decay as a function of
+  frequency and recency, with a community-default decay parameter
+  ~0.5. It is a rational-analysis form validated on decades of
+  cognitive-science data. The survey's L4 in roadmap v3
+  ("Confidence half-life has an existing formalization") argues KOS
+  should adopt ACT-R rather than invent decay curves.
+
+  The open question is whether the ACT-R form is directly
+  transplantable to project-knowledge decay or whether project
+  knowledge has domain-specific decay properties that require a
+  modified model.
+
+  Sub-questions:
+  1. **Is retrieval the right proxy for frequency?** ACT-R
+     activation strengthens with retrieval. KOS retrieval telemetry
+     (roadmap v3 Issue 20) provides retrieval counts. But KOS also
+     has *edge traversals* (a node cited by many findings), *drift
+     propagation* (a node touched by a hash change), and *validate
+     visits*. Which of these count as "activation" and which are
+     background noise?
+  2. **What is the appropriate decay time constant?** ACT-R's ~0.5
+     is calibrated for human episodic memory. Project knowledge
+     decays on organizational, not perceptual, timescales.
+     Empirical calibration per knowledge type is required
+     (see elem-knowledge-decay-stale-worse-than-absent) — bedrock
+     facts persist for decades; version facts rot in months.
+  3. **Does bedrock permit decay at all?** Roadmap v3.1 does not
+     rescope bedrock as "immortal." If bedrock decays past a
+     re-verification horizon it should degrade to `bedrock-stale`
+     (Improvement #3 modified in kos-nine-improvements-reassessed).
+     What class of bedrock is a candidate — the durable-class
+     values, or the volatile-class facts they authorized?
+  4. **How does the decay interact with reopener triggers?**
+     Reopener triggers (Issue 24) surface a graveyard entry when a
+     specific condition fires. Should time-based decay be
+     represented as one of the trigger types, or is it a separate
+     concept?
+
+  Prerequisite: Issue 20 telemetry must run for enough sessions to
+  give retrieval counts a stable signal. This is why Improvement #3
+  is sequenced behind MR by construction — you cannot compute
+  retrieval-reinforced decay without retrieval counts.
+
+  Depends on: elem-knowledge-decay-stale-worse-than-absent,
+  val-retrieval-before-capture.
+
+  Source: docs/kos-prior-work-survey.md §Recommendations Stage 2
+  ("Adopt ACT-R base-level activation…"), Open Question 4;
+  docs/kos-roadmap-v3.md §Part 0 L4, §Deferred #3;
+  docs/kos-nine-improvements-reassessed.md §#3 modified.
+edges:
+  - target: elem-knowledge-decay-stale-worse-than-absent
+    type: derives
+    note: "The literature ground for the decay question."
+  - target: val-retrieval-before-capture
+    type: derives
+    note: "Prerequisite: telemetry (MR Issue 20) must ship first."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md §Recommendations Stage 2, Open Question 4"
+    - "docs/kos-roadmap-v3.md §Part 0 L4"

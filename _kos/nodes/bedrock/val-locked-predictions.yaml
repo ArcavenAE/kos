@@ -1,0 +1,55 @@
+id: val-locked-predictions
+type: value
+confidence: bedrock
+title: "Lock predictions — predicted_confidence and hypotheses are immutable post-harvest (anti-HARKing)"
+content: |
+  `predicted_confidence` on briefs and hypotheses stated at brief-
+  creation time are TIMESTAMPED AND LOCKED. Editing them after the
+  outcome is known is HARKing — hypothesizing after results are
+  known [@kerr1998harking] — and it destroys calibration validity.
+  If you're wrong, that surprise magnitude IS the learning signal;
+  its value is in being wrong.
+
+  Rationale:
+  - Calibration is measurable and trainable (Brier scoring, the Good
+    Judgment Project) [@tetlock2015superforecasting; @brier1950verification]
+    but only when predictions are recorded *before* outcomes. Kerr
+    [@kerr1998harking] is the key hazard.
+  - Registered reports methodology [@nosek2014registered] is the
+    canonical discipline — briefs *are* registered reports for
+    engineering knowledge (roadmap v3, Issue 10).
+  - Retrodictive replay is bias-contaminated without pre-registration
+    (see elem-hindsight-lookahead-contamination).
+
+  Operational form for KOS:
+  - Schema (v0.3 already ships this): brief.predicted_confidence
+    is a float 0.0–1.0, recorded at brief creation, not revised
+    afterward. See schema/node.schema.yaml lines 278–289.
+  - Findings carry surprise_magnitude (none / low / medium / high /
+    inverted). Record honestly. A string of "none" entries means the
+    probes are too safe or the predictions too vague to be
+    falsifiable.
+  - Post-hoc null findings must carry `post_hoc: true` flag; HARKing
+    is named the failure mode in docs.
+  - Validate soft-warns when a brief lacks `predicted_confidence`
+    (roadmap v3.1 §Issue 4 extended pre-commit prompts).
+
+  Source: docs/kos-prior-work-survey.md §Recommendations Stage 1,
+  §Key Findings #6; docs/kos-roadmap-v3.md §Issue 10, §Issue 25;
+  schema/node.schema.yaml v0.3.
+  Derived from: elem-hindsight-lookahead-contamination,
+  question-brief-as-prediction-record.
+edges:
+  - target: elem-hindsight-lookahead-contamination
+    type: derives
+    note: "Anti-HARKing follows from hindsight contamination."
+  - target: question-brief-as-prediction-record
+    type: partially_resolves
+    note: "The lock discipline is the answer to the calibration-instrument question."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md §Recommendations Stage 1"
+    - "docs/kos-roadmap-v3.md §Issue 10, §Issue 25"
