@@ -1,0 +1,82 @@
+id: brief-lenient-edge-loading
+type: brief
+confidence: frontier
+title: "Lenient edge loading — nodes never dropped, validate gates"
+content: |
+  ## Question
+
+  Addresses question-edge-vocabulary-gap sub-question (c): the loader
+  currently drops an ENTIRE node when one edge carries an unknown
+  type — serde parses Edge.edge_type as a strict enum (model.rs:131),
+  the whole-document parse fails, and the load loop (copy-pasted 9x
+  across orient/drift/graph/charter/compact/...) eprintln-warns to
+  stderr and skips the file. Observed cost: marvel ran two months
+  with 14/25 nodes invisible to orient; switchboard is 11/13
+  invisible today; ~49 nodes hidden fleet-wide. Nobody noticed
+  because the warning goes to stderr and nobody reads it
+  (aae-orc kos-read-path-gap).
+
+  ## Approach
+
+  1. EdgeType gains Unknown(String) via #[serde(from = "String")]
+     with an infallible From<String>: known strings map to variants,
+     anything else is preserved verbatim. is_blocking(Unknown) =
+     false. Display echoes the raw string. Preserving the author's
+     original string serves migration sub-question (d) — a future
+     vocabulary sweep reads invented types verbatim instead of
+     losing them.
+  2. Load-issues become data: read paths (orient, graph, charter,
+     drift, compact) load every parseable node and surface unknown-
+     edge flags in the OUTPUT (orient header line: "N nodes carry
+     unrecognized edge types — run kos validate"), not stderr-only.
+  3. validate hard-fails: unknown edge type = FAIL (structural
+     check, legitimate gate per orc diagnostic-not-gate rule), and
+     exit-code semantics get fixed — validate currently exits 0
+     even with 11 parse errors, which makes any lefthook/CI gate
+     (bd aae-orc-bs28) a no-op.
+  4. Tests: fixture node with `type: related` — orient includes and
+     flags it; validate exits nonzero naming node + edge; blocking
+     and Display behavior for Unknown covered.
+  5. Cut a release so fleet binaries pick the behavior up — hidden
+     nodes reappear fleet-wide before any conformance sweep.
+
+  Severable from sub-questions (a)/(b): lenient parsing is needed
+  under ANY vocabulary — drift will recur whatever types are legal.
+
+  ## Excluded scope
+
+  - Vocabulary adjudication itself (sub-questions a/b — whether
+    relates_to / leaves_open become types)
+  - The fleet conformance sweep (bd aae-orc-ow62, blocked on a/b)
+  - Collapsing the 9 load loops into one shared loader (nice-to-
+    have; minimum viable threads issue lists through existing loops)
+edges:
+  - target: question-edge-vocabulary-gap
+    type: derives
+    note: "executes sub-question (c) of the parent question"
+  - target: elem-ai-improvisation-past-broken-refs
+    type: instantiates
+    note: "the loader improvising past broken nodes is the pattern this element names"
+provenance:
+  created_by: agent
+  session: aae-orc session 2026-07-17
+  created_at: "2026-07-17"
+brief:
+  hypothesis: |
+    Unknown edge types can be made non-fatal at read time and fatal
+    at validate time with no loss of information (originals preserved
+    verbatim in Unknown(String)), restoring ~49 hidden nodes to
+    fleet visibility without waiting on vocabulary adjudication.
+  excluded_scope: |
+    - Vocabulary adjudication (sub-questions a/b)
+    - Fleet conformance sweep (aae-orc-ow62)
+    - Load-loop deduplication beyond what issue-surfacing requires
+  success_signal: |
+    - Fixture with an invented edge type loads in orient with a
+      visible output-level flag, and fails validate with nonzero exit
+    - kos validate exits nonzero on the existing fleet repos that
+      today report parse errors with exit 0
+    - marvel/switchboard orient node counts jump to full without any
+      node file edits
+  timebox: "one focused session (~150-250 lines incl. tests) + release"
+  predicted_confidence: bedrock
