@@ -1,0 +1,78 @@
+id: question-edge-vocabulary-gap
+type: question
+confidence: frontier
+title: "Does schema v0.3's edge vocabulary need a weak-association type and a scope-exclusion type?"
+content: |
+  Field evidence (fleet inventory, 2026-07-17): authors across the
+  aae-orc fleet convergently invent edge types the schema lacks, and
+  the strict loader then drops the ENTIRE node — marvel ran two months
+  with 14/25 nodes invisible to `kos orient` before anyone noticed.
+
+  The inventory splits into signal and noise:
+
+  SIGNAL (convergent — multiple repos, independent authors):
+  - `related`/`relates` — 48 instances across ALL 8 repos carrying
+    _kos graphs. A weak, non-directional association. The schema
+    deliberately excluded it (val-typed-traversable: relationships
+    must be typed). Counter-argument from our own bedrock:
+    val-incremental-formalization (Shipman & Marshall) — never require
+    up-front classification. Forcing full relationship-typing at
+    capture time is the exact formality-considered-harmful pattern;
+    authors under extraction pressure invent the weak edge anyway,
+    and the strict parser turns their capture into silent data loss.
+    Candidate: a `relates_to` type explicitly documented as
+    "association pending classification" — a capture-time placeholder
+    the doctor can nag toward a stronger type (incremental
+    formalization operationalized, not abandoned).
+  - `leaves-open` — 8 instances across 6 repos. A negative-space
+    assertion: "this completed work deliberately did NOT address the
+    target." Carried by NOTHING in v0.3 — discovered_from is
+    provenance, not exclusion; non-goal exists as a node type but has
+    no edge equivalent. Scope exclusions are real knowledge (marvel's
+    B8 shipped without a permission model ON PURPOSE); today they can
+    only live as prose.
+
+  NOISE (1-2 repos each, legal equivalents exist):
+  - `depends`/`depends-on` -> derives (schema names the equivalence)
+  - `blocks` -> inverse derives; `extends` -> derives/supersedes;
+    `in-scope-of` -> derives; `cousin`, `refines` -> supports/
+    partially_resolves with notes.
+    These are authoring-process failures (schema not in context
+    during extraction), answered by a validate gate, not new types.
+
+  Sub-questions:
+  a) Adjudicate `relates_to` (weak association): does incremental
+     formalization win over typed-traversability at CAPTURE time,
+     with doctor-driven reclassification restoring typing over time?
+  b) Adjudicate `leaves_open` (scope exclusion): edge type, or a
+     structured content convention?
+  c) Loader failure mode: one illegal edge type currently drops the
+     whole node from orient with only a stderr warning nobody reads.
+     Skip-the-edge-and-warn, or hard-fail validate? Silently omitting
+     the node is the worst available behavior (cf.
+     elem-ai-improvisation-past-broken-refs — the loader improvises
+     past broken nodes).
+  d) If types are added: migration story for the normalized edges
+     (marvel 57d058f documents its mapping; git history preserves
+     originals byte-for-byte).
+
+  Repair ordering downstream: the fleet conformance sweep
+  (bd aae-orc-ow62, ~49 parse errors in 7 repos) is deliberately
+  BLOCKED on this question — normalizing before adjudication would
+  repeat marvel's lossy mapping fleet-wide.
+edges:
+  - target: val-incremental-formalization
+    type: derives
+    note: "the weak-edge demand is this guardrail applied to edge authoring"
+  - target: val-typed-traversable
+    type: contradicts
+    note: "capture-time weak edges vs must-be-typed — the tension this question adjudicates"
+  - target: elem-formality-considered-harmful
+    type: derives
+  - target: elem-ai-improvisation-past-broken-refs
+    type: supports
+    note: "loader failure mode (sub-question c) is an instance of the improvise-past-broken pattern"
+provenance:
+  created_by: agent
+  session: aae-orc session 2026-07-17 (marvel schema-conformance fix)
+  created_at: "2026-07-17"
