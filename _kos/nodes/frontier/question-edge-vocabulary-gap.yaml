@@ -3,6 +3,48 @@ type: question
 confidence: frontier
 title: "Does schema v0.3's edge vocabulary need a weak-association type and a scope-exclusion type?"
 content: |
+  ## ADJUDICATED 2026-08-09 — see finding-044
+
+  (b), (c) and (d) are answered. (a) defers to Issue 17. The body below is
+  the question AS ORIGINALLY POSED, kept verbatim; its central evidentiary
+  claim is false and is corrected under CORRECTION further down.
+
+  RULING: **the eight edge types stand. No new edge types.**
+  - (a) `relates_to`: NO. Roughly 80% of the `related` instances are
+    misfiled derives/supports/discovered_from; the residue is carried by
+    note prose. Revisit only via Issue 17, after a consumer of weak-
+    association semantics exists.
+  - (b) `leaves_open`: NOT an edge. The scope-exclusion semantic lands as
+    an `out_of_scope` node field with named target ids (bd aae-orc-gq1c).
+    Promotion condition, recorded here because bd aae-orc-dboj is CLOSED
+    and no longer functions as the anchor this node's tail assumes: it
+    becomes an edge type if and when a consumer ships that reads it
+    edge-shaped, direction pinned element-to-question.
+  - (c) SHIPPED. Lenient loading, kos PR #89 / `3495ed1`, released
+    alpha-20260809-030901-3495ed1. Unknown types load as `Unknown(raw)`
+    preserving the author's string; validate FAILS and names the value
+    plus the legal vocabulary. 50 nodes restored fleet-wide, no node file
+    edited.
+  - (d) Migration needs no loader and no binary change: normalization
+    restores 50/50 under the already-deployed binary. Rules in bd
+    aae-orc-ow62.
+
+  CORRECTION to the SIGNAL block below: "convergent, multiple repos,
+  independent authors" is FALSE. 48 of the 50 offending nodes were last
+  modified on or before 2026-05-13 and 39 on that single day, which was
+  one fleet-wide charter-extraction campaign run in a single session
+  across six repos. The repos are multiple; the authors and session are
+  not. (A later pass found at least three sessions in total, tmux-cmc
+  2026-04-02 and sidestep 2026-05-03; the convergence claim fails either
+  way.) The counts below also conflate nodes with edge instances: true
+  per-edge figures are related 50, leaves-open 15, others 12, i.e. 77
+  illegal edges inside 50 nodes.
+
+  Dissent is preserved in finding-044 and must not be dissolved by this
+  ruling; one of four voters held for `leaves_open` as a ninth type.
+
+  ---
+
   Field evidence (fleet inventory, 2026-07-17): authors across the
   aae-orc fleet convergently invent edge types the schema lacks, and
   the strict loader then drops the ENTIRE node — marvel ran two months
@@ -61,12 +103,16 @@ content: |
   BLOCKED on this question — normalizing before adjudication would
   repeat marvel's lossy mapping fleet-wide.
 edges:
+  - target: finding-044-edge-vocabulary-adjudicated
+    type: partially_resolves
+    note: "the adjudication: (b)(c)(d) answered, (a) deferred to Issue 17"
   - target: val-incremental-formalization
     type: derives
     note: "the weak-edge demand is this guardrail applied to edge authoring"
   - target: val-typed-traversable
     type: contradicts
-    note: "capture-time weak edges vs must-be-typed — the tension this question adjudicates"
+    signal: error
+    note: "OVERSTATED, see finding-044. That value is cited by exactly two nodes (elem-correspondence-layer, elem-storage-model), both session-001, both via the legacy v0.1 depends_on field, and both about the spec-to-code correspondence layer rather than intra-graph edge typing. This contradicts edge, added here 2026-07-17, is the only artifact treating it as a general typing mandate. Retained rather than deleted because the tension it names is real at capture time, but it should not be read as bedrock forbidding a weak type."
   - target: elem-formality-considered-harmful
     type: derives
   - target: elem-ai-improvisation-past-broken-refs
