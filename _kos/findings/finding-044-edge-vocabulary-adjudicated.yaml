@@ -1,0 +1,232 @@
+id: finding-044-edge-vocabulary-adjudicated
+type: finding
+confidence: frontier
+title: "Edge vocabulary adjudicated: eight types stand, the loader was the real defect, and the demand premise was false"
+content: |
+  ## Summary
+
+  `question-edge-vocabulary-gap` asked whether v0.3's edge vocabulary needs a
+  weak-association type (`relates_to`) and a scope-exclusion type
+  (`leaves_open`). Adjudicated 2026-08-08/09. **The eight types stand. No new
+  edge types.** The scope-exclusion semantic lands as a node FIELD
+  (`out_of_scope`), not an edge. The loader failure mode, sub-question (c),
+  shipped independently and was the largest real defect in the whole area.
+
+  The question's central evidentiary claim did not survive measurement, which
+  is the most reusable part of this finding.
+
+  ## Method
+
+  Fifteen agents: four research lenses (kos intent from vision/charter/roadmap;
+  kos mechanics from source; knowledge-representation literature; retrieval
+  literature plus empirical measurement of the live fleet graph), four argued
+  positions (legalize-both, normalize-eight, split-ruling, restructure), four
+  adversarial cross-examinations each casting an independent verdict, two live
+  simulations against real data, and a synthesis that tallied the vote and
+  preserved dissent.
+
+  Vote: **3 of 4 for normalize-eight, all at high confidence.** normalize-eight
+  was the only position to survive its own cross-examination.
+
+  ## The premise that failed
+
+  The question claimed the invented types were "convergent, multiple repos,
+  independent authors" and treated that as evidence of real schema demand.
+
+  Measured: 48 of the 50 offending nodes were last modified on or before
+  2026-05-13, and 39 on that single day. That day was one fleet-wide
+  charter-extraction campaign, run in a single session across switchboard
+  (c5b4c22), BetterDials (0c64d60), forestage (d277a3a), curtain (71460da),
+  spectacle (8d9a9bd) and sidestep (2985c6b), every commit of the form
+  `harvest(kos): extract ... from charter`.
+
+  The repos are multiple. The authors and the session are not. This is one
+  habit copied six times, not distributed demand. A later pass narrowed it
+  further: at least three authoring sessions total (tmux-cmc's cluster dates
+  to 2026-04-02, sidestep's `cousin` to 2026-05-03), but the convergence claim
+  stays dead either way.
+
+  Corroborating trend, orc graph from git history: illegal-edge ratio fell
+  from 9% (2026-04-28) to 2% (May, June) to 0% (July, August), with 32 edges
+  authored in the last three weeks and zero illegal. Authors comply with the
+  eight-type vocabulary once they know it.
+
+  ## Why normalize rather than legalize
+
+  1. **Demand collapsed.** Above.
+  2. **Value is absent.** Only two semantic consumers of edge types exist:
+     `is_blocking()` at orient.rs:126,146 (`Derives | Implements`) and drift
+     propagation at drift.rs:255 (`Derives | Contradicts`, `_ => continue`).
+     Both whitelist, so a legalized `relates_to` was fixture-tested
+     byte-identical to `supports` for ready-work, dependents and drift. It
+     fails kos's own admission test
+     (`elem-machine-consumption-earns-formal-structure`), and roadmap Part 4
+     already cut upfront edge-ontology work with Issue 17 pre-registered to
+     PRUNE toward derives/contradicts/supersedes, not grow.
+  3. **Cost is measured.** `SCHEMA_VERSION` is hardcoded "0.3" at init.rs:8
+     with no negotiation. Under the deployed binary, **normalize restores 50
+     of 50 hidden nodes; legalize restores 7 of 50**, leaving 43 invisible
+     until every fleet binary upgrades. This inverts the intuition the gate
+     was built on.
+  4. **Loss is controllable.** Per-edge review with an `[orig: <type>]`
+     retention note yields zero irrecoverable in-file loss.
+
+  ## The residue, sized by reading all 15 leaves-open edges
+
+  | class | n | carried by |
+  |---|---|---|
+  | inverse direction (question to element) | 4 | derives / discovered_from |
+  | element genuinely partially resolved the question | 1 | partially_resolves |
+  | conditional invalidation, not exclusion | 1 | see below |
+  | genuine scope exclusion | 9 | nothing in the eight |
+
+  Two of the 15 are reciprocal pairs, so 13 distinct relations.
+
+  The 9 are weaker than the count suggests, for three measured reasons:
+
+  - **Every one already states the assertion in prose in the same node.**
+    `elem-mvp-scope-single-lan`: "The MVP scope itself is bedrock; the next
+    scope is open." `elem-timeslice-framing`: "The model is bedrock; the tick
+    rates are tuning parameters." `elem-sync-architecture`: "deferred
+    post-MVP." This retires the strongest argument for legalizing, which was
+    a Grudin re-extraction debt (structure paid for once, discarded, re-parsed
+    later from free text). No such debt exists: the prose was never removed,
+    because the prose is what the extractor was reading when it invented the
+    type.
+  - **They carry two different meanings.** Commitment granularity (5, all
+    switchboard session-049, near-identical phrasing) and temporal deferral
+    (4). One type would conflate them on day one.
+  - **Concentration.** 5 of 9 are one author in one session.
+
+  Landing: `out_of_scope` node field with named target ids. The Node struct
+  carries no `deny_unknown_fields`, so a field costs zero version skew where
+  an edge drops the whole node in every pre-loader binary. Migration is
+  mechanical because the prose to populate it already sits in each node.
+
+  ## Sub-question (c) was the real defect, and it shipped
+
+  One unrecognized edge type failed the whole-document parse. Every read path
+  then skipped the entire NODE and warned only on stderr, so `orient --json`,
+  the path agents read, emitted a clean, well-formed, confidently incomplete
+  graph with no signal anything was missing. That is
+  `elem-ai-improvisation-past-broken-refs` firing exactly as described.
+
+  Shipped in kos PR #89 (`3495ed1`), released `alpha-20260809-030901-3495ed1`:
+  `EdgeType` deserialization is infallible, unknown types become
+  `Unknown(raw)` preserving the author's string verbatim, never blocking and
+  never propagating; `validate` FAILS on unknown and names the offending value
+  plus the legal vocabulary; `orient` gained an in-band degradation signal on
+  both human and `--json` paths; `doctor`'s affirmative false green
+  (`parse_errors` hardcoded 0) fixed.
+
+  Measured: **117 own-graph nodes visible across the 7 affected repos where 67
+  were before, exactly the 50 predicted**, with no node file edited. Fleet
+  validate flipped from "50 parse errors, 0 failed" to "0 parse errors, 50
+  failed": nothing hidden, everything wrong named.
+
+  ## Premises found false during the adjudication
+
+  Recorded because the rate matters more than any single item. Four were
+  claims I carried in, three were in the graph's own artifacts.
+
+  - MEASURED: "any graph written with a new edge type is dropped wholesale by
+    every older binary" is FALSE. Tested against a real 2026-04-05 binary:
+    per-NODE, 17 of 83.
+  - MEASURED: the illegal-value distribution counted failing NODES, not edge
+    instances. True per-edge: related 50, leaves-open 15, others 12; 77
+    illegal edges inside 50 nodes.
+  - MEASURED: marvel 57d058f's loss was overstated. Exactly 2 edges dropped
+    outright, both restored as prose 7 minutes later in 05f4f3a; durable
+    in-file loss is original type strings on 18 retyped edges.
+  - MEASURED: "only two consumers" is right for SEMANTIC consumers but
+    graph.rs:78-79 also renders types as Display labels (cosmetic).
+  - `brief-lenient-edge-loading`: its claim that `kos validate` exits 0 on
+    parse errors is FALSE; it exits 1. Mechanism demonstrated: piping validate
+    through `tail` masks the exit code.
+  - `question-edge-vocabulary-gap`: the convergence claim, above.
+  - The adjudication brief cited orc charter "F22"; no such section exists.
+
+  ## Not confirmed, recorded as a data point only
+
+  `elem-multi-display-mute-sync` to `question-per-monitor-state` is not a
+  scope exclusion. Its content says "when per-monitor state becomes
+  authoritative, the absolute-set rationale dissolves": a decision declaring
+  what would invalidate it, i.e. `conditional_on` plus a falsifier, both
+  already specified for schema v0.4.
+
+  This is ONE field specimen, not demand evidence. A lexical sweep for
+  conditional/invalidation language returned 23 nodes, but most are incidental
+  prose; genuinely edge-shaped cases are roughly 4 to 6, and at least one
+  (`grv-git-as-sufficient-substrate`) is ALREADY carried today by
+  `contradicts` with `signal: evolution`. The existing `signal:` axis may
+  cover the semantic without a new type.
+
+  ## The generalizable result
+
+  Every apparent demand for a new edge type dissolved into an existing type,
+  an existing axis, or a node field. The schema is less short of vocabulary
+  than it looks, and shorter of places to put things that are not
+  relationships. This predicts the outcome Issue 17 already pre-registered:
+  the vocabulary prunes rather than grows.
+
+  Second, for process: a fleet-wide bulk campaign propagates its schema errors
+  to every repo it touches in one pass. Six repos went nonconformant in one
+  afternoon because nothing validated before the first write. Validate before
+  the first repo, not after the last.
+
+  ## Dissent, preserved
+
+  1. **`leaves_open` as a ninth type** (the one non-majority vote). It is the
+     only invented type with demonstrated post-repair operator demand: marvel
+     restored the dropped exclusions as prose within 7 minutes and filed a
+     ticket wanting them back as edges. Vindicated if Issue 24's reopener
+     machinery ships consuming edge-shaped exclusions rather than node-level
+     triggers, or if the field convention measurably fails in practice.
+  2. **Restructure the eight** into a closed machine signal (blocking,
+     propagates) plus an open free-text label. Position refuted, diagnosis
+     explicitly salvaged by its refuter. Vindicated if Issue 17 measures
+     traversal value below authoring cost AND the read path lands in the
+     activation/PPR mold that consumes open-vocabulary relation text.
+  3. **One fenced weak type anyway**, on doctrine: every mature KOS standard
+     admits exactly one (skos:related, rdfs:seeAlso, RT), and
+     `val-incremental-formalization` forbids forced up-front classification.
+     Vindicated by recurrence of invented weak vocabulary AFTER the lenient
+     loader and the validate gate have both propagated.
+
+  ## Open
+
+  - Whether `relates_to` ever earns admission. Defers to Issue 17 and to what
+    shape the read path actually consumes. Not settleable now.
+  - Whether `out_of_scope` stays a field or becomes an edge. Needs Issue 24 to
+    name its consumer.
+  - Whether orient's local-only blocker resolution is a defect or intended
+    semantics. Cross-graph and probe targets are permanent blockers; marvel
+    has two live specimens from its own repair.
+  - How to verify fleet binary propagation before any future vocabulary
+    change. No binary inventory exists; a stale 2026-04-16 build was found in
+    kos/target/release during this work and briefly contaminated measurements.
+  - Whether the roughly-80-percent lossless-normalization figure holds across
+    all 51 related/relates edges. It rests on a 15-edge read sample.
+edges:
+  - target: question-edge-vocabulary-gap
+    type: partially_resolves
+    note: "answers (b), (c) and (d); (a) defers to Issue 17"
+  - target: elem-ai-improvisation-past-broken-refs
+    type: instantiates
+    note: "the silent whole-node drop is this element's pattern in kos's own loader"
+  - target: elem-machine-consumption-earns-formal-structure
+    type: supports
+    note: "the admission test both candidate types failed"
+  - target: val-incremental-formalization
+    type: supports
+    note: "dissent 3 rests on it; the ruling defers rather than overrides it"
+provenance:
+  created_by: agent
+  session: "aae-orc session 2026-08-08/09 (fleet kos compliance sweep)"
+  created_at: "2026-08-09"
+finding:
+  probe: brief-lenient-edge-loading
+  result: |
+    Eight edge types stand. Scope exclusion lands as the out_of_scope node
+    field. Lenient loading shipped and released; 50 nodes restored fleet-wide
+    with no node file edited.

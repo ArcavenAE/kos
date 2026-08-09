@@ -80,3 +80,26 @@ brief:
       node file edits
   timebox: "one focused session (~150-250 lines incl. tests) + release"
   predicted_confidence: bedrock
+  status: complete
+  outcome: |
+    Shipped 2026-08-09 in kos PR #89 (`3495ed1`), released as
+    alpha-20260809-030901-3495ed1 and verified from the brew-installed
+    binary. See finding-044.
+
+    Every success signal met. 117 own-graph nodes visible across the 7
+    affected repos where 67 were before, exactly the 50 predicted, with no
+    node file edited. Fleet validate flipped from "50 parse errors, 0
+    failed" to "0 parse errors, 50 failed": nothing hidden, everything
+    wrong named. 5 new tests, 20 passing.
+
+    One premise in this brief was FALSE and is corrected in finding-044:
+    approach step 3 claimed `kos validate` exits 0 on parse errors, making
+    any CI gate a no-op. It exits 1, scoped and merged. The mechanism that
+    produced the wrong reading is worth keeping: piping validate through
+    `tail` masks the exit code. Only the "unknown edge type = FAIL" half of
+    step 3 was outstanding, and it shipped.
+
+    Scope note: the CI gate this brief anticipated (bd aae-orc-bs28) was
+    subsequently ruled ADVISORY rather than blocking, to avoid a chilling
+    effect on authors who genuinely need new vocabulary while Issue 17 is
+    still open.
