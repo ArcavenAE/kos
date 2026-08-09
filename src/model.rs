@@ -125,8 +125,38 @@ pub struct Edge {
     pub note: Option<String>,
 }
 
+/// The legal edge vocabulary, in the order the schema documents it.
+/// Used to render actionable errors when an unknown type is rejected.
+pub const LEGAL_EDGE_TYPES: [&str; 8] = [
+    "derives",
+    "implements",
+    "contradicts",
+    "supersedes",
+    "supports",
+    "instantiates",
+    "partially_resolves",
+    "discovered_from",
+];
+
+/// Deserialization is INFALLIBLE by design: an unrecognized type becomes
+/// `Unknown(raw)` rather than failing the parse.
+///
+/// The strict enum used to fail the whole-document parse, and every read
+/// path (orient, drift, graph, charter, compact, doctor) then skipped the
+/// entire NODE over one bad edge, warning only on stderr. marvel ran two
+/// months with 14 of 25 nodes invisible; switchboard lost all 7 of its
+/// bedrock elements. Dropping a node's content to punish one pointer is
+/// the failure `elem-ai-improvisation-past-broken-refs` describes: the
+/// reader does not error, it confabulates over the hole.
+///
+/// Leniency here is paired with strictness at authorship: `kos validate`
+/// FAILS on `Unknown`, naming the value and the legal vocabulary. Tolerant
+/// reader, strict writer.
+///
+/// The raw string is preserved verbatim so a later vocabulary migration
+/// reads what the author actually wrote instead of a lossy normalization.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(rename_all = "snake_case")]
+#[serde(from = "String")]
 #[non_exhaustive]
 pub enum EdgeType {
     Derives,
@@ -141,14 +171,44 @@ pub enum EdgeType {
     PartiallyResolves,
     /// Found during work on the target. Provenance link for probe→question lineage.
     DiscoveredFrom,
+    /// An edge type outside the schema vocabulary, preserved verbatim.
+    /// Never blocking, never propagating. `kos validate` fails on it.
+    Unknown(String),
+}
+
+impl From<String> for EdgeType {
+    fn from(raw: String) -> Self {
+        match raw.as_str() {
+            "derives" => EdgeType::Derives,
+            "implements" => EdgeType::Implements,
+            "contradicts" => EdgeType::Contradicts,
+            "supersedes" => EdgeType::Supersedes,
+            "supports" => EdgeType::Supports,
+            "instantiates" => EdgeType::Instantiates,
+            "partially_resolves" => EdgeType::PartiallyResolves,
+            "discovered_from" => EdgeType::DiscoveredFrom,
+            _ => EdgeType::Unknown(raw),
+        }
+    }
 }
 
 impl EdgeType {
     /// Whether this edge type represents a blocking dependency for ready-work
     /// computation. Blocking means: if the target is unresolved, the source
     /// cannot be probed/acted on.
+    ///
+    /// `Unknown` is never blocking: an edge we cannot interpret must not
+    /// silently evict its source node from the ready queue.
     pub fn is_blocking(&self) -> bool {
         matches!(self, EdgeType::Derives | EdgeType::Implements)
+    }
+
+    /// The raw string if this edge type is outside the schema vocabulary.
+    pub fn unknown_value(&self) -> Option<&str> {
+        match self {
+            EdgeType::Unknown(raw) => Some(raw.as_str()),
+            _ => None,
+        }
     }
 }
 
@@ -163,6 +223,7 @@ impl std::fmt::Display for EdgeType {
             EdgeType::Instantiates => write!(f, "instantiates"),
             EdgeType::PartiallyResolves => write!(f, "partially_resolves"),
             EdgeType::DiscoveredFrom => write!(f, "discovered_from"),
+            EdgeType::Unknown(raw) => write!(f, "{raw}"),
         }
     }
 }
