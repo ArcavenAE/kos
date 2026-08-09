@@ -27,6 +27,26 @@ pub struct Orientation {
     pub is_standalone: bool,
 }
 
+impl Orientation {
+    /// Count edges whose type is outside the schema vocabulary.
+    ///
+    /// These load (the reader is lenient) but carry no traversal meaning:
+    /// they are neither blocking for `--ready` nor propagating in drift.
+    /// Surfacing the count IN the output is the point. The old loader
+    /// dropped whole nodes and warned only on stderr, so `--json`
+    /// consumers received a clean, confidently incomplete graph with no
+    /// signal that anything was missing.
+    pub fn unrecognized_edge_count(&self) -> usize {
+        self.frontier_questions
+            .iter()
+            .chain(&self.bedrock_nodes)
+            .chain(&self.graveyard_nodes)
+            .flat_map(Node::all_edges)
+            .filter(|e| e.edge_type.unknown_value().is_some())
+            .count()
+    }
+}
+
 /// A probe entry loaded from `_kos/probes/`.
 #[derive(Debug)]
 pub struct ProbeEntry {
@@ -1075,6 +1095,13 @@ fn print_human(o: &Orientation) {
         println!("=== kos orient: {} ===\n", o.target);
     }
 
+    let degraded = o.unrecognized_edge_count();
+    if degraded > 0 {
+        println!(
+            "!! {degraded} edge(s) carry unrecognized types and do not traverse — run `kos validate`\n"
+        );
+    }
+
     if !o.charter_items.is_empty() {
         if o.is_standalone {
             println!("## Charter\n");
@@ -1203,6 +1230,20 @@ fn print_jsonl(o: &Orientation) {
             "type": "orient_meta",
             "target": o.target,
             "standalone": true,
+        });
+        println!("{json}");
+    }
+
+    // In-band degradation signal. An agent consuming this stream has no
+    // access to stderr, so a graph with untraversable edges must say so
+    // here or the omission is indistinguishable from absence.
+    let degraded = o.unrecognized_edge_count();
+    if degraded > 0 {
+        let json = serde_json::json!({
+            "type": "orient_degraded",
+            "target": o.target,
+            "unrecognized_edges": degraded,
+            "hint": "run `kos validate`; these edges load but do not traverse",
         });
         println!("{json}");
     }

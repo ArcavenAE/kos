@@ -175,9 +175,9 @@ fn check_graph(graph: &GraphSource, workspace: &Workspace, fix: bool) -> Result<
     println!();
     println!("  Content");
 
-    let nodes = load_all_nodes(&graph.path);
+    let (nodes, parse_errors) = load_all_nodes_counting_failures(&graph.path);
     let node_count = nodes.len();
-    let parse_errors = 0;
+    let mut unknown_edge_types = 0;
     let mut id_mismatches = 0;
     let mut dir_mismatches = 0;
     let mut broken_edges = 0;
@@ -227,10 +227,30 @@ fn check_graph(graph: &GraphSource, workspace: &Workspace, fix: bool) -> Result<
                 ));
                 broken_edges += 1;
             }
+            if let Some(raw) = edge.edge_type.unknown_value() {
+                warn(&format!(
+                    "node {}: edge to '{}' has unknown type '{raw}' (kos validate fails on this)",
+                    node.id, edge.target
+                ));
+                unknown_edge_types += 1;
+            }
         }
     }
 
-    if parse_errors == 0 && node_count > 0 {
+    if parse_errors > 0 {
+        err(&format!(
+            "{parse_errors} file(s) failed to parse and are invisible to every kos read path"
+        ));
+        errors += parse_errors;
+        hint("run `kos validate` to see the offending files");
+    }
+
+    if unknown_edge_types > 0 {
+        warnings += unknown_edge_types;
+        hint("unknown edge types load but do not traverse; `kos validate` names each one");
+    }
+
+    if parse_errors == 0 && unknown_edge_types == 0 && node_count > 0 {
         ok(&format!("{node_count} nodes parse successfully"));
     } else if node_count == 0 {
         warn("no nodes found");
@@ -358,14 +378,21 @@ fn check_legacy(workspace: &Workspace, _fix: bool) -> Result<()> {
 }
 
 /// Load all node YAML files from a _kos/ graph directory.
-fn load_all_nodes(kos_dir: &Path) -> Vec<Node> {
+/// Load nodes, returning the count of files that failed to parse.
+///
+/// `load_all_nodes` swallows read and parse failures, which is why doctor
+/// used to hardcode `parse_errors = 0` and print an affirmative
+/// "N nodes parse successfully" over graphs that were partly unreadable.
+/// A health check that cannot report ill health is worse than none.
+fn load_all_nodes_counting_failures(kos_dir: &Path) -> (Vec<Node>, usize) {
     let nodes_dir = kos_dir.join("nodes");
     if !nodes_dir.exists() {
-        return vec![];
+        return (Vec::new(), 0);
     }
 
     let mut nodes = Vec::new();
-    for entry in walkdir::WalkDir::new(nodes_dir)
+    let mut failures = 0;
+    for entry in walkdir::WalkDir::new(&nodes_dir)
         .into_iter()
         .filter_map(std::result::Result::ok)
     {
@@ -374,15 +401,19 @@ fn load_all_nodes(kos_dir: &Path) -> Vec<Node> {
             .extension()
             .is_some_and(|ext| ext == "yaml" || ext == "yml")
         {
-            if let Ok(content) = std::fs::read_to_string(path) {
-                if let Ok(mut node) = serde_yaml::from_str::<Node>(&content) {
-                    node.source_path = path.to_path_buf();
-                    nodes.push(node);
-                }
+            match std::fs::read_to_string(path) {
+                Ok(content) => match serde_yaml::from_str::<Node>(&content) {
+                    Ok(mut node) => {
+                        node.source_path = path.to_path_buf();
+                        nodes.push(node);
+                    }
+                    Err(_) => failures += 1,
+                },
+                Err(_) => failures += 1,
             }
         }
     }
-    nodes
+    (nodes, failures)
 }
 
 // ── Output helpers ──────────────────────────────────────────

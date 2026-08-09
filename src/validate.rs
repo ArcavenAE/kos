@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::path::Path;
 
 use crate::error::{KosError, Result};
-use crate::model::{Node, NodeType};
+use crate::model::{LEGAL_EDGE_TYPES, Node, NodeType};
 
 #[derive(Debug)]
 pub struct ValidationResult {
@@ -188,6 +188,17 @@ fn validate_node(node: &Node, rel_path: &str, known_ids: &HashSet<String>) -> Va
             warnings.push(format!(
                 "edge target '{}' not found in nodes/ (may be a finding or probe)",
                 edge.target
+            ));
+        }
+
+        // 3b. Edge type is in the schema vocabulary. The loader is lenient so
+        // one bad edge never hides a node from readers; the gate lives here,
+        // at authorship, where the author can still fix it.
+        if let Some(raw) = edge.edge_type.unknown_value() {
+            errors.push(format!(
+                "edge to '{}' has unknown type '{raw}' (expected one of: {})",
+                edge.target,
+                LEGAL_EDGE_TYPES.join(", ")
             ));
         }
     }
