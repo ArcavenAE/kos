@@ -1,0 +1,54 @@
+curtain|rust|cold|rc=0|real=4.60|rss_bytes=583024640|scip_bytes=491|start=2026-08-16T15:32:04-0500|end=2026-08-16T15:32:09-0500
+curtain|rust|warm|rc=0|real=1.64|rss_bytes=599064576|scip_bytes=491|start=2026-08-16T15:32:09-0500|end=2026-08-16T15:32:10-0500
+GITSTATUS curtain: []
+flyloft|rust|cold|rc=0|real=8.25|rss_bytes=986988544|scip_bytes=148353|start=2026-08-16T15:32:21-0500|end=2026-08-16T15:32:30-0500
+flyloft|rust|warm|rc=0|real=2.51|rss_bytes=978796544|scip_bytes=148353|start=2026-08-16T15:32:30-0500|end=2026-08-16T15:32:32-0500
+GITSTATUS flyloft: []
+tmux-cmc|rust|cold|rc=0|real=4.54|rss_bytes=705265664|scip_bytes=294450|start=2026-08-16T15:32:32-0500|end=2026-08-16T15:32:37-0500
+tmux-cmc|rust|warm|rc=0|real=2.42|rss_bytes=706199552|scip_bytes=294450|start=2026-08-16T15:32:37-0500|end=2026-08-16T15:32:39-0500
+GITSTATUS tmux-cmc: []
+beadle|rust|cold|rc=0|real=141.77|rss_bytes=313131008|scip_bytes=346690|start=2026-08-16T15:32:39-0500|end=2026-08-16T15:35:01-0500
+beadle|rust|warm|rc=0|real=0.77|rss_bytes=297271296|scip_bytes=346690|start=2026-08-16T15:35:01-0500|end=2026-08-16T15:35:02-0500
+GITSTATUS beadle: []
+BetterDials|rust|cold|rc=0|real=4.63|rss_bytes=1292337152|scip_bytes=957324|start=2026-08-16T15:36:21-0500|end=2026-08-16T15:36:26-0500
+BetterDials|rust|warm|rc=0|real=3.96|rss_bytes=1303248896|scip_bytes=957324|start=2026-08-16T15:36:26-0500|end=2026-08-16T15:36:30-0500
+GITSTATUS BetterDials: []
+kos|rust|cold|rc=0|real=3.34|rss_bytes=1357905920|scip_bytes=1328663|start=2026-08-16T15:36:30-0500|end=2026-08-16T15:36:34-0500
+kos|rust|warm|rc=0|real=3.49|rss_bytes=1331331072|scip_bytes=1328663|start=2026-08-16T15:36:34-0500|end=2026-08-16T15:36:37-0500
+GITSTATUS kos: [?? .serena/;]
+forestage|rust|cold|rc=0|real=14.68|rss_bytes=2263023616|scip_bytes=1742008|start=2026-08-16T15:36:47-0500|end=2026-08-16T15:37:01-0500
+forestage|rust|warm|rc=0|real=5.18|rss_bytes=2266185728|scip_bytes=1742008|start=2026-08-16T15:37:01-0500|end=2026-08-16T15:37:07-0500
+GITSTATUS forestage: []
+bloomctl|rust|cold|rc=0|real=8.02|rss_bytes=1754251264|scip_bytes=3745612|start=2026-08-16T15:37:07-0500|end=2026-08-16T15:37:15-0500
+bloomctl|rust|warm|rc=0|real=5.43|rss_bytes=1739096064|scip_bytes=3745612|start=2026-08-16T15:37:15-0500|end=2026-08-16T15:37:20-0500
+GITSTATUS bloomctl: []
+stave|rust|cold|rc=0|real=12.11|rss_bytes=1673674752|scip_bytes=2310379|start=2026-08-16T15:37:26-0500|end=2026-08-16T15:37:38-0500
+stave|rust|warm|rc=0|real=4.66|rss_bytes=1662648320|scip_bytes=2310379|start=2026-08-16T15:37:38-0500|end=2026-08-16T15:37:43-0500
+GITSTATUS stave: [ M _bmad-output/party-mode/memories/installed/.memlog.md;]
+sidestep|rust|cold|rc=0|real=27.60|rss_bytes=1844477952|scip_bytes=7979437|start=2026-08-16T15:37:43-0500|end=2026-08-16T15:38:11-0500
+sidestep|rust|warm|rc=0|real=6.49|rss_bytes=1851326464|scip_bytes=7979437|start=2026-08-16T15:38:11-0500|end=2026-08-16T15:38:17-0500
+GITSTATUS sidestep: []
+akey|rust|cold|rc=0|real=28.29|rss_bytes=1840594944|scip_bytes=8046228|start=2026-08-16T15:38:24-0500|end=2026-08-16T15:38:52-0500
+akey|rust|warm|rc=0|real=8.46|rss_bytes=1862762496|scip_bytes=8046228|start=2026-08-16T15:38:52-0500|end=2026-08-16T15:39:01-0500
+GITSTATUS akey: []
+curtain|rust|warm_post_rustsrc|real=1.72|rss_bytes=582844416|std_errors=0
+flyloft|rust|warm_post_rustsrc|real=2.60|rss_bytes=957530112|std_errors=0
+beadle|rust|warm_post_rustsrc|real=2.46|rss_bytes=864043008|std_errors=0
+ai|go|cold|rc=0|real=15.03|rss_bytes=781565952|scip_bytes=52546|start=2026-08-16T15:39:30-0500|end=2026-08-16T15:39:45-0500
+ai|go|warm|rc=0|real=0.35|rss_bytes=42893312|scip_bytes=52546|start=2026-08-16T15:39:45-0500|end=2026-08-16T15:39:46-0500
+GITSTATUS ai: []
+ourbot|go|cold|rc=0|real=1.64|rss_bytes=163397632|scip_bytes=41755|start=2026-08-16T15:39:46-0500|end=2026-08-16T15:39:47-0500
+ourbot|go|warm|rc=0|real=0.31|rss_bytes=39010304|scip_bytes=41755|start=2026-08-16T15:39:47-0500|end=2026-08-16T15:39:48-0500
+GITSTATUS ourbot: []
+switchboard|go|cold|rc=0|real=4.19|rss_bytes=232456192|scip_bytes=15892|start=2026-08-16T15:39:48-0500|end=2026-08-16T15:39:52-0500
+switchboard|go|warm|rc=0|real=0.23|rss_bytes=33161216|scip_bytes=15892|start=2026-08-16T15:39:52-0500|end=2026-08-16T15:39:52-0500
+GITSTATUS switchboard: []
+sideshow|go|cold|rc=0|real=0.77|rss_bytes=115671040|scip_bytes=3112192|start=2026-08-16T15:39:59-0500|end=2026-08-16T15:40:00-0500
+sideshow|go|warm|rc=0|real=0.33|rss_bytes=81952768|scip_bytes=3112192|start=2026-08-16T15:40:00-0500|end=2026-08-16T15:40:00-0500
+GITSTATUS sideshow: []
+marvel|go|cold|rc=0|real=0.47|rss_bytes=123879424|scip_bytes=6144267|start=2026-08-16T15:40:00-0500|end=2026-08-16T15:40:01-0500
+marvel|go|warm|rc=0|real=0.45|rss_bytes=128303104|scip_bytes=6144267|start=2026-08-16T15:40:01-0500|end=2026-08-16T15:40:01-0500
+GITSTATUS marvel: [?? .DS_Store;?? docs/.DS_Store;]
+ThreeDoors|go|cold|rc=0|real=28.99|rss_bytes=712228864|scip_bytes=28796028|start=2026-08-16T15:40:23-0500|end=2026-08-16T15:40:52-0500
+ThreeDoors|go|warm|rc=0|real=0.95|rss_bytes=450183168|scip_bytes=29259655|start=2026-08-16T15:40:52-0500|end=2026-08-16T15:40:53-0500
+GITSTATUS ThreeDoors: []

@@ -18,7 +18,6 @@ use std::path::{Path, PathBuf};
 use crate::error::Result;
 use crate::model::{Confidence, EdgeType, Node, NodeType};
 use crate::orient;
-use crate::telemetry::{self, ReadClass, ReadEvent};
 use crate::workspace::{KOS_DIR, Workspace};
 
 // ── Ranking weights ──────────────────────────────────────────
@@ -127,31 +126,6 @@ pub fn run(
         print_json(&results);
     } else {
         print_human(query, &label, total, &results);
-    }
-
-    // Consultation-class read: the served set is narrowed by the question, so
-    // it can evidence adoption in the read telemetry. Fail-open exactly like
-    // orient; a read verb must never fail because its own telemetry failed.
-    if telemetry::enabled() {
-        let event = ReadEvent {
-            verb: "ask",
-            target: &label,
-            read_class: ReadClass::Consultation,
-            json_output: json,
-            node_ids: results
-                .iter()
-                .filter(|r| !r.is_finding)
-                .map(|r| r.id.as_str())
-                .collect(),
-            finding_ids: results
-                .iter()
-                .filter(|r| r.is_finding)
-                .map(|r| r.id.as_str())
-                .collect(),
-        };
-        if let Err(e) = telemetry::record_reads(&graph_dir, &event) {
-            eprintln!("warning: could not write read telemetry: {e}");
-        }
     }
 
     Ok(())

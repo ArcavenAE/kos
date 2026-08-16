@@ -1,0 +1,10 @@
+[
+ {"label":"W1-cold-impls-Adapter","tool":"find_implementations","args":{"name_path":"Adapter","relative_path":"internal/runtime/adapter.go"}},
+ {"label":"W1-warm-impls-Adapter","tool":"find_implementations","args":{"name_path":"Adapter","relative_path":"internal/runtime/adapter.go"}},
+ {"label":"W4a-callers-of-Prepare","tool":"find_referencing_symbols","args":{"name_path":"Adapter/Prepare","relative_path":"internal/runtime/adapter.go"}},
+ {"label":"W4b-refs-LaunchResult","tool":"find_referencing_symbols","args":{"name_path":"LaunchResult","relative_path":"internal/runtime/adapter.go"}},
+ {"label":"W4c-symbol-LaunchContext","tool":"find_symbol","args":{"name_path_pattern":"LaunchContext","include_info":true}},
+ {"label":"W7b-crossrepo-kos-file","tool":"get_symbols_overview","args":{"relative_path":"../kos/src/model.rs"}},
+ {"label":"W7c-crossrepo-abs","tool":"get_symbols_overview","args":{"relative_path":"/Users/michael.pursifull/work/aae-orc/kos/src/model.rs"}},
+ {"label":"W6b-memories-marvel","tool":"list_memories","args":{}}
+]

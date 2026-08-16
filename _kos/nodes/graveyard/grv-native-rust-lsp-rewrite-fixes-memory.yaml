@@ -1,0 +1,60 @@
+id: grv-native-rust-lsp-rewrite-fixes-memory
+type: element
+confidence: graveyard
+title: "A native Rust LSP-client rewrite does not fix the memory profile (ruled out)"
+content: |
+  RULED OUT 2026-08-16 by finding-aae-orc-5lbu, measured false. If the fleet
+  keeps the live-LSP pattern for symbol workloads and reimplements the client
+  natively in Rust (the finding's own recommendation, chosen over adopting
+  Serena), a tempting assumption rides along: that a native client also fixes
+  the memory and cold-start cost. It does not. That cost belongs to the language
+  server, which a native client still spawns and still waits for.
+
+  THE NUMBERS THAT RULE IT OUT. Peak RSS was PID-attributed to descendants of
+  the spawned process, so a concurrent rust-analyzer could not be mistaken for
+  it. On kos (8,681 lines of Rust):
+
+  - rust-analyzer alone: 1,204 MB / 1,173 MB across two runs.
+  - rust-analyzer-proc-macro-srv: 40 MB.
+  - Serena (Python): 113 MB.
+  - uv wrapper: 53 MB.
+
+  The Python and uv layers together are roughly 166 to 181 MB. That is the whole
+  of what a native Rust rewrite could recover. The 1.2 GB of rust-analyzer and
+  the 6.3 to 7.2 second cold start survive any rewrite, because they are the
+  language server doing the analysis, not the client driving it. The finding
+  confirmed the Rust index does not survive a restart either: run 2's cold query
+  took 7.22 s against run 1's 6.91 s, so rust-analyzer rebuilds its picture from
+  scratch each session, and this fleet's norm is 3 to 5 concurrent sessions.
+
+  WHAT A REWRITE DOES BUY, stated so the ruling is not mistaken for "do not
+  rewrite." A native client recovers the ~170 MB of glue, plus control over
+  process lifecycle, cache location, and whether anything is written into the
+  working tree (Serena writes a .serena/ directory into the repo root). Those
+  are real reasons to build it. Making live LSP cheap is not among them. Any
+  sizing that assumes a Rust rewrite fixes the memory profile is assuming
+  something this probe measured to be false, and would under-budget the resident
+  cost of running symbol resolution across a concurrent fleet.
+
+  CROSS-REFERENCE. The independent SCIP-index cost measurement
+  (finding-aae-orc-msqx) found the same shape from the other direction: for
+  Rust, memory (0.55 to 2.16 GB peak per run, unrelated to repo size), not time,
+  is the binding constraint. Whether the resident cost comes from a live server
+  or from a batch indexer, Rust code intelligence is memory-bound on this stack,
+  and the client language does not change that.
+
+  REOPEN TRIGGERS. A materially lighter Rust language server than rust-analyzer;
+  a rust-analyzer release that persists a cross-run analysis cache and cuts cold
+  start; or a native client that drives analysis without spawning rust-analyzer
+  at all (which would be a different architecture, not a rewrite of the client).
+edges:
+  - target: question-code-graph-correspondence
+    type: partially_resolves
+    note: "constrains sub-question A's implement-natively-in-Rust outcome: the rewrite is worth doing for other reasons, but it does not make live LSP cheap"
+provenance:
+  created_by: human
+  session: "session-2026-08-16-code-graph-harvest"
+  created_at: "2026-08-16"
+  evidence:
+    - _kos/findings/finding-aae-orc-5lbu-serena-live-lsp-baseline.md
+    - _kos/findings/finding-aae-orc-msqx-scip-indexing-cost.md
