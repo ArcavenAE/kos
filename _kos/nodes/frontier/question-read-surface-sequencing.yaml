@@ -1,0 +1,123 @@
+id: question-read-surface-sequencing
+type: question
+confidence: frontier
+title: "Does verb-first-then-MCP hold, or does read benefit only arrive inside the agent task loop?"
+content: |
+  The adopted sequencing (bd `aae-orc-di23`, and Track B of
+  `aae-orc-b0kp` round 3) is one query engine behind three faces over
+  time: the `kos ask` CLI verb now, a kos-side read-only MCP Phase 0
+  next (after the M0 schema repair, because serving a graph with
+  undeclared edge types means serving falsehoods with a clean API), and
+  flyloft federation later when flyloft is real. The reasoning was
+  soonest-surface plus federation-not-foreclosed, and it is recorded as
+  a decision rather than a finding because no evidence has been
+  gathered for it.
+
+  The counter-position is worth stating at full strength, because it
+  changes what a low adoption number means. A CLI verb requires the
+  agent to decide to shell out to a tool it was not already holding. An
+  MCP tool sits inside the task loop, in the same list the model is
+  already choosing from. If read benefit lands mostly there, then
+  measuring `kos ask` adoption from the CLI measures the wrong surface,
+  and a weak result reads as "retrieval is unwanted" when it actually
+  means "the surface is one hop too far away".
+  `elem-machine-consumption-earns-formal-structure` cuts in this
+  direction: structure earns its keep at the moment a machine consumes
+  it, and the MCP face is where the machine is.
+
+  This matters operationally, not just philosophically. The kill
+  condition in `question-kos-ask-retrieval-value` is adoption-weighted.
+  If the sequencing claim is wrong and unexamined, that node can
+  execute a graveyard verdict on a verb that was fine and a surface
+  that was misplaced.
+
+  **Evidence.** Consultation-read share by surface. The telemetry
+  already records a verb field; when MCP Phase 0 lands its reads are
+  tagged as a distinct surface. Two comparisons follow: per-session
+  consultation-read counts in the CLI-only era against the MCP era, and
+  within the MCP era, the CLI-versus-MCP split for sessions that use
+  both.
+
+  **Success signal for the adopted sequencing (testable).** CLI-era
+  consultation reads reach the adoption floor stated in
+  `question-kos-ask-retrieval-value` (invocation in at least half of
+  graph-consulting sessions) without MCP existing. Verb-first survives;
+  MCP Phase 0 proceeds as a convenience face rather than as the fix for
+  a missed surface.
+
+  **Alternative confirmed (falsifies the sequencing, not the read
+  path).** CLI-era consultation reads sit below that floor, and MCP-era
+  per-session consultation reads rise by a factor of two or more over
+  the same query engine. Then verb-first is falsified as a sequencing
+  claim: the `kos ask` graveyard verdict is vacated, the ADR recording
+  the sequencing is superseded rather than the verb, and future read
+  features target the task loop first.
+
+  **Kill condition for this question (graveyard).** If MCP Phase 0 is
+  still unbuilt once the M0 repair has landed and two harvest review
+  rounds have passed, this question has no evidence path and moves to
+  graveyard as unfalsifiable in practice. The adopted sequencing then
+  stands by default, and the record says explicitly that it stands
+  unmeasured rather than confirmed.
+
+  **Standing constraint.** Whatever the verdict, it changes which face
+  ships next, never how many engines exist. Two permanent servers over
+  the same graph is the ruled-out failure the ADR records; a result
+  that argues for MCP-first argues for reordering faces, not for a
+  second implementation.
+
+  Sub-questions:
+  1. **Can telemetry attribute reads to a surface reliably?** An MCP
+     server is a separate process with its own session identity. If
+     session IDs do not line up, the CLI-versus-MCP split inside one
+     session is not computable and only the era comparison remains.
+  2. **Is a factor of two the right threshold, and is between-era the
+     right comparison?** Within-session comparison is stronger evidence
+     and weaker on sample size. The threshold above is a first cut, set
+     before data exist so that it cannot be tuned to the result.
+  3. **Does the M0 repair break the comparison?** An MCP era serving a
+     repaired graph is not comparing like with like against a CLI era
+     that served an unrepaired one. Some of any measured lift belongs
+     to the repair.
+  4. **What if flyloft becomes real before MCP Phase 0?** The question
+     either re-targets to flyloft's surface or dissolves, depending on
+     whether flyloft fronts the same engine or replaces it.
+  5. **Is there a cheap intermediate that tests the hypothesis without
+     building the server?** Putting `kos ask` in an agent's default
+     reach through a rule or skill approximates in-loop availability at
+     a fraction of the cost, and would separate "wrong surface" from
+     "wrong verb" before Phase 0 is committed.
+
+  Cross-graph parents (no cross-graph edge primitive exists yet; see
+  aae-orc finding-133):
+  - aae-orc `_kos/nodes/frontier/question-active-knowledge-surfacing.yaml`
+    (charter F19). Surface placement is where the PULL and PUSH halves
+    meet: an in-loop tool is closer to surfacing than a verb the agent
+    must remember to call.
+  - aae-orc `_kos/ideas/kos-read-path-gap.md`.
+
+  Proposal: `docs/proposals/read-path-first-steps.md`.
+  bd: `aae-orc-di23` (single-surface decision and its ADR),
+  `aae-orc-b0kp` (Track B ordering), `aae-orc-jajn3` (the verb whose
+  verdict this can vacate), `aae-orc-2qlx0` (the evidence source).
+edges:
+  - target: question-kos-ask-retrieval-value
+    type: derives
+    note: "That node's kill condition is adoption-weighted; this question decides whether a low number indicts the verb or its surface."
+  - target: question-read-telemetry-decision-value
+    type: derives
+    note: "Consultation-read share by surface is the only evidence path available for this question."
+  - target: elem-machine-consumption-earns-formal-structure
+    type: derives
+    note: "Grounds the MCP-first counter-position: benefit arrives at the moment the machine reads it."
+  - target: val-locked-predictions
+    type: derives
+    note: "The threshold and comparison shape are fixed before either era has data."
+provenance:
+  created_by: agent
+  session: "2026-08-16 read-path-first-steps"
+  created_at: "2026-08-16"
+  derived_from:
+    - "docs/proposals/read-path-first-steps.md"
+    - "bd aae-orc-di23 (single MCP surface decision)"
+    - "bd aae-orc-b0kp round-3 Track B ordering"
