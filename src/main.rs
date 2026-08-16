@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use clap::Parser;
 
-/// KOS — Knowledge Operating System
+/// KOS; Knowledge Operating System
 ///
 /// Graph-based knowledge accumulation for designed systems.
 /// Reads typed YAML nodes, validates schema, renders graphs,
@@ -40,7 +40,7 @@ enum Commands {
         ready: bool,
     },
 
-    /// Ask a question — ranked, scoped retrieval over the knowledge graph
+    /// Ask a question; ranked, scoped retrieval over the knowledge graph
     ///
     /// Searches the nearest graph's nodes and findings, ranks them by lexical
     /// match strength boosted by graph proximity, and carries provenance
@@ -108,10 +108,10 @@ enum Commands {
         update: bool,
     },
 
-    /// Detect drift — content changes and stale dependents
+    /// Detect drift; content changes and stale dependents
     Drift,
 
-    /// Session-close retrospection audit — what changed, predicted vs actual, harvest debt
+    /// Session-close retrospection audit; what changed, predicted vs actual, harvest debt
     Reflect {
         /// Git ref to compare against. Default: most recent harvest/charter commit.
         #[arg(long)]
@@ -166,7 +166,7 @@ enum Commands {
         fix: bool,
     },
 
-    /// Create an idea file — pre-hypothesis brainstorming
+    /// Create an idea file; pre-hypothesis brainstorming
     Idea {
         /// Slug for the idea filename (e.g., "my-observation")
         slug: String,
@@ -180,7 +180,7 @@ enum Commands {
         dir: Option<PathBuf>,
     },
 
-    /// Create a frontier question node — the unit of work
+    /// Create a frontier question node; the unit of work
     Question {
         /// Slug for the question (e.g., "charter-scaling" → question-charter-scaling)
         slug: String,
@@ -193,7 +193,7 @@ enum Commands {
         dir: Option<PathBuf>,
     },
 
-    /// Create a finding — probe result with auto-numbered ID
+    /// Create a finding; probe result with auto-numbered ID
     Finding {
         /// Slug for the finding (e.g., "charter-inflation")
         slug: String,
@@ -206,7 +206,7 @@ enum Commands {
         dir: Option<PathBuf>,
     },
 
-    /// Create an exploration brief — plan for a probe
+    /// Create an exploration brief; plan for a probe
     Probe {
         /// Slug for the brief (e.g., "substrate" → brief-substrate)
         slug: String,
@@ -255,7 +255,7 @@ enum CharterAction {
         #[arg(long, env = "KOS_WORKSPACE")]
         workspace: Option<PathBuf>,
 
-        /// Quiet mode — print nothing, just exit 0/1
+        /// Quiet mode; print nothing, just exit 0/1
         #[arg(long, short)]
         quiet: bool,
     },
@@ -320,7 +320,7 @@ fn main() -> anyhow::Result<()> {
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
 
             if merged {
-                // Validate every discovered graph, accumulating results —
+                // Validate every discovered graph, accumulating results ;
                 // one failing graph must not mask the others (aae-orc-z67m).
                 let mut combined = kos::validate::Summary::default();
                 let mut io_errors = 0;
@@ -340,18 +340,21 @@ fn main() -> anyhow::Result<()> {
                 }
                 eprintln!();
                 eprintln!(
-                    "all graphs: {} nodes, {} passed, {} warnings, {} failed, {} parse errors",
+                    "all graphs: {} nodes, {} passed, {} warnings, {} failed, {} parse errors; {} findings, {} duplicate-id failures, {} findings warnings",
                     combined.total,
                     combined.passed,
                     combined.warnings,
                     combined.failed,
-                    combined.parse_errors
+                    combined.parse_errors,
+                    combined.findings_total,
+                    combined.findings_failed,
+                    combined.findings_warnings
                 );
                 if !combined.clean() || io_errors > 0 {
                     std::process::exit(1);
                 }
             } else {
-                // Validate the graph nearest to cwd — the local subrepo graph
+                // Validate the graph nearest to cwd; the local subrepo graph
                 // when inside one, the orchestrator graph at orc root.
                 // Previously this always resolved to the kos repo's own graph
                 // regardless of cwd (aae-orc-z67m / finding-060 anomaly 1).
