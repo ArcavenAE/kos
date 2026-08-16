@@ -7,9 +7,6 @@
 # kos drift snapshots (local state, not committed)
 .drift-snapshot.json
 
-# kos read telemetry (per-session logs under any graph, not committed)
-.telemetry/
-
 # IDE
 .idea/
 .vscode/
