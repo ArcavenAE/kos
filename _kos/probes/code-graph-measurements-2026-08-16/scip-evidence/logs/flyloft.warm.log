@@ -1,0 +1,53 @@
+Generating SCIP start...
+rust-analyzer: Loading discovering sysroot
+rust-analyzer: Loading querying project metadata
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading build script proc-macro2 run
+rust-analyzer: Loading build script quote run
+rust-analyzer: Loading build script serde_json run
+rust-analyzer: Loading build script thiserror run
+rust-analyzer: Loading build script libc run
+rust-analyzer: Loading build script zmij run
+rust-analyzer: Loading build script serde_core run
+rust-analyzer: Loading build script anyhow run
+rust-analyzer: Loading build script getrandom run
+rust-analyzer: Loading build script serde run
+rust-analyzer: Loading build script parking_lot_core run
+rust-analyzer: Loading build script num-traits run
+rust-analyzer: Loading build script blake3 run
+rust-analyzer: Loading proc-macro serde_derive built
+rust-analyzer: Loading proc-macro tokio-macros built
+rust-analyzer: Loading proc-macro thiserror-impl built
+rust-analyzer: Loading proc-macro tracing-attributes built
+rust-analyzer: Loading proc-macro clap_derive built
+rust-analyzer: Loading proc-macro async-trait built
+2026-08-16T15:32:32.691137-05:00 ERROR Bug: definition at crates/flyloft-core/src/catalog.rs:15:21-15:31 should have been in an SCIP document but was not.
+2026-08-16T15:32:32.691189-05:00 ERROR Bug: definition at crates/flyloft-core/src/line_set.rs:13:21-13:31 should have been in an SCIP document but was not.
+Generating SCIP finished 2.432878125s
+        2.51 real         3.38 user         1.84 sys
+           978796544  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              120040  page reclaims
+                   4  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   1  signals received
+                 220  voluntary context switches
+                6800  involuntary context switches
+         47817880048  instructions retired
+         16475527136  cycles elapsed
+           944948568  peak memory footprint

@@ -1,0 +1,23 @@
+Resolving module name
+Loading Packages
+Visiting Packages [0/1]Visiting Packages [1/1]
+Indexing Implementations [0/238]Indexing Implementations [238/238]
+Visiting Project Files [0/1]Visiting Project Files [1/1]
+        1.64 real         1.40 user         0.91 sys
+           163397632  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               68644  page reclaims
+                  62  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  55  messages sent
+                 145  messages received
+                1037  signals received
+                 805  voluntary context switches
+               15272  involuntary context switches
+           450849090  instructions retired
+           174304726  cycles elapsed
+            22528624  peak memory footprint

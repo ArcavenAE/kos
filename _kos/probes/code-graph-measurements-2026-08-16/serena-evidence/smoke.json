@@ -1,0 +1,18 @@
+[
+  {
+    "label": "__initialize__",
+    "seconds": 4.163
+  },
+  {
+    "label": "smoke-overview",
+    "tool": "get_symbols_overview",
+    "args": {
+      "relative_path": "src/model.rs"
+    },
+    "seconds": 6.283,
+    "error": null,
+    "chars": 692,
+    "text": "{\"Struct\": [\"Node\", \"Edge\", \"GraveyardSection\", \"BriefSection\", \"Gate\", \"FindingSection\", \"CompactionMeta\", \"Provenance\", \"Finding\", \"CharterItem\", \"RdBrief\", \"GraphManifest\", \"GraphInclude\", \"GraphSource\"], \"Object\": [\"impl Node\", \"impl std::fmt::Display for NodeType\", \"impl Confidence\", \"impl std::fmt::Display for Confidence\", \"impl From<String> for EdgeType\", \"impl EdgeType\", \"impl std::fmt::Display for EdgeType\", \"impl std::fmt::Display for SignalType\", \"impl Finding\", \"impl std::fmt::Display for CharterSection\", \"impl std::fmt::Display for GraphScope\"], \"Enum\": [\"NodeType\", \"Confidence\", \"EdgeType\", \"SignalType\", \"CharterSection\", \"GraphScope\"], \"Constant\": [\"LEGAL_EDGE_TYPES\"]}",
+    "ts": "15:32:09"
+  }
+]
