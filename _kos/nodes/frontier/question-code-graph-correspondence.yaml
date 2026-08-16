@@ -1,0 +1,178 @@
+id: question-code-graph-correspondence
+type: question
+confidence: frontier
+title: "Code-graph correspondence: should compiler-sourced symbol facts land in kos, on what substrate, and as one lens or two?"
+content: |
+  The open question the 2026-08-08 code-graph research arc is really asking:
+  does this fleet want a source-code graph, and if so, is it a second
+  population of correspondence facts inside kos (compiler-sourced symbol edges
+  beside the spec-to-code correspondences already there), or a separate system?
+  The briefing's own recommendation (R1) is "make kos the sink": emit SCIP from
+  the toolchain, parse it, land DEFINES / REFERENCES / IMPLEMENTS / DEPENDS_ON
+  as typed facts, and let kos's three-state confidence model carry the
+  provenance the field otherwise loses. This node holds that question open so
+  the arc can be revised as a whole, rather than each of its sixteen tickets
+  silently becoming its own little plan.
+
+  The pre-hypothesis capture (the three readings: a correspondence layer is
+  arriving, this forces the substrate decision, the methodology is escaping the
+  tool) lives in `_kos/ideas/code-graph-as-second-lens.md` and is not repeated
+  here. The props stay verbatim in `docs/research/`.
+
+  SOURCE AUDIT. The two research documents
+  (`docs/research/2026-08-08-code-graph-briefing.md` and its
+  `-initial-analysis.md`) are committed and are the primary source. Everything
+  the arc asserts BEYOND those two documents is currently unsourced and is
+  tracked in aae-orc-1od3. A reader should treat claims traceable to the two
+  docs as load-bearing and claims beyond them as borrowed until 1od3 closes.
+
+  SOURCE CALIBRATION (a fact about the source, not an error in any single
+  recommendation). The briefing is calibrated to a pre-2026-07-31 roster. It
+  assumes forestage is a live target twice (R3, "implement the PageRank repo
+  map in Forestage," and the R2 objection-answer, "Forestage already speaks to
+  tooling"), and its section 1 stack table lists forestage as live. forestage
+  was retired by operator directive on 2026-07-31 (vision.md). This is exactly
+  the provenance-versus-confidence separation the arc argues for elsewhere: a
+  high-grade source can carry a stale premise. Every recommendation naming a
+  component must be checked against the current roster before it is actioned.
+  Forestage's retirement also orphans the two ranking/injection recommendations
+  (sub-question F and outcome three of sub-question A); both now need a host
+  named before they can proceed.
+
+  ── Sub-questions ──────────────────────────────────────────────
+
+  A. Does live LSP suffice, making an ingest optional? (aae-orc-5lbu)
+     MEASURED. finding-aae-orc-5lbu-serena-live-lsp-baseline. Split verdict:
+     live LSP (rust-analyzer / gopls via a symbol adapter) beats grep on
+     correctness for symbol-resolution workloads (found an implementation grep
+     missed; dropped 9 false positives from a blast-radius estimate), and
+     cannot serve orientation, prior-session history, cross-repo scope, or
+     provenance. An ingest is therefore not optional for the non-symbol
+     workloads, and live LSP is not replaceable for the symbol ones. The two
+     are complementary, not competing. Answers the briefing's Q2 and R2.
+
+  B. Is compiler-grade indexing affordable at our cadence? (aae-orc-msqx)
+     MEASURED, cost half only. finding-aae-orc-msqx-scip-indexing-cost. Cheap
+     in wall time, expensive in memory for Rust (0.55 to 2.16 GB peak per run,
+     unrelated to repo size); near-free for Go. Warm fleet sweep 44.31 s / cold
+     294.24 s / 60.83 MB index. Per-push is the defensible fleet default; the CI
+     cache-persistence question decides whether any per-commit rung survives.
+     A silent-degradation failure mode is the load-bearing caveat: rust-analyzer
+     indexed one workspace without the standard library, exited 0, and wrote a
+     plausible index. The DECISION-FORCING half of B is NOT done: whether raw
+     SCIP facts can ADDRESS the W6 (history), W7 (fleet-scope), and W8 (typed
+     provenance) workloads that live LSP failed is a separate probe, still open.
+     msqx measured what indexing costs, not whether its output closes the gap
+     5lbu found.
+
+  C. What substrate holds the facts? (aae-orc-isie)
+     OPEN. Ungated by the mission-split (per isie). A per-commit, per-repo,
+     versioned code graph across 25-plus repos is orders of magnitude past the
+     flat-file ceiling kos already measured (grv-flat-file-context-scaling,
+     ~20 epics). The substrate hypothesis (finding-036-substrate-hypothesis)
+     and its ceiling convergence (finding-040-substrate-ceiling-convergence)
+     say YAML-in-git cannot carry this. Whether the answer is the kos fact store,
+     Dolt, or both (bedrock facts in kos, raw symbol table in Dolt) is the
+     briefing's Q3 / R1-vs-R6, and it shares the multi-writer concern with
+     question-kos-multi-writer-concurrency.
+
+  D. How do source grade and confidence tier stay separate? (aae-orc-pwnh)
+     OPEN. The schema test. A compiler-resolved edge is high source grade but is
+     not automatically bedrock; a symbol absent from the current index is not
+     graveyard (graveyard is append-only and epistemic, not "not currently
+     present"). The 5lbu finding sharpened this: live LSP answers carry location,
+     never provenance, and its authored memories arrive with no date, author, or
+     commit. Source grade (how the fact was derived) and confidence tier (how
+     sure we are it is true) are different axes, and conflating them would import
+     the field's exact weakness into kos.
+
+  E. One retrieval surface or two? (aae-orc-di23)
+     OPEN. flyloft-mcp federation vs a kos epistemic API as the single MCP
+     surface. The briefing's R5 models an indexed repo as a flyloft batten (held
+     vs cataloged, index-on-demand as interlibrary loan), which would yield one
+     retrieval surface across code and documents rather than two.
+
+  F. Where does ranking live now that forestage is retired? (aae-orc-rhdj)
+     OPEN, and re-hosted. The briefing's R3 (reimplement Aider's personalised
+     PageRank as a ranking heuristic, ~50 lines of power iteration, tags.scm
+     Apache-2.0) named forestage as the host. forestage is retired, so R3 needs
+     a new host named before it can proceed. This is the direct downstream cost
+     of the source-calibration fact above.
+
+  G. Is the correspondence layer one mission or two? (aae-orc-p74l)
+     OPEN. Issue 16's mission split. Does the code graph belong to one mission
+     (extend elem-correspondence-layer to compiler-sourced symbol facts) or
+     two that currently borrow against each other? The idea file's Reading 1
+     records the unresolved tension: a spec-to-code correspondence is authored
+     and load-bearing; a symbol-to-symbol edge from a compiler is derived and
+     regenerated on every index. Whether they share one node type or need two is
+     the heart of this sub-question, and I do not settle it by choosing a word.
+
+  ── Two honesty disciplines (applied, not softened) ────────────
+
+  1. The registered 0.65-insufficient prediction is scored a HIT and annotated
+     CONSTRUCTION-INFLATED. The 5lbu brief registered 0.65 that Serena alone
+     proves insufficient, and the measurement confirms it (W7 fails with a hard
+     error: one language-server set binds to one active project). I log the hit.
+     I also mark it inflated, because the workload list deliberately named W6,
+     W7, and W8 as not-served probes, so "at least one fails" was near-certain by
+     the instrument's own design. The prediction was calibrated against a list
+     the same author built to contain guaranteed failures. Logging the hit keeps
+     the scoreboard honest; marking it construction-inflated keeps the
+     calibration record honest (anti-HARKing applied to our own scoring).
+
+  2. W8 is NOT promoted into a read-path mandate. W8 (why is it this way /
+     provenance) is the single strongest piece of evidence in the 5lbu finding
+     for read-path work: Serena surfaced the right finding only through its grep
+     tool, unranked and undifferentiated from a parse call, with no notion that a
+     finding is a different kind of object from a call site. That is a real and
+     pointed gap. It is also one workload. If read-path work proceeds, it
+     proceeds as its own registered question with its own probe and timebox, not
+     as a conclusion smuggled out of this finding. One workload names a gap; it
+     does not authorise a program.
+
+  This question closes when the arc is decided (kos as sink or not, substrate
+  chosen, mission split resolved), not when the two cost probes finished. A and
+  B are answered; C through G are open; the decision-forcing half of B is the
+  nearest open probe.
+edges:
+  - target: elem-correspondence-layer
+    type: derives
+    note: "the code graph is a second population of correspondence edges; this question extends that element to compiler-sourced symbol facts (sub-question G)"
+  - target: finding-036-substrate-hypothesis
+    type: supports
+    note: "substrate hypothesis; the code graph is the workload that may force the move off files (sub-question C)"
+  - target: finding-040-substrate-ceiling-convergence
+    type: supports
+    note: "measured ceiling on the flat-file substrate"
+  - target: grv-flat-file-context-scaling
+    type: supports
+    note: "flat-file context loading measured to stop scaling at ~20 epics; a per-commit code graph is far past that"
+  - target: finding-023-signal-to-noise-four-projects
+    type: supports
+    note: "independent-discovery criterion; two projects arriving at confidence-tagging is weak evidence the structure is real (briefing sec 7)"
+  - target: aae-orc::question-kos-multi-writer-concurrency
+    type: supports
+    note: "shared substrate and multi-writer concern feeding sub-question C"
+provenance:
+  created_by: human
+  session: "session-2026-08-16-code-graph-harvest"
+  created_at: "2026-08-16"
+  evidence:
+    - _kos/ideas/code-graph-as-second-lens.md
+    - _kos/findings/finding-aae-orc-5lbu-serena-live-lsp-baseline.md
+    - _kos/findings/finding-aae-orc-msqx-scip-indexing-cost.md
+    - docs/research/2026-08-08-code-graph-briefing.md
+notes: >
+  Same-graph edge targets are bare kos-graph ids: elem-correspondence-layer,
+  finding-036, finding-040, grv-flat-file-context-scaling, finding-023 all
+  live in this graph (kos/_kos). The one cross-graph target,
+  aae-orc::question-kos-multi-writer-concurrency, is an orc-graph node
+  (RELOCATION-PENDING -> kos per aae-orc/_kos/relocations.md); the aae-orc::
+  prefix is the fleet namespacing convention, tolerated by kos validate as a
+  warning since no cross-graph edge primitive exists yet (finding-133).
+  Charter F10/F19/F25 are orc charter sections, referenced in prose not as
+  edges. Relocated from the orc graph 2026-08-16 by the subject test: the
+  subject is kos code-graph correspondence and every substantive edge targets
+  a kos node. Every one of the sixteen arc tickets should reference this node
+  (aj3c close condition).

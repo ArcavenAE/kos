@@ -1,0 +1,28 @@
+[
+  {
+    "label": "__initialize__",
+    "seconds": 2.071
+  },
+  {
+    "label": "list-after-restart",
+    "tool": "list_memories",
+    "args": {},
+    "seconds": 1.026,
+    "error": null,
+    "chars": 52,
+    "text": "{\"memories\": [\"memory_maintenance\", \"probe_marker\"]}",
+    "ts": "15:38:07"
+  },
+  {
+    "label": "read-after-restart",
+    "tool": "read_memory",
+    "args": {
+      "memory_name": "probe_marker"
+    },
+    "seconds": 0.106,
+    "error": null,
+    "chars": 122,
+    "text": "Probe marker written by aae-orc-5lbu at test time. If a later session reads this, memories persist across server restarts.",
+    "ts": "15:38:07"
+  }
+]

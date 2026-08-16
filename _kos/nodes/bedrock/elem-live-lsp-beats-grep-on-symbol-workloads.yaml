@@ -1,0 +1,68 @@
+id: elem-live-lsp-beats-grep-on-symbol-workloads
+type: element
+confidence: bedrock
+title: "On symbol-resolution workloads, a live language server beats grep on correctness"
+content: |
+  CLAIM, tightly scoped. On symbol-resolution workloads (who implements this
+  interface, what breaks if I change this symbol, where does this call path go,
+  is this symbol dead), a live language server (rust-analyzer or gopls, driven
+  through a symbol adapter over MCP) beats the ripgrep an agent would otherwise
+  run, on correctness and not merely on convenience. The comparator was grep,
+  deliberately, because a language server that only beats nothing has not earned
+  its process and memory cost.
+
+  The scope qualifier is load-bearing and is the reason this is a narrow element
+  rather than a claim about live LSP in general. It holds for workloads whose
+  answer lives in the type graph. It says nothing about orientation, history,
+  cross-repo scope, or provenance, which the companion graveyard node
+  grv-live-lsp-serves-non-symbol-workloads rules out on the same evidence.
+
+  WHAT WAS MEASURED (finding-aae-orc-5lbu, kos + marvel, workloads W1-W5):
+
+  - W1 (who implements runtime.Adapter, marvel/Go): the language server returned
+    seven implementations to my six. The seventh, feedlessAdapter in a test
+    file, genuinely implements the interface; my hand-built ripgrep ground truth
+    missed it because I guessed the directory and the type system did not. Grep
+    is over text; the answer was in the type graph.
+  - W2 (blast radius of the Confidence enum, kos/Rust): ripgrep found 51 textual
+    occurrences across 8 files; the language server returned 42 across 6, and
+    every omission was correct on inspection (matches inside markdown template
+    strings, doc comments, string literals, and definition headers). Grep
+    carried nine false positives into a blast-radius estimate, of the kind that
+    look real in a diff review. The server also attributed each reference to its
+    containing symbol, which is the actual unit of a refactor and which grep
+    cannot produce.
+  - W4 and W5 (cross-package call path and caller set) were served, W4 with a
+    signal-to-noise caveat (the one production caller arrived among ~31 test
+    functions with no ranking; containing-symbol attribution is what keeps it
+    usable).
+
+  EVIDENCE BASE AND ITS LIMIT. This is one probe over two repositories, one Rust
+  and one Go, run in a single afternoon. The correctness results (W1, W2, W5) do
+  not depend on machine load and I verified each against the source by hand, so
+  the direction is solid. But "measured on kos and marvel" is the honest extent
+  of it; I did not test the claim across languages beyond these two or across
+  the harder Rust features (traits, generics, macros) the briefing flags as
+  where heuristic tools fail. The claim is bedrock for what it says and no wider.
+
+  IMPLEMENTATION NOTE, not part of the claim. The finding's recommendation is to
+  keep this pattern and build it natively in Rust rather than adopt Serena (a
+  Python MCP server that writes into the working tree and binds one language
+  server set to one project). The memory cost of that build is addressed
+  separately in grv-native-rust-lsp-rewrite-fixes-memory, which rules out the
+  assumption that a rewrite makes live LSP cheap.
+
+  REOPEN / REVISE TRIGGERS. New evidence that would move this: a symbol workload
+  where grep matches or beats the language server on correctness; a measurement
+  on a trait-heavy or macro-heavy Rust crate showing the server no better than
+  grep there; or a third language where the pattern does not hold.
+edges:
+  - target: question-code-graph-correspondence
+    type: partially_resolves
+    note: "answers the symbol-workload half of sub-question A (does live LSP suffice): yes, and it beats grep, for symbol workloads only"
+provenance:
+  created_by: human
+  session: "session-2026-08-16-code-graph-harvest"
+  created_at: "2026-08-16"
+  evidence:
+    - _kos/findings/finding-aae-orc-5lbu-serena-live-lsp-baseline.md

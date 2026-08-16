@@ -1,0 +1,52 @@
+[
+  {
+    "tag": "marvel-run1",
+    "project": "/Users/michael.pursifull/work/aae-orc/marvel",
+    "initialize_s": 2.11,
+    "queries": [
+      {
+        "label": "cold",
+        "seconds": 2.193,
+        "error": null
+      },
+      {
+        "label": "warm",
+        "seconds": 0.139,
+        "error": null
+      }
+    ],
+    "rss_peak_mb": {
+      "gopls:97992": 600.8,
+      "python:97977": 127.6,
+      "uv:97944": 53.3,
+      "gopls:97999": 26.7
+    },
+    "total_peak_mb": 808.4,
+    "samples": 16
+  },
+  {
+    "tag": "marvel-run2",
+    "project": "/Users/michael.pursifull/work/aae-orc/marvel",
+    "initialize_s": 2.757,
+    "queries": [
+      {
+        "label": "cold",
+        "seconds": 2.14,
+        "error": null
+      },
+      {
+        "label": "warm",
+        "seconds": 0.123,
+        "error": null
+      }
+    ],
+    "rss_peak_mb": {
+      "gopls:98706": 212.0,
+      "python:98619": 128.1,
+      "uv:98596": 53.4,
+      "gopls:98708": 26.6
+    },
+    "total_peak_mb": 420.0,
+    "samples": 17
+  }
+]
