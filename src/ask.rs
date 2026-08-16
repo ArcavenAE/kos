@@ -15,7 +15,7 @@
 
 use std::path::{Path, PathBuf};
 
-use crate::error::{KosError, Result};
+use crate::error::Result;
 use crate::model::{Confidence, EdgeType, Node, NodeType};
 use crate::orient;
 use crate::telemetry::{self, ReadClass, ReadEvent};
@@ -400,87 +400,15 @@ fn floor_boundary(s: &str, mut i: usize) -> usize {
 
 /// Load the search corpus for a graph: every node (all tiers) plus every
 /// finding. Findings are read as nodes so their citation edges and dates join
-/// the graph the ranking walks. Reuses `orient`'s node loader; see
-/// `load_findings_as_nodes` for the one legacy shape it cannot parse.
+/// the graph the ranking walks. Node loading reuses `orient`'s loader; finding
+/// loading goes through the shared `findings` module, which accepts all three
+/// on-disk finding shapes (pure yaml, md+frontmatter, legacy bare md).
 pub fn load_corpus(graph_dir: &Path) -> Result<Vec<Node>> {
     let mut corpus = orient::load_all_nodes(&graph_dir.join("nodes"))?;
-    corpus.extend(load_findings_as_nodes(&graph_dir.join("findings"))?);
+    corpus.extend(crate::findings::load_finding_nodes(
+        &graph_dir.join("findings"),
+    )?);
     Ok(corpus)
-}
-
-/// Load findings as nodes. Findings carry id/type/confidence/title/edges/
-/// provenance, so they deserialize as `Node` directly, which keeps their
-/// (heavily cited) edges and their `created_at` dates in the corpus. One
-/// legacy finding stores its prose under `finding.summary`/`detail` with no
-/// top-level `content`; that one is retried through `finding_node_fallback`
-/// before it would be dropped. Parse failures are skipped silently: a
-/// malformed finding is not `ask`'s error to report.
-fn load_findings_as_nodes(dir: &Path) -> Result<Vec<Node>> {
-    if !dir.exists() {
-        return Ok(Vec::new());
-    }
-    let mut out = Vec::new();
-    for entry in walkdir::WalkDir::new(dir)
-        .max_depth(1)
-        .into_iter()
-        .filter_map(std::result::Result::ok)
-    {
-        let path = entry.path();
-        let ext = path.extension().and_then(|e| e.to_str());
-        if !path.is_file() || (ext != Some("yaml") && ext != Some("yml")) {
-            continue;
-        }
-        let text = std::fs::read_to_string(path).map_err(KosError::Io)?;
-        match serde_yaml::from_str::<Node>(&text) {
-            Ok(mut node) => {
-                node.source_path = path.to_path_buf();
-                out.push(node);
-            }
-            Err(_) => {
-                if let Some(mut node) = finding_node_fallback(&text) {
-                    node.source_path = path.to_path_buf();
-                    out.push(node);
-                }
-            }
-        }
-    }
-    Ok(out)
-}
-
-/// Build a searchable node from a finding whose prose lives under the `finding`
-/// block instead of a top-level `content` field. Pulls id, title, and confidence
-/// from the top level and flattens the `finding` block into content so the text
-/// is still matchable.
-fn finding_node_fallback(text: &str) -> Option<Node> {
-    let value: serde_yaml::Value = serde_yaml::from_str(text).ok()?;
-    let id = value.get("id")?.as_str()?.to_string();
-    let title = value
-        .get("title")
-        .and_then(serde_yaml::Value::as_str)
-        .unwrap_or("")
-        .to_string();
-    let content = value
-        .get("finding")
-        .and_then(|f| serde_yaml::to_string(f).ok())
-        .unwrap_or_default();
-
-    Some(Node {
-        id,
-        node_type: NodeType::Finding,
-        confidence: Confidence::Frontier,
-        title,
-        content,
-        edges: Vec::new(),
-        depends_on: Vec::new(),
-        graveyard: None,
-        brief: None,
-        finding: None,
-        compaction: None,
-        provenance: None,
-        tags: Vec::new(),
-        notes: None,
-        source_path: PathBuf::new(),
-    })
 }
 
 /// Resolve which graph to search and the label to log it under. An explicit

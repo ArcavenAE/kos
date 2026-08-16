@@ -1,7 +1,8 @@
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashSet};
 use std::path::Path;
 
 use crate::error::{KosError, Result};
+use crate::findings::{self, FindingLoad};
 use crate::model::{LEGAL_EDGE_TYPES, Node, NodeType};
 
 #[derive(Debug)]
@@ -19,7 +20,7 @@ impl ValidationResult {
 }
 
 /// Aggregate outcome of validating one graph. The caller decides the
-/// process exit code — `run` never exits, so multi-graph validation
+/// process exit code; `run` never exits, so multi-graph validation
 /// can accumulate results across graphs (kos#54 / aae-orc-z67m).
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Summary {
@@ -28,11 +29,18 @@ pub struct Summary {
     pub warnings: usize,
     pub failed: usize,
     pub parse_errors: usize,
+    /// Findings examined across all three on-disk shapes.
+    pub findings_total: usize,
+    /// Findings that share a finding number with another file (structural
+    /// failure; two files claiming the same finding).
+    pub findings_failed: usize,
+    /// Findings with an id/filename mismatch, or files that would not load.
+    pub findings_warnings: usize,
 }
 
 impl Summary {
     pub fn clean(&self) -> bool {
-        self.failed == 0 && self.parse_errors == 0
+        self.failed == 0 && self.parse_errors == 0 && self.findings_failed == 0
     }
 
     pub fn merge(&mut self, other: &Summary) {
@@ -41,6 +49,9 @@ impl Summary {
         self.warnings += other.warnings;
         self.failed += other.failed;
         self.parse_errors += other.parse_errors;
+        self.findings_total += other.findings_total;
+        self.findings_failed += other.findings_failed;
+        self.findings_warnings += other.findings_warnings;
     }
 }
 
@@ -103,13 +114,123 @@ pub fn run(kos_root: &Path) -> Result<Summary> {
         "{total} nodes: {pass_count} passed, {warn_count} warnings, {fail_count} failed, {parse_error_count} parse errors",
     );
 
+    // Findings pass; a second section over _kos/findings/. Findings are not
+    // under nodes/, so the node passes above never saw them; the collision
+    // between two files claiming the same finding number went unnoticed.
+    let findings = validate_findings(&kos_root.join("findings"));
+
     Ok(Summary {
         total,
         passed: pass_count,
         warnings: warn_count,
         failed: fail_count,
         parse_errors: parse_error_count,
+        findings_total: findings.total,
+        findings_failed: findings.failed,
+        findings_warnings: findings.warnings,
     })
+}
+
+/// Counts from the findings pass, folded into the returned `Summary`.
+#[derive(Default)]
+struct FindingsReport {
+    total: usize,
+    failed: usize,
+    warnings: usize,
+}
+
+/// Validate findings: fail on two files claiming the same finding number, warn
+/// on id/filename drift and on files that will not load. Shape is never an
+/// error; pure yaml, md+frontmatter, and legacy bare md are all valid. A
+/// duplicate id is structural well-formedness (may gate per ADR-007), not a
+/// health metric.
+fn validate_findings(findings_dir: &Path) -> FindingsReport {
+    let mut report = FindingsReport::default();
+    if !findings_dir.exists() {
+        return report;
+    }
+
+    let loads = match findings::load_findings(findings_dir) {
+        Ok(l) => l,
+        Err(e) => {
+            println!();
+            println!("=== findings ===");
+            println!("  could not read findings/: {e}");
+            return report;
+        }
+    };
+
+    // Group loaded findings by finding number so two files claiming the same
+    // number are visible; carry an id/stem-drift warning per file.
+    let mut by_key: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
+    let mut drift: Vec<(String, String)> = Vec::new();
+    let mut unloadable: Vec<(String, String)> = Vec::new();
+
+    for load in loads {
+        match load {
+            FindingLoad::Loaded(l) => {
+                report.total += 1;
+                let key = findings::finding_key(&l.node.id);
+                by_key
+                    .entry(key)
+                    .or_default()
+                    .push((l.node.id.clone(), l.stem.clone()));
+                if l.node.id != l.stem {
+                    drift.push((l.node.id.clone(), l.stem.clone()));
+                }
+            }
+            FindingLoad::Unloadable { path, error } => {
+                report.total += 1;
+                let name = path
+                    .file_name()
+                    .and_then(|f| f.to_str())
+                    .unwrap_or("?")
+                    .to_string();
+                unloadable.push((name, error));
+            }
+        }
+    }
+
+    println!();
+    println!("=== findings ===");
+
+    // Duplicate finding numbers; the structural failure.
+    for (key, members) in &by_key {
+        if members.len() > 1 {
+            report.failed += members.len();
+            println!(
+                "  FAIL  duplicate finding number '{key}' across {} files:",
+                members.len()
+            );
+            for (id, stem) in members {
+                if id == stem {
+                    println!("        ✗ {stem}");
+                } else {
+                    println!("        ✗ {stem} (id '{id}')");
+                }
+            }
+        }
+    }
+
+    // id/filename drift; a warning, not a failure.
+    for (id, stem) in &drift {
+        report.warnings += 1;
+        println!("  WARN  id '{id}' does not match filename stem '{stem}'");
+    }
+
+    // Files that would not load at all; kept visible as a warning.
+    for (name, error) in &unloadable {
+        report.warnings += 1;
+        println!("  WARN  could not load {name}: {error}");
+    }
+
+    println!();
+    println!(
+        "{} findings: {} duplicate-id failures, {} warnings",
+        report.total, report.failed, report.warnings
+    );
+
+    report
 }
 
 /// A loaded node: either successfully parsed or failed to parse.
@@ -146,7 +267,7 @@ fn load_all_nodes(nodes_dir: &Path) -> Result<(Vec<LoadedNode>, HashSet<String>)
                 nodes.push(LoadedNode::Parsed(Box::new(node), rel_path));
             }
             Err(e) => {
-                // Parse error is the complete report — no further validation
+                // Parse error is the complete report; no further validation
                 println!("  PARSE ERROR  {rel_path}: {e}");
                 nodes.push(LoadedNode::ParseError);
             }
@@ -213,5 +334,104 @@ fn validate_node(node: &Node, rel_path: &str, known_ids: &HashSet<String>) -> Va
         path: rel_path.to_string(),
         errors,
         warnings,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+    use std::path::PathBuf;
+
+    use super::*;
+
+    /// A minimal but valid kos root: one well-formed bedrock node, plus a
+    /// findings/ dir the caller populates. Findings validation only runs when
+    /// nodes/ exists, so the node is required scaffolding.
+    fn scaffold() -> (tempfile::TempDir, PathBuf) {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path().to_path_buf();
+        let bedrock = root.join("nodes").join("bedrock");
+        fs::create_dir_all(&bedrock).unwrap();
+        fs::write(
+            bedrock.join("elem-anchor.yaml"),
+            "id: elem-anchor\ntype: element\nconfidence: bedrock\ntitle: anchor\ncontent: a body\n",
+        )
+        .unwrap();
+        fs::create_dir_all(root.join("findings")).unwrap();
+        (dir, root)
+    }
+
+    fn write_finding(root: &Path, name: &str, text: &str) {
+        fs::write(root.join("findings").join(name), text).unwrap();
+    }
+
+    #[test]
+    fn duplicate_finding_number_fails() {
+        let (_guard, root) = scaffold();
+        // Two distinct findings, different slugs, SAME number; the collision.
+        write_finding(
+            &root,
+            "finding-123-harness-invocation.md",
+            "# harness invocation\n\n**Date:** 2026-08-01\n\nbody one\n",
+        );
+        write_finding(
+            &root,
+            "finding-123-org-owned-fork.md",
+            "# org owned fork\n\n**Date:** 2026-08-02\n\nbody two\n",
+        );
+
+        let summary = run(&root).unwrap();
+        assert!(
+            !summary.clean(),
+            "a duplicate finding number must fail the graph"
+        );
+        assert_eq!(summary.findings_total, 2);
+        assert_eq!(summary.findings_failed, 2);
+    }
+
+    #[test]
+    fn distinct_finding_numbers_pass() {
+        let (_guard, root) = scaffold();
+        write_finding(
+            &root,
+            "finding-201-alpha.md",
+            "# alpha\n\n**Date:** 2026-08-01\n\nbody\n",
+        );
+        write_finding(
+            &root,
+            "finding-202-beta.yaml",
+            "id: finding-202-beta\ntype: finding\nconfidence: frontier\ntitle: beta\ncontent: body\n",
+        );
+
+        let summary = run(&root).unwrap();
+        assert!(summary.clean(), "distinct finding numbers must pass");
+        assert_eq!(summary.findings_total, 2);
+        assert_eq!(summary.findings_failed, 0);
+    }
+
+    #[test]
+    fn id_filename_drift_warns_without_failing() {
+        let (_guard, root) = scaffold();
+        // Frontmatter id disagrees with the filename stem: a drift warning.
+        write_finding(
+            &root,
+            "finding-210-on-disk.md",
+            "---\nid: finding-210-declared-differently\ntype: finding\nconfidence: frontier\n---\n# t\nbody\n",
+        );
+
+        let summary = run(&root).unwrap();
+        assert!(summary.clean(), "id/stem drift is a warning, not a failure");
+        assert_eq!(summary.findings_warnings, 1);
+    }
+
+    #[test]
+    fn unloadable_yaml_finding_warns_but_does_not_fail() {
+        let (_guard, root) = scaffold();
+        write_finding(&root, "finding-220-broken.yaml", "id: [unterminated\n");
+
+        let summary = run(&root).unwrap();
+        assert!(summary.clean(), "an unloadable finding warns, never fails");
+        assert_eq!(summary.findings_total, 1);
+        assert_eq!(summary.findings_warnings, 1);
     }
 }

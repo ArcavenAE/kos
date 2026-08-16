@@ -311,19 +311,13 @@ pub(crate) fn load_all_nodes(nodes_dir: &Path) -> Result<Vec<Node>> {
 
 fn load_finding_ids(findings_dir: &Path) -> std::collections::HashSet<String> {
     let mut ids = std::collections::HashSet::new();
-    if !findings_dir.exists() {
-        return ids;
-    }
-    if let Ok(entries) = std::fs::read_dir(findings_dir) {
-        for entry in entries.flatten() {
-            let name = entry.file_name();
-            let name = name.to_string_lossy();
-            if name.ends_with(".yaml") || name.ends_with(".yml") {
-                // Extract finding ID from filename
-                if let Some(stem) = name.strip_suffix(".yaml").or(name.strip_suffix(".yml")) {
-                    ids.insert(stem.to_string());
-                }
-            }
+    // Uses the shared loader so md findings (frontmatter and legacy bare md)
+    // resolve blockers alongside yaml ones. Both the full id and the finding
+    // number are inserted, so an edge that names either form resolves.
+    if let Ok(nodes) = crate::findings::load_finding_nodes(findings_dir) {
+        for node in nodes {
+            ids.insert(crate::findings::finding_key(&node.id));
+            ids.insert(node.id);
         }
     }
     ids
@@ -440,7 +434,7 @@ fn gather(workspace: &Workspace, cwd: &Path, target: &str) -> Result<Orientation
 /// Gather orientation data for a standalone repo (no orchestrator).
 ///
 /// In standalone mode, everything lives under `_kos/`:
-/// - Charter items from a local charter file (unfiltered — all are relevant)
+/// - Charter items from a local charter file (unfiltered; all are relevant)
 /// - Nodes from `_kos/nodes/{bedrock,frontier,graveyard,placeholder}/`
 /// - Findings from `_kos/findings/`
 /// - Probes from `_kos/probes/`
@@ -450,7 +444,7 @@ fn gather(workspace: &Workspace, cwd: &Path, target: &str) -> Result<Orientation
 fn gather_standalone(workspace: &Workspace, target: &str) -> Result<Orientation> {
     let kos_dir = workspace.root.join(KOS_DIR);
 
-    // Charter: check local charter files (unfiltered — all items are relevant)
+    // Charter: check local charter files (unfiltered; all items are relevant)
     let charter_items = load_standalone_charter(&workspace.root)?;
 
     // Findings from _kos/findings/
@@ -499,7 +493,7 @@ fn load_standalone_charter(root: &Path) -> Result<Vec<CharterItem>> {
     load_charter_items_unfiltered(&charter_path)
 }
 
-/// Load charter items without filtering by target — all items are relevant.
+/// Load charter items without filtering by target; all items are relevant.
 fn load_charter_items_unfiltered(charter_path: &Path) -> Result<Vec<CharterItem>> {
     if !charter_path.exists() {
         return Ok(vec![]);
@@ -632,38 +626,25 @@ fn flush_item_unfiltered(
     });
 }
 
-/// Load findings without filtering by target — all findings are relevant.
+/// Project a loaded finding node down to the lighter `Finding` orient displays.
+fn finding_from_node(node: Node) -> Finding {
+    Finding {
+        id: node.id,
+        confidence: node.confidence,
+        title: node.title,
+        content: node.content,
+        source_path: node.source_path,
+    }
+}
+
+/// Load findings without filtering by target; all findings are relevant.
+/// Goes through the shared `findings` loader, so all three on-disk finding
+/// shapes (pure yaml, md+frontmatter, legacy bare md) are surfaced.
 fn load_findings_unfiltered(findings_dir: &Path) -> Result<Vec<Finding>> {
-    if !findings_dir.exists() {
-        return Ok(vec![]);
-    }
-
-    let mut results = Vec::new();
-
-    for entry in walkdir::WalkDir::new(findings_dir)
-        .max_depth(1)
+    Ok(crate::findings::load_finding_nodes(findings_dir)?
         .into_iter()
-        .filter_map(std::result::Result::ok)
-    {
-        let path = entry.path();
-        if !path.is_file() || path.extension().and_then(|e| e.to_str()) != Some("yaml") {
-            continue;
-        }
-
-        let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
-
-        match serde_yaml::from_str::<Finding>(&content) {
-            Ok(mut finding) => {
-                finding.source_path = path.to_path_buf();
-                results.push(finding);
-            }
-            Err(e) => {
-                eprintln!("warning: skipping {}: {e}", path.display());
-            }
-        }
-    }
-
-    Ok(results)
+        .map(finding_from_node)
+        .collect())
 }
 
 /// Load all nodes from a specific confidence tier directory.
@@ -949,42 +930,18 @@ fn flush_item(
 // ── Finding loading ──────────────────────────────────────────
 
 fn load_findings(findings_dir: &Path, target: &str) -> Result<Vec<Finding>> {
-    if !findings_dir.exists() {
-        return Ok(vec![]);
-    }
-
     let target_lower = target.to_lowercase();
-    let mut results = Vec::new();
-
-    for entry in walkdir::WalkDir::new(findings_dir)
-        .max_depth(1)
+    Ok(crate::findings::load_finding_nodes(findings_dir)?
         .into_iter()
-        .filter_map(std::result::Result::ok)
-    {
-        let path = entry.path();
-        if !path.is_file() || path.extension().and_then(|e| e.to_str()) != Some("yaml") {
-            continue;
-        }
-
-        let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
-
-        // Check if the finding mentions the target before full parse
-        if !content.to_lowercase().contains(&target_lower) {
-            continue;
-        }
-
-        match serde_yaml::from_str::<Finding>(&content) {
-            Ok(mut finding) => {
-                finding.source_path = path.to_path_buf();
-                results.push(finding);
-            }
-            Err(e) => {
-                eprintln!("warning: skipping {}: {e}", path.display());
-            }
-        }
-    }
-
-    Ok(results)
+        .filter(|node| {
+            // Mirror the old whole-file substring match against id, title, and
+            // body, which is where a target name would appear.
+            node.id.to_lowercase().contains(&target_lower)
+                || node.title.to_lowercase().contains(&target_lower)
+                || node.content.to_lowercase().contains(&target_lower)
+        })
+        .map(finding_from_node)
+        .collect())
 }
 
 // ── Frontier question loading ────────────────────────────────
@@ -1154,7 +1111,7 @@ fn print_human(o: &Orientation) {
     let degraded = o.unrecognized_edge_count();
     if degraded > 0 {
         println!(
-            "!! {degraded} edge(s) carry unrecognized types and do not traverse — run `kos validate`\n"
+            "!! {degraded} edge(s) carry unrecognized types and do not traverse; run `kos validate`\n"
         );
     }
 
@@ -1411,7 +1368,7 @@ fn print_jsonl(o: &Orientation) {
 // ── Usage logging (opt-in via --log) ─────────────────────────
 
 /// Append a single JSONL line to the local usage log.
-/// No content or file paths — just the shape of what was surfaced.
+/// No content or file paths; just the shape of what was surfaced.
 fn append_usage_log(
     o: &Orientation,
     duration: std::time::Duration,
