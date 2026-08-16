@@ -281,7 +281,7 @@ fn run_ready(workspace: &Workspace, cwd: &Path, target: &str, json: bool) -> Res
     Ok(())
 }
 
-fn load_all_nodes(nodes_dir: &Path) -> Result<Vec<Node>> {
+pub(crate) fn load_all_nodes(nodes_dir: &Path) -> Result<Vec<Node>> {
     let mut results = Vec::new();
     for entry in walkdir::WalkDir::new(nodes_dir)
         .into_iter()
