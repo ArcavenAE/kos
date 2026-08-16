@@ -40,6 +40,34 @@ enum Commands {
         ready: bool,
     },
 
+    /// Ask a question — ranked, scoped retrieval over the knowledge graph
+    ///
+    /// Searches the nearest graph's nodes and findings, ranks them by lexical
+    /// match strength boosted by graph proximity, and carries provenance
+    /// (id, type, confidence tier, date) and freshness (superseded and
+    /// ruled-out items are shown as such, not hidden) on every result.
+    Ask {
+        /// The question to search for (one or more words)
+        #[arg(required = true, num_args = 1..)]
+        question: Vec<String>,
+
+        /// Path to the aae-orc workspace root (env: KOS_WORKSPACE)
+        #[arg(long, env = "KOS_WORKSPACE")]
+        workspace: Option<PathBuf>,
+
+        /// Scope to a single named graph (its graph_id); defaults to the nearest graph
+        #[arg(long)]
+        target: Option<String>,
+
+        /// Maximum number of results to return
+        #[arg(long, default_value_t = 10)]
+        limit: usize,
+
+        /// Output as a JSON array instead of human-readable text
+        #[arg(long)]
+        json: bool,
+    },
+
     /// Validate nodes against the schema (nearest graph by default)
     ///
     /// Validates the graph nearest to the current directory: the local
@@ -264,6 +292,27 @@ fn main() -> anyhow::Result<()> {
                 .unwrap_or_else(|| "kos".to_string());
 
             kos::orient::run(&workspace, &target, json, log, ready)?;
+        }
+
+        Commands::Ask {
+            question,
+            workspace: workspace_path,
+            target,
+            limit,
+            json,
+        } => {
+            let cwd = std::env::current_dir()?;
+
+            let workspace = kos::workspace::Workspace::discover(&cwd).or_else(|discover_err| {
+                if let Some(ref ws_path) = workspace_path {
+                    kos::workspace::Workspace::from_explicit(ws_path)
+                } else {
+                    Err(discover_err)
+                }
+            })?;
+
+            let query = question.join(" ");
+            kos::ask::run(&workspace, &cwd, target.as_deref(), &query, limit, json)?;
         }
 
         Commands::Validate { merged } => {
