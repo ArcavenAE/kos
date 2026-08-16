@@ -13,6 +13,7 @@ pub mod orient;
 pub mod process;
 pub mod reflect;
 pub mod seed;
+pub mod telemetry;
 pub mod updater;
 pub mod validate;
 pub mod workspace;
