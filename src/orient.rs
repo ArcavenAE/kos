@@ -4,7 +4,6 @@ use std::time::Instant;
 use crate::bridge::RdFinding;
 use crate::error::{KosError, Result};
 use crate::model::{CharterItem, CharterSection, Confidence, Finding, Node, RdBrief};
-use crate::telemetry::{self, ReadClass, ReadEvent};
 use crate::workspace::{KOS_DIR, Workspace};
 
 /// Collected orientation data for a target repo.
@@ -62,7 +61,7 @@ pub fn run(workspace: &Workspace, target: &str, json: bool, log: bool, ready: bo
     let cwd = std::env::current_dir().map_err(KosError::Io)?;
 
     if ready {
-        return run_ready(workspace, &cwd, target, json);
+        return run_ready(workspace, &cwd, json);
     }
 
     let orientation = if workspace.is_standalone() {
@@ -84,45 +83,7 @@ pub fn run(workspace: &Workspace, target: &str, json: bool, log: bool, ready: bo
         }
     }
 
-    if telemetry::enabled() {
-        let (graph_dir, read_class) = telemetry_context(workspace, &cwd);
-        let event = ReadEvent {
-            verb: "orient",
-            target: &orientation.target,
-            read_class,
-            json_output: json,
-            // Both printers render everything in the Orientation, so what is
-            // present in it is what was served.
-            node_ids: orientation
-                .bedrock_nodes
-                .iter()
-                .chain(&orientation.frontier_questions)
-                .chain(&orientation.graveyard_nodes)
-                .map(|n| n.id.as_str())
-                .collect(),
-            finding_ids: orientation.findings.iter().map(|f| f.id.as_str()).collect(),
-        };
-        if let Err(e) = telemetry::record_reads(&graph_dir, &event) {
-            eprintln!("warning: could not write read telemetry: {e}");
-        }
-    }
-
     Ok(())
-}
-
-/// Where to log a read, and how to classify it.
-///
-/// Mirrors the branch `gather`/`gather_standalone` takes. Only the legacy
-/// fallback narrows nodes and findings by target; the graph paths load whole
-/// confidence tiers, which is a bulk serve however specific the target is.
-fn telemetry_context(workspace: &Workspace, cwd: &Path) -> (PathBuf, ReadClass) {
-    if workspace.is_standalone() {
-        (workspace.root.join(KOS_DIR), ReadClass::Bulk)
-    } else if let Some(graph) = workspace.nearest_graph(cwd) {
-        (graph.path.clone(), ReadClass::Bulk)
-    } else {
-        (workspace.node_root(), ReadClass::Consultation)
-    }
 }
 
 /// A frontier question classified as ready or blocked.
@@ -143,7 +104,7 @@ pub enum ReadyStatus {
 }
 
 /// Run the --ready computation: which frontier questions are actionable?
-fn run_ready(workspace: &Workspace, cwd: &Path, target: &str, json: bool) -> Result<()> {
+fn run_ready(workspace: &Workspace, cwd: &Path, json: bool) -> Result<()> {
     let nearest = workspace.nearest_graph(cwd);
     let graph_root = if let Some(graph) = nearest {
         graph.path.clone()
@@ -259,23 +220,6 @@ fn run_ready(workspace: &Workspace, cwd: &Path, target: &str, json: bool) -> Res
         print_ready_jsonl(&ready_questions);
     } else {
         print_ready_human(&ready_questions);
-    }
-
-    if telemetry::enabled() {
-        let event = ReadEvent {
-            verb: "orient-ready",
-            target,
-            // --ready serves every frontier question by construction, so it
-            // cannot evidence consultation.
-            read_class: ReadClass::Bulk,
-            json_output: json,
-            node_ids: ready_questions.iter().map(|q| q.node.id.as_str()).collect(),
-            // Findings are loaded to resolve blockers, never served.
-            finding_ids: vec![],
-        };
-        if let Err(e) = telemetry::record_reads(&graph_root, &event) {
-            eprintln!("warning: could not write read telemetry: {e}");
-        }
     }
 
     Ok(())
