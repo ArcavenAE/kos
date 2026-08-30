@@ -85,6 +85,29 @@ pub fn load_findings(dir: &Path) -> Result<Vec<FindingLoad>> {
     Ok(out)
 }
 
+/// Load one finding file across the three on-disk shapes. Returns the finding
+/// as a searchable `Node`, or `None` for a `.yaml`/`.yml` file that parses as
+/// neither a node nor the legacy finding-block shape, for an extension other
+/// than yaml/yml/md, or for an unreadable file. Markdown always loads.
+///
+/// The single-file counterpart to [`load_findings`], for callers that already
+/// hold a path (e.g. reflect resolving a git-diff entry). Reusing this decoder
+/// is what lets reflect see markdown findings; a plain `serde_yaml` node parse
+/// silently dropped them (kos#91).
+pub fn load_finding_file(path: &Path) -> Option<Node> {
+    let ext = path.extension().and_then(|e| e.to_str())?;
+    let stem = path.file_stem().and_then(|s| s.to_str())?.to_string();
+    let text = std::fs::read_to_string(path).ok()?;
+    match ext {
+        "yaml" | "yml" => match yaml_finding(path, &stem, &text) {
+            FindingLoad::Loaded(l) => Some(l.node),
+            FindingLoad::Unloadable { .. } => None,
+        },
+        "md" => Some(md_finding(path, &stem, &text).node),
+        _ => None,
+    }
+}
+
 /// Convenience for the read paths (ask, orient): the finding nodes only,
 /// unloadable files dropped. A malformed finding is not the read path's error
 /// to report; validate is where that surfaces.
@@ -615,5 +638,47 @@ mod tests {
         let missing = dir.path().join("does-not-exist");
         assert!(load_findings(&missing).unwrap().is_empty());
         assert!(load_finding_nodes(&missing).unwrap().is_empty());
+    }
+
+    #[test]
+    fn load_finding_file_reads_bare_markdown() {
+        // kos#91: the markdown shape a node parse would drop. It must load, with
+        // id from the filename stem and title from the H1 heading.
+        let dir = tempfile::tempdir().unwrap();
+        write(
+            dir.path(),
+            "finding-901-md-shape.md",
+            "# finding-901: markdown findings must be visible\n\n**Date:** 2026-08-09\n\nbody\n",
+        );
+        let node = load_finding_file(&dir.path().join("finding-901-md-shape.md")).unwrap();
+        assert_eq!(node.id, "finding-901-md-shape");
+        assert_eq!(node.title, "finding-901: markdown findings must be visible");
+        assert_eq!(node.node_type, NodeType::Finding);
+    }
+
+    #[test]
+    fn load_finding_file_reads_pure_yaml() {
+        let dir = tempfile::tempdir().unwrap();
+        write(
+            dir.path(),
+            "finding-902-yaml.yaml",
+            "id: finding-902-yaml\ntype: finding\nconfidence: bedrock\ntitle: y\ncontent: c\n",
+        );
+        let node = load_finding_file(&dir.path().join("finding-902-yaml.yaml")).unwrap();
+        assert_eq!(node.id, "finding-902-yaml");
+        assert_eq!(node.confidence, Confidence::Bedrock);
+    }
+
+    #[test]
+    fn load_finding_file_none_for_unloadable_yaml() {
+        let dir = tempfile::tempdir().unwrap();
+        write(dir.path(), "finding-903-bad.yaml", "id: [unterminated\n");
+        assert!(load_finding_file(&dir.path().join("finding-903-bad.yaml")).is_none());
+    }
+
+    #[test]
+    fn load_finding_file_none_for_missing_file() {
+        let dir = tempfile::tempdir().unwrap();
+        assert!(load_finding_file(&dir.path().join("nope.md")).is_none());
     }
 }

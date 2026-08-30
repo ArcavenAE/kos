@@ -15,6 +15,7 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 
 use crate::error::Result;
+use crate::findings;
 use crate::model::{Confidence, Node};
 use crate::workspace::Workspace;
 
@@ -210,8 +211,13 @@ fn find_last_boundary_commit(repo_root: &Path) -> Option<String> {
 }
 
 fn is_boundary_subject(subject: &str) -> bool {
-    // `harvest(scope): ...` or `charter(scope): ...` marks a session close.
-    subject.starts_with("harvest(") || subject.starts_with("charter(")
+    // A harvest or charter commit marks a session close, in either the scoped
+    // conventional form (`harvest(orc): ...`) or the documented unscoped kos
+    // action form (`harvest: ...`, per `.claude/rules/kos-commits.md`). Match
+    // the action token up to the first `(` or `:` so both forms are accepted
+    // and near-misses (`harvest-debt:`, `charterhouse:`) are not (kos#92).
+    let action = subject.split(['(', ':']).next().unwrap_or("").trim();
+    matches!(action, "harvest" | "charter")
 }
 
 // ── Build reflection ─────────────────────────────────────────
@@ -477,9 +483,7 @@ fn classify_changes(
                 });
             }
             ('A', PathKind::Finding) => {
-                if let Some(refer) = load_artifact_ref(repo_root, p) {
-                    findings_added.push(refer);
-                }
+                findings_added.push(load_finding_ref(repo_root, p));
             }
             ('A', PathKind::Brief) => {
                 if let Some(refer) = load_artifact_ref(repo_root, p) {
@@ -652,6 +656,29 @@ fn load_artifact_ref(repo_root: &Path, rel_path: &str) -> Option<ArtifactRef> {
     })
 }
 
+/// Build an `ArtifactRef` for an added finding across all three on-disk shapes
+/// (pure yaml, md+frontmatter, bare md), never dropping one. Pure-yaml findings
+/// carry id + title on the node; markdown findings derive title from the H1 and
+/// id from the filename stem, exactly as ideas already do. kos#91: the previous
+/// path required a node parse and silently dropped every markdown finding —
+/// 114 of 133 on disk — so the session-close audit reported "(none)".
+fn load_finding_ref(repo_root: &Path, rel_path: &str) -> ArtifactRef {
+    if let Some(node) = findings::load_finding_file(&repo_root.join(rel_path)) {
+        return ArtifactRef {
+            id: node.id,
+            title: node.title,
+            path: rel_path.to_string(),
+        };
+    }
+    // Truly unloadable (e.g. malformed yaml): still surface it by its filename
+    // stem rather than dropping it — "could not read" must not read as "none".
+    ArtifactRef {
+        id: stem(rel_path).to_string(),
+        title: String::new(),
+        path: rel_path.to_string(),
+    }
+}
+
 fn idea_title(path: &Path) -> String {
     let content = match std::fs::read_to_string(path) {
         Ok(s) => s,
@@ -681,7 +708,10 @@ fn findings_with_calibration(
                 .file_name()
                 .unwrap_or_else(|| f.path.as_ref()),
         );
-        let node = match load_node_at(&abs) {
+        // Decode across all three finding shapes so markdown findings load
+        // too (kos#91). Markdown findings carry no `finding:` calibration
+        // block, so they surface as id + title with no calibration line.
+        let node = match findings::load_finding_file(&abs) {
             Some(n) => n,
             None => {
                 // Fallback: try loading via id match among loaded nodes.
@@ -703,7 +733,22 @@ fn findings_with_calibration(
                         notes: n.notes.clone(),
                         source_path: n.source_path.clone(),
                     },
-                    None => continue,
+                    None => {
+                        // Neither the file nor a loaded node was readable. Emit
+                        // the finding from its artifact ref rather than dropping
+                        // it — "could not read" must not read as "none".
+                        out.push(FindingChange {
+                            id: f.id.clone(),
+                            title: f.title.clone(),
+                            probe: None,
+                            result: None,
+                            surprise: None,
+                            predicted_confidence: None,
+                            actual_confidence: String::new(),
+                            delta: None,
+                        });
+                        continue;
+                    }
                 }
             }
         };
@@ -977,16 +1022,23 @@ fn render_markdown(r: &Reflection) {
             if let Some(res) = &f.result {
                 println!("      result:  {res}");
             }
-            match (f.predicted_confidence, &f.delta) {
-                (Some(p), Some(d)) => println!(
+            // Calibration is only meaningful for a finding that links a probe.
+            // Markdown findings (and yaml findings with no `finding:` block)
+            // link none, so they show no calibration line rather than a
+            // spurious "(no predicted_confidence on brief)" (kos#91).
+            match (&f.probe, f.predicted_confidence, &f.delta) {
+                (Some(_), Some(p), Some(d)) => println!(
                     "      calibration: predicted {:.2} → actual {} (delta {:+.2})",
                     p, f.actual_confidence, d
                 ),
-                (Some(p), None) => println!(
+                (Some(_), Some(p), None) => println!(
                     "      calibration: predicted {p:.2}, actual {}",
                     f.actual_confidence
                 ),
-                _ => println!("      calibration: (no predicted_confidence on brief)"),
+                (Some(_), None, _) => {
+                    println!("      calibration: (no predicted_confidence on brief)");
+                }
+                (None, _, _) => {}
             }
             if let Some(s) = &f.surprise {
                 println!("      surprise: {s}");
@@ -1141,5 +1193,211 @@ fn short(s: &str) -> &str {
         &s[..12]
     } else {
         s
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+    use std::process::Command;
+
+    use super::*;
+
+    // ── uijm / kos#92: session-boundary detection ────────────────
+
+    #[test]
+    fn boundary_subject_accepts_scoped_harvest_and_charter() {
+        assert!(is_boundary_subject("harvest(orc): question-x — done"));
+        assert!(is_boundary_subject("charter(kos): re-render"));
+    }
+
+    #[test]
+    fn boundary_subject_accepts_unscoped_harvest_and_charter() {
+        // The documented kos action-commit form is unscoped
+        // (`.claude/rules/kos-commits.md`): `[action]: [ids] — [desc]`.
+        assert!(is_boundary_subject("harvest: question-x — probe complete"));
+        assert!(is_boundary_subject("charter: re-render from graph"));
+    }
+
+    #[test]
+    fn boundary_subject_rejects_non_boundary_actions() {
+        assert!(!is_boundary_subject("feat(reflect): add thing"));
+        assert!(!is_boundary_subject("probe: explore substrate"));
+        assert!(!is_boundary_subject("finding: something learned"));
+        assert!(!is_boundary_subject("promote: elem-x"));
+        // A word that merely starts with "harvest" is not the harvest action.
+        assert!(!is_boundary_subject("harvest-debt: not an action token"));
+        assert!(!is_boundary_subject("charterhouse: not charter"));
+    }
+
+    // ── shared git fixture ───────────────────────────────────────
+
+    /// Run git in `dir` with an isolated identity and signing disabled, so
+    /// fixtures never touch the developer's global gitconfig or a signing key.
+    fn git(dir: &Path, args: &[&str]) {
+        let status = Command::new("git")
+            .args([
+                "-c",
+                "user.name=kos-test",
+                "-c",
+                "user.email=kos-test@example.com",
+                "-c",
+                "commit.gpgsign=false",
+                "-c",
+                "init.defaultBranch=main",
+            ])
+            .args(args)
+            .current_dir(dir)
+            .status()
+            .expect("git runnable");
+        assert!(status.success(), "git {args:?} failed");
+    }
+
+    fn write(path: &Path, content: &str) {
+        fs::create_dir_all(path.parent().unwrap()).unwrap();
+        fs::write(path, content).unwrap();
+    }
+
+    fn head(dir: &Path) -> String {
+        run_git(dir, &["rev-parse", "--short", "HEAD"])
+            .unwrap()
+            .trim()
+            .to_string()
+    }
+
+    // ── uijm / kos#92: default --since picks the unscoped boundary ─
+
+    #[test]
+    fn resolve_since_finds_unscoped_harvest_commit() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        git(root, &["init", "-q"]);
+
+        write(&root.join("a.txt"), "one\n");
+        git(root, &["add", "-A"]);
+        git(
+            root,
+            &["commit", "-q", "-m", "harvest: node-a — first boundary"],
+        );
+
+        write(&root.join("b.txt"), "two\n");
+        git(root, &["add", "-A"]);
+        git(root, &["commit", "-q", "-m", "feat: some later work"]);
+
+        // Default (no explicit ref) must resolve back to the unscoped harvest
+        // commit — not skip past it as the parenthesised-only matcher did.
+        let since = resolve_since(root, None).unwrap();
+        let harvest_sha = run_git(root, &["log", "--pretty=%H", "--grep=first boundary", "-1"])
+            .unwrap()
+            .trim()
+            .to_string();
+        assert_eq!(
+            since, harvest_sha,
+            "default since must be the harvest commit"
+        );
+    }
+
+    // ── oe55 / kos#91: markdown findings are visible ──────────────
+
+    #[test]
+    fn build_reflection_lists_markdown_and_yaml_findings() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        let graph_root = root.join("_kos");
+        git(root, &["init", "-q"]);
+
+        // Baseline commit so `since` has a parent to diff from.
+        write(&root.join("README.md"), "seed\n");
+        git(root, &["add", "-A"]);
+        git(root, &["commit", "-q", "-m", "chore: seed"]);
+        let base = head(root);
+
+        // A markdown finding (the common shape — 114 of 133 on disk) and a
+        // pure-yaml finding, both added in the range under audit.
+        write(
+            &graph_root.join("findings/finding-901-md-shape.md"),
+            "# finding-901: markdown findings must be visible\n\n**Date:** 2026-08-09\n\nbody\n",
+        );
+        write(
+            &graph_root.join("findings/finding-902-yaml-shape.yaml"),
+            "id: finding-902-yaml-shape\ntype: finding\nconfidence: frontier\ntitle: yaml finding\ncontent: body\n",
+        );
+        git(root, &["add", "-A"]);
+        git(root, &["commit", "-q", "-m", "finding: add two findings"]);
+
+        let head_ref = head(root);
+        let ws = make_workspace(root);
+        let r = build_reflection(&graph_root, root, &base, &head_ref, &ws).unwrap();
+
+        let ids: Vec<&str> = r.findings.iter().map(|f| f.id.as_str()).collect();
+        assert!(
+            ids.contains(&"finding-901-md-shape"),
+            "markdown finding must appear in Findings produced, got {ids:?}"
+        );
+        assert!(
+            ids.contains(&"finding-902-yaml-shape"),
+            "yaml finding must appear, got {ids:?}"
+        );
+        // Markdown finding derives its title from the H1 heading.
+        let md = r
+            .findings
+            .iter()
+            .find(|f| f.id == "finding-901-md-shape")
+            .unwrap();
+        assert_eq!(md.title, "finding-901: markdown findings must be visible");
+    }
+
+    #[test]
+    fn build_reflection_preserves_yaml_finding_calibration() {
+        // Guard against the loader swap (kos#91) dropping calibration for real
+        // yaml findings: a finding that links a probe whose brief predicted a
+        // confidence must still show predicted + delta.
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        let graph_root = root.join("_kos");
+        git(root, &["init", "-q"]);
+
+        // Brief with a predicted confidence lives on disk in probes/.
+        write(
+            &graph_root.join("probes/brief-cal.yaml"),
+            "id: brief-cal\ntype: brief\nconfidence: frontier\ntitle: cal brief\ncontent: plan\nbrief:\n  predicted_confidence: 0.5\n",
+        );
+        git(root, &["add", "-A"]);
+        git(root, &["commit", "-q", "-m", "chore: seed brief"]);
+        let base = head(root);
+
+        // A yaml finding that links the brief and lands at bedrock (score 1.0).
+        write(
+            &graph_root.join("findings/finding-905-calibrated.yaml"),
+            "id: finding-905-calibrated\ntype: finding\nconfidence: bedrock\ntitle: calibrated\ncontent: body\nfinding:\n  probe: brief-cal\n  result: confirmed\n  surprise_magnitude: low\n",
+        );
+        git(root, &["add", "-A"]);
+        git(
+            root,
+            &["commit", "-q", "-m", "finding: add calibrated finding"],
+        );
+
+        let head_ref = head(root);
+        let ws = make_workspace(root);
+        let r = build_reflection(&graph_root, root, &base, &head_ref, &ws).unwrap();
+
+        let f = r
+            .findings
+            .iter()
+            .find(|f| f.id == "finding-905-calibrated")
+            .expect("calibrated finding must appear");
+        assert_eq!(f.probe.as_deref(), Some("brief-cal"));
+        assert_eq!(f.result.as_deref(), Some("confirmed"));
+        assert_eq!(f.predicted_confidence, Some(0.5));
+        assert_eq!(f.delta, Some(0.5)); // bedrock (1.0) − predicted (0.5)
+    }
+
+    /// A standalone workspace rooted at `root` (needs `_kos/kos.yaml`).
+    fn make_workspace(root: &Path) -> Workspace {
+        write(
+            &root.join("_kos/kos.yaml"),
+            "graph_id: fixture\nscope: repo\nschema_version: '0.3'\n",
+        );
+        Workspace::from_explicit(root).unwrap()
     }
 }

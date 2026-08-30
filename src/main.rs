@@ -358,14 +358,37 @@ fn main() -> anyhow::Result<()> {
                 // when inside one, the orchestrator graph at orc root.
                 // Previously this always resolved to the kos repo's own graph
                 // regardless of cwd (aae-orc-z67m / finding-060 anomaly 1).
-                let summary = if let Some(graph) = workspace.nearest_graph(&cwd) {
-                    eprintln!("Validating graph: {} ({})", graph.graph_id, graph.scope);
-                    kos::validate::run(&graph.path)?
-                } else {
-                    kos::validate::run(&workspace.node_root())?
-                };
-                if !summary.clean() {
-                    std::process::exit(1);
+                match kos::validate::run_nearest(&workspace, &cwd)? {
+                    kos::validate::ScopedValidation::Validated(summary) => {
+                        if !summary.clean() {
+                            std::process::exit(1);
+                        }
+                    }
+                    // A bare _kos/ here (dir exists, no kos.yaml) would walk up
+                    // and validate a parent graph, reporting its clean result
+                    // as this repo's. Refuse loudly instead of a false pass
+                    // (aae-orc-5z4p).
+                    kos::validate::ScopedValidation::BareKosDir(path) => {
+                        eprintln!(
+                            "error: {} exists but has no {} manifest.",
+                            path.display(),
+                            kos::workspace::MANIFEST_FILE
+                        );
+                        eprintln!();
+                        eprintln!(
+                            "A bare _kos/ is not a graph, so `kos validate` would walk up and"
+                        );
+                        eprintln!(
+                            "validate a parent graph — silently reporting its result as this repo's."
+                        );
+                        eprintln!("Refusing to do that. To fix, either:");
+                        eprintln!("  • run `kos init` here to create the graph, or");
+                        eprintln!(
+                            "  • remove the empty {} directory if this repo carries no graph.",
+                            path.display()
+                        );
+                        std::process::exit(1);
+                    }
                 }
             }
         }

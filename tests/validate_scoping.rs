@@ -119,3 +119,86 @@ fn summary_merge_accumulates_across_graphs() {
         "one failing graph must fail the merged run"
     );
 }
+
+// ── aae-orc-5z4p / kos: a bare _kos/ must not silently validate a parent ──
+
+/// A cwd whose `_kos/` exists but carries no `kos.yaml` must be REFUSED, not
+/// silently attributed to the walked-up parent graph. Regression: callbook and
+/// betterdials-site each have a `_kos/` with no manifest, and `kos validate`
+/// there returned the aae-orc graph's clean result as if it were theirs.
+#[test]
+fn run_nearest_refuses_bare_kos_directory() {
+    let tmp = tempfile::tempdir().unwrap();
+    fixture(tmp.path());
+
+    // A subrepo-shaped dir with a _kos/ that has content but no manifest.
+    write(
+        &tmp.path().join("bare/_kos/findings/finding-001-orphan.md"),
+        "# orphan finding\n\nbody\n",
+    );
+
+    let ws = Workspace::from_explicit(tmp.path()).unwrap();
+
+    // Absent the guard, the walk-up would resolve `bare/` to the orchestrator
+    // graph — the misattribution this test protects against.
+    assert_eq!(
+        ws.nearest_graph(&tmp.path().join("bare")).unwrap().graph_id,
+        "fixture-orc",
+        "precondition: nearest_graph would misattribute the parent graph"
+    );
+
+    match validate::run_nearest(&ws, &tmp.path().join("bare")).unwrap() {
+        validate::ScopedValidation::BareKosDir(path) => {
+            assert!(
+                path.ends_with("bare/_kos"),
+                "must name the offending directory, got {}",
+                path.display()
+            );
+        }
+        validate::ScopedValidation::Validated(s) => {
+            panic!("bare _kos/ silently validated a parent graph: {s:?}");
+        }
+    }
+}
+
+/// The refusal must fire from a SUBDIRECTORY of a bare-_kos repo too — the
+/// axis a cwd-only check missed. `kos validate` in `callbook/src/` walks up
+/// past `callbook/_kos` to the orchestrator graph without this.
+#[test]
+fn run_nearest_refuses_bare_kos_from_subdirectory() {
+    let tmp = tempfile::tempdir().unwrap();
+    fixture(tmp.path());
+    write(
+        &tmp.path().join("bare/_kos/findings/finding-001-orphan.md"),
+        "# orphan finding\n\nbody\n",
+    );
+    // A nested working directory with no _kos/ of its own.
+    std::fs::create_dir_all(tmp.path().join("bare/src/deep")).unwrap();
+
+    let ws = Workspace::from_explicit(tmp.path()).unwrap();
+    match validate::run_nearest(&ws, &tmp.path().join("bare/src/deep")).unwrap() {
+        validate::ScopedValidation::BareKosDir(path) => {
+            assert!(path.ends_with("bare/_kos"), "got {}", path.display());
+        }
+        validate::ScopedValidation::Validated(s) => {
+            panic!("bare _kos/ misattributed from a subdirectory: {s:?}");
+        }
+    }
+}
+
+/// A cwd with a real graph (manifest present) validates that graph as before.
+#[test]
+fn run_nearest_validates_real_graph() {
+    let tmp = tempfile::tempdir().unwrap();
+    fixture(tmp.path());
+
+    let ws = Workspace::from_explicit(tmp.path()).unwrap();
+    match validate::run_nearest(&ws, &tmp.path().join("sub")).unwrap() {
+        validate::ScopedValidation::Validated(s) => {
+            assert_eq!(s.total, 3, "the sub graph has three nodes");
+        }
+        validate::ScopedValidation::BareKosDir(p) => {
+            panic!("a real graph was refused as bare: {}", p.display());
+        }
+    }
+}
