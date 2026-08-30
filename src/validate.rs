@@ -1,9 +1,10 @@
 use std::collections::{BTreeMap, HashSet};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use crate::error::{KosError, Result};
 use crate::findings::{self, FindingLoad};
 use crate::model::{LEGAL_EDGE_TYPES, Node, NodeType};
+use crate::workspace::{KOS_DIR, MANIFEST_FILE, Workspace};
 
 #[derive(Debug)]
 pub struct ValidationResult {
@@ -53,6 +54,87 @@ impl Summary {
         self.findings_failed += other.findings_failed;
         self.findings_warnings += other.findings_warnings;
     }
+}
+
+/// The outcome of resolving and validating the graph nearest a directory.
+#[derive(Debug)]
+pub enum ScopedValidation {
+    /// A graph was found and validated; carries its summary.
+    Validated(Summary),
+    /// The directory has a `_kos/` that exists but has no `kos.yaml` manifest.
+    /// kos treats that as "not a graph" and walks up, so validating here would
+    /// silently attribute a parent graph's result to this location. Refused;
+    /// carries the offending `_kos/` path for the caller's message.
+    BareKosDir(PathBuf),
+}
+
+/// A `_kos/` directory at `dir` that exists but carries no `kos.yaml` manifest.
+///
+/// A bare `_kos/` is a strong signal the user intended a graph here, yet kos
+/// walks up past it to a parent graph. Without this check, `kos validate` run
+/// from such a directory returns the parent graph's clean result as if it were
+/// this repo's — the aae-orc-5z4p / aae-orc-z67m misattribution in a new form.
+pub fn bare_kos_dir(dir: &Path) -> Option<PathBuf> {
+    let kos = dir.join(KOS_DIR);
+    if kos.is_dir() && !kos.join(MANIFEST_FILE).exists() {
+        Some(kos)
+    } else {
+        None
+    }
+}
+
+/// The nearest bare `_kos/` at or above `cwd`, searched up to (and including)
+/// `stop_at` (the workspace root). Walking up, the FIRST `_kos/` encountered
+/// decides: a manifest present means a real graph (validate it — return `None`);
+/// a manifest absent means the bare directory to refuse. Levels with no `_kos/`
+/// are transparent and the walk continues. A repo with no `_kos/` anywhere up
+/// to the root returns `None`, preserving the existing "inherit the parent
+/// graph" behaviour for graph-less subrepos.
+///
+/// This is the walk-up form of [`bare_kos_dir`]: it closes the case where
+/// `kos validate` is run from a *subdirectory* of a bare-`_kos` repo, where a
+/// cwd-only check would miss the bare directory and misattribute a parent
+/// graph (aae-orc-5z4p).
+fn nearest_bare_kos(cwd: &Path, stop_at: &Path) -> Option<PathBuf> {
+    let stop = std::fs::canonicalize(stop_at).ok();
+    let mut cur = std::fs::canonicalize(cwd).ok()?;
+    loop {
+        let kos = cur.join(KOS_DIR);
+        if kos.is_dir() {
+            return if kos.join(MANIFEST_FILE).exists() {
+                None
+            } else {
+                Some(kos)
+            };
+        }
+        if stop.as_deref() == Some(cur.as_path()) {
+            break;
+        }
+        match cur.parent() {
+            Some(parent) => cur = parent.to_path_buf(),
+            None => break,
+        }
+    }
+    None
+}
+
+/// Resolve the graph nearest `cwd` and validate it — but first refuse the
+/// aae-orc-5z4p misattribution. If a bare `_kos/` (a `_kos/` with no `kos.yaml`)
+/// sits at or above `cwd` up to the workspace root, return
+/// [`ScopedValidation::BareKosDir`] instead of validating a walked-up parent
+/// graph and reporting it as this repo's.
+pub fn run_nearest(workspace: &Workspace, cwd: &Path) -> Result<ScopedValidation> {
+    if let Some(bare) = nearest_bare_kos(cwd, &workspace.root) {
+        return Ok(ScopedValidation::BareKosDir(bare));
+    }
+
+    let summary = if let Some(graph) = workspace.nearest_graph(cwd) {
+        eprintln!("Validating graph: {} ({})", graph.graph_id, graph.scope);
+        run(&graph.path)?
+    } else {
+        run(&workspace.node_root())?
+    };
+    Ok(ScopedValidation::Validated(summary))
 }
 
 /// Run the validate subcommand against all nodes in the kos root.
@@ -433,5 +515,33 @@ mod tests {
         assert!(summary.clean(), "an unloadable finding warns, never fails");
         assert_eq!(summary.findings_total, 1);
         assert_eq!(summary.findings_warnings, 1);
+    }
+
+    // ── aae-orc-5z4p: bare _kos/ detection ───────────────────────
+
+    #[test]
+    fn bare_kos_dir_detects_missing_manifest() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::create_dir_all(dir.path().join("_kos/findings")).unwrap();
+        let found = bare_kos_dir(dir.path()).expect("a _kos/ with no kos.yaml is bare");
+        assert!(found.ends_with("_kos"));
+    }
+
+    #[test]
+    fn bare_kos_dir_ignores_real_graph() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::create_dir_all(dir.path().join("_kos")).unwrap();
+        fs::write(
+            dir.path().join("_kos/kos.yaml"),
+            "graph_id: g\nscope: repo\nschema_version: '0.3'\n",
+        )
+        .unwrap();
+        assert!(bare_kos_dir(dir.path()).is_none());
+    }
+
+    #[test]
+    fn bare_kos_dir_ignores_absent_directory() {
+        let dir = tempfile::tempdir().unwrap();
+        assert!(bare_kos_dir(dir.path()).is_none());
     }
 }
