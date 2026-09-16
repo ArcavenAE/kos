@@ -1,0 +1,119 @@
+id: question-artifact-id-allocation
+type: question
+confidence: frontier
+title: "How should kos allocate artifact ids (findings, nodes, probes, ideas) so that cross-graph and fan-out collisions end?"
+content: |
+  kos allocates two kinds of id and both collide. Node ids are
+  human-readable slugs, unique within one graph and allocated
+  independently from a shared vocabulary in about twenty graphs, so the
+  same slug names different nodes in different graphs (13 exact
+  collisions measured across the fleet on 2026-08-15; finding-131).
+  Finding numbers are a sequential counter allocated by read-max-plus-one
+  from each session's local tree, and they collide in two distinct ways:
+  a race, where two sessions overlap (finding-068: three instances;
+  finding-131 addendum: the 123 and 136 pairs), and a fan-out, where N
+  arms cloned from one base commit all compute the same next number
+  deterministically (2026-08-09: four of six arms allocated finding-019;
+  2026-09-15: finding-170 allocated on a branch while main took 170 and
+  171, resolved by renumbering to 172). The fan-out case defeats every
+  check-the-ledger protocol, because each arm reads the same ledger and
+  gets the same confident answer. The counter is a shared mutable
+  namespace living exactly where parallelism lives.
+
+  The question is which allocation scheme removes both collision shapes
+  without giving up what the slug buys (a reader can tell what a node is
+  from its id) or breaking existing ids and edges.
+
+  Candidates on the table, to be weighed against each other rather than
+  adopted by default:
+
+  1. **Author slug-only, attach the number at merge** (bd
+     `aae-orc-vxaa`). The counter disappears at the point of parallelism;
+     cross-references use the slug and survive renumbering; merge order
+     becomes the number's meaning. Open: where the number lives, whether
+     the back catalogue migrates, what happens to a finding never merged,
+     and how independently numbering subrepo graphs relate.
+  2. **A bd-style opaque suffix** per artifact (`prefix-{short hash}`),
+     allocated at authoring with no merge step. bd's verified algorithm
+     (bd 1.1.2 at forks/beads 0c5fa422d): base36 of the leading sha256
+     bytes of title, description, actor, created_at, and a nonce,
+     truncated to an adaptive length L in 3..8 chosen so the birthday
+     bound over the per-prefix count stays at or below 0.25; nonce retry
+     at the same length on collision, grow L after ten misses. Because
+     the hash input carries created_at and a nonce, fan-out arms hash
+     differently even from one base commit, which is the property the
+     counter lacks. Cost: the id says nothing to a reader without a
+     lookup.
+  3. **finding-131's three shapes** for node ids: namespace prefix
+     (`graph:slug`, already deployed unmanaged as `aae-orc::` edge
+     targets in four subrepo graphs), a two-layer opaque canonical id
+     with the slug as a resolving alias (git's model: SHA under, refs
+     over), and the Nix-style hybrid `slug-<shortid>` in one string.
+
+  Inputs the probe builds on rather than re-derives: the bd algorithm as
+  verified from source against the live db (pinned to code refs in the
+  study), git's short-SHA auto-scaling and ambiguity handling (fetched),
+  and the fleet's existing unmanaged practice.
+
+  **Structural, so it may gate.** A duplicate finding number is a
+  structural defect, not a vital sign; `kos validate` already fails on it
+  (kos PR #101) and that check may sit in CI without offending
+  `val-diagnostic-never-gate`. Verified 2026-09-16: the check exists in
+  src/validate.rs and runs nowhere automatically in the orc (no .github,
+  no lefthook.yml). Detection is `aae-orc-ul2h`; this question is about
+  allocation, which detection does not fix.
+
+  **Success signal.** A written recommendation, with tradeoffs, that names
+  one scheme (or one per id kind) and a migration path that keeps every
+  existing slug and edge resolving; the operator rules on it; the first
+  fan-out after adoption produces zero duplicate ids without a
+  coordinator. **Kill condition.** If every scheme that removes fan-out
+  collisions also removes readability and the operator rules readability
+  load-bearing, the question closes to the graveyard with the two-layer
+  shape recorded as the reason a later attempt should start there.
+
+  **Ruled 2026-09-16 (operator, via the director seat).** Two problems,
+  two answers. Node ids: the namespace prefix `graph::slug` is accepted as
+  the canonical cross-graph reference. Finding numbers: allocation-at-merge
+  is rejected; opaque bd-style ids are adopted now. The decision of record
+  is finding-173's ruling section; the bedrock node is
+  elem-kos-artifact-id-scheme. What stays open here is the implementation
+  and its consequences (sub-questions 3 and 4 below; sub-questions 1 and 2
+  are answered by the ruling).
+
+  Sub-questions:
+  1. Are node ids and finding numbers one problem or two? The slug
+     collides across graphs; the number collides across sessions. One
+     scheme may not fit both.
+  2. Does allocate-at-merge need a canonical id at all, or is the slug
+     plus the merge-assigned number enough when cross-references use the
+     slug?
+  3. How does any scheme interact with relocation (finding-132,
+     `aae-orc-qso2f`): does a moved node keep its id, get a new one, or
+     leave a forwarding record?
+  4. What is the smallest change that ends the fan-out case this month,
+     independent of the full scheme?
+edges:
+  - target: question-subrepo-kos-workflow
+    type: derives
+    note: "Independent per-graph allocation is what a subrepo kos workflow does today; the id scheme is downstream of how many graphs there are and how they coordinate"
+  - target: question-projection-seam
+    type: supports
+    note: "A collision-free canonical id is a precondition for projecting nodes across graphs without ambiguity"
+provenance:
+  created_by: agent
+  session: research-supervisor dispatch 2026-09-16 (operator commission via the director seat)
+  source: "finding-131 (observation and the three shapes), finding-131 addenda 2026-08-15 and 2026-08-16, finding-068, bd aae-orc-ul2h notes (fan-out instance 4), bd aae-orc-vxaa, orc PR #339 (finding-170 to 172 renumber)"
+notes: |
+  Filed here by the subject test: kos assigns and resolves ids, so the
+  question lives in kos's graph even though every specimen is an orc or
+  fleet event. bd ticket aae-orc-hf58k was closed 2026-09-02 as "study
+  complete" citing finding-131; finding-131 records the observation and
+  says the study is not yet filed, so that closure rested on a false
+  premise. The probe brief is brief-artifact-id-allocation.md; the study
+  output is finding-173-kos-artifact-id-allocation-study.md, which
+  recommended namespace-prefixed node ids (graph::slug) together with
+  number-at-merge for findings, deferring opaque ids. The operator accepted
+  the first and overruled the second in favour of opaque ids now; the
+  ruling is recorded in finding-173 and in elem-kos-artifact-id-scheme.
+tags: [kos-tool, id-scheme, federation, fan-out, collision]

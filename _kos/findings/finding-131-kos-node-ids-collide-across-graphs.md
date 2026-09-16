@@ -249,3 +249,21 @@ finding-105 and `.claude/rules/session-close-mutex.md` (Race A),
 
 - aae-orc-hf58k (kos: node ids collide across graphs; id scheme study). bd
   work-queue anchor; this finding is the authoritative record.
+
+## Update 2026-09-16: the bd study is done (finding-173)
+
+The "study: exactly how bd generates the suffix" paragraph above is answered
+in finding-173 (`finding-173-kos-artifact-id-allocation-study.md`), pinned to
+source at `forks/beads` `0c5fa422d`: base36 of the leading 2 to 5 bytes of
+sha256 over `title|description|creator|created_at_ns|nonce`, at the smallest
+length in 3..8 whose birthday-bound collision probability over the per-prefix
+count stays at or under 0.25, retried with ten nonces per length and grown
+through 8 against a store-backed existence check. The prefix does all
+cross-project namespacing; the hash never does. The frontier question is
+`question-artifact-id-allocation`; the recommendation there is the operator's
+to rule. bd ticket `aae-orc-hf58k` was closed 2026-09-02 citing this finding
+as the study; it was the observation, and finding-173 is the study.
+Ruled 2026-09-16: namespace prefix `graph::slug` accepted for node ids;
+opaque bd-style ids adopted for findings (allocation-at-merge rejected). The
+decision of record is in finding-173's ruling section; implementation is
+tracked in bd.
