@@ -1,0 +1,48 @@
+id: elem-kos-artifact-id-scheme
+type: element
+confidence: bedrock
+title: "kos artifact ids: namespace prefix for node ids across graphs; opaque bd-style ids for findings"
+content: |
+  Ruled by the operator on 2026-09-16 (relayed by the director seat),
+  closing the allocation half of finding-131 and the fan-out failure the
+  ul2h and vxaa tickets describe.
+
+  **Node ids.** `graph::slug` is the canonical cross-graph reference (for
+  example `marvel::question-permission-model`). A bare slug remains legal
+  inside its own graph and resolves there. This ratifies the unmanaged
+  practice already present as `aae-orc::` edge targets in the marvel,
+  forestage, curtain, and switchboard graphs; `kos validate` is to accept
+  the syntax rather than warn on it.
+
+  **Finding ids.** Findings take an opaque id minted at authoring, bd-style:
+  a graph prefix plus a short hash suffix, adaptive in length to the
+  per-graph count, with the readable slug kept in the filename and as the
+  citation key. Allocation-at-merge was considered and rejected. The
+  reason of record: an id minted at authoring removes the parallel-session
+  race and the fan-out case without a merge-time step a session can skip or
+  a CI hook the orc does not run.
+
+  **Reference algorithm.** bd 1.1.2 at forks/beads 0c5fa422d: base36 of the
+  leading 2 to 5 bytes of sha256 over title, description, creator,
+  created_at in nanoseconds, and a nonce; smallest length in 3..8 whose
+  birthday-bound collision probability over the per-prefix count is at or
+  under 0.25; ten nonces per length, grown through 8 against an existence
+  check. kos has no serialized store, so its existence check is the local
+  tree plus the duplicate-id failure in kos validate (kos PR #101) as the
+  backstop. Pinned to source in finding-173.
+
+  **Not decided here.** The exact prefix per graph, whether existing
+  numbered findings migrate (bd's live coexistence of 3, 4, and 5 character
+  suffixes suggests additive), and the validator and resolver changes.
+  Those are implementation, tracked in bd with this node as the decision of
+  record: aae-orc-qvpr8 (node reference resolver) and aae-orc-wmna4
+  (opaque finding ids).
+edges:
+  - target: question-artifact-id-allocation
+    type: partially_resolves
+    note: "Answers the allocation question; implementation and relocation consequences stay open there"
+provenance:
+  created_by: human
+  session: operator ruling 2026-09-16, harvested by the research-supervisor seat
+  source: "finding-173 (study and ruling section), finding-131, bd aae-orc-ul2h, aae-orc-vxaa (rejected), aae-orc-qso2f"
+tags: [kos-tool, id-scheme, federation, fan-out, collision, ruling]
