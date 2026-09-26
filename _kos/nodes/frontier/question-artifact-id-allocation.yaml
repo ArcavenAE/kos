@@ -81,6 +81,17 @@ content: |
   and its consequences (sub-questions 3 and 4 below; sub-questions 1 and 2
   are answered by the ruling).
 
+  **Live cross-graph specimen (recorded 2026-09-25).** The number this
+  question's own study received is itself a collision: `finding-173` is
+  `kos/_kos/findings/finding-173-kos-artifact-id-allocation-study.md`
+  (kos 65600f1) and also
+  `aae-orc/_kos/findings/finding-173-corrected-premise-never-reached-the-loaded-surface.md`
+  (aae-orc 92bec3e), both merged 2026-09-16. A bare "finding-173" in any
+  prose, commit or bd note that crosses graphs is ambiguous today, and
+  nothing detects it, because each graph validates only itself. The
+  `graph::slug` form in the ruling resolves it for nodes; findings wait on
+  the opaque-id implementation.
+
   Sub-questions:
   1. Are node ids and finding numbers one problem or two? The slug
      collides across graphs; the number collides across sessions. One
