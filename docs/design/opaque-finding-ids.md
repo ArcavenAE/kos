@@ -5,7 +5,9 @@
 director (brief `2026-09-25-kos-opaque-finding-ids`)
 **Status:** design and plan only. Nothing here is built. Where this note
 departs from the 2026-09-16 ruling, it says **PROPOSAL** and the ruling stands
-until the operator rules again.
+until the operator rules again. **Ruled since:** the prefix (2.3), on
+2026-09-25. Hash inputs, the length floor, the citation key and the gate are
+still proposals.
 **Decision of record:** `_kos/nodes/bedrock/elem-kos-artifact-id-scheme.yaml`.
 **Study:** `_kos/findings/finding-173-kos-artifact-id-allocation-study.md`.
 **Implementation ticket:** `aae-orc-wmna4`.
@@ -28,7 +30,7 @@ Each line is one command and what it returned.
 | The orc runs no validate | `ls .github/workflows lefthook.yml` at orc root | Neither exists. kos's own `graph-validate.yml` runs validate on the kos graph only, advisory (kos#106). |
 | Most findings are hand-written prose | `ls _kos/findings \| sed 's/.*\.//' \| uniq -c` | orc: 168 `.md`, 19 `.yaml`. kos: 7 `.md`, 44 `.yaml`. `kos finding` writes `.yaml` only. |
 | bd ids already appear as finding names | `ls kos/_kos/findings` | `finding-aae-orc-5lbu-serena-live-lsp-baseline.md` and `finding-aae-orc-msqx-scip-indexing-cost.md`, named after bd tickets. |
-| `finding_key` reads a leading digit run | `sed -n 124-137p kos/src/findings.rs` | `take_while(is_ascii_digit)`: an opaque suffix such as `4a7k` keys as `finding-4`. |
+| `finding_key` reads a leading digit run | `sed -n 124-137p kos/src/findings.rs` | `take_while(is_ascii_digit)`, else the full id: a prefixed id such as `finding-aae-orc-k3m9-x` keys on its whole stem, slug included, so two colliding ids with different slugs are never compared. |
 
 The last two rows change the design; sections 2.3 and 2.4 say how.
 
@@ -100,65 +102,98 @@ values) mod 46,656, so the effective space is about 41,600.
 - The duplicate check in `kos validate` stays the backstop for the residue,
   which the table puts under 0.1 percent per fan-out even at 50 arms.
 
-### 2.3 Prefix
+### 2.3 Prefix (ruled 2026-09-25)
 
-wmna4 proposes the graph_id from `kos.yaml` as the prefix, giving
-`finding-aae-orc-k3m9-slug.md`. That shape is already taken:
+**Ruling (operator, 2026-09-25, on kos#110):** keep a prefix. The prefix is
+the project that owns the finding, which names the scope of the id namespace:
+`marvel`, `kos`, `aae-orc`. This replaces the earlier proposal to drop the
+prefix and namespace with `graph::` alone.
 
-- For the orc graph, `aae-orc-k3m9` is exactly the shape of a bd ticket id.
-- The two kos findings named after bd tickets (`finding-aae-orc-5lbu-...`,
-  `finding-aae-orc-msqx-...`) would read as minted ids of the orc graph while
-  sitting in the kos graph.
-- `parse_md_edges` already treats any `aae-orc-` token as a citation, so every
-  new finding id would also look like a ticket reference to the edge extractor.
+**Shape.**
 
-The graph already has a namespace mechanism: `graph::slug`, ratified the same
-day for exactly this job.
+- The prefix is the owning graph's `graph_id` from `kos.yaml`, lowercased.
+  Every graph_id in the fleet today is unique, starts with a letter, and uses
+  only `[a-z0-9-]` once lowercased (`BetterDials` becomes `betterdials`).
+  `kos validate` checks those three properties when it reads a manifest.
+- The id is the kind word, the prefix and the suffix:
+  `finding-aae-orc-k3m9`, `finding-kos-p2ab`, `finding-marvel-7xqh`.
+- The filename appends the slug: `finding-aae-orc-k3m9-bus-review.md`.
+- The adaptive length counts the findings in the prefix's namespace, which is
+  the owning graph. bd's rule counts per prefix the same way.
 
-**Recommendation (PROPOSAL, changes "a graph prefix plus a short hash
-suffix"):**
+**Beside `graph::` references.** The two forms do different jobs and read
+differently:
 
-- The id is the kind word plus the suffix: `finding-k3m9`. The filename is
-  `finding-k3m9-<slug>.md`.
-- Inside its own graph a finding is cited as `finding-k3m9`. Across graphs it
-  is cited as `aae-orc::finding-k3m9`.
-- One namespacing mechanism, not two. In filenames and commit subjects the id
-  is ten characters, the same as `finding-173`.
-- The ruling's purpose for the prefix, keeping ids apart across graphs, is met
-  by `graph::`, which is what bd's prefix does too (finding-173 section 4:
-  "the prefix does all cross-project namespacing; the hash never does").
+- `graph::` says where to look: `marvel::question-permission-model` is a
+  node in the marvel graph. It stays the form for node ids and for legacy
+  numbered findings, which are unique only within their graph
+  (`kos::finding-173`, `aae-orc::finding-173`).
+- The prefix says which namespace minted the id. Owner plus a suffix unique
+  within the owner makes `finding-aae-orc-k3m9` unique across the fleet, so it
+  needs no `graph::` in any graph.
+- `aae-orc::finding-aae-orc-k3m9` is legal and redundant. The resolver accepts
+  it. validate WARNs when the `graph::` part and the prefix disagree and no
+  relocation record explains it.
+- **Relocation** (`aae-orc-qso2f`): an id never changes. A finding moved to
+  another graph keeps its prefix, which then records where it was minted, and
+  the relocation index gives the forwarding. validate WARNs, not FAILs, on a
+  prefix that differs from the owning graph.
 
-If the operator keeps a graph prefix in the id, it should be a short code that
-is not a bd prefix, recorded in `kos.yaml`. `graph_id` itself collides with
-bd for the orc.
+**Why it will not be confused with bd ids.** For the orc, the prefix is the
+same string as bd's: the kinu db holds 1,638 ids, every one prefixed
+`aae-orc-` (`bd sql`, 2026-09-25). The inner part, `aae-orc-k3m9`, is exactly
+bd's shape. Three rules keep them apart:
+
+1. **The kind word is part of the id and is never dropped.** Prose, commit
+   subjects, citations and filenames all write `finding-aae-orc-k3m9`.
+   bd never emits an id starting with `finding-`, so the lead word alone
+   decides it: `aae-orc-k3m9` on its own always means a bd ticket, and
+   `finding-aae-orc-k3m9` always means a finding. The authoring guidance (plan
+   item 5) states this in one line.
+2. **Tools classify on the lead word first.** `parse_md_edges` splits tokens on
+   characters outside `[A-Za-z0-9-]`, so `finding-aae-orc-k3m9` stays one token
+   and is taken as a finding citation by its `finding-` test before the
+   `aae-orc-` test applies. The shared resolver (item 3) tries the `finding-`
+   form first, and its table test includes a finding id whose suffix equals a
+   live bd suffix.
+3. **The two bd-named kos findings are renamed.** `finding-aae-orc-5lbu-...`
+   and `finding-aae-orc-msqx-...` sit in the kos graph and are named after bd
+   tickets. Under the ruled shape they read as findings minted by the orc
+   graph, so they take minted `finding-kos-...` names with forwarding notes
+   that keep the bd reference (item 1).
+
+What remains is a suffix that happens to equal a bd suffix, which is under 0.1
+percent per mint at length 4. A machine never confuses them because the lead
+word differs. A human skimming might, which is the reason for rule 1. kos does
+not check bd, because it must stay usable without bd (SOUL section 2).
 
 ### 2.4 Coexistence with numbered findings
 
 No migration. bd's live mix of 3, 4 and 5 character suffixes is the precedent.
 What must change is classification:
 
-- **Key rule.** The key is the segment between `finding-` and the next `-`:
-  - All digits: numbered, compared as an integer (so `019` and `19` are one
-    key).
-  - Anything else: opaque, compared lowercase.
-  - A minter never emits an all-digit suffix. It treats one as a collision and
-    tries again, which happens with probability (10/36)^4, about 0.6 percent at
-    L=4. Without that rule `finding-0173` could mint and mean 173.
-- **The bug this fixes first.** `finding_key` today takes the leading digit
-  run, so `finding-4a7k-x` and `finding-4zzz-y` both key as `finding-4` and
-  fail validate as duplicates of each other and of a numbered finding-4. About
-  28 percent of suffixes start with a digit. The validate change has to land
-  before the first minted finding, or the first fan-out after adoption produces
-  false duplicate failures.
-- **Legacy odd names.** `finding-aae-orc-5lbu-...` keys as the opaque `aae`,
-  and so does its sibling `...msqx...`: a false duplicate under the new rule.
-  Either rename those two files to their minted shape with a forwarding note,
-  or teach the key rule that a segment equal to a bd prefix takes the next
-  segment too. I recommend the rename: two files, one PR, and the special case
-  never enters the code.
-- **Resolution.** Every reader resolves the same four forms through one
-  function in `findings.rs`:
-  - the key (`finding-173`, `finding-k3m9`);
+- **Key rule.** After `finding-`:
+  - All digits up to the next `-`: numbered, compared as an integer (so `019`
+    and `19` are one key), unique only within its graph.
+  - A known prefix followed by `-`: opaque, and the key is
+    `finding-<prefix>-<suffix>`, where the suffix is the next segment. The
+    known prefixes are the owning graph's plus, at an orchestrator root, those
+    of its included graphs. The longest match wins, so `aae-orc` is tried
+    before any shorter prefix.
+  - Anything else: WARN "unrecognised finding id". The file keys on its full
+    stem and never counts as a duplicate of another file.
+  - Because a prefix always precedes the suffix, an all-digit suffix
+    (`finding-kos-0173`) cannot be read as numbered, so the minter needs no
+    all-digit rejection.
+- **Why this lands first.** `finding_key` today takes the leading digit run
+  and falls back to the full id. For `finding-aae-orc-k3m9-x` the digit run is
+  empty, so the key is the whole stem, slug included. Two minted findings
+  that collide on id with different slugs get different keys, and the
+  duplicate check, the backstop for the blind set in 2.2, never sees the
+  collision. The key change has to land before the first minted finding.
+- **Resolution.** Every reader resolves the same forms through one function in
+  `findings.rs`:
+  - the key (`finding-173`, `finding-aae-orc-k3m9`);
   - the full stem;
   - the bare slug, when unique in the graph;
   - any of those after `graph::`.
@@ -166,20 +201,22 @@ What must change is classification:
   Callers: `kos ask` edge walking, validate's edge-target check (which today
   warns "may be a finding or probe" for every short citation, numbered ones
   included), charter render, and `aq finding`/`aq harvest` in the orc.
-  - `aq`'s slug fallback globs `finding-*-*${key}*`, which never matches a key
-    in the first segment, so `aq finding k3m9` would miss.
+  - `aq`'s slug fallback globs `finding-*-*${key}*`. It happens to catch a
+    bare suffix (`aq finding k3m9`) but also matches any slug containing
+    those four characters, so it needs a prefix-aware match, not a glob.
   - A bare slug that matches two files is an error that lists both, git's
     ambiguous-abbreviation model.
-  - A bare citation resolves in the citing file's own graph first, which
-    keeps orc `finding-173` and kos `finding-173` apart without edits.
+  - A bare numbered citation resolves in the citing file's own graph first,
+    which keeps orc `finding-173` and kos `finding-173` apart without edits.
+    Opaque ids need no such rule.
 
 **Slug as citation key (PROPOSAL, changes "slug kept ... as the citation
 key"):** fan-out arms handed one topic are the case most likely to pick the
-same slug. Two graphs picking the same slug is harmless, because `graph::`
+same slug. Two graphs picking the same slug is harmless, because the prefix
 separates them. Two findings in one graph picking the same slug is the real
 case, and there the slug cannot be the key. I recommend:
 
-- The canonical citation is the id (`finding-k3m9`).
+- The canonical citation is the id (`finding-aae-orc-k3m9`).
 - The slug stays in the filename for readers and resolves as an alias while it
   is unique.
 - validate WARNs on a duplicate slug within a graph. It does not fail, because
@@ -249,10 +286,10 @@ are pieces that land in their own PR.
 
 | # | Work item | Repo, files | Proving test | Blocked by | Ticket |
 |---|---|---|---|---|---|
-| 1 | Finding key classification: numbered vs opaque, integer compare, duplicate-slug WARN, `numbered_through` WARN, rename the two bd-named kos findings | kos: `src/findings.rs` (`finding_key`), `src/validate.rs`, `src/model.rs` (manifest field), `_kos/findings/` (two renames with forwarding notes) | table test: `finding-4a7k-x` and `finding-4zzz-y` are distinct keys; `finding-019-a` and `finding-19-b` collide; `finding-k3m9-x` and `finding-k3m9-y` collide; same slug under two ids WARNs, does not fail | none | `aae-orc-ottn4` |
-| 2 | Mint: `src/id.rs` (random 16 bytes per attempt, bd base36 widths, floor 4, adaptive over n, ten tries per length, all-digit rejected); `kos finding` mints and writes `.md` by default; `kos id finding` prints id and filename | kos: `src/id.rs`, `src/process.rs`, `src/main.rs`, `Cargo.toml` (`getrandom`) | unit: adaptive length at the kos count (51) and orc count (187) gives 4; injected RNG covers the all-digit and existence retries. Integration (wmna4 acceptance): clone one base commit twice, run `kos finding same-slug --title same` in each, assert distinct ids and that `kos validate` passes on the union | 1 | `aae-orc-wmna4` (REMAINING updated) |
+| 1 | Finding key classification: numbered vs prefixed opaque (longest known prefix), integer compare, unrecognised-id WARN, prefix-differs-from-owner WARN, duplicate-slug WARN, `numbered_through` WARN, graph_id shape check; rename the two bd-named kos findings | kos: `src/findings.rs` (`finding_key`), `src/validate.rs`, `src/model.rs` (manifest field), `_kos/findings/` (two renames with forwarding notes) | table test: `finding-aae-orc-k3m9-x` and `finding-aae-orc-k3m9-y` collide; `finding-aae-orc-k3m9-x` and `finding-kos-k3m9-x` do not; `finding-019-a` and `finding-19-b` collide; `finding-kos-0173-x` is opaque, not 173; same slug under two ids WARNs, does not fail | none | `aae-orc-ottn4` |
+| 2 | Mint: `src/id.rs` (prefix = owning graph_id lowercased; random 16 bytes per attempt, bd base36 widths, floor 4, adaptive over the graph's count, ten tries per length); `kos finding` mints and writes `.md` by default; `kos id finding` prints id and filename | kos: `src/id.rs`, `src/process.rs`, `src/main.rs`, `Cargo.toml` (`getrandom`) | unit: adaptive length at the kos count (51) and orc count (187) gives 4; injected RNG covers the existence retry and growth to the next length; minted ids carry the owning prefix. Integration (wmna4 acceptance): clone one base commit twice, run `kos finding same-slug --title same` in each, assert distinct ids and that `kos validate` passes on the union | 1 | `aae-orc-wmna4` (REMAINING updated) |
 | 3 | One resolver for citations (key, stem, unique slug, `graph::` form, own graph first, ambiguity lists candidates) used by ask, validate's edge check, charter render | kos: `src/findings.rs`, `src/ask.rs`, `src/validate.rs`, `src/charter.rs` | resolver table test over a fixture graph with numbered, opaque, duplicate-slug and cross-graph entries; validate no longer warns on a short citation that resolves | 1 | `aae-orc-cnnim` |
-| 4 | `aq finding` and `aq harvest` accept opaque keys (match the first segment) | orc: `tools/aq` | fixture dir with `finding-k3m9-x.md`: `aq finding k3m9`, `aq finding finding-k3m9`, `aq finding x` all print it; a numbered key still pads | 1 | `aae-orc-6di8d` |
+| 4 | `aq finding` and `aq harvest` accept prefixed keys with a prefix-aware match instead of the slug glob | orc: `tools/aq` | fixture dir with `finding-aae-orc-k3m9-x.md` and a slug containing `k3m9`: `aq finding finding-aae-orc-k3m9`, `aq finding k3m9` and `aq finding x` each print only the finding; a numbered key still pads | 1 | `aae-orc-6di8d` |
 | 5 | Authoring guidance and adoption: set `numbered_through` per graph, change "next free number" text to the mint verbs | orc: `CLAUDE.md`, `.claude/rules/` where findings are authored; kos: `CLAUDE.md`; each graph's `kos.yaml` | `grep -rn 'next free number\|max.plus.one'` in authoring docs returns only historical findings | 2 | `aae-orc-ul2h` (notes; its guidance item) |
 | 6 | Renumber orc 175 and 177 duplicates (the later-merged of each pair), forwarding notes | orc: `_kos/findings/` | `kos validate` in the orc reports 0 duplicate-id failures | none | `aae-orc-rr5h2` |
 | 7 | Gate: duplicate-id section required | kos CI now; orc CI via `aae-orc-bs28` | a PR adding a duplicate id fails that one check; a warning-only PR passes | 1, 6, operator ruling | ruling request, no ticket until ruled |
@@ -269,16 +306,15 @@ Each has a default that applies if no ruling comes.
    title|description|creator|created_at. Default: adopt, since the ruling's
    inputs separate nothing in kos beyond the timestamp.
 2. **Floor of 4** (2.2). Default: adopt.
-3. **No graph prefix in the id; `graph::` namespaces it** (2.3). Default:
-   none. This one changes the ruling's wording, so it waits for a ruling.
-   Item 2 is written so that the prefix is one constant either way.
+3. **Prefix: RULED 2026-09-25.** Keep a project prefix naming the owning
+   graph (2.3). The earlier proposal to drop it is withdrawn.
 4. **Id, not slug, as the canonical citation** (2.4). Default: adopt, slug
    kept as an alias.
 5. **Duplicate-id section required** (2.7). Default: stays advisory.
 
 ## 5. Not decided here
 
-- Relocation between graphs (`aae-orc-qso2f`): an opaque finding keeps its id
-  and changes its namespace, the same rule finding-173 gives slugs.
+- The relocation primitive itself (`aae-orc-qso2f`). Section 2.3 gives only
+  the id rule: a moved finding keeps its id, prefix included.
 - Whether charter render displays the slug beside an opaque id. This is a
   rendering choice for item 3's author.
