@@ -1,0 +1,139 @@
+id: finding-014-twelve-project-synthesis
+type: finding
+confidence: frontier
+title: "Twelve-project synthesis: category stability, signal classification, process quality gradient"
+content: |
+  ## Summary
+
+  Twelve projects probed for the KOS checksum property. Three personal
+  (ThreeDoors, penny-orc, project-alpha) and nine external open-source
+  (Backstage, Crossplane, Kubernetes KEPs, Rust RFCs, Go Proposals,
+  Python PEPs, BMAD enterprise, OpenHands, AutoGen). All twelve
+  produced signal at document seams. No project had zero findings.
+
+  ## Category stability
+
+  The three original categories (contradictions, gaps, structural chaos)
+  held across all twelve projects. They were not artifacts of the first
+  three projects.
+
+  Three new patterns emerged that the original categories did not cover:
+
+  1. SILENT ABANDONMENT: A decision is made, then later dropped without
+     record. No supersedes edge, no graveyard entry. The reasoning is
+     lost. Examples: Crossplane composition immutability, Rust PinBox,
+     Go check/handle. This is a missing graveyard entry — detectable
+     as a graph pattern (referenced node with no outgoing supersedes
+     edge and no graveyard entry).
+
+  2. ACKNOWLEDGED EVOLUTION: Later documents explicitly supersede earlier
+     ones with rationale. The seam is clean. Examples: Go contracts →
+     interfaces, Python PEP 544 resolving PEP 484's structural gap.
+     This is the supersedes edge working correctly. The graph detects
+     the disagreement but the declared supersession means it's not a bug.
+
+  3. COUNT/REFERENCE DRIFT: Numbers, paths, or terms go stale when
+     something else changes. Low severity, high frequency. Examples:
+     BMAD enterprise fragment count (35 → 42), OpenHands microagent →
+     skills terminology. This is a contradiction where the signal is
+     "drift" not "error."
+
+  These three patterns require signal classification on edges. A
+  contradicts edge can be signal: error (something is wrong) or
+  signal: drift (something is stale). A supersedes edge is inherently
+  signal: evolution. Without classification, the graph surfaces signal
+  but cannot distinguish severity.
+
+  ## Process quality gradient
+
+  The strongest findings came from projects with the loosest governance:
+  - ThreeDoors (solo BMAD): 10 issues, hard contradictions
+  - project-alpha (solo BMAD): 11 issues, phase boundary erosion
+  - OpenHands (mid-transition): 7 issues, stale architecture docs
+
+  The weakest findings came from projects with the most disciplined
+  processes:
+  - Kubernetes KEPs: 2 issues, both minor gaps
+  - Go Proposals: 4 issues, 3 already acknowledged by authors
+  - Python PEPs: 3 issues, managed evolution with minor residual seams
+
+  This gradient is consistent and predictable. KOS adds the most value
+  where existing processes are weakest — exactly where it's hardest to
+  get adoption, but also where the need is greatest.
+
+  ## AI-generated document finding
+
+  BMAD enterprise (AI-generated docs) had the mildest seams: 3 issues,
+  all low-severity count drift. One data point — insufficient to
+  conclude that AI-generated docs are inherently more consistent. Could
+  reflect structured generation, project youth, or constrained document
+  space. Noted but not promoted.
+
+  ## Schema implications (enacted in v0.3)
+
+  1. Signal classification added to edges: error | evolution | drift
+  2. Silent abandonment documented as a graph analysis pattern, not an
+     edge type (it's the absence of a supersedes edge, not a presence)
+  3. No new edge types needed — the four types (derives, implements,
+     contradicts, supersedes) with signal classification cover all
+     twelve projects
+
+  ## Charter implications (enacted)
+
+  1. B5 (Shadow Principle) revised: "surfaces signal, classification
+     requires human judgment" replaces "errors become apparent"
+  2. B7 (Process Quality Gradient) added as new bedrock element
+  3. Understanding that isn't encoded into schema or charter doesn't
+     survive the session — if it's not in the graph, it evaporates
+
+edges:
+  - target: finding-001-mvg-bootstrap
+    type: derives
+  - target: finding-002-penny-orc
+    type: derives
+  - target: finding-003-alpha
+    type: derives
+  - target: finding-004-schema-revision
+    type: derives
+  - target: finding-005-backstage
+    type: derives
+  - target: finding-006-crossplane
+    type: derives
+  - target: finding-007-kubernetes
+    type: derives
+  - target: finding-008-rust-rfcs
+    type: derives
+  - target: finding-009-go-proposals
+    type: derives
+  - target: finding-010-python-peps
+    type: derives
+  - target: finding-011-bmad-enterprise
+    type: derives
+  - target: finding-012-openhands
+    type: derives
+  - target: finding-013-autogen
+    type: derives
+  - target: elem-shadow-principle
+    type: derives
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - finding-001-mvg-bootstrap
+    - finding-002-penny-orc
+    - finding-003-alpha
+    - finding-004-schema-revision
+    - finding-005-backstage
+    - finding-006-crossplane
+    - finding-007-kubernetes
+    - finding-008-rust-rfcs
+    - finding-009-go-proposals
+    - finding-010-python-peps
+    - finding-011-bmad-enterprise
+    - finding-012-openhands
+    - finding-013-autogen
+  reviewed_by: null
+finding:
+  probe: brief-mvg-bootstrap
+  result: confirms

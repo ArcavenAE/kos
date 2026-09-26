@@ -1,0 +1,26 @@
+id: td-phase1-scope
+type: element
+confidence: frontier
+title: "ThreeDoors Phase 1 scope definition"
+content: |
+  Phase 1 (Technical Demo & Validation) scope as defined in product-scope.md.
+
+  Includes: CLI/TUI (Go/Bubbletea), Three Doors interface, local text file storage,
+  door selection (A/W/D, arrows), door refresh, expanded task detail view,
+  task status management (complete/blocked/in-progress/expand/fork/procrastinate/rework),
+  quick search, command palette, mood tracking, session metrics (JSONL),
+  completed task tracking, progress-over-perfection messaging, macOS primary.
+
+  STATUS AMBIGUITY: executive-summary.md marks Phase 1 as "VALIDATED" and "PASSED"
+  but product-scope.md still frames it as "In Scope" without marking it complete.
+  The document doesn't reflect its own project's temporal state.
+depends_on:
+  - td-vision
+  - td-val-progress
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - product-scope.md
+    - executive-summary.md

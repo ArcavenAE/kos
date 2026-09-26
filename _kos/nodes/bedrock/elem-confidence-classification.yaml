@@ -1,0 +1,25 @@
+id: elem-confidence-classification
+type: element
+confidence: bedrock
+title: "Three-state confidence classification"
+content: |
+  Every spec node carries exactly one of three confidence states:
+
+  BEDROCK: Committed. Evidence-based. Load-bearing. Changing this
+  node invalidates dependents. Requires evidence to promote, not consensus.
+
+  FRONTIER: Active hypothesis. Under exploration. Expected to hold
+  but subject to revision from probe findings. Questions live here.
+
+  GRAVEYARD: Tried, ruled out, permanently recorded. Append-only.
+  Never deleted. Never promoted back without new evidence and explicit
+  rationale. The graveyard is the system's wisdom layer.
+
+  PLACEHOLDER: Known unknown. Honest marker. Not a guess dressed
+  as fact. Marks a gap the system knows it has.
+depends_on:
+  - val-uncertainty-structural
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

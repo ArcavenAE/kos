@@ -1,0 +1,19 @@
+id: bm-readme-overview
+type: element
+confidence: frontier
+title: "BMAD TEA module: README and top-level overview claims"
+content: |
+  The README.md is the primary entry point for the BMAD TEA module. Key claims:
+  - TEA provides "a single expert agent (Murat)" and "nine workflows"
+  - 9 workflows listed: teach-me-testing, framework, test-design, atdd,
+    automate, test-review, trace, nfr-assess, ci
+  - Knowledge base has "40 reusable fragments" (README table, line 75)
+  - Step-file architecture with just-in-time loading, subagent isolation
+  - Supports 10+ platforms: Claude Code, Cursor, Codex, Gemini, etc.
+
+  Source: README.md, docs/index.md
+depends_on: []
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-bmad-enterprise-probe"
+  created_at: "2026-03-15"

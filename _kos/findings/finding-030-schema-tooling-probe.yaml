@@ -1,0 +1,111 @@
+id: finding-030-schema-tooling-probe
+type: finding
+confidence: frontier
+title: "Schema v0.3 holds under mechanical validation — 100% pass rate, graph reveals structural asymmetries"
+content: |
+  ## Summary
+
+  Session-007 built `kos validate` and `kos graph` — the first mechanical
+  test of schema v0.3 against all 25 existing nodes. Both subcommands
+  implemented in Rust using the typed model from session-006 (serde_yaml
+  deserialization into Confidence, NodeType, EdgeType, SignalType enums).
+
+  All 5 success signals from brief-schema-tooling met.
+
+  ## Findings
+
+  ### F1: Schema v0.3 is followed in practice — 0 failures
+
+  25 nodes validated. 0 failures. 2 warnings (edge targets pointing to
+  findings in findings/, not nodes/ — correct behavior, not drift). Every
+  node has: id, type, confidence, title, content. Every filename matches
+  its id. Every file is in the correct confidence directory. Every type
+  and confidence value deserializes into the enum without error.
+
+  The hypothesis was "> 90% pass without modification." Actual: 100%.
+  Schema v0.3 has been followed manually across 6 sessions without a
+  single structural deviation. This is notable — 3 schema revisions,
+  25 nodes written by hand over 4 months, zero drift. The schema is
+  either well-designed or underused. Given that 15 of 25 nodes have
+  no edges at all, underuse may be the better explanation for parts
+  of the schema.
+
+  ### F2: Mixed versioning coexists without conflict
+
+  8 nodes use depends_on (v0.1), 2 use edges (v0.2+), 15 use neither.
+  The Node::all_edges() method unifies both formats. serde handles
+  the optionality cleanly — both fields deserialize as Vec::default()
+  when absent. No migration needed. The v0.1 compat note in the schema
+  is validated: depends_on IS shorthand for edges with type derives.
+
+  ### F3: Graph reveals structural asymmetries invisible in YAML
+
+  The mermaid rendering shows:
+
+  1. val-uncertainty-structural is the most-depended-on node — 3 other
+     bedrock elements derive from it. It's the philosophical root.
+
+  2. 3 of 4 graveyard nodes are disconnected islands. Only
+     grv-git-as-sufficient-substrate has edges (contradicts elem-storage-
+     model with signal: evolution). The other 3 graveyards (documents-as-
+     source, git-semantic-layer, waterfall-frontload) are recorded but
+     not connected to the graph. This means ripple would never propagate
+     to or from them.
+
+  3. 6 of 9 frontier questions have NO edges to bedrock. Only
+     question-knowledge-layer-requirements, question-edge-types, and
+     question-temporal-state declare derivation edges. The other 6
+     questions (executive-mechanism, ripple-noise, collaboration-
+     continuity, mvg-bootstrap, charter-priority-encoding, node-schema-
+     validity) float disconnected. This is the edge model being underused
+     — questions that clearly derive from bedrock elements don't declare
+     the relationship.
+
+  4. Non-goals and values are leaf nodes — nothing derives from them
+     except through the element layer. They are roots, not hubs.
+
+  ### F4: Tool architecture splits into outward and inward
+
+  orient is the only cross-repo tool (queries the graph ABOUT other
+  repos). validate, graph, bridge, and drift are kos-internal (maintain
+  the graph itself). This maps to B6's cognitive architecture: orient is
+  the query interface to long-term memory; validate/graph/drift are
+  memory maintenance operations. The split emerged naturally from
+  implementation, not from design.
+
+  ### F5: Rust type system caught 3 deserialization errors during development
+
+  While building the typed model, serde_yaml's strict deserialization
+  caught: (1) the hyphenated "non-goal" type requiring serde rename_all
+  = "kebab-case", (2) edge types needing a separate EdgeType enum (not
+  strings), (3) optional fields needing explicit #[serde(default)].
+  Each was a compile-time or immediate-runtime error, not a silent bug.
+  This is the Rust language choice (session-005) paying off — the type
+  system mirrors the schema and catches deviations at parse time.
+
+  ## Assessment
+
+  Result: CONFIRMS. Schema v0.3 holds under mechanical validation.
+  The graph rendering reveals structural insights (disconnected
+  graveyards, unlinked questions) that validate the tool's value.
+  The edge model is underused — most nodes don't declare relationships
+  that clearly exist conceptually.
+
+edges:
+  - target: finding-029-kos-orient-probe
+    type: derives
+    note: "Builds on orient's model types and workspace discovery"
+  - target: question-node-schema-validity
+    type: derives
+    note: "First mechanical answer to this question"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Second implementation in the pivot sequence"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-007
+  created_at: 2026-03-30
+  reviewed_by: null
+finding:
+  probe: brief-schema-tooling
+  result: confirms

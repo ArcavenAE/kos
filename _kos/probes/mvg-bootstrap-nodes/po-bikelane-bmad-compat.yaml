@@ -1,0 +1,35 @@
+id: po-bikelane-bmad-compat
+type: element
+confidence: frontier
+title: "BikeLane claims full BMAD 6.0 compatibility"
+content: |
+  BIKELANE.md claims Pennyfarthing provides "full import support for BMAD
+  workflows with automatic conversion of syntax and structure." A migration
+  script converts BMAD workflows to Pennyfarthing format. Key differences
+  are superficial: variable syntax (hyphens to underscores), metadata format
+  (XML tags to YAML frontmatter).
+
+  SEAM TENSION: The rs.md argues that BMAD's workflow mechanism is
+  fundamentally insufficient (section 3c) — a single flat workflow type
+  that doesn't fit implementation, reviews, or exploration. But BIKELANE.md
+  proudly ports all nine BMAD planning workflows and calls it "full
+  compatibility." The rs.md critiques a system that the architecture doc
+  claims to have imported wholesale. The tension: if BMAD's workflow
+  mechanism is broken, why is "BMAD 6.0 compatible" a feature?
+
+  The answer is nuanced — Pennyfarthing added phased and procedural types
+  ON TOP of BMAD's stepped workflows. But the BIKELANE.md doc doesn't frame
+  it that way. It frames BMAD compatibility as a selling point rather than
+  an inherited limitation being addressed.
+
+  Source: BIKELANE.md, BMAD 6.0 Compatibility section.
+depends_on:
+  - po-bikelane-workflow-types
+  - po-rs-composable-workflows
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - BIKELANE.md
+    - lifecycle-improvement-rs.md

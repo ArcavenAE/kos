@@ -1,0 +1,34 @@
+id: bs-bep0003-auth-evolution
+type: element
+confidence: frontier
+title: "BEP-0003: Auth architecture evolution (AuthService, HttpAuthService)"
+content: |
+  BEP-0003 (status: implemented) overhauls Backstage authentication:
+
+  New services:
+  - AuthService: low-level auth (authenticate, getPluginRequestToken,
+    getLimitedUserToken, getOwnServiceCredentials)
+  - HttpAuthService: higher-level HTTP-specific auth (credentials, issueUserCookie)
+  - UserInfoService: ownership refs, decoupled from token
+  - HttpRouterService: extended with addAuthPolicy for opt-out of defaults
+
+  Key design decisions:
+  - Secure by default: all routes require authenticated users/services
+  - Plugins opt OUT of protection (not opt in)
+  - Cookie-based auth with limited-scope tokens for static assets
+  - On-Behalf-Of (OBO) flow replaces direct user token forwarding
+  - Ownership entity refs (ent claim) removed from user tokens
+  - Replaces IdentityService and TokenManagerService
+
+  Backwards compatibility layer for old backend system, but new
+  protection only applies to new backend system.
+
+  Source: beps/0003-auth-architecture-evolution/README.md
+tags:
+  - backstage
+  - auth
+  - security
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-backstage-probe"
+  created_at: "2026-03-15"

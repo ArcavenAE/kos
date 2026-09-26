@@ -1,0 +1,84 @@
+id: brief-code-only-bootstrap
+type: brief
+confidence: frontier
+title: "Code-only bootstrap probe — can the graph be seeded from code and git history alone?"
+content: |
+  Open question 4: Can the graph bootstrap from a codebase with no existing
+  spec, using only code structure and git history?
+
+  F4 established that manual bootstrap (human+agent reading documents) works.
+  This probe tests the harder case: what if there are no documents? Can code
+  structure, git history, commit messages, and naming conventions produce
+  enough signal to seed a useful graph?
+
+  ## Approach
+
+  Use a controlled test with ground truth. Take one of the previously-probed
+  projects (ThreeDoors or project-alpha) and attempt bootstrap using ONLY:
+  - Source code files
+  - Git log and commit messages
+  - Git blame
+  - Directory structure and naming
+  - Test files and CI configuration
+  - README (if it exists — but not PRDs, architecture docs, or planning artifacts)
+
+  Deliberately ignore all BMAD documents, PRDs, architecture docs, and planning
+  artifacts. Produce a set of inferred nodes. Then compare against findings
+  001-003 (which used the full document set) to measure:
+  1. What the code-only graph catches that the doc-based graph also caught
+  2. What the code-only graph misses
+  3. What the code-only graph finds that the doc-based graph did NOT find
+
+  ## Why controlled test over true code-only repo
+
+  A repo with zero docs has no ground truth to compare against. We can't
+  measure what was missed. Using a previously-probed project gives us a
+  baseline. The comparison IS the finding.
+
+  ## Target: project-alpha (via alpha-orc)
+
+  project-alpha over ThreeDoors because:
+  - Finding-003 found 11 issues including systematic phase boundary erosion
+    and the "ALL GAPS RESOLVED" self-deception — rich ground truth
+  - Rust codebase with strong type system — code structure carries more
+    semantic signal than a Go TUI app
+  - Sharded PRD gives us many document-derived claims to check against
+
+depends_on:
+  - question-code-bootstrap
+edges:
+  - target: finding-003-alpha
+    type: derives
+    note: "ground truth comparison — what did docs find that code alone misses?"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+brief:
+  hypothesis: |
+    Code structure and git history contain enough signal to bootstrap a
+    partial graph that catches at least SOME of the issues found by
+    document-based probing. Specifically: architectural contradictions
+    that manifest in code (wrong parser, missing modules, dead code paths)
+    should be detectable. Document-only contradictions (PRD says X,
+    architecture doc says Y, but neither is in code yet) will be invisible.
+    The code-only graph will find a different class of signal — drift
+    between intent (commit messages) and reality (current code state).
+  excluded_scope: |
+    - Automated tooling for extraction (this is manual agent work)
+    - Embedding-based similarity matching
+    - AST parsing beyond what the agent can do by reading code
+    - Any document in the project's planning/BMAD directories
+  success_signal: |
+    1. Code-only bootstrap produces at least 5 typed nodes that conform
+       to the KOS schema
+    2. At least 2 of the 11 issues from finding-003 are independently
+       rediscovered from code alone
+    3. At least 1 issue is found that finding-003 missed (code-only signal)
+
+    If all three: confirms (code-only bootstrap viable, produces
+    complementary signal).
+    If 1-2 only: partial (code-only produces nodes but limited signal).
+    If decomposition fails: redirects (code structure insufficient for
+    graph seeding without documents).
+  timebox: "Session-003, first probe cycle"

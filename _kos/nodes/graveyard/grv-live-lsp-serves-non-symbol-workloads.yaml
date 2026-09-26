@@ -1,0 +1,66 @@
+id: grv-live-lsp-serves-non-symbol-workloads
+type: element
+confidence: graveyard
+title: "Live LSP does not serve orientation, history, cross-repo scope, or provenance (ruled out)"
+content: |
+  RULED OUT 2026-08-16 by finding-aae-orc-5lbu. A live language server does not
+  serve the non-symbol workloads a session in this fleet actually runs, and the
+  reason in each case is structural (a property of what a language server is)
+  rather than a matter of configuration or version. This is the companion to
+  elem-live-lsp-beats-grep-on-symbol-workloads: the two together are the split
+  verdict on sub-question A. Symbol workloads win; these do not.
+
+  WHAT WAS RULED OUT, tied to the workload that demonstrated it:
+
+  - Orientation (W3). The onboarding tool does not produce orientation. It
+    returned 2,023 characters of instructions to the model telling it to go read
+    the project and write its own memory files, under generic headings
+    (tech_stack, suggested_commands, conventions). The orientation is authored
+    by the model, not derived by the tool, and the categories are generic
+    scaffolding rather than what this fleet's preamble needs (current bedrock,
+    open frontier questions, what is already ruled out). The F25 authored
+    backdrops already do this work; a symbol index does not.
+  - Prior-session history and decisions (W6). A language server is a snapshot
+    index of one working tree. It has no representation of time, prior sessions,
+    or decisions, and can only describe the code as it stands now. Not served,
+    by construction.
+  - Cross-repo / fleet scope (W7). Not served, with a hard error rather than a
+    judgment call: `Cannot extract symbols from file .../kos/src/model.rs.
+    Active language servers: ['go']`. One language-server set binds to one active
+    project. The fleet is 25-plus repos across at least two languages, so a
+    convention check spanning kos and marvel cannot be expressed as one query.
+    This is the evidence that carried the registered 0.65-insufficient
+    prediction.
+  - Provenance (W8). Partially served, and only by the tool's grep, not by any
+    symbol tool. The tool surfaced the right finding (finding-030's recorded
+    reason) but at position three in a flat list of twenty files, ranked no
+    differently from a bare parse call. There is no typing, no ranking, and no
+    provenance: the answer to "why" was present in the output and
+    indistinguishable from the noise around it. The knowledge was on disk and
+    greppable; the failure is that live LSP has no representation for anything
+    that is not a symbol. (W8 is the strongest single signal for read-path work
+    but is explicitly NOT promoted to a read-path mandate in the finding: one
+    workload names a gap, it does not authorise a program.)
+
+  WHY THIS IS GRAVEYARD AND NOT A GAP LIST. These are not missing features to be
+  added to a language server. History, orientation, cross-repo scope, and
+  provenance are not properties of a snapshot index of one working tree, and no
+  amount of language-server work adds them. That is what makes the answer to
+  sub-question A a split rather than a verdict, and it is the standing reason an
+  ingest is not optional for these workloads even though live LSP won cleanly on
+  the symbol ones.
+
+  REOPEN TRIGGERS. A language-server protocol or product that persists
+  cross-session history; a single query that provably spans two differently-
+  languaged repos through one server; or a symbol tool that carries commit,
+  date, author, and reason on its answers. None exist in the surveyed field.
+edges:
+  - target: question-code-graph-correspondence
+    type: partially_resolves
+    note: "answers the non-symbol half of sub-question A: live LSP cannot serve these workloads, so an ingest is not optional for them"
+provenance:
+  created_by: human
+  session: "session-2026-08-16-code-graph-harvest"
+  created_at: "2026-08-16"
+  evidence:
+    - _kos/findings/finding-aae-orc-5lbu-serena-live-lsp-baseline.md

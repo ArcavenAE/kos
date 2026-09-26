@@ -1,0 +1,71 @@
+Generating SCIP start...
+rust-analyzer: Loading discovering sysroot
+rust-analyzer: Loading querying project metadata
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading build script proc-macro2 run
+rust-analyzer: Loading build script quote run
+rust-analyzer: Loading build script rustversion run
+rust-analyzer: Loading build script httparse run
+rust-analyzer: Loading build script typenum run
+rust-analyzer: Loading build script thiserror run
+rust-analyzer: Loading build script serde_json run
+rust-analyzer: Loading build script rustix run
+rust-analyzer: Loading build script zerocopy run
+rust-analyzer: Loading build script crossbeam-utils run
+rust-analyzer: Loading proc-macro rustversion built
+rust-analyzer: Loading build script icu_properties_data run
+rust-analyzer: Loading build script getrandom run
+rust-analyzer: Loading build script libc run
+rust-analyzer: Loading build script icu_normalizer_data run
+rust-analyzer: Loading build script generic-array run
+rust-analyzer: Loading build script zmij run
+rust-analyzer: Loading build script parking_lot_core run
+rust-analyzer: Loading build script getrandom run
+rust-analyzer: Loading build script serde run
+rust-analyzer: Loading build script serde_core run
+rust-analyzer: Loading proc-macro serde_repr built
+rust-analyzer: Loading build script slog run
+rust-analyzer: Loading proc-macro futures-macro built
+rust-analyzer: Loading proc-macro tracing-attributes built
+rust-analyzer: Loading proc-macro tokio-macros built
+rust-analyzer: Loading proc-macro displaydoc built
+rust-analyzer: Loading proc-macro serde_derive built
+rust-analyzer: Loading proc-macro thiserror-impl built
+rust-analyzer: Loading proc-macro zerovec-derive built
+rust-analyzer: Loading proc-macro zerofrom-derive built
+rust-analyzer: Loading proc-macro yoke-derive built
+2026-08-16T15:36:30.193157-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(345ab) } })
+2026-08-16T15:36:30.193236-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(345ab) } })
+2026-08-16T15:36:30.193281-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(345ab) } })
+2026-08-16T15:36:30.19332-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(345ab) } })
+2026-08-16T15:36:30.193354-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(345ab) } })
+2026-08-16T15:36:30.193407-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(345ab) } })
+2026-08-16T15:36:30.193455-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(345ab) } })
+Generating SCIP finished 3.837626292s
+        3.96 real         5.78 user         2.50 sys
+          1303248896  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              144635  page reclaims
+                   0  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   1  signals received
+                 449  voluntary context switches
+                9149  involuntary context switches
+         79959088383  instructions retired
+         27615926877  cycles elapsed
+          1269253656  peak memory footprint

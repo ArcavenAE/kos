@@ -1,0 +1,189 @@
+id: executive-empirical-batch3-mid
+type: finding
+confidence: frontier
+title: "Executive empirical test batch 3: Backstage, Crossplane, AutoGen (mid-size team projects)"
+content: |
+  ## Backstage (Spotify/CNCF, 6 issues)
+
+  ### Visibility assessment
+  MEDIUM. ADRs and BEPs capture some architectural thinking. But
+  Backstage is Spotify-scale OSS — the actual design discussions
+  happen in GitHub issues, Discord, SIG meetings, and internal
+  Spotify channels. The ADRs are decisions, not the deliberation
+  that produced them.
+
+  ### Convergence detection
+  CLUSTER: BEP-0002 (dynamic plugins) as convergence center
+  - bs-seam-dynamic-plugins-no-auth-mention: no auth in plugin loading
+  - bs-seam-bep0002-adr011-build-divergence: parallel naming to ADR011
+  - bs-seam-bep0009-bep0002-metadata-overlap: two metadata systems
+
+  Three independent gaps all converge on BEP-0002 — the dynamic plugins
+  proposal creates integration gaps with three other documents. The
+  proposal was written without referencing existing ADRs or BEPs.
+
+  Would threshold fire? YES. 3 paths converging on one proposal.
+  Is it a real problem? YES — BEP-0002 is the least integrated
+  proposal in the corpus, and it touches security (auth gap).
+
+  ISOLATED: bs-seam-bep0003-bep0007-scope-field-inconsistency (minor),
+  bs-seam-adr002-apiversion-stale (temporal drift, 4+ years stale).
+
+  ### Priority function
+  bs-seam-dynamic-plugins-no-auth-mention should rank highest:
+  - dependency_depth: HIGH (security affects everything)
+  - visibility_gap: MEDIUM (some deliberation invisible)
+  - tractability: HIGH (add auth section to BEP-0002)
+  - adjacent_evidence: HIGHEST (convergent cluster)
+
+  A human would agree: the security gap in the plugin loading
+  proposal is the most consequential finding.
+
+  ### Human channel
+  Whether the auth gap is a real security concern or just a
+  documentation gap requires understanding Backstage's threat model.
+  Dynamic plugins execute in the browser — is the auth architecture
+  sufficient to protect backend APIs from malicious plugins? That's
+  a security architecture judgment, not a document consistency check.
+
+  ### Maturity model
+  Growing graph. ADRs (2020-2021) and BEPs (2024) don't cross-reference
+  each other. The project has a mechanism (BEPs) but doesn't enforce
+  backward linkage to ADRs. Growing → discovery-primary, which matches:
+  the main value is discovering the gaps between the two document eras.
+
+  ---
+
+  ## Crossplane (CNCF, 5 issues)
+
+  ### Visibility assessment
+  MEDIUM-HIGH. Design docs are in the repo. The CNCF community
+  discussions happen in Slack and SIG meetings, but Crossplane's
+  design docs are more detailed than most (full proposals with
+  alternatives considered).
+
+  ### Convergence detection
+  CLUSTER: Original design intent abandonment (3 issues converge)
+  - cp-seam-immutability-abandoned: immutability dropped, no record
+  - cp-seam-extension-model-diverged: alternate types → Functions
+  - cp-seam-appdef-silent-removal: ApplicationDefinition disappeared
+
+  Three independent design decisions from the original proposal were
+  silently abandoned. Each involves a different architectural element,
+  but all converge on "original design intent vs. current reality."
+  The original design document's reasoning was progressively made
+  irrelevant without anyone recording why.
+
+  Would threshold fire? YES. 3 paths to "original design integrity."
+  Is it a real problem? NUANCED. The current design is likely correct
+  (it evolved through use). The problem is the LOST REASONING — why
+  was immutability dropped? Why was ApplicationDefinition removed?
+  Those decisions had rationale that no longer exists in the repo.
+
+  ISOLATED: cp-seam-validation-stale-api (references defunct API),
+  cp-seam-original-note-incomplete (evolution note misses major changes).
+
+  POSITIVE: cp-seam-alpha-beta-api-break — the team DOES have a
+  supersession mechanism (defunct/ directory, explicit rationale). They
+  just didn't apply it to the original→current evolution.
+
+  ### Priority function
+  cp-seam-immutability-abandoned should rank highest:
+  - dependency_depth: HIGHEST (immutability is a foundational decision
+    that affects CompositionRevisions, rollout, and the entire update
+    model)
+  - visibility_gap: MEDIUM-HIGH
+  - tractability: MEDIUM (requires reconstructing the decision rationale)
+  - adjacent_evidence: HIGH (convergent cluster)
+
+  A human would agree: understanding WHY immutability was dropped is the
+  highest-leverage question because it affects the most downstream
+  design decisions.
+
+  ### Human channel
+  The observation that the team HAS a supersession mechanism (defunct/)
+  but didn't apply it to the original design is a process judgment.
+  Why did they handle alpha→beta well but original→beta poorly?
+  Possible answer: the alpha→beta transition was a deliberate project
+  milestone; the original design erosion was gradual and invisible.
+  This is the "all projects are transitioning but most don't know it"
+  insight in action.
+
+  ### Maturity model
+  Growing/mature. Has mechanisms for design evolution but applies them
+  inconsistently. The executive should recommend: apply the existing
+  defunct/ mechanism to the original design decisions that were abandoned.
+  This is maintenance work using the project's own tools — the cheapest
+  kind of improvement.
+
+  ---
+
+  ## AutoGen (Microsoft, 5 issues)
+
+  ### Visibility assessment
+  MEDIUM. Microsoft internal discussions invisible. Design docs and
+  migration guide visible. The Python migration guide is thorough;
+  the .NET side is neglected.
+
+  ### Convergence detection
+  CLUSTER: Agent identity specification (3 issues converge)
+  - ag-agentid-terminology-seam: (namespace,name) vs (type,key)
+  - ag-agentkey-validation-contradiction: three different character
+    constraints, code validates none
+  - ag-agent-type-regex-inconsistency: type constraints differ between
+    prose and regex across documents
+
+  Three independent specification inconsistencies about the SAME
+  concept (agent identity). Each involves different documents and
+  different aspects of the identity system, but all converge on
+  "how agents are identified."
+
+  Would threshold fire? YES. 3 paths to "agent identity spec."
+  Is it a real problem? YES — this is the most implementer-facing
+  cluster in the entire twelve-project sample. Someone building an
+  AutoGen agent would encounter three different rules for what
+  characters are allowed in agent keys.
+
+  ISOLATED: ag-dotnet-readme-v02-steering (.NET migration gap),
+  ag-cloudevents-claim-divergence (compliance claim vs reality).
+
+  ### Priority function
+  ag-agentkey-validation-contradiction should rank highest:
+  - dependency_depth: HIGH (every agent creation depends on knowing
+    what IDs are valid)
+  - visibility_gap: MEDIUM
+  - tractability: HIGHEST (check the code, pick one constraint, update
+    docs to match)
+  - adjacent_evidence: HIGHEST (convergent cluster, all identity)
+
+  A human would agree: the agent key contradiction is immediately
+  harmful and immediately fixable.
+
+  ### Human channel
+  The insight that "the worst seams are WITHIN v0.4, not at the version
+  boundary" is a meta-observation. The team invested heavily in the
+  Python migration guide (macro transition) but neglected internal
+  specification consistency (micro transitions). This pattern inverts
+  the assumption that version transitions are the highest-risk area.
+
+  ### Maturity model
+  Growing graph (active transition). Matches prediction: discovery-
+  primary (what IS the v0.4 spec, specifically?) with emerging
+  maintenance. The Python side is more mature than the .NET side —
+  a cross-platform maturity split the executive should track.
+
+edges:
+  - target: brief-executive-empirical-test
+    type: derives
+  - target: finding-005-backstage
+    type: derives
+  - target: finding-006-crossplane
+    type: derives
+  - target: finding-013-autogen
+    type: derives
+  - target: executive-mechanism-proposal
+    type: derives
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15

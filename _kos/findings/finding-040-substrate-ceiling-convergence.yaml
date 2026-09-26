@@ -1,0 +1,75 @@
+id: finding-040-substrate-ceiling-convergence
+type: finding
+confidence: frontier
+title: "Three graveyard entries measure the same ceiling — kos has outgrown its substrate assumptions"
+content: |
+  ## Summary
+
+  The three graveyard entries from the lifecycle composition extraction
+  (session-013) appear to be separate rulings but are three measurements
+  of the same underlying constraint:
+
+  - grv-flat-file-context-scaling: files don't fit in context
+  - grv-single-workflow-type: one process shape doesn't flex
+  - grv-human-as-integration-bus: humans can't carry context at scale
+
+  All three are failures of a system designed around: single agent,
+  single session, single repo, human-in-the-loop. The graveyard isn't
+  recording three separate findings. It's recording three angles on
+  the same ceiling: **kos at current scale has outgrown its substrate
+  assumptions.**
+
+  ## Connection to the substrate hypothesis
+
+  Finding-036 (session-011, ThreeDoors bootstrap) identified five
+  properties files structurally cannot provide:
+  1. First-class relationships
+  2. Preserved reasoning chains
+  3. On-demand projections
+  4. Context that survives session breaks
+  5. Concurrent transaction semantics
+
+  The three graveyard entries are empirical evidence of properties 3,
+  4, and (implicitly) 1 failing in practice. The substrate hypothesis
+  predicted this theoretically. The lifecycle research measured it.
+
+  ## What this means
+
+  This is not a crisis. The process is proven — 11 sessions, 40
+  findings, 200+ nodes across 7 graphs, signal found in every project
+  tested. The substrate is the constraint, not the process.
+
+  The next phase is substrate work, not process refinement. The
+  question-intent-under-context-break node is where this ceiling
+  meets the auftragstaktik insight — intent persistence across context
+  breaks requires substrate properties that files don't have.
+
+  ## Assessment
+
+  Result: CONFIRMS — the three graveyard entries converge on the
+  substrate hypothesis. The lifecycle research provides measured
+  evidence (context ceiling data from 5 projects) for what finding-036
+  predicted from structural analysis.
+edges:
+  - target: grv-flat-file-context-scaling
+    type: derives
+    note: "One of the three measurements"
+  - target: grv-single-workflow-type
+    type: derives
+    note: "One of the three measurements"
+  - target: grv-human-as-integration-bus
+    type: derives
+    note: "One of the three measurements"
+  - target: question-intent-under-context-break
+    type: derives
+    note: "Intent persistence is where the ceiling meets the solution"
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "finding-036-substrate-hypothesis (session-011)"
+    - "finding-039-lifecycle-composition-extraction (session-013)"
+finding:
+  probe: null
+  result: confirms

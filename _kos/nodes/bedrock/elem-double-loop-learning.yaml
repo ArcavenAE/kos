@@ -1,0 +1,53 @@
+id: elem-double-loop-learning
+type: element
+confidence: bedrock
+title: "Double-loop learning (questioning the spec) outperforms single-loop (adjusting execution)"
+content: |
+  Argyris & Schon distinguish two kinds of organizational learning:
+
+  Single-loop: adjust behavior within existing rules.
+  "We didn't hit velocity because we didn't estimate well."
+
+  Double-loop: question whether the rules themselves are correct.
+  "Our story definition process breaks for >5-point stories; change
+  the PRD validation gate."
+
+  Double-loop addresses root causes. Single-loop treats symptoms.
+  The lifecycle research (171 sources) validates that double-loop
+  learning prevents premature convergence on wrong approaches and
+  enables rapid course correction.
+
+  kos's process IS double-loop learning applied to knowledge:
+  - Orient: read the graph (what do we believe?)
+  - Question: challenge what's believed (is the spec correct?)
+  - Probe: test the challenge (generate evidence)
+  - Finding: what did we learn (including "the spec was wrong")
+  - Harvest: update the graph (change the rules, not just behavior)
+  - Graveyard: permanently record what was wrong and why
+
+  Single-loop kos would be: run the process, update the code, close
+  the ticket. Double-loop kos is: run the process, discover the spec
+  was wrong, update the spec, THEN update the code.
+
+  The graveyard is kos's strongest double-loop mechanism — it records
+  not just what was tried but WHY it was ruled out. This prevents
+  future re-exploration of dead ends and preserves the reasoning chain.
+
+  The lifecycle research claims: double-loop retrospectives reduce
+  downstream rework by 25%+ because root causes are addressed at the
+  specification level. Testable.
+edges:
+  - target: elem-bidirectional-feedback-underimplemented
+    type: derives
+    note: "Double-loop requires the upward feedback channel"
+  - target: elem-gate-enforcement
+    type: derives
+    note: "Gates are checkpoints where double-loop questions can be asked"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "Argyris & Schon — Organizational Learning"
+    - "penny-orc lifecycle research synthesis"
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-research-bootstrap.md"

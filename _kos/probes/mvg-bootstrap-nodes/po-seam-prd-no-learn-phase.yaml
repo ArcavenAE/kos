@@ -1,0 +1,36 @@
+id: po-seam-prd-no-learn-phase
+type: finding
+confidence: frontier
+title: "Seam: PRDs produced by the pipeline the rs.md says is incomplete"
+content: |
+  CATEGORY 2 — GAP
+
+  The rs.md's first finding is that the BMAD lifecycle "stops at shipped"
+  with no LEARN phase. The bikeshop-prd.md was produced by the stepped PRD
+  workflow — the exact BMAD-derived pipeline the rs.md critiques. The PRD
+  has a revision note documenting a terminology correction (WheelHub was
+  architecturally incorrect). This revision is exactly the kind of "drift
+  detected, spec updated" event the rs.md says has no process.
+
+  But the correction happened ad hoc — M. Pursifull noticed the error and
+  revised the document. There was no Delivery Finding, no structured upward
+  channel, no change propagation analysis. The revision note says what
+  changed but not what downstream artifacts are now stale.
+
+  The bikeshop-prd.md is a live example of both the problem and the
+  workaround: drift was caught (good), but caught by human inspection
+  rather than process (the gap the rs.md identifies).
+depends_on:
+  - po-rs-lifecycle-incomplete
+  - po-rs-drift-invisible
+  - po-bikeshop-prd
+finding:
+  probe: brief-mvg-bootstrap
+  result: confirms
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md
+    - bikeshop-prd.md

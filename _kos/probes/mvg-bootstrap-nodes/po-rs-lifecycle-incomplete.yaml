@@ -1,0 +1,22 @@
+id: po-rs-lifecycle-incomplete
+type: element
+confidence: frontier
+title: "RS claim: BMAD lifecycle stops at shipped"
+content: |
+  The lifecycle-improvement-rs.md identifies eight structural problems with
+  BMAD's lifecycle. The first and most foundational: the lifecycle is a pipeline,
+  not a loop. After release, there is no structured process for integration
+  validation, architectural drift detection, learning capture, or change
+  propagation. The rs.md proposes a LEARN phase to close the loop.
+
+  This is the rs.md's central thesis. Every other problem (drift, ripple,
+  scaling, context) follows from or is amplified by the open-ended pipeline.
+
+  Source: lifecycle-improvement-rs.md, sections 1, 5, 6, Vision A.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md

@@ -1,0 +1,41 @@
+id: bm-seam-fragment-count-drift
+type: element
+confidence: frontier
+title: "BMAD TEA seam: knowledge fragment count drifts across documents"
+content: |
+  The number of knowledge fragments is stated differently across documents,
+  reflecting a growth from ~35 to 42 that was not propagated to all docs:
+
+  - README.md: "40 reusable fragments" (line 75, workflow vs skills table)
+  - CHANGELOG.md: "35 total" (at time of Playwright CLI addition)
+  - MIGRATION.md: "35 knowledge fragments"
+  - commands.md Session 7: "35 knowledge fragments exploration"
+  - tutorials/learn-testing-tea-academy.md: "35 knowledge fragments" (2x)
+  - troubleshooting.md: "42 fragments" (multiple times)
+  - tea-overview.md: "42 fragments" (lines 458, 473)
+  - Actual count: 42 files in knowledge/, 42 entries in tea-index.csv
+
+  The true count is 42. Documents saying 35 or 40 are stale. This is a
+  classic versioning-without-propagation problem: the knowledge base grew
+  from 35 to 42 fragments (adding pactjs-utils, pact-mcp, pact-consumer-*,
+  adr-quality-readiness-checklist, playwright-cli, pact-consumer-di), but
+  only some docs were updated.
+
+  Category: gap (stale reference, not contradiction in intent)
+edges:
+  - target: bm-readme-overview
+    type: contradicts
+    note: "README says 40, actual is 42"
+  - target: bm-tea-overview-architecture
+    type: derives
+    note: "Overview correctly says 42"
+  - target: bm-commands-reference
+    type: contradicts
+    note: "Commands ref says 35 for Session 7"
+  - target: bm-workflow-implementations
+    type: derives
+    note: "Implementation has 42 files"
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-bmad-enterprise-probe"
+  created_at: "2026-03-15"

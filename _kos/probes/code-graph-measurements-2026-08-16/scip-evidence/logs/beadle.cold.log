@@ -1,0 +1,61 @@
+Generating SCIP start...
+rust-analyzer: Loading discovering sysroot
+2026-08-16T15:34:56.659233-05:00 ERROR can't load standard library, try installing `rust-src` sysroot_path=/Users/michael.pursifull/.rustup/toolchains/stable-aarch64-apple-darwin
+rust-analyzer: Loading querying project metadata
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading build script serde_json run
+rust-analyzer: Loading proc-macro time-macros built
+rust-analyzer: Loading build script getrandom run
+rust-analyzer: Loading build script anyhow run
+rust-analyzer: Loading build script quote run
+rust-analyzer: Loading build script proc-macro2 run
+rust-analyzer: Loading build script serde run
+rust-analyzer: Loading build script serde_core run
+rust-analyzer: Loading build script zmij run
+rust-analyzer: Loading build script libc run
+rust-analyzer: Loading build script rustix run
+rust-analyzer: Loading build script generic-array run
+rust-analyzer: Loading proc-macro clap_derive built
+rust-analyzer: Loading proc-macro serde_derive built
+2026-08-16T15:35:01.654569-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(484d) } })
+
+Encountered duplicate scip symbols, indicating an internal rust-analyzer bug. These duplicates are
+included in the output, but this causes information lookup to be ambiguous and so information about
+these symbols presented by downstream tools may be incorrect.
+
+Known rust-analyzer bugs that can cause this:
+
+  * Definitions in crate example binaries which have the same symbol as definitions in the library
+    or some other example.
+
+  * Struct/enum/const/static/impl definitions nested in a function do not mention the function name.
+    See #18771.
+
+Duplicate symbols encountered:
+
+crates/beadle/src/main.rs:0:0-139:0
+  Duplicate symbol: rust-analyzer cargo beadle 0.1.0 crate/
+
+Generating SCIP finished 141.736352917s
+      141.77 real         7.02 user         2.23 sys
+           313131008  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              461155  page reclaims
+                6910  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                  23  signals received
+                2579  voluntary context switches
+               25523  involuntary context switches
+         14428027530  instructions retired
+          4976043049  cycles elapsed
+           269337416  peak memory footprint

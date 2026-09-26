@@ -1,0 +1,56 @@
+[package]
+name = "kos"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MIT"
+description = "Graph-based knowledge accumulation for designed systems"
+
+[dependencies]
+# CLI
+clap = { version = "4", features = ["derive", "env"] }
+
+# Serialization (the graph substrate is YAML)
+serde = { version = "1", features = ["derive"] }
+# TODO: serde_yaml is archived/deprecated — migrate to serde_yml before v1.0
+serde_yaml = "0.9"
+serde_json = "1"
+
+# Error handling
+anyhow = "1"
+thiserror = "2"
+
+# Graph traversal (drift detection, ripple propagation)
+petgraph = "0.7"
+
+# File system traversal
+walkdir = "2"
+
+# Usage logging (opt-in)
+chrono = { version = "0.4", features = ["serde"] }
+dirs-next = "2"
+
+# Regex for markdown parsing
+regex = "1"
+
+# Content hashing for drift detection
+sha2 = "0.10"
+
+# Self-update (GitHub releases API)
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+
+[build-dependencies]
+chrono = "0.4"
+
+[dev-dependencies]
+insta = { version = "1", features = ["yaml", "json"] }
+tempfile = "3"
+
+[lints.clippy]
+cloned_instead_of_copied = "warn"
+needless_pass_by_value = "warn"
+redundant_closure_for_method_calls = "warn"
+uninlined_format_args = "deny"
+
+[lints.rust]
+unsafe_code = "forbid"

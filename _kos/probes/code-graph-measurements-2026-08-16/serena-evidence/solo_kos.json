@@ -1,0 +1,52 @@
+[
+  {
+    "tag": "kos-run1",
+    "project": "/Users/michael.pursifull/work/aae-orc/kos",
+    "initialize_s": 2.277,
+    "queries": [
+      {
+        "label": "cold",
+        "seconds": 6.908,
+        "error": null
+      },
+      {
+        "label": "warm",
+        "seconds": 0.254,
+        "error": null
+      }
+    ],
+    "rss_peak_mb": {
+      "rust-analyzer:96208": 1204.3,
+      "python:96183": 113.2,
+      "uv:96159": 53.6,
+      "rust-analyzer-proc-macro-srv:96226": 40.5
+    },
+    "total_peak_mb": 1411.6,
+    "samples": 23
+  },
+  {
+    "tag": "kos-run2",
+    "project": "/Users/michael.pursifull/work/aae-orc/kos",
+    "initialize_s": 2.105,
+    "queries": [
+      {
+        "label": "cold",
+        "seconds": 7.223,
+        "error": null
+      },
+      {
+        "label": "warm",
+        "seconds": 0.302,
+        "error": null
+      }
+    ],
+    "rss_peak_mb": {
+      "rust-analyzer:96651": 1173.2,
+      "python:96546": 113.4,
+      "uv:96526": 53.4,
+      "rust-analyzer-proc-macro-srv:96712": 40.7
+    },
+    "total_peak_mb": 1380.7,
+    "samples": 24
+  }
+]

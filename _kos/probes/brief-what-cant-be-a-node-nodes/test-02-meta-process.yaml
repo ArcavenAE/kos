@@ -1,0 +1,68 @@
+id: test-02-meta-process
+type: observation
+confidence: frontier
+title: "Test: can correction events be nodes? — instances yes, capacity no"
+content: |
+  ## Decision tested
+
+  Session-003: agent wrote finding-016 with evidence but no architectural
+  implications. Human provided a 4-line compressed version that extracted
+  B4 necessity, B5 symmetry, and Q2 connection. Agent acknowledged the
+  finding was under-interpreted. Finding was updated.
+
+  ## Attempt to decompose
+
+  The INSTANCE is a node:
+    id: meta-correction-016
+    type: observation
+    content: "Finding-016 initially under-interpreted. Human identified
+      B4, B5, Q2 implications that agent missed."
+    edges:
+      - target: finding-016
+        type: derives
+
+  This works syntactically. The correction is recorded.
+
+  ## What resists
+
+  The PATTERN cannot be a node: "the human sees architectural implications
+  the agent misses." This is meta-knowledge about the collaboration's
+  structure. You could write:
+
+    id: meta-pattern-human-implication-detection
+    type: observation
+    content: "Human consistently identifies architectural implications
+      that agent under-interprets in findings."
+
+  But what are its edges? It derives from... every instance where this
+  happened? That's a derived metric, not a relationship. And the node
+  has no natural place in the graph's dependency structure. Nothing
+  DERIVES from it. Nothing IMPLEMENTS it. It doesn't CONTRADICT anything.
+  It's knowledge ABOUT the graph-building process that floats outside
+  the domain the graph models.
+
+  More precisely: the graph models WHAT IS KNOWN about designed systems.
+  Meta-process knowledge is about HOW THE KNOWING HAPPENS. These are
+  different layers. The graph can hold instances (this correction happened)
+  but the pattern (corrections happen this way) belongs to a meta-layer
+  that the current schema doesn't distinguish from the object layer.
+
+  ## Category: META-PROCESS
+
+  Instances decompose. Patterns about the process resist — not because
+  they can't be written as text in a content field, but because they
+  have no structural role in the graph. They're edgeless nodes that
+  nothing depends on and that depend on nothing in a meaningful way.
+
+  ## Severity
+
+  MEDIUM. The collaboration model (B6) says "human = graph, agent =
+  inference, session = executive loop." Finding-015 and this correction
+  are evidence about whether that model is working. If we can't
+  structurally capture process-level patterns, we can't use the graph
+  to evaluate its own collaboration model.
+edges: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15

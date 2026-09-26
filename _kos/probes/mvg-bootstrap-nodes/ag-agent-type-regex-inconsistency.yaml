@@ -1,0 +1,21 @@
+id: ag-agent-type-regex-inconsistency
+type: claim
+confidence: frontier
+claim:
+  text: >
+    Agent type allowed characters differ across docs. Design doc 02 (Topics)
+    and doc 04 both describe constraints, but with different character sets:
+    doc 02 mentions the regex ^[\w\-\.]+\Z (allowing hyphens and dots),
+    while doc 04 says "alphanumeric letters (a-z) and (0-9), or underscores"
+    (no hyphens or dots). The user-facing doc (agent-identity-and-lifecycle.md)
+    also says "alphanumeric and underscores only." The code uses the permissive
+    regex ^[\w\-\.]+\Z, matching doc 02. The prose descriptions in doc 04 and
+    user docs are incorrect relative to the implementation.
+  source_docs:
+    - docs/design/02 - Topics.md
+    - docs/design/04 - Agent and Topic ID Specs.md
+    - python/docs/src/user-guide/core-user-guide/core-concepts/agent-identity-and-lifecycle.md
+    - python/packages/autogen-core/src/autogen_core/_agent_id.py
+  severity: low
+  category: spec-implementation-mismatch
+tags: [seam, agent-type, regex, v0.4]

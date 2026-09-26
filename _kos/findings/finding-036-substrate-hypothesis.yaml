@@ -1,0 +1,116 @@
+id: finding-036-substrate-hypothesis
+type: finding
+confidence: frontier
+title: "The substrate hypothesis: YAML-in-git proved the graph model, now the graph needs a substrate that isn't files"
+content: |
+  ## Summary
+
+  Sessions 006-011 built a CLI toolchain and bootstrapped a real project
+  (104 nodes from ~800 documents). The toolchain works. The graph model
+  works. The YAML-in-git substrate holds at 181 nodes. But the research
+  proved its own thesis: information stored in files is fundamentally
+  flawed for accumulated understanding. kos demonstrated this while
+  being files itself.
+
+  ## The recursive irony
+
+  The ThreeDoors bootstrap proved that 800 files containing real knowledge
+  produce drift invisible to any single document. The graph found what
+  the files couldn't surface (adr-0026 contradicted by 3 incidents, SOUL
+  contradicted by scope, dark factory produces all incidents while app
+  produces none). But the graph is 104 YAML files in git — the same lossy
+  file-shaped layer the charter (B5) warns about.
+
+  ## Provenance of this finding
+
+  The human identified the recursive irony: kos proves files are
+  insufficient while being files. The agent articulated and structured
+  it. The graph did not self-diagnose — it was diagnosed from outside.
+  This confirms the constitutional boundary from B6: the human is the
+  pattern recognizer operating on the graph's blind spot. The agent
+  executes within declared structure. The human expands the declared
+  structure by seeing what it doesn't yet contain.
+
+  This provenance matters: if recorded as "kos made the recursive move"
+  it would be a false bedrock claim about agent capability. The accurate
+  finding is that the division of labor from the charter held — even
+  when the evidence was rich and the framework explicit.
+
+  ## Five properties the substrate must have that files structurally cannot
+
+  1. **Relationships as first-class objects.** The contradicts edge
+     between inc-001 and adr-0026 is the knowledge. The YAML file
+     holding it is a projection. Edges should be as real as nodes —
+     queryable, versionable, independently evolvable.
+
+  2. **Reasoning chains preserved, not just conclusions.** "I noticed
+     INC-001 contradicts adr-0026 because both assume isolation but
+     one enforces it and one doesn't" — the because is lost in YAML.
+     The substrate should record the inference, not just the fact.
+
+  3. **Projections generated on demand.** The charter, orient output,
+     mermaid graph are manually maintained projections. A real substrate
+     generates them from the graph when asked — always current, never
+     stale. Documents become outputs, not inputs.
+
+  4. **Context that survives session breaks.** The charter is a
+     compression artifact for the next session to cold-start from.
+     Each session re-derives understanding from files. The substrate
+     should BE the context — not a document the agent reads, but the
+     memory it already has.
+
+  5. **Concurrent agent access with real transaction semantics.** The
+     ThreeDoors dark factory proved advisory locks fail (INC-003: epic
+     collision, markdown registry with no CAS). The substrate needs
+     atomic operations, conflict detection, and transactional writes.
+
+  ## The probe question
+
+  What is the minimum viable non-file substrate that demonstrates even
+  one of the five required properties better than YAML-in-git — tested
+  against the ThreeDoors 104-node graph as reference material?
+
+  One property. One test case. If it works on one property, the
+  direction is real. If it fails, it's the most important graveyard
+  entry the project has produced.
+
+  ## Evidence base
+
+  This is not speculation. It is a frontier hypothesis with bedrock
+  under it:
+  - 12 projects probed (sessions 001-004)
+  - 35 findings (001-035)
+  - 6 sessions of tooling (006-011)
+  - 1 real-scale bootstrap (104 nodes, 8 actionable findings filed)
+  - 181 nodes across 6 graphs, 0 validation failures
+  - The shadow principle (B5) predicted this outcome
+  - G5 graveyarded git-as-sufficient-substrate
+  - B3 specified the datom model that would replace it
+
+  The CLI was the instrument. The findings are the product. The
+  scaffold has been outgrown. The next cycle starts from here.
+
+edges:
+  - target: finding-035-threedoors-bootstrap-complete
+    type: derives
+    note: "The bootstrap proved the graph model while demonstrating the file substrate's limits"
+  - target: finding-033-drift-probe
+    type: derives
+    note: "Drift detection works but files can't represent the reasoning behind edges"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "The implementation pivot built the scaffold; this finding says the scaffold is complete"
+provenance:
+  created_by: human
+  session: session-011
+  created_at: "2026-03-31"
+  derived_from:
+    - finding-035-threedoors-bootstrap-complete
+    - finding-033-drift-probe
+    - finding-027-implementation-pivot
+  reviewed_by: null
+tags:
+  - substrate
+  - meta
+  - recursive
+  - cognitive-architecture

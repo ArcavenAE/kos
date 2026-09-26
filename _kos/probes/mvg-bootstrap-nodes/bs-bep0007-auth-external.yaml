@@ -1,0 +1,31 @@
+id: bs-bep0007-auth-external
+type: element
+confidence: frontier
+title: "BEP-0007: External service authentication (static tokens, scopes)"
+content: |
+  BEP-0007 (status: implemented) builds on BEP-0003 to add external
+  service authentication:
+
+  - New config section: backend.auth.externalAccess (array of typed entries)
+  - Access types: "legacy" (shared-secret JWT signing) and "static" (raw bearer token)
+  - Optional scope restrictions: by plugin ID, permission name, or permission attributes
+  - backend.auth.keys is now legacy (still supported, emits warning)
+  - Implementation lives entirely in coreServices.auth.authenticate()
+  - Configuration-only on Backstage side; no code changes needed
+
+  Explicitly notes extensibility for future types (jwks, certificate)
+  is deferred to a future framework-level extension point.
+
+  Source: beps/0007-auth-external-services/README.md
+edges:
+  - target: bs-bep0003-auth-evolution
+    type: derives
+    note: "Explicitly builds on BEP-0003's AuthService interface"
+tags:
+  - backstage
+  - auth
+  - external-services
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-backstage-probe"
+  created_at: "2026-03-15"

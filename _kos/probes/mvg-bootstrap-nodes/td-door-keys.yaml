@@ -1,0 +1,29 @@
+id: td-door-keys
+type: element
+confidence: frontier
+title: "ThreeDoors door selection key bindings"
+content: |
+  CONTRADICTION: Two documents specify different key bindings for the same action.
+
+  Source A (product-scope.md, line 9):
+    "Door selection via keyboard (A/W/D, arrow keys)"
+
+  Source B (high-level-architecture.md, line 35):
+    "User selects door (1/2/3)"
+
+  These are different interaction models. A/W/D implies spatial mapping
+  (left/up/right), 1/2/3 implies ordinal selection. The architecture also
+  specifies refresh as "R" while the PRD specifies "S".
+
+  Graph signal: any downstream node that depends on key bindings (UX design,
+  onboarding, help text, keybinding display system) inherits this ambiguity.
+depends_on:
+  - td-phase1-scope
+  - td-arch-phase1
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - product-scope.md
+    - high-level-architecture.md

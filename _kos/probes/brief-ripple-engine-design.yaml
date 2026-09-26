@@ -1,0 +1,93 @@
+id: brief-ripple-engine-design
+type: brief
+confidence: frontier
+title: "Q2 probe: ripple engine design — surfacing signal without noise"
+content: |
+  Open question 2: How does the ripple engine surface conflicts to humans
+  without creating noise that gets ignored?
+
+  Sharpened by session-003:
+  - Finding-016: code-derived and doc-derived nodes have different signal
+    profiles. Ripple must propagate across lenses.
+  - Finding-017: edges flatten epistemological character. Ripple must
+    propagate across edges that don't carry their own epistemological
+    weight — a derives-from-evidence edge and a derives-from-conviction
+    edge look identical to the engine.
+
+  ## Approach
+
+  This is a DESIGN probe, not an empirical one. Propose a ripple mechanism,
+  then test it against existing findings to see if it would have surfaced
+  the right signal and suppressed the noise.
+
+  Specifically: replay the twelve-project probe data (findings 001-014)
+  through the proposed mechanism. For each finding:
+  1. Would ripple have detected it? (sensitivity)
+  2. Would ripple have surfaced it at the right severity? (calibration)
+  3. What false positives would ripple have generated? (noise)
+
+  The test is retrospective — we know what the probes found, so we can
+  check whether a proposed engine would have found the same things.
+
+  ## Design constraints (from existing bedrock and findings)
+
+  - Dirty propagation, not eager computation (B3 — git substrate,
+    immutable facts, current state is a view)
+  - Must handle cross-lens ripple: code change → doc-derived node
+    and vice versa (finding-016)
+  - Must handle epistemologically flat edges without generating
+    false-severity signals (finding-017)
+  - Signal classification (error/evolution/drift) already exists on
+    edges — the engine should USE this, not duplicate it
+  - Human judgment required for classification (finding-014) — the
+    engine detects, the human classifies
+  - The process quality gradient (B7) means noise tolerance varies
+    by project governance maturity
+
+depends_on:
+  - question-ripple-noise
+edges:
+  - target: finding-016-code-only-bootstrap
+    type: derives
+    note: "cross-lens ripple requirement"
+  - target: finding-017-what-cant-be-a-node
+    type: derives
+    note: "epistemological flattening constraint"
+  - target: finding-014-twelve-project-synthesis
+    type: derives
+    note: "retrospective test data"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+brief:
+  hypothesis: |
+    A ripple engine based on dirty-flag propagation along typed edges,
+    with severity attenuation by distance and edge type, can surface
+    the signal found in the twelve-project probe while generating
+    fewer false positives than "mark everything dirty."
+
+    The key mechanism: not all edges propagate equally. A contradicts
+    edge is a hard signal (always propagate). A derives edge attenuates
+    with distance. A supersedes edge STOPS propagation (the newer node
+    absorbs the change). Cross-lens edges (correspondence) propagate
+    at reduced confidence (inferred, not declared).
+  excluded_scope: |
+    - Implementation (no code, just mechanism design)
+    - Executive loop (Q3 — how ripple gets scheduled)
+    - Automated classification (human does this)
+    - Tooling for surfacing (UI/notification concerns)
+  success_signal: |
+    1. A proposed mechanism with clear propagation rules
+    2. Retrospective test: mechanism would have detected at least 8 of
+       the 11 project-alpha issues from finding-003
+    3. Retrospective test: mechanism would NOT have generated more than
+       3 false positives (signals that look dirty but aren't real issues)
+    4. Cross-lens propagation rules that handle finding-016's
+       complementary signal problem
+
+    If all four: confirms (ripple design is viable).
+    If 1-2 only: partial (detection works, calibration doesn't).
+    If mechanism can't handle cross-lens: redirects (need different
+    architecture for multi-lens graphs).
+  timebox: "Session-003, third probe cycle"

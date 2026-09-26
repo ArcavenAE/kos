@@ -1,0 +1,48 @@
+id: po-seam-solo-vs-team
+type: finding
+confidence: frontier
+title: "Seam: solo passion project building team infrastructure"
+content: |
+  CATEGORY 2 — GAP
+
+  The rs.md critiques BMAD as "architecturally a solo-practitioner tool"
+  (section 3b). The bikeshop-prd.md is explicitly a team product — it
+  exists to make Pennyfarthing work for teams of 5-15 developers. The
+  pf-prd.md's success criteria reference "agents" as the primary user,
+  and the bikeshop-prd.md references "Drummer" managing five developers.
+
+  But the project metadata reveals a different reality. The pf-prd.md is
+  authored by Keith Avery. The bikeshop-prd.md is authored by Keith Avery,
+  revised by M. Pursifull. The rs.md is authored by Michael Pursifull.
+  The project is a "solo passion project" (per the task description) with
+  at most two contributors.
+
+  The gap: the project is building team-scale infrastructure (BikeShop:
+  10+ concurrent BikeRacks, multi-session dashboards, per-identity auth)
+  while operating as a solo/duo effort. The rs.md critiques BMAD for not
+  scaling to teams, but the proposed solutions (BikeShop, multi-contributor
+  workflows, cross-epic dependency tracking) have not been validated with
+  an actual team. The user journeys in bikeshop-prd.md are elaborate
+  fiction — "Drummer," "Holden," "Naomi," "Alex" — describing team
+  dynamics that don't yet exist.
+
+  This is not necessarily a problem. Building for the future is rational.
+  But the rs.md uses "measured data" and "evidence" language while the
+  team-scale claims rest entirely on projection. The seam between
+  "evidence-based critique" and "speculative team vision" is not
+  marked in either document.
+depends_on:
+  - po-rs-human-integration-bus
+  - po-bikeshop-prd
+  - po-pf-prd-cli
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md
+    - bikeshop-prd.md
+    - pf-prd.md

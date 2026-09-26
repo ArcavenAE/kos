@@ -1,0 +1,117 @@
+id: question-read-telemetry-decision-value
+type: question
+confidence: frontier
+title: "Does read telemetry change a later read-feature decision, or does the instrument go unread like the graph it measures?"
+content: |
+  kos records nothing about which nodes are consulted. The telemetry
+  collection slice (bd `aae-orc-2qlx0`, roadmap v3 Issue 20) logs the
+  node IDs served by each `kos orient` invocation to a per-session
+  append-only JSONL file, classified at log time as CONSULTATION
+  (targeted or filtered orient, later `kos ask`) or BULK-SERVE
+  (unfiltered orient, which marks essentially the whole graph as read
+  by construction). The aggregator that would turn those lines into an
+  answer is a separate, unbuilt seam (bd `aae-orc-kx8f`).
+
+  The stated justification is that every later read-feature decision
+  (ranking weights for `kos ask`, cold-node retirement, circulation as
+  promotion evidence, flyloft's eventual role) should rest on measured
+  circulation rather than intuition. That justification is a
+  prediction, not a fact, and it is exposed to the exact failure it
+  was built to detect: an instrument nobody consults is the same
+  defect as a graph nobody reads, one layer up. `val-retrieval-before-capture`
+  governs author-side capture cost; no rule yet governs a machine-paid
+  instrument whose output no decision consumes.
+
+  This node holds that uncertainty open. The claim under test is not
+  "can we collect read events" (that is an engineering task with a
+  known answer) but "does having collected them change what someone
+  decides".
+
+  **Success signal (testable).** Within five sessions of the aggregator
+  existing, at least one named read-feature decision cites specific
+  telemetry output as evidence, in a finding, an ADR, or ticket notes
+  that name the decision, the number the telemetry produced, and the
+  alternative the number ruled out. A citation that would read the
+  same with the number deleted does not count.
+
+  **Kill condition (graveyard).** Two consecutive harvest review rounds
+  in which no decision consulted the telemetry and nobody can name a
+  pending decision that would. On the second, this question moves to
+  graveyard: collection stops, the log format is recorded as an
+  artifact so a later attempt does not redesign it, and the aggregator
+  is not built. The recorded lesson would be that measure-before-build
+  is cheaper to say than to consume.
+
+  **Standing constraint.** Per `val-diagnostic-never-gate`, nothing may
+  gate on these numbers. A success signal that hardens into a required
+  check falsifies itself; the citation must come from a human or agent
+  choosing to look, not from CI failing.
+
+  **Pre-registration (amended before any data collection, per
+  `val-locked-predictions`).** The slice-1 deliverable is orient-shape
+  statistics, not the circulation hypothesis. The ten-session
+  "at least 40% of nodes are never read after creation" clock starts
+  when `kos ask` lands and counts consultation reads only. Recording
+  this before collection is what prevents the hypothesis from being
+  re-fitted to whatever the first data show.
+
+  Sub-questions:
+  1. **What counts as a decision citing the telemetry?** The success
+     signal is only testable if citation-as-evidence is separable from
+     citation-as-decoration. The proposed test above (delete the number,
+     does the sentence change?) is a first cut and may not survive a
+     real case.
+  2. **Is five sessions the right window, and measured from what?**
+     From the collector shipping, or from the aggregator existing? The
+     signal above says the aggregator, on the reasoning that raw JSONL
+     is not a consultable instrument. That choice is arguable.
+  3. **Does the consultation/bulk split survive real usage?** If
+     unfiltered `kos orient` is the overwhelming majority of
+     invocations, the consultation stream may be too thin to support
+     any decision, and the split will have measured the tool's shape
+     rather than the graph's circulation.
+  4. **Who reads it?** If the only consumer is the agent that wrote the
+     line in the same session, the Grudin asymmetry has reappeared
+     inside the instrument (see `elem-grudin-asymmetric-cost-benefit`)
+     and the instrument is self-serving rather than institutional.
+  5. **What if the telemetry is never consulted but `kos ask` succeeds
+     anyway?** That outcome would falsify measure-before-build as
+     applied here without falsifying the read path. It is the most
+     informative failure available and should be recorded as such
+     rather than quietly absorbed.
+
+  Cross-graph parents (no cross-graph edge primitive exists yet; see
+  aae-orc finding-133):
+  - aae-orc `_kos/nodes/frontier/question-active-knowledge-surfacing.yaml`
+    (charter F19). That question is the PUSH half (surfacing what you
+    did not know to ask for); this one sits under the PULL half.
+  - aae-orc `_kos/ideas/kos-read-path-gap.md`, the idea this
+    crystallized from.
+
+  Proposal: `docs/proposals/read-path-first-steps.md`.
+  bd: `aae-orc-2qlx0` (collection slice), `aae-orc-kx8f` (aggregator
+  seam), `aae-orc-b0kp` (Track B sequencing this sits inside).
+edges:
+  - target: val-retrieval-before-capture
+    type: derives
+    note: "Telemetry is the measurement that would demonstrate retrieval value; the rule is what makes the measurement load-bearing."
+  - target: elem-grudin-asymmetric-cost-benefit
+    type: derives
+    note: "The asymmetry this instrument exists to detect, and the one it may itself fall to."
+  - target: val-diagnostic-never-gate
+    type: derives
+    note: "Standing constraint: these numbers inform decisions and never block them."
+  - target: val-locked-predictions
+    type: derives
+    note: "The pre-registration above is fixed before collection and immutable post-harvest."
+  - target: question-act-r-decay-as-confidence-model
+    type: supports
+    note: "Retrieval counts are the frequency input ACT-R decay needs; that question is downstream of this instrument earning its keep."
+provenance:
+  created_by: agent
+  session: "2026-08-16 read-path-first-steps"
+  created_at: "2026-08-16"
+  derived_from:
+    - "docs/proposals/read-path-first-steps.md"
+    - "docs/kos-roadmap-v3.md Issue 20"
+    - "aae-orc vision.md Gap 0 (adopted 2026-08-01)"

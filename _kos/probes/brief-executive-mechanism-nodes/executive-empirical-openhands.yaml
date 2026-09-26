@@ -1,0 +1,208 @@
+id: executive-empirical-openhands
+type: finding
+confidence: frontier
+title: "Executive empirical test: OpenHands (mid-size team, transitioning, 7 issues)"
+content: |
+  ## Project profile
+
+  OpenHands: mid-size open-source project undergoing V0→V1 architectural
+  transition. SDK-based architecture replacing monolithic Python backend.
+  Some docs updated (skills/README, app_server/README), most still in V0
+  terms. 7 issues found across three categories: architecture model
+  divergence (1), stale feature references (2), V0/V1 terminology
+  mismatch (4).
+
+  ## Test 1: Convergence detection
+
+  The 7 issues exhibit strong convergence:
+
+  CLUSTER A — V0/V1 terminology propagation failure (4 issues converge):
+  - oh-microagent-terminology-seam: 5 docs use V0 "microagent" term
+  - oh-skills-dir-missing: V1 directory conventions not followed
+  - oh-glossary-missing-v1-terms: glossary omits all V1 terms
+  - oh-docker-image-v0-stale: V0 Docker image refs persist
+
+  All four are independent manifestations of the same structural
+  problem: the V0→V1 rename propagated to center-of-gravity docs
+  but not to peripheral docs. Four independent dirty paths converge
+  on the "terminology transition" region of the graph.
+
+  Would threshold fire? YES. 4 paths, same structural region
+  (within 2 hops of a hypothetical "v1-terminology" node). This is
+  PATH CONVERGENCE with CROSS-SOURCE characteristics (four different
+  source documents, all independently stale).
+
+  CLUSTER B — Stale implementation references (2 issues):
+  - oh-agenthub-delegation-stale: references removed agents
+  - oh-runtime-readme-impl-mismatch: lists wrong implementations
+
+  Both are docs referencing code that no longer exists. Related theme
+  but structurally independent (different subsystems). 2 paths.
+
+  Would threshold fire? NO. Below threshold. But these two issues
+  DO cross the code↔spec boundary (documentation referencing code
+  state). This is CROSS-LENS CONVERGENCE — a dirty flag crossing
+  the correspondence boundary. The mechanism proposal says any
+  cross-lens propagation is structurally significant.
+
+  Revised assessment: threshold fires on CROSS-LENS criterion even
+  though PATH criterion is below threshold. This is interesting —
+  the cross-lens trigger catches a real problem (docs lagging code
+  changes) that the path-count trigger misses.
+
+  CLUSTER C — Architecture model (1 issue):
+  - oh-v0-arch-link-stale: V0 README vs V1 app_server README
+
+  Isolated at the issue level, but actually the ROOT of clusters A
+  and B. The V0→V1 architectural transition is the source change;
+  everything else is propagation failure. If the executive had been
+  running when the V1 architecture was committed, ripple would have
+  fired from the architecture change and marked all V0-referencing
+  docs as DIRTY_STALE.
+
+  This reveals something about timing: the executive would have been
+  MOST valuable at the moment of the V0→V1 architectural decision.
+  Running it after the fact finds the damage but can't prevent it.
+
+  Convergence detection result: FIRES CORRECTLY on cluster A (path
+  convergence, 4 paths). FIRES CORRECTLY on cluster B via cross-lens
+  criterion. Root cause (cluster C) would have triggered the entire
+  propagation cascade if the executive had been running at the time
+  of the change.
+
+  ## Test 2: Priority function
+
+  oh-v0-arch-link-stale (architecture divergence):
+    dependency_depth: HIGHEST (root cause — everything derives from
+    the architectural model choice)
+    governance_gap: MEDIUM (some docs updated, process exists but
+    isn't consistently applied)
+    tractability: MEDIUM (requires coordinated update across docs)
+    adjacent_evidence: HIGHEST (all 6 other issues derive from this)
+    COMPOSITE: HIGHEST PRIORITY
+
+  oh-microagent-terminology-seam (V0/V1 naming):
+    dependency_depth: MEDIUM (5 docs affected, but surface-level)
+    governance_gap: MEDIUM
+    tractability: HIGH (find-and-replace level fix)
+    adjacent_evidence: HIGH (cluster A, 3 other issues)
+    COMPOSITE: HIGH
+
+  oh-agenthub-delegation-stale (removed agents):
+    dependency_depth: LOW (one subsystem's docs)
+    governance_gap: MEDIUM
+    tractability: HIGH (remove stale references)
+    adjacent_evidence: MEDIUM (cluster B, cross-lens)
+    COMPOSITE: MEDIUM
+
+  The priority function ranks the architectural divergence (root
+  cause) highest, then the terminology propagation failure (widest
+  blast radius), then individual stale references (localized). A
+  human reviewer would agree: fix the architecture docs first because
+  everything else follows from that decision. Then do the terminology
+  sweep. Then clean up individual stale references.
+
+  Priority function result: PRODUCES REASONABLE RANKING. Correctly
+  identifies the root cause as highest priority.
+
+  ## Test 3: Human channel necessity
+
+  oh-v0-arch-link-stale: The V0→V1 transition is a deliberate
+  architectural decision. But the two READMEs don't cross-reference
+  each other. Is this because:
+  (a) The transition is complete and V0 docs should be deleted?
+  (b) The transition is ongoing and both need to coexist temporarily?
+  (c) Different maintainers own different docs and haven't coordinated?
+
+  Only a human with project context can answer. The executive can
+  surface the divergence. Deciding the response requires understanding
+  the project's transition timeline and social dynamics.
+
+  oh-docker-image-v0-stale: The finding notes this is "self-documented
+  as a known issue." The executive would flag it as dirty. A human
+  would dismiss it: "we know, it's in the backlog." This is a case
+  where the executive's signal is technically correct but socially
+  redundant — the project already knows. The human channel's value
+  here is FILTERING: knowing which dirty flags the team already
+  tracks and suppressing re-escalation.
+
+  Human channel result: At least 2 issues require human judgment.
+  One for root-cause strategy (which response?), one for social
+  filtering (team already knows). The filtering case is new — the
+  mechanism proposal didn't account for "known issues" as a
+  suppression signal.
+
+  ## Test 4: Graph maturity model
+
+  OpenHands has mid-level governance. Docs exist but aren't
+  consistently maintained. The project is actively transitioning.
+
+  Predicted behavior (GROWING GRAPH): Question channel dominates.
+  Convergent signals appear from findings. Discovery is primary,
+  maintenance is emerging. Human overrides frequent — structure
+  is still being established.
+
+  Actual need: OpenHands needs BOTH discovery (what does V1 actually
+  look like? which docs are authoritative?) AND maintenance (propagate
+  the V1 decision to all affected docs). The discovery question is
+  upstream: until the V1 architecture is fully specified, maintenance
+  is premature — you'd be maintaining toward a moving target.
+
+  This is a nuance the maturity model captures: growing graph means
+  discovery-primary with emerging maintenance. The executive should
+  NOT recommend a ripple pass on OpenHands until the V1 architecture
+  stabilizes. It should recommend a discovery probe: "what is the V1
+  architecture, specifically?" Then, after that probe, ripple the
+  results to all stale docs.
+
+  Maturity model result: MATCH. Growing/transitioning project →
+  discovery-primary, maintenance-emerging. The sequence matters:
+  discover first (what is V1?), then maintain (propagate V1).
+
+  ## Test 5: Maintenance vs. discovery balance
+
+  Predicted: Discovery-primary. The transition creates new structure
+  that hasn't been declared yet. Maintenance is premature until the
+  V1 architecture is specified.
+
+  Actual signal: 1 architectural divergence (needs discovery: what IS
+  the V1 model?) + 6 propagation failures (need maintenance: update
+  stale refs). But the maintenance work depends on the discovery
+  output — you can't fix the terminology until you know what V1
+  terms are authoritative.
+
+  Balance result: DISCOVERY THEN MAINTENANCE, matching the growing-
+  graph prediction. The temporal ordering is important and the
+  executive should capture it: the priority function ranks the
+  discovery issue (architecture) above the maintenance issues
+  (terminology, stale refs).
+
+  ## Notable observation: the "known issue" suppression gap
+
+  The oh-docker-image-v0-stale issue is self-documented as known.
+  The executive mechanism has no concept of "the team already knows
+  this." It would surface it as DIRTY_STALE and potentially waste
+  attention on a tracked issue.
+
+  This suggests a missing input: ACKNOWLEDGED DEBT. A project's
+  existing issue tracker, known-issues docs, or tech debt backlog
+  should feed into the executive as a suppression signal. Dirty
+  flags that match acknowledged debt get suppressed (or reduced to
+  lowest priority) rather than escalated.
+
+  This is not in the current mechanism proposal. It's a gap
+  exposed by the OpenHands test.
+
+edges:
+  - target: brief-executive-empirical-test
+    type: derives
+  - target: finding-012-openhands
+    type: derives
+    note: "OpenHands issue data"
+  - target: executive-mechanism-proposal
+    type: derives
+    note: "mechanism being tested"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15

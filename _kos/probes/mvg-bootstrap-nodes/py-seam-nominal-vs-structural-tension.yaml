@@ -1,0 +1,50 @@
+id: py-seam-nominal-vs-structural-tension
+type: element
+confidence: frontier
+title: "Seam: PEP 484 typing ABCs have structural runtime behavior but nominal static semantics"
+content: |
+  PEP 484 defines typing module ABCs (Iterable, Sized, Sequence, etc.)
+  that behave STRUCTURALLY at runtime — isinstance(Bucket(), Iterable)
+  returns True if Bucket has __iter__, even without explicit inheritance.
+
+  Yet PEP 484 specifies only NOMINAL subtyping for static type checking.
+  A type checker following PEP 484 strictly should reject:
+    class Bucket:
+        def __iter__(self): ...
+    def f(x: Iterable): ...
+    f(Bucket())  # Nominally, Bucket is not Iterable
+
+  PEP 544 acknowledges this tension explicitly: "ABCs in typing module
+  already provide structural behavior at runtime [...] The main goal of
+  this proposal is to support such behavior statically."
+
+  This means that between PEP 484 (2014) and PEP 544 (2017), the typing
+  module's runtime behavior and its specified static semantics were
+  inconsistent. The runtime said "structural"; the spec said "nominal."
+  Type checkers during this period had to make a practical choice that
+  the spec didn't cover.
+
+  PEP 544 resolves this by making the structural behavior official for
+  static checking too, but only for classes explicitly marked as Protocol.
+  The pre-existing typing ABCs retroactively become protocol classes.
+
+  This is a genuine SEAM — not a contradiction between documents, but a
+  gap where the spec lagged behind the runtime for three years.
+
+  Severity: MEDIUM. The gap existed in practice. PEP 544 resolved it
+  cleanly, but the resolution required reinterpreting PEP 484's ABCs
+  retroactively.
+edges:
+  - target: py-pep484-type-system-foundation
+    type: derives
+    note: "PEP 484 defines ABCs with structural runtime but nominal static semantics"
+  - target: py-pep544-protocols
+    type: derives
+    note: "PEP 544 resolves the tension by adding structural static semantics"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-probe-010
+  created_at: 2026-03-15
+  derived_from:
+    - pep-0484.rst
+    - pep-0544.rst

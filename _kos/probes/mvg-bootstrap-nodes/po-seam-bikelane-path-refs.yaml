@@ -1,0 +1,37 @@
+id: po-seam-bikelane-path-refs
+type: finding
+confidence: frontier
+title: "Seam: BIKELANE.md contains wrong-user file paths"
+content: |
+  CATEGORY 3 — STRUCTURAL CHAOS
+
+  BIKELANE.md contains hardcoded paths referencing a different user's
+  filesystem: /Users/keithavery/Projects/pennyfarthing-2/. These appear
+  in the "Related Documentation" section (line 439, 643-644) and in the
+  BMAD compatibility matrix reference.
+
+  The rs.md (section 5) specifically identifies broken file references
+  as a systemic problem in BMAD-style projects: "a forensic analysis
+  of 422 closed BMAD-METHOD issues found 236 bugs; broken file
+  references and path handling accounted for 25% of all bugs." The
+  rs.md argues for automated integrity validation.
+
+  The BIKELANE.md doc — the project's own architecture documentation for
+  its workflow system — exhibits exactly the class of error the rs.md
+  warns about. The doc that describes the system has the problem the
+  research doc says needs solving. This is a small-scale instance of
+  the rs.md's larger argument: without automated validation, reference
+  integrity degrades silently.
+depends_on:
+  - po-bikelane-workflow-types
+  - po-rs-drift-invisible
+finding:
+  probe: brief-mvg-bootstrap
+  result: confirms
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - BIKELANE.md
+    - lifecycle-improvement-rs.md

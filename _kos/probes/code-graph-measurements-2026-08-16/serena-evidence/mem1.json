@@ -1,0 +1,2 @@
+[{"label":"write-mem","tool":"write_memory","args":{"memory_name":"probe_marker","content":"Probe marker written by aae-orc-5lbu at test time. If a later session reads this, memories persist across server restarts."}},
+ {"label":"list-after-write","tool":"list_memories","args":{}}]

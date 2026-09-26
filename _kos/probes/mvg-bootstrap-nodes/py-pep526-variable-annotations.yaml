@@ -1,0 +1,41 @@
+id: py-pep526-variable-annotations
+type: element
+confidence: frontier
+title: "PEP 526: syntax for variable annotations, superseding type comments"
+content: |
+  PEP 526 (Python 3.6, 2016) adds first-class syntax for variable
+  type annotations, replacing the type comment pattern from PEP 484.
+  Key claims:
+
+  1. Type comments from PEP 484 are replaced by annotation syntax:
+     `x: int = 5` instead of `x = 5  # type: int`
+
+  2. Reiterates PEP 484's optionality commitment verbatim:
+     "Python will remain a dynamically typed language, and the authors
+     have no desire to ever make type hints mandatory, even by convention."
+
+  3. Introduces ClassVar[T] for distinguishing class vs instance variables.
+
+  4. Local variable annotations are NOT EVALUATED by the interpreter.
+     Module/class level annotations ARE evaluated and stored in
+     __annotations__.
+
+  5. Explicitly states it introduces "no new semantics beyond PEP 484."
+
+  6. Paves the way for "static duck-typing as a complement to nominal
+     typing defined by PEP 484" — foreshadowing PEP 544.
+
+  Source: pep-0526.rst (Status: Final)
+edges:
+  - target: py-pep484-type-system-foundation
+    type: supersedes
+    note: "Supersedes PEP 484's type comment syntax for variables"
+  - target: py-pep544-protocols
+    type: derives
+    note: "PEP 544 uses PEP 526 variable annotation syntax for protocol members"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-probe-010
+  created_at: 2026-03-15
+  derived_from:
+    - pep-0526.rst

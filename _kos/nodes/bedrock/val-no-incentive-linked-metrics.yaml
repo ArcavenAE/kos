@@ -1,0 +1,52 @@
+id: val-no-incentive-linked-metrics
+type: value
+confidence: bedrock
+title: "Never attach incentives to knowledge metrics (Austin/Goodhart guardrail)"
+content: |
+  No incentives on node counts, finding velocity, coverage percentages,
+  contribution scores, calibration ranks, or any other KOS metric.
+  Ever. Use metrics for process feedback and diagnostic visibility
+  only; never for individual performance ranking, never as gates.
+  Assume any metric will be gamed the moment it carries status
+  [@austin1996measuring].
+
+  Operational form for KOS:
+  - Retrieval telemetry (`_kos/.telemetry/reads.jsonl`, roadmap v3
+    Issue 20) is diagnostic — visible in reports, never in gates.
+    "Your nodes are never read" becomes retrieval-bait if attached
+    to status.
+  - Charter-inflation, brief-adherence rates, unharvested-finding
+    counts: all diagnostic. `kos doctor` surfaces; the human
+    interprets and acts.
+  - The one metric identified as game-resistant: *canary detection
+    rate* (roadmap v3 Issue 26). Detection of corruption you don't
+    know exists cannot be gamed. See question-epistemic-chaos-engineering.
+
+  Vital-signs vs. gates: liveness signals — schema-valid %, dangling
+  edges, fired-but-unaddressed reopeners, decay signature — may be
+  measured continuously and surfaced. They do NOT gate commits or
+  promotions.
+
+  This is roadmap v3.1 standing rule 3 (Goodhart rule) and
+  ADR-007 (orc) clause 3. Its behavior-trigger sibling in the orc
+  rules directory is `.claude/rules/diagnostic-not-gate.md` — the
+  keystroke-intercept form that catches gate-by-accretion.
+
+  Source: docs/kos-prior-work-survey.md §Recommendations Stage 1,
+  §Key Findings #3, §14; docs/kos-roadmap-v3.md §Part 0 L5, §Part 4;
+  docs/kos-roadmap-v3_1.md standing rule 3.
+  Derived from: elem-metrics-become-targets.
+edges:
+  - target: elem-metrics-become-targets
+    type: derives
+    note: "The literature finding this guardrail is built on."
+  - target: val-diagnostic-never-gate
+    type: supports
+    note: "The behavior-trigger form is diagnostic-never-gate."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md §Recommendations Stage 1"
+    - "docs/kos-roadmap-v3_1.md standing rule 3"

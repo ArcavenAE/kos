@@ -1,0 +1,48 @@
+id: brief-mvg-bootstrap
+type: brief
+confidence: frontier
+title: "MVG Bootstrap Probe — can a flat YAML graph demonstrate the checksum property?"
+content: |
+  Test whether the current schema and storage model (flat YAML nodes in git)
+  is sufficient to demonstrate the core value proposition: errors invisible in
+  documents become structurally visible in the graph.
+
+  The test: take one existing SDD document (or a realistic synthetic one),
+  cast its contents as inferred nodes with typed dependencies, and see whether
+  the graph representation surfaces at least one inconsistency that is invisible
+  in the document form.
+depends_on:
+  - question-mvg-bootstrap
+  - elem-storage-model
+  - val-spec-is-product
+provenance:
+  created_by: human
+  session: session-002
+  created_at: 2026-03-15
+brief:
+  hypothesis: |
+    A flat YAML node store with git as substrate, no additional tooling,
+    is sufficient to demonstrate the checksum property against one existing
+    SDD document. Specifically: casting a document as typed nodes with
+    declared dependencies will make at least one structural inconsistency
+    visible that the document form hides.
+  excluded_scope: |
+    - Ripple engine (dirty propagation)
+    - Agent contracts and type signatures
+    - Correspondence layer (spec-to-code links)
+    - Any tooling beyond manual YAML authoring
+    - Ingestion automation
+    These are all downstream. This probe validates the foundation they'd sit on.
+  success_signal: |
+    1. We can take one real or realistic SDD document and decompose it into
+       typed nodes that conform to the schema
+    2. The dependency graph between those nodes is expressible in depends_on
+    3. At least one inconsistency is structurally apparent in the graph
+       (missing dependency, contradictory confidence, orphan node, circular
+       dependency, undeclared assumption) that is NOT apparent reading the
+       source document
+    If all three hold: confirms. If decomposition works but no inconsistency
+    surfaces: partial (the checksum property may need richer structure).
+    If decomposition itself breaks the schema: redirects (schema needs revision
+    before the checksum property can be tested).
+  timebox: "One session (session-002)"

@@ -1,0 +1,39 @@
+id: po-seam-drift-vs-telemetry
+type: finding
+confidence: frontier
+title: "Seam: BikeShop monitors everything except spec drift"
+content: |
+  CATEGORY 2 — GAP
+
+  The rs.md's central argument (sections 5-6) is that implementation drift
+  is invisible and changes ripple without tracking. It proposes Delivery
+  Findings, drift assessment workflows, and change propagation as the fix.
+
+  The bikeshop-prd.md builds an elaborate telemetry and visibility system:
+  real-time session tiles, agent state, workflow phase, context usage,
+  velocity indicators, tool call tracking, sprint notifications. BikeShop
+  knows WHO is doing WHAT, HOW FAST, and WHETHER THEY'RE STUCK.
+
+  But BikeShop has no concept of spec drift. It monitors execution, not
+  fidelity. There is no channel for "Story 192's implementation diverged
+  from the architecture." The ShowRoom shows you the workflow phase
+  (coding/testing/review) but not whether the code matches the spec.
+
+  The gap: the project invested heavily in execution visibility (BikeShop)
+  while the rs.md argues the critical missing capability is spec-execution
+  correspondence. These are orthogonal investments. BikeShop answers "is
+  work happening?" The rs.md asks "is the right work happening?" Neither
+  document acknowledges the other's concern.
+depends_on:
+  - po-rs-drift-invisible
+  - po-bikeshop-prd
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md
+    - bikeshop-prd.md

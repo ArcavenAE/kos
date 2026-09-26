@@ -1,0 +1,58 @@
+id: elem-automation-complacency-deskilling
+type: element
+confidence: frontier
+title: "Automation induces complacency and deskilling — Bainbridge's Irony (first-order risk for human–AI knowledge systems)"
+content: |
+  Bainbridge's "Ironies of Automation" [@bainbridge1983ironies] is
+  essential reading for KOS: automating the routine leaves humans to
+  handle exactly the cases automation cannot, while their skills
+  atrophy from disuse. Parasuraman & Manzey [@parasuraman2010complacency]
+  document that operators of consistently reliable systems become
+  markedly worse at detecting failures, and complacency "cannot be
+  overcome with simple practice." Automation bias — trusting a
+  system's assertion because it is usually right — is the
+  epistemic sibling of complacency.
+
+  KOS-specific exposures:
+  - Trusting graph confidence tiers because the graph is usually
+    right is exactly the automation-bias failure mode.
+  - Auto-summarization or auto-classification erodes the operator's
+    grip on what the graph actually contains (the "industrialized
+    forgetting" trap named in the stage-rig capture,
+    `_kos/ideas/stage-rig-information-architecture.md` at orc level).
+  - Delegating promotion, meaning, or dissent to automation removes
+    exactly the human judgments where the graph is silent.
+
+  Prescriptive consequence — the Bainbridge rule (roadmap v3.1
+  standing rule 4): the tool drives the process; the operator makes
+  the decisions. Automation of reminding, scheduling, checking, and
+  proposing is encouraged; automation of judging (promotion, meaning,
+  dissent) is prohibited. Every automated proposal is
+  confirm-or-override. See val-tool-drives-operator-decides for the
+  guardrail form and ADR-007 (orc) for the ratified boundary.
+
+  Design consequence for read-side features: KOS must be designed
+  to *counter* rather than induce complacency — surfacing
+  uncertainty, forcing engagement, showing the residual, revealing
+  the seam. The graph's own confidence tiers are a signal to the
+  operator about where their judgment is load-bearing, not a
+  replacement for it.
+
+  Source: docs/kos-prior-work-survey.md §Key Findings #5, §9;
+  docs/kos-roadmap-v3_1.md standing rule 4, §Part 3 (Bainbridge rule);
+  docs/kos-use-assessment.md §R2 (hooks fire; humans perform), §R6.
+edges:
+  - target: val-tool-drives-operator-decides
+    type: supports
+    note: "This is the ground for the Bainbridge rule."
+  - target: elem-shadow-principle
+    type: supports
+    note: "The graph as external cognitive scaffold, not judgment replacement."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md — Key Findings #5; §9; §11"
+    - "docs/kos-roadmap-v3_1.md standing rule 4"
+    - "docs/kos-use-assessment.md §R2, §R6"

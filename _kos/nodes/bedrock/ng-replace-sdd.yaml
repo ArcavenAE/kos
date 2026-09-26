@@ -1,0 +1,17 @@
+id: ng-replace-sdd
+type: non-goal
+confidence: bedrock
+title: "Do not replace existing SDD processes"
+content: |
+  KOS runs alongside existing SDD systems. It does not require teams to
+  change their tools or workflows. Existing documents (PRDs, ADRs,
+  architecture docs) are ingested as low-confidence inferred nodes —
+  valid but lossy projections of the graph.
+
+  The transition from shadow to graph as source of truth happens gradually,
+  not by flag day. This is a strategic non-goal: replacing existing processes
+  creates adoption friction that would kill the project before it demonstrates value.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

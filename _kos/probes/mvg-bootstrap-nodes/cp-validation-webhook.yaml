@@ -1,0 +1,32 @@
+id: cp-validation-webhook
+type: element
+confidence: frontier
+title: "Composition Validating Webhook design"
+content: |
+  The validation webhook design (Philippe Scorsolini, Status: Draft) proposes
+  server-side validation of Compositions at apply time.
+
+  Key points:
+  - Two modes: strict (reject if schemas unavailable) and loose (default, warn)
+  - Three validation levels: logical, schema-based, rendered resource validation
+  - Functions acknowledged as a complication: "having at least a function defined
+    would invalidate the assumption that rendered Managed Resources should be
+    valid according to the schema"
+  - Functions usage should "short-circuit any unnecessary check"
+
+  The document references Composition functions as an alpha feature
+  (references `functions` field, not `pipeline`), suggesting it was written
+  before or during the alpha-to-beta transition.
+
+  Source: /tmp/kos-probes/crossplane/design/design-doc-composition-validating-webhook.md
+edges:
+  - target: cp-composition-original-goals
+    type: derives
+    note: "Validates the P&T Composition model"
+  - target: cp-composition-beta-functions
+    type: derives
+    note: "Must account for functions, but details are underspecified"
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

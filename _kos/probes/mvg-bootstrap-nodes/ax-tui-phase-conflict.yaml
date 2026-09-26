@@ -1,0 +1,49 @@
+id: ax-tui-phase-conflict
+type: element
+confidence: frontier
+title: "TUI is Growth in PRD but functional requirements reference TUI in MVP-phase features"
+content: |
+  The product-scope.md is explicit: TUI is Phase 2 (Growth).
+    "Phase 2: Growth — TUI Interface:
+     Keyboard-driven TUI with vim-style navigation (SSH-accessible)
+     Full feature parity with WebUI"
+
+  The executive-summary.md reinforces this:
+    "WebUI-first (MVP) with full dashboards and investigation canvases,
+     plus a keyboard-driven TUI (Growth)"
+
+  But the functional requirements blur this boundary:
+    - FR33: "Analysts can execute queries via TUI interface" (no phase annotation)
+    - FR48-57: Alert Management in TUI has an annotation saying
+      "FR48-FR57 (TUI alert triage) are Growth via Epic 4" — so these are correctly tagged.
+    - FR96: "Administrators can view system health status via CLI" (MVP)
+    - FR97: "Administrators can view system health status via TUI (Growth — requires Epic 4 TUI)"
+
+  The architecture defines a two-binary model (alpha-server + project-alpha client)
+  where the client binary contains BOTH CLI and TUI. The CLI is MVP, the TUI is Growth.
+  But they live in the same crate (alpha-client), which means the binary must
+  be structured to ship CLI-only at MVP and add TUI later.
+
+  FR33 is the problematic one: it says analysts can query via TUI with no phase
+  annotation, sitting in the Query & Search section alongside MVP requirements.
+  This could lead an implementer to build TUI query support as part of MVP.
+
+  The architecture's cli-tui-architecture.md handles this reasonably by defining
+  the split cleanly, but the FR list doesn't match.
+depends_on:
+  - ax-webui-first
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "project-alpha/_planning/prd/product-scope.md"
+    - "project-alpha/_planning/prd/executive-summary.md"
+    - "project-alpha/_planning/prd/functional-requirements.md"
+    - "project-alpha/_planning/architecture/core-architectural-decisions/cli-tui-architecture.md"
+  reviewed_by: null
+tags:
+  - phase-conflict
+  - tui
+  - mvp
+  - growth

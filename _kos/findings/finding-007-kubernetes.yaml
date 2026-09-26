@@ -1,0 +1,123 @@
+id: finding-007-kubernetes
+type: finding
+confidence: frontier
+title: "Kubernetes KEP seam test: three cross-SIG KEPs on API server request pipeline"
+content: |
+  ## Probe Design
+
+  Read three related KEPs that touch the kube-apiserver request processing pipeline:
+  - KEP-3221 (sig-auth): Structured Authorization Configuration
+  - KEP-4601 (sig-auth): Authorize with Selectors
+  - KEP-1040 (sig-api-machinery): Priority and Fairness
+
+  These KEPs address different stages of the same pipeline: authentication
+  feeds into authorization (3221, 4601) and flow control (1040). The seam
+  test asks: do these documents make incompatible assumptions about each
+  other's subsystems?
+
+  ## Findings
+
+  ### No hard contradictions found
+
+  The three KEPs are well-coordinated on their core assumptions. system:masters
+  is consistently treated as a bypass in all three subsystems. SubjectAccessReview
+  is the shared contract between authorization configuration (3221) and selector
+  attributes (4601). The KEPs do not make incompatible claims.
+
+  ### Two gaps at document seams (not contradictions)
+
+  **Gap 1: Pipeline ordering is implicit, not specified.**
+  None of the three KEPs explicitly declares where its functionality sits
+  relative to the others in the handler chain. KEP-1040 references an external
+  slide deck for the pipeline position. The actual ordering (authn -> authz -> P&F)
+  is only knowable from source code, not from the specifications. This is a
+  documentation gap, not a design conflict. Category: unstated assumption that
+  happens to be consistent.
+
+  **Gap 2: P&F cost model does not account for multi-webhook authorization latency.**
+  KEP-3221 enables multiple authorization webhooks (each with up to 30s timeout).
+  KEP-1040's request cost model focuses on execution width (etcd operations,
+  serialization) not pre-handler pipeline latency. Adding multiple slow authz
+  webhooks could increase effective seat occupancy in ways P&F's width estimation
+  does not model. This is a forward-looking design gap: KEP-1040 was designed
+  before multi-webhook authorization existed. Whether this matters in practice
+  depends on the actual pipeline ordering (see Gap 1) -- if P&F runs AFTER
+  authorization, then authz webhook latency is invisible to P&F entirely; if
+  BEFORE, then authz webhook latency is part of the seat occupancy.
+
+  ### One operational consideration (not a specification issue)
+
+  KEP-4601's tightening of the Node authorizer (kubelets must filter pod lists
+  by spec.nodeName) may cause previously-succeeding requests to be denied.
+  These denied requests still consume P&F flow capacity during authorization.
+  KEP-1040's default FlowSchema configuration for node requests was designed
+  before this tightening. This is an operational upgrade consideration, not a
+  spec conflict.
+
+  ## Assessment
+
+  The Kubernetes KEP system shows good cross-SIG coordination on shared
+  contracts (SubjectAccessReview, system:masters semantics). The gaps found
+  are of the "unstated but consistent assumption" variety rather than
+  "contradictory claims." This is what you'd expect from a mature project
+  with established review processes.
+
+  The checksum property probe methodology works here: decomposing claims
+  into typed nodes makes the shared assumptions explicit. The system:masters
+  node (k8s-claim-pf-system-masters) required checking three documents to
+  verify consistency -- that's the kind of cross-document verification that
+  a graph makes tractable.
+
+  ## Nodes Created
+
+  8 nodes in /probes/mvg-bootstrap-nodes/ with k8s- prefix:
+  - k8s-claim-authz-chain-ordering
+  - k8s-claim-sar-version-contract
+  - k8s-claim-selector-authz-attributes
+  - k8s-claim-pf-request-categorization
+  - k8s-claim-pf-system-masters
+  - k8s-claim-pf-webhook-latency-interaction
+  - k8s-claim-node-authz-selector-pf-interaction
+  - k8s-seam-pf-authz-pipeline-ordering
+
+edges:
+  - target: k8s-claim-authz-chain-ordering
+    type: derives
+    note: "Core claim extracted from KEP-3221"
+  - target: k8s-claim-sar-version-contract
+    type: derives
+    note: "Cross-KEP contract between 3221 and 4601"
+  - target: k8s-claim-selector-authz-attributes
+    type: derives
+    note: "Core claim extracted from KEP-4601"
+  - target: k8s-claim-pf-request-categorization
+    type: derives
+    note: "Core claim extracted from KEP-1040"
+  - target: k8s-claim-pf-system-masters
+    type: derives
+    note: "Cross-document consistency check"
+  - target: k8s-claim-pf-webhook-latency-interaction
+    type: derives
+    note: "Gap identified at KEP-1040/KEP-3221 seam"
+  - target: k8s-claim-node-authz-selector-pf-interaction
+    type: derives
+    note: "Operational consideration at KEP-4601/KEP-1040 seam"
+  - target: k8s-seam-pf-authz-pipeline-ordering
+    type: derives
+    note: "Documentation gap across all three KEPs"
+
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+
+tags:
+  - k8s
+  - authorization
+  - api-machinery
+  - flow-control
+  - seam-test
+
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-k8s-probe"
+  created_at: "2026-03-15"

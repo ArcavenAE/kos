@@ -1,0 +1,25 @@
+id: po-rs-context-ceiling
+type: element
+confidence: frontier
+title: "RS claim: flat-file context collapses at scale"
+content: |
+  The rs.md presents measured data from five projects showing that flat-file
+  context loading hits a hard ceiling. A 25-epic BMAD project consumed 97%
+  of the context window before any work began. The rs.md argues this is
+  structural — not BMAD-specific — and that any file-backed spec-driven
+  approach faces it. Pennyfarthing's sharding defers it but does not solve
+  the retrieval problem.
+
+  The rs.md is careful to note that Pennyfarthing's total footprint is
+  actually 15K HIGHER than BMAD's at comparable scale due to richer metadata.
+  The structural sharding benefit appears only in selective loading, not
+  total footprint.
+
+  Source: lifecycle-improvement-rs.md, section 8.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md

@@ -1,0 +1,53 @@
+id: bs-seam-bep0002-adr011-build-divergence
+type: element
+confidence: frontier
+title: "Gap: BEP-0002 introduces a parallel build/distribution model that ADR011 does not anticipate"
+content: |
+  Category 2 (Gap).
+
+  ADR011 defines plugin package structure with the assumption that
+  plugins are npm packages consumed at build time. It states:
+  - "We will place all plugin related code in the plugins/ directory"
+  - "We prefix the package names with @backstage/plugin-"
+  - packages/ is for core Backstage packages only
+
+  BEP-0002 introduces a completely different distribution model where
+  plugins are built as standalone Webpack Module Federation bundles,
+  served from a dynamic assets directory:
+
+    path/to/assets/plugin/dynamic-plugins/
+    └── dynamic-backstage.plugin-user-settings
+        ├── dist
+        ├── package.json
+        └── plugin-manifest.json
+
+  The naming convention for dynamic plugins uses a different scheme:
+  "dynamic-backstage.plugin-<name>" (dot-separated, "dynamic-" prefix)
+  vs ADR011's "@backstage/plugin-<name>" (npm scoped package).
+
+  ADR011 says nothing about dynamic distribution. BEP-0002 does not
+  explicitly state how its naming/directory scheme relates to ADR011's
+  decisions, nor whether it supersedes or supplements them. The
+  BEP-0002 naming scheme appears to be an independent invention that
+  transforms the npm scope into a dot-separated form.
+
+  This is not a contradiction because both can coexist (static and
+  dynamic builds from the same source). But ADR011 has no awareness
+  of the dynamic case, and BEP-0002 does not acknowledge ADR011 or
+  explain the relationship.
+
+  Sources: ADR011 (naming rules), BEP-0002 (dynamic plugin naming, directory layout)
+edges:
+  - target: bs-adr011-plugin-package-structure
+    type: derives
+  - target: bs-bep0002-dynamic-frontend-plugins
+    type: derives
+tags:
+  - backstage
+  - seam
+  - plugins
+  - packaging
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-backstage-probe"
+  created_at: "2026-03-15"

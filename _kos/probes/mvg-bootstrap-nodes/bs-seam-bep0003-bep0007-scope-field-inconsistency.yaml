@@ -1,0 +1,41 @@
+id: bs-seam-bep0003-bep0007-scope-field-inconsistency
+type: element
+confidence: frontier
+title: "Minor inconsistency: BEP-0007 scope config uses 'plugin' (singular) vs BEP-0003's 'plugins'"
+content: |
+  Category 3 (Structural chaos, minor).
+
+  BEP-0007 shows two different forms for the scope.plugins field
+  within the same document:
+
+  First example (line ~88):
+    scope:
+      plugins: catalog
+
+  Later example (line ~110):
+    scope:
+      plugin: catalog
+
+  The field name is "plugins" (plural) in the first example and
+  "plugin" (singular) in the second. Within the same BEP document,
+  the config schema is inconsistent with itself. One of these is
+  presumably the correct field name, but the document does not
+  clarify which.
+
+  This is a self-inconsistency within BEP-0007 rather than a
+  cross-document seam issue. It is minor but could cause real
+  configuration errors for adopters.
+
+  Source: BEP-0007 (scope configuration examples)
+edges:
+  - target: bs-bep0007-auth-external
+    type: derives
+tags:
+  - backstage
+  - seam
+  - auth
+  - config-schema
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-backstage-probe"
+  created_at: "2026-03-15"

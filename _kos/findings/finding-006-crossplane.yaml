@@ -1,0 +1,125 @@
+id: finding-006-crossplane
+type: finding
+confidence: frontier
+title: "Crossplane Composition design docs: seam test reveals gap pattern, not contradiction pattern"
+content: |
+  ## Probe Summary
+
+  Tested the KOS checksum property against Crossplane's Composition design
+  documents — a real, active CNCF project with overlapping design docs
+  spanning ~3 years of evolution of the same subsystem.
+
+  ## Documents Examined
+
+  1. design-doc-composition.md (original, ~2020) — founding Composition design
+  2. design/defunct/design-doc-composition-functions.md (alpha, ~2022) — first
+     Functions proposal, Container-based FunctionIO
+  3. design/design-doc-composition-functions.md (beta, ~2023) — supersedes alpha,
+     gRPC long-running processes
+  4. one-pager-composition-revisions.md — CompositionRevision for controlled rollout
+  5. one-pager-controlled-rollout-of-composition-functions.md — function revision rollout
+  6. design-doc-composition-validating-webhook.md (Draft) — Composition validation
+
+  ## Findings
+
+  ### What the graph reveals
+
+  5 seam issues found, 0 outright contradictions, 4 gaps, 1 positive finding.
+
+  **Gaps (Category 2):**
+
+  1. **Composition immutability silently abandoned** (cp-seam-immutability-abandoned):
+     The original design explicitly proposed Compositions be immutable. The
+     Revisions one-pager exists specifically because they are mutable. No
+     document records when or why immutability was dropped.
+
+  2. **Extension model diverged without acknowledgment** (cp-seam-extension-model-diverged):
+     Original design proposed alternate Composition types (HelmComposition,
+     KustomizeComposition). Beta design took a fundamentally different approach
+     (single type with Functions pipeline). The shift is undocumented.
+
+  3. **Validation webhook references alpha API** (cp-seam-validation-stale-api):
+     The webhook design discusses the `functions` field (alpha) rather than
+     `pipeline` (beta). It remains in active design/ directory as Status: Draft
+     but references a defunct API.
+
+  4. **Original doc's evolution note is incomplete** (cp-seam-original-note-incomplete):
+     The note at the top of the original design covers naming changes but
+     omits the major structural changes: ApplicationDefinition removal,
+     immutability abandonment, Functions introduction.
+
+  5. **ApplicationDefinition removed without trace** (cp-seam-appdef-silent-removal):
+     A first-class resource kind in the original design (with detailed section,
+     examples, and use cases) disappeared. No document records the decision to
+     collapse app/infra into unified XRs.
+
+  **Positive finding:**
+
+  6. **Alpha-to-beta transition well-documented** (cp-seam-alpha-beta-api-break):
+     The beta Functions design does a good job of acknowledging and explaining
+     the breaking changes from the alpha. The alpha is properly moved to
+     defunct/. The supersession is explicit.
+
+  ### Pattern Analysis
+
+  The dominant pattern is **Category 2 (Gap)**, not Category 1 (Contradiction).
+  The Crossplane documents are individually coherent and internally consistent.
+  The newer documents do not make claims that directly contradict older ones.
+  Instead, the older documents make claims (immutability, alternate types,
+  ApplicationDefinition) that were silently abandoned — the newer documents
+  simply do not reference these decisions.
+
+  This is a different failure mode from what was seen in previous probes
+  (project-alpha had outright contradictions). Crossplane's pattern is more like
+  *erosion* — the original design's reasoning gets gradually lost as each
+  new document builds on the current state rather than explicitly addressing
+  what changed from the prior state.
+
+  The one exception is the alpha-to-beta Functions transition, which is
+  handled well — explicit supersession, clear rationale, proper defunct
+  marking. This suggests the team HAS a mechanism for managing design
+  evolution; it just was not applied between the original Composition design
+  and the later documents.
+
+  ### Implications for KOS
+
+  The Crossplane corpus confirms that the checksum property works on real
+  open-source infrastructure projects, not just internal project docs. The
+  gap pattern (silent abandonment without graveyard entries) is arguably
+  harder to detect than outright contradictions — a human reader would have
+  to hold both the original and beta designs in working memory simultaneously
+  to notice that immutability was dropped. The graph makes this structural.
+
+  This also validates the KOS graveyard concept: when Crossplane properly
+  records a design retirement (alpha -> defunct/), the seam is clean. When
+  it does not (immutability, ApplicationDefinition), the reasoning is lost.
+
+  ## Nodes Produced
+
+  Source nodes: cp-composition-original-goals, cp-composition-alpha-functions,
+  cp-composition-beta-functions, cp-composition-revisions, cp-fn-rollout,
+  cp-validation-webhook
+
+  Seam nodes: cp-seam-immutability-abandoned, cp-seam-extension-model-diverged,
+  cp-seam-validation-stale-api, cp-seam-alpha-beta-api-break,
+  cp-seam-original-note-incomplete, cp-seam-appdef-silent-removal
+edges:
+  - target: question-mvg-bootstrap
+    type: derives
+    note: "This finding addresses the checksum property question"
+  - target: cp-composition-original-goals
+    type: derives
+    note: "Primary source document analyzed"
+  - target: cp-composition-beta-functions
+    type: derives
+    note: "Primary source document analyzed"
+  - target: cp-composition-alpha-functions
+    type: derives
+    note: "Defunct source document analyzed"
+finding:
+  probe: brief-mvg-bootstrap
+  result: confirms
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

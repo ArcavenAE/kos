@@ -1,0 +1,48 @@
+id: question-kos-as-learn-phase
+type: question
+confidence: frontier
+title: "Is kos the implementation of the LEARN phase for any lifecycle?"
+content: |
+  The lifecycle composition brief (penny-orc) identifies that BMAD's
+  lifecycle stops at "shipped" with no feedback loops. It proposes a
+  LEARN phase: ingest/integrate → assess drift/impact → ripple changes.
+
+  kos's process does exactly this:
+  - Orient = ingest/integrate (read the graph, what's changed?)
+  - Drift = assess drift/impact (content hash + edge walk)
+  - Harvest = ripple changes (update nodes, move confidence)
+
+  Hypothesis: kos is not a separate system from the lifecycle composition
+  engine. It IS the lifecycle composition engine viewed from the knowledge
+  layer rather than the workflow layer. The lifecycle document describes
+  workflows, agents, gates, feedback loops. kos describes the knowledge
+  substrate those workflows operate on.
+
+  If true:
+  - The universal bridge (kos ↔ bmad ↔ spectacle) is the mechanism by
+    which kos implements the LEARN phase for projects using those formats
+  - kos drift is the delivery finding channel (§5 of lifecycle doc)
+  - kos's ripple engine is the change propagation mechanism (§6)
+  - kos's confidence tiers map to lifecycle maturity (bedrock = shipped,
+    frontier = in-progress, graveyard = ruled out)
+
+  If false: kos is a separate knowledge management tool that happens to
+  share vocabulary with the lifecycle. The overlap is coincidental, not
+  structural.
+
+  Testable by: implementing the LEARN phase on a real project using kos
+  commands and evaluating whether the knowledge graph captures what the
+  lifecycle document says the LEARN phase should produce.
+edges:
+  - target: elem-fractal-lifecycle
+    type: derives
+    note: "kos as LEARN phase means kos is one scale of the fractal lifecycle"
+  - target: question-orient-gathering-vs-interpreting
+    type: derives
+    note: "Orient-as-gathering is the ingest/integrate step of LEARN"
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md §A, §1"

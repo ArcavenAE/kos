@@ -1,0 +1,49 @@
+id: go-formatter-method-rename
+type: element
+confidence: frontier
+title: "errors.Formatter method renamed from Format to FormatError between draft and proposal"
+content: |
+  The error values overview (go2draft-error-values-overview.md, Aug 2018)
+  defines the Formatter interface with a method named Format:
+
+    type Formatter interface {
+        Format(p Printer) (next error)
+    }
+
+  The formal proposal (29934-error-values.md, Jan 2019) defines the
+  Formatter interface with a method named FormatError:
+
+    type Formatter interface {
+        error
+        FormatError(p Printer) (next error)
+    }
+
+  Two changes happened:
+  1. The method was renamed from Format to FormatError
+  2. The interface now embeds the error interface (requiring both Error()
+     and FormatError() methods)
+
+  The formal proposal does not provide explicit rationale for the rename.
+  The likely reason: Format conflicts with the existing fmt.Formatter
+  interface's Format(fmt.State, rune) method — having both would create
+  ambiguity for types implementing both interfaces.
+
+  This is a minor seam. The documents are internally consistent within
+  each version, but a reader following from draft to proposal would see
+  the method name change without explanation.
+edges:
+  - target: go-check-handle-abandoned
+    type: derives
+    note: "Part of the same error values evolution"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "go-proposals/design/go2draft-error-values-overview.md"
+    - "go-proposals/design/29934-error-values.md"
+  reviewed_by: null
+tags:
+  - seam-minor
+  - api-evolution
+  - error-handling

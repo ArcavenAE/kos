@@ -1,0 +1,20 @@
+id: ag-cloudevents-claim-divergence
+type: claim
+confidence: frontier
+claim:
+  text: >
+    Design doc 01 (Programming Model) states that "each event in the system
+    is defined using the CloudEvents Specification" with required id, source,
+    and type attributes. The actual implementation uses a custom TopicId(type,
+    source) and AgentId(type, key) system. While inspired by CloudEvents,
+    the implementation does not produce or consume CloudEvents-compliant
+    messages. The design doc 05 (Services) still says "events are packaged
+    as CloudEvents" but no CloudEvents envelope is visible in the Python SDK.
+    This is a design-aspiration vs. implementation gap.
+  source_docs:
+    - docs/design/01 - Programming Model.md
+    - docs/design/05 - Services.md
+    - python/packages/autogen-core/src/autogen_core/_topic.py
+  severity: low
+  category: aspiration-vs-implementation
+tags: [seam, cloudevents, design-doc, v0.4]

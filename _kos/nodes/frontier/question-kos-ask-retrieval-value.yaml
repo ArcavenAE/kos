@@ -1,0 +1,125 @@
+id: question-kos-ask-retrieval-value
+type: question
+confidence: frontier
+title: "Does `kos ask` beat grep and unfiltered orient on real session questions, and does it get used?"
+content: |
+  `kos ask <question>` (bd `aae-orc-jajn3`, Phase 0) is a scoped, ranked
+  retrieval verb over the graph: lexical matching plus graph proximity
+  as the interim substrate, with the verb as the durable contract and
+  the substrate free to change underneath it (flyloft eventually, per
+  bd `aae-orc-di23`). The stated decision criterion is that it improve
+  ranking, freshness, and provenance over `grep` against real session
+  questions.
+
+  That criterion contains two claims which can come apart, and the
+  order between them is the point of this node.
+
+  **The quality claim.** Ranked, graph-aware retrieval returns better
+  answers than substring search over `_kos/` or an unfiltered
+  `kos orient` dump the reader must triage themselves.
+
+  **The adoption claim.** Sessions actually reach for it mid-work.
+
+  **Pre-registered ordering: adoption dominates.** If sessions keep
+  reaching for grep after the verb exists, the verb failed, regardless
+  of how well it scores on any benchmark. A retrieval tool that wins
+  offline and goes unused is a benchmark artifact, and
+  `elem-who-pays-survival-predictor` says so directly: what survives is
+  determined by who pays and who benefits, not by measured quality.
+  This ordering is recorded here before the verb ships so that a good
+  benchmark result cannot be substituted for the outcome that matters
+  (`val-locked-predictions`).
+
+  **How adoption is measured.** Consultation-class reads in the read
+  telemetry (`question-read-telemetry-decision-value`, bd
+  `aae-orc-2qlx0`). This is why the instrument sequences before the
+  verb: without it, adoption is an anecdote, and the ten-session
+  circulation clock has no honest start point.
+
+  **Success signal (testable).** Over the ten sessions following the
+  verb shipping, BOTH of:
+  (a) `kos ask` is invoked in at least half of the sessions that
+      consult the graph at all; and
+  (b) at least one session records a question answered through a hit
+      the lexical match set did not contain, meaning graph proximity
+      did work that grep could not have done.
+  Both halves are required. Adoption without (b) means the verb
+  replaced grep by ergonomics and habit rather than by retrieval merit,
+  which is a real but much smaller result and should be recorded as
+  that rather than as a win.
+
+  **Kill condition (graveyard).** After the same ten sessions, either
+  (a) fewer than a quarter of graph-consulting sessions invoke it, or
+  (b) no recorded case where proximity ranking beat plain lexical
+  search. On either, the verb moves to graveyard with the finding that
+  the retrieval gap is not lexical-plus-proximity shaped. The next
+  attempt then belongs to flyloft's substrate work, not to a second
+  implementation inside kos.
+
+  **Scope guard.** The verb must not grow into flyloft-inside-kos.
+  Embeddings, rerankers, and a vector store are out of scope for
+  Phase 0 by construction; the failure mode being guarded is winning
+  the quality claim by absorbing another project's roadmap.
+
+  **Trust companions.** A ranked answer that presents an untested
+  finding as authoritative is worse than grep, which at least hands the
+  reader the raw file and its context. bd `aae-orc-37hm` (tested and
+  untested findings are indistinguishable) and `aae-orc-qao2` (who pays
+  to trust) carry that half; this node depends on their state without
+  resolving them.
+
+  Sub-questions:
+  1. **What is the benchmark corpus, and when is it collected?** Real
+     session questions, captured before the verb ships. Collected after,
+     the corpus is selected by whoever knows what the verb can do, which
+     is the same defect `val-locked-predictions` guards against.
+  2. **Is grep the honest control?** The realistic alternative may be
+     unfiltered `kos orient` plus the reader's own scan, which is a
+     stronger baseline than substring search and the one the verb has
+     to beat in practice.
+  3. **Does graph proximity contribute measurable lift?** If lexical
+     matching carries the whole result, the graph is decorative in the
+     ranking and success signal (b) is unreachable by construction.
+  4. **Can the verb rank a bedrock node above a superseded one without
+     a separate freshness model?** The freshness and provenance parts of
+     the criterion may need schema support (supersedes edges, confidence
+     tiers) that the ranking does not currently read.
+  5. **If adoption is high but only from agents and never from humans,
+     is that success?** It satisfies the letter of the signal. Whether
+     it satisfies the intent depends on whether the operator is meant
+     to be a user of the read path or only its beneficiary.
+
+  Cross-graph parents (no cross-graph edge primitive exists yet; see
+  aae-orc finding-133):
+  - aae-orc `_kos/nodes/frontier/question-active-knowledge-surfacing.yaml`
+    (charter F19), the PUSH half of the same problem.
+  - aae-orc `_kos/ideas/kos-read-path-gap.md`.
+
+  Proposal: `docs/proposals/read-path-first-steps.md`.
+  bd: `aae-orc-jajn3` (this verb), `aae-orc-2qlx0` (the measurement it
+  is judged by), `aae-orc-37hm` and `aae-orc-qao2` (trust side),
+  `aae-orc-di23` (which surface it lands on first).
+edges:
+  - target: question-read-telemetry-decision-value
+    type: derives
+    note: "Adoption is measured in consultation-class reads; the instrument must exist first or the success signal is anecdote."
+  - target: val-retrieval-before-capture
+    type: derives
+    note: "This verb is the retrieval value the rule requires before further author-side capture ships."
+  - target: elem-who-pays-survival-predictor
+    type: derives
+    note: "Grounds the pre-registered ordering: adoption dominates benchmark quality."
+  - target: val-locked-predictions
+    type: derives
+    note: "The adoption-dominates ordering and the benchmark corpus timing are fixed before the verb ships."
+  - target: elem-grudin-asymmetric-cost-benefit
+    type: derives
+    note: "The verb is the retrieval benefit whose absence the asymmetry predicts will kill the system."
+provenance:
+  created_by: agent
+  session: "2026-08-16 read-path-first-steps"
+  created_at: "2026-08-16"
+  derived_from:
+    - "docs/proposals/read-path-first-steps.md"
+    - "aae-orc vision.md Gap 0 fix order (adopted 2026-08-01)"
+    - "aae-orc _kos/ideas/kos-read-path-gap.md direction 2"

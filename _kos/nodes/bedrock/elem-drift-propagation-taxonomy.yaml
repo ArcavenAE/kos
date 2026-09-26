@@ -1,0 +1,39 @@
+id: elem-drift-propagation-taxonomy
+type: element
+confidence: bedrock
+title: "Change propagation has four classifications: extend, integrate, deprecate, target"
+content: |
+  When a spec change ripples through downstream artifacts, different
+  stories in different states require different responses. But beyond
+  the blast zone (delivered/in-progress/future), the TYPE of change
+  matters for how agents should handle existing patterns.
+
+  Propagation taxonomy from xMP PRD validation:
+
+  | Classification | Instruction to agents | Example |
+  |---|---|---|
+  | Extend | Copy this pattern to new code | Task naming, interface patterns |
+  | Integrate | Work with this, don't replicate | Monolithic config structures |
+  | Deprecate | Don't add new dependencies | Legacy access patterns |
+  | Target | New code should follow this | Replacement architecture |
+
+  Without this classification, agents treat every existing pattern as
+  something to extend — propagating the old approach into new stories
+  even after the architecture has changed.
+
+  kos connection: kos edges have types (derives, implements, contradicts,
+  supersedes) but no propagation classification. A node that supersedes
+  another doesn't tell agents whether to extend, integrate, deprecate,
+  or target the old pattern. This taxonomy could map to edge metadata
+  or a new edge property.
+edges:
+  - target: elem-ai-improvisation-past-broken-refs
+    type: derives
+    note: "Without classification, agents propagate stale patterns — same failure mode"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md §6"
+    - "pursifull_2026b — xMP PRD validation, Finding #4"

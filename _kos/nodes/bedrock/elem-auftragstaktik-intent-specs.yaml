@@ -1,0 +1,56 @@
+id: elem-auftragstaktik-intent-specs
+type: element
+confidence: bedrock
+title: "Mission command (Auftragstaktik): specify WHAT must be achieved, not HOW — agents get bounded autonomy"
+content: |
+  Auftragstaktik (mission command), from Prussian military doctrine
+  (Moltke, 1857-1888) and modernized by McChrystal's "Team of Teams":
+  authority flows from commander's intent (what must be achieved), not
+  detailed procedures (how to achieve it). Subordinates have bounded
+  autonomy — maximum freedom within the boundaries of the higher intent.
+
+  The system rests on:
+  - Mutual trust (Vertrauenstaktik)
+  - Shared professional education (Einheit der Auffassung — unity of
+    understanding)
+  - Schwerpunkt (focal point — convergence for independent decisions)
+
+  Applied to AI agents: specifications define WHAT (acceptance criteria,
+  architectural constraints, interface contracts). Implementation
+  autonomy defines HOW. The sprint goal serves as Schwerpunkt.
+
+  Applied to kos: kos nodes should describe intent (what must be true),
+  not procedure (how to make it true). Bedrock nodes are commander's
+  intent — they constrain without prescribing. Frontier questions are
+  reconnaissance missions — bounded exploration within the intent.
+
+  The lifecycle research claims: intent-based specs (Auftragstaktik)
+  produce fewer clarification interrupts and equivalent or superior
+  quality compared to procedure-based specs (Befehlstaktik). Agents
+  trust their judgment rather than asking for step-by-step guidance.
+  Testable.
+
+  Counter-example: the lifecycle also found that AI agents improvise
+  past broken references (elem-ai-improvisation-past-broken-refs).
+  Bounded autonomy requires clear boundaries — without constraints,
+  autonomy becomes confabulation. The boundaries must be structural
+  (gates, fitness functions, typed contracts), not advisory (prose).
+edges:
+  - target: elem-gate-enforcement
+    type: derives
+    note: "Gates provide the boundaries for bounded autonomy"
+  - target: elem-ai-improvisation-past-broken-refs
+    type: contradicts
+    note: "Autonomy without boundaries produces confabulation"
+  - target: elem-double-loop-learning
+    type: derives
+    note: "Agents with autonomy can question specs (double-loop)"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "Moltke — Prussian military doctrine, 1857-1888"
+    - "McChrystal et al. — Team of Teams"
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-workflow-maps.md"
+    - "penny-orc research-track-2-organizational-structure.md"

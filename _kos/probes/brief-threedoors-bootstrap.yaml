@@ -1,0 +1,186 @@
+id: brief-threedoors-bootstrap
+type: brief
+confidence: frontier
+title: "Bootstrap ThreeDoors into kos — full-scale graph from ~800 existing documents"
+content: |
+  Sixth implementation probe. First real-scale bootstrap of a kos graph
+  from an existing, mature project with extensive documentation. ThreeDoors
+  has ~800 documents across 6 layers, 36 ADRs, 4 incident reports, 34
+  open questions (BOARD), a retrospector agent, and ~2k commits. It is
+  also two projects in one: a Bubbletea TUI app AND a dark factory /
+  human-agent collaboration experiment.
+
+  This probe tests F4 (bootstrap from existing artifacts) at 10-20x the
+  scale of any previous kos graph, and produces actionable findings for
+  ThreeDoors — not just kos process validation.
+
+  ## Why ThreeDoors
+
+  1. **Scale.** 800 docs is an order of magnitude beyond kos's 25-node
+     graph. This tests whether the toolchain and YAML-in-git substrate
+     hold at real project scale.
+
+  2. **Density.** ThreeDoors has ADRs, PRDs, architecture specs, incident
+     reports, a living BOARD, and a retrospector. These are 6 different
+     projections of the same system — exactly what the shadow principle
+     (B5) says produces signal at the seams.
+
+  3. **Two-project seam.** ThreeDoors is simultaneously: (a) a personal
+     productivity app (TUI, task providers, sync, themes), and (b) an
+     experiment in AI dark factory / human-agent collaboration (BMAD
+     agents, retrospector, governance, multi-agent coordination). These
+     two halves share infrastructure, ADRs, and the BOARD, but have
+     different users, lifecycles, and failure modes. The seam between
+     them is where the highest-value signal lives.
+
+  4. **Ground truth.** The human maintainer knows this project deeply —
+     can validate whether kos-surfaced signal is real or noise.
+
+  5. **Prior art.** Finding-028 already identified ThreeDoors as having
+     independently implemented kos-like patterns: JSONL retrospector
+     (primitive ripple), L0-L4 provenance (primitive confidence), agent
+     failure modes that match kos signal classes.
+
+  ## Approach: layered decomposition
+
+  Process each documentation layer as a sub-probe, building the graph
+  incrementally. Each layer produces nodes with edges to other layers.
+  Run drift between layers to see what new edges reveal.
+
+  ### Layer 1: ADRs (36 decisions)
+
+  Most structured source. MADR format with explicit status. Each ADR
+  becomes a node (type: element, confidence by status — accepted = bedrock,
+  proposed = frontier, deprecated/superseded = graveyard). Edges: ADRs
+  reference each other, reference architecture docs, reference PRD features.
+  Expected yield: 36+ nodes, 50+ edges.
+
+  Questions this layer answers:
+  - Which ADRs are superseded but not marked as such?
+  - Which ADRs contradict each other?
+  - Which ADRs reference features that were never built?
+
+  ### Layer 2: BOARD open questions (34 questions)
+
+  Living decision dashboard. Each open question becomes a frontier question
+  node. Edges: questions reference ADRs, architecture docs, research
+  projects. Expected yield: 34+ nodes, 40+ edges.
+
+  Questions this layer answers:
+  - Which "open" questions are already answered by existing ADRs or code?
+  - Which questions have stalled (no research, no resolution)?
+  - Which questions span the app/dark-factory seam?
+
+  ### Layer 3: Incident reports (4 incidents)
+
+  High-signal findings from failures. Each incident becomes a finding node
+  with `contradicts` edges to the architectural assumptions they broke.
+  Expected yield: 4+ nodes, 12+ edges.
+
+  Questions this layer answers:
+  - Have the architectural docs absorbed the lessons from each incident?
+  - Are the recommended mitigations implemented?
+  - Do the incidents reveal patterns (all 4 may share a root cause)?
+
+  ### Layer 4: Architecture specs (31 documents)
+
+  Detailed system projections. Each major spec section becomes a node.
+  Edges: specs reference ADRs, PRD requirements, each other. Not every
+  document becomes a node — only claims that carry structural weight
+  (component boundaries, data flow, integration contracts).
+
+  Questions this layer answers:
+  - Where have architecture docs drifted from what was actually built?
+  - Where do architecture docs contradict ADRs?
+  - Where does the dark factory architecture contradict the app architecture?
+
+  ### Layer 5: PRD and stories (requirements vs reality)
+
+  Product requirements vs implementation evidence. PRD claims become nodes.
+  Story completion status provides implements/explores edges. 411 stories
+  are evidence, not nodes — but their status tells us which PRD claims
+  are real vs aspirational.
+
+  Questions this layer answers:
+  - Which PRD features are claimed but unimplemented?
+  - Which implemented features have no PRD coverage (organic growth)?
+  - Where has the product scope drifted from the original brief?
+
+  ### Layer 6: Dark factory / governance layer
+
+  BMAD agents, governance model, retrospector findings, agent evaluation,
+  typed comments protocol. This is the experimental half of ThreeDoors.
+  Nodes here capture the collaboration model, governance decisions, and
+  agent operational patterns.
+
+  Questions this layer answers:
+  - Does the governance model match actual agent behavior?
+  - Have retrospector findings propagated to architecture or ADRs?
+  - Where does the BMAD methodology conflict with SOUL.md principles?
+  - Is the dark factory documentation accurate to current practice?
+
+  ## What we learn (for kos)
+
+  - Does YAML-in-git hold at 150-300 nodes with 200+ edges?
+  - Does `kos drift` produce actionable signal on a real graph?
+  - Does the toolchain (orient, validate, graph, bridge, drift) compose
+    into a useful workflow at real project scale?
+  - What's the time cost of full bootstrap? (Informs F4 automation question)
+  - Does the graph reveal things the existing docs don't surface?
+
+  ## What we learn (for ThreeDoors)
+
+  - Cross-document contradictions the project doesn't know about
+  - Stale ADRs that no longer reflect reality
+  - BOARD questions that are already answered elsewhere
+  - Incident lessons that haven't propagated
+  - Drift between the app half and the dark factory half
+  - Whether the retrospector's findings align with kos's findings
+
+edges:
+  - target: finding-028-threedoors-empirical-patterns
+    type: derives
+    note: "ThreeDoors already identified as having kos-like patterns"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "First real-scale test of the implementation pivot's toolchain"
+  - target: finding-033-drift-probe
+    type: derives
+    note: "Tests drift at 10x scale"
+provenance:
+  created_by: human
+  session: session-011
+  created_at: "2026-03-30"
+brief:
+  hypothesis: |
+    ThreeDoors' documentation surface can be decomposed into a kos graph
+    with >100 nodes and >100 edges across 6 layers. The graph will surface
+    at least 10 cross-document findings that the existing documentation
+    doesn't make visible — contradictions, stale decisions, unanswered
+    questions, and drift between the app and dark factory halves.
+
+    The YAML-in-git substrate will hold at this scale (read/write <100ms).
+    The toolchain (orient, validate, graph, drift) will work without
+    modification.
+
+    If the bootstrap produces <50 nodes: the documents are more consistent
+    than expected, or the decomposition is too coarse. Adjust granularity.
+    If the bootstrap produces >10 findings: kos adds value to a real
+    project with existing, disciplined documentation. The review gap
+    gradient (B7) predicts signal even in well-governed projects.
+  excluded_scope: |
+    - Automated extraction (this is human+agent decomposition, not tooling)
+    - Code-level correspondence (no code analysis, only doc analysis)
+    - Modifying ThreeDoors' documents (read-only probe — findings are
+      reported, not remediated)
+    - Story-level granularity (411 stories are evidence, not nodes)
+    - Building new kos tooling (use existing tools only)
+  success_signal: |
+    1. kos graph with >100 nodes and >100 edges across 6 layers
+    2. >10 cross-document findings surfaced that the project didn't know about
+    3. `kos orient threedoors` surfaces meaningful context for each layer
+    4. `kos drift` detects real staleness after graph changes
+    5. At least 3 findings actionable enough to become ThreeDoors issues/PRs
+    6. YAML-in-git substrate holds (read/write <100ms, validate <1s)
+  timebox: "2-3 sessions (this is a large probe — layer 1-2 in session-011,
+    layers 3-6 across sessions 012-013)"

@@ -1,0 +1,32 @@
+id: td-personas
+type: element
+confidence: frontier
+title: "ThreeDoors user personas"
+content: |
+  Three personas defined in executive-summary.md representing recurring states
+  of the same user:
+  - Hyperfocus Navigator: needs variety, momentum transfer, long-term sneaking
+  - Overwhelmed Juggler: multiple demand sources, trust, flexibility
+  - Stuck Starter: inertia, low barriers, gentle encouragement
+
+  ORPHAN NODE: These personas are defined in the vision layer but have no
+  depends_on path FROM any architectural or scope node. No feature in
+  product-scope.md references them by name. No architectural decision in
+  high-level-architecture.md uses them to justify a design choice.
+
+  The door selection algorithm is described as "random" in Phase 1 and
+  "intelligent" in Phase 2+, but neither version references personas as
+  input. The Intelligence Layer mentions "learning algorithms" but doesn't
+  specify what it learns about (persona state? mood? energy?).
+
+  Graph signal: a node with no consumers is either unnecessary or reveals
+  a missing implementation path. The personas were load-bearing in the
+  vision but the load was never transferred to the implementation layers.
+depends_on:
+  - td-vision
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - executive-summary.md

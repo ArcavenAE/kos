@@ -1,0 +1,56 @@
+id: elem-who-pays-survival-predictor
+type: element
+confidence: bedrock
+title: "The survival predictor is who pays — not novelty, not rigor"
+content: |
+  The single sharpest lesson from the reassessment of the nine
+  improvements: **the survival predictor was never novelty or rigor —
+  it was who pays.**
+
+  Empirical evidence from the reassessment
+  (docs/kos-nine-improvements-reassessed.md §Two Cross-Cutting
+  Observations, cost-posture table):
+
+  | Cost posture              | Improvements | Outcome                    |
+  | ------------------------- | ------------ | -------------------------- |
+  | Author-neutral (read-side)| #5, #8, #9   | All survive strong         |
+  | Machine-paid              | #2, #7       | Survive                    |
+  | Author-light              | #3           | Survives with prerequisite |
+  | Author-taxed at write time| #1, #4, #6   | One killed, two deferred   |
+
+  The correlation is perfect across nine independent proposals
+  evaluated against the survey literature. Intellectual appeal,
+  novelty, and rigor did not predict which proposals survived
+  contact with Grudin/Weber/Shipman. Cost incidence did.
+
+  Test to apply to any KOS feature proposal:
+  1. Who pays at authoring time — human, agent, or nobody (machine
+     runs it deterministically)?
+  2. Who benefits at retrieval time — the same actor, or a different
+     one?
+  3. If (1) is human and (2) is a different actor, the proposal
+     inherits the Grudin failure mode.
+
+  Corollary: proposals that pass this test do not need heroic
+  discipline to survive. Proposals that fail it will not survive
+  even with heroic discipline (four decades of design rationale
+  attempts demonstrate this).
+
+  This rule is the operational form of val-agents-bear-capture-cost
+  applied to feature evaluation, not just capture format.
+
+  Source: docs/kos-nine-improvements-reassessed.md §Two Cross-Cutting
+  Observations #2 ("The nine-doc's blind spot was cost accounting").
+edges:
+  - target: elem-grudin-asymmetric-cost-benefit
+    type: derives
+    note: "The observed survival pattern instantiates the Grudin master risk."
+  - target: val-agents-bear-capture-cost
+    type: supports
+    note: "The evaluation lens the guardrail imposes on feature proposals."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-nine-improvements-reassessed.md §Two Cross-Cutting Observations #2"

@@ -1,0 +1,71 @@
+id: question-ai-borne-capture-solves-grudin
+type: question
+confidence: frontier
+title: "Does AI-borne capture cost finally solve the asymmetric cost/benefit problem that killed design rationale and KM?"
+content: |
+  The central survival bet for KOS. The literature is unambiguous
+  that human-authored knowledge capture systems die from Grudin's
+  asymmetry — the people who pay the capture cost are not the
+  people who reap the retrieval benefit
+  [@grudin1996evaluating; @gotel1994analysis; @walsh1991organizational;
+  @hutchinson2014model]. Every prior discipline that tried this —
+  design rationale, requirements traceability, KM, MDE, the
+  Semantic Web, lessons-learned systems — died on it.
+
+  The bet: LLM agents' incentives (task completion, correct
+  behavior, avoiding rework) may finally break the deadlock. If
+  agents auto-populate nodes, graveyard entries, and structured
+  triggers as a by-product of doing work, capture becomes free from
+  the human side — and Grudin's asymmetry collapses.
+
+  Sub-questions the empirical work needs to answer:
+
+  1. **Do agents that capture pay a task-completion penalty?** If
+     capture ceremony visibly slows agents in ways that reduce
+     downstream reward, they will learn to skip it — the same
+     resistance humans displayed to gIBIS but implemented differently.
+     Requires longitudinal telemetry of task success rate with vs.
+     without capture ceremony (roadmap v3 Issue 20 lays the
+     instrumentation).
+  2. **Do agent captures survive human review?** Weber [@weber2001intelligent]
+     found LLIS entries accumulated but were not consulted. If
+     agent-produced captures accumulate but fail human triage at
+     harvest, the asymmetry has just moved — the human review load
+     is the new bottleneck.
+  3. **Does agent capture produce residuals?** Anything that
+     doesn't fit the schema goes to `_kos/inbox/` (Issue 23
+     extended). If the inbox grows monotonically without triage,
+     the residual is the new failure mode (see
+     elem-classification-residual-categories).
+  4. **What breaks first — capture volume or capture quality?**
+     Grudin's failure mode was low volume; the LLM variant may be
+     high volume, low quality.
+
+  This question is not answerable at n=1 human. Its resolution
+  requires the external-operator probe (roadmap v3 Issue 13) plus
+  telemetry (Issue 20) plus at least one heterogeneous agent
+  population working through MCP (Issue 23).
+
+  Depends on: val-agents-bear-capture-cost,
+  elem-grudin-asymmetric-cost-benefit,
+  elem-who-pays-survival-predictor.
+
+  Source: docs/kos-prior-work-survey.md §Recommendations Stage 3
+  ("Test whether LLM-borne capture and formalization finally
+  dissolves the cost/benefit asymmetry"); Open Question 1
+  ("Does AI-borne capture cost finally solve the asymmetric
+  cost/benefit problem that killed design rationale and KM?");
+  §2 further research (LLM auto-population of the graveyard).
+edges:
+  - target: val-agents-bear-capture-cost
+    type: derives
+    note: "The guardrail whose empirical basis this question is testing."
+  - target: elem-grudin-asymmetric-cost-benefit
+    type: derives
+    note: "The literature ground the empirical work is validating against."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md §Recommendations Stage 3; Open Question 1"

@@ -1,0 +1,19 @@
+id: oh-glossary-missing-v1-terms
+type: claim
+confidence: frontier
+claim:
+  text: >
+    The glossary (.openhands/microagents/glossary.md) defines the V0
+    terminology exclusively: "Microagent", "Public Microagent", "Repository
+    Microagent", "Microagent Registry", "Prompt Manager". It does not
+    define any V1 terms: "skill", "app_server", "agent-server", "sandbox
+    spec", or "Software Agent SDK". It also still defines "E2B Runtime"
+    as a top-level concept, though E2B has been moved to third_party/.
+    The glossary has not been updated for the V0-to-V1 transition.
+  source_doc: .openhands/microagents/glossary.md
+  contradicted_by:
+    - skills/README.md (V1 terminology)
+    - openhands/app_server/README.md (V1 architecture)
+  severity: low
+  category: stale-glossary
+tags: [seam, v0-v1, glossary, terminology]

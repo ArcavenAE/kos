@@ -1,0 +1,25 @@
+id: bm-workflow-implementations
+type: element
+confidence: frontier
+title: "BMAD TEA: actual workflow step-file implementations"
+content: |
+  The actual workflow implementations in src/workflows/testarch/:
+  - 9 workflow directories confirmed (ls count)
+  - test-review: 4 subagent workers: Determinism, Isolation, Maintainability,
+    Performance. Weights in step-03f: 30/30/25/15. Consistent with commands.md.
+  - nfr-assess: 4 subagent workers: Security, Performance, Reliability,
+    SCALABILITY. Note: 4th worker is Scalability, not Maintainability.
+  - Both workflows share identical execution mode resolution code
+    (normalizeUserExecutionMode, capability probe, fallback logic)
+  - Knowledge base: 42 files in src/testarch/knowledge/, 43 lines in
+    tea-index.csv (header + 42 entries)
+
+  Source: src/workflows/testarch/*/steps-c/*.md, src/testarch/knowledge/,
+  src/testarch/tea-index.csv
+depends_on:
+  - bm-commands-reference
+  - bm-tea-overview-architecture
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-bmad-enterprise-probe"
+  created_at: "2026-03-15"

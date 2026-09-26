@@ -1,0 +1,19 @@
+id: ag-dotnet-readme-v02-steering
+type: claim
+confidence: frontier
+claim:
+  text: >
+    The dotnet/README.md presents ConversableAgent/InitiateChatAsync (v0.2
+    conversation-based patterns) as the primary getting-started code sample,
+    while simultaneously noting that the AutoGen.* packages "will gradually
+    be deprecated" and that the Microsoft.AutoGen.* packages "use the
+    event-driven model." A newcomer reading this README is actively steered
+    toward the architecture that is being replaced. The Python side has a
+    migration guide; the .NET side does not.
+  source_doc: dotnet/README.md
+  contradicted_by:
+    - README.md (top-level, describes event-driven architecture)
+    - FAQ.md (describes v0.4 as "rewrite from the ground up")
+  severity: medium
+  category: version-transition-seam
+tags: [seam, dotnet, v0.2, v0.4, migration]

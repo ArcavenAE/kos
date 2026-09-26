@@ -1,0 +1,23 @@
+id: po-rs-human-integration-bus
+type: element
+confidence: frontier
+title: "RS claim: human is the integration bus between agents"
+content: |
+  The rs.md identifies that in BMAD, each lifecycle stage runs in a fresh
+  conversation. The human manually drives every agent transition, carries
+  context between sessions, and decides when a phase is done. There is no
+  session state, no handoff protocol, no automated transition.
+
+  The rs.md claims Pennyfarthing solves this with phased workflows —
+  automated agent-to-agent handoffs with session files tracking state.
+  SM sets up, TEA writes tests, Dev implements, Reviewer validates,
+  SM closes — each handoff automated.
+
+  Source: lifecycle-improvement-rs.md, section 3b.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md

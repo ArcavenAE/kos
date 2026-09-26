@@ -1,0 +1,30 @@
+id: elem-shadow-principle
+type: element
+confidence: bedrock
+title: "Existing SDD documents are projections of the graph"
+content: |
+  Existing SDD documents (PRDs, architecture docs, ADRs, epics) are valid
+  but lossy projections of the graph — a 2D shadow of an N-dimensional object.
+
+  The projection is systematic, not random. It discards: dependency
+  relationships, confidence classification, provenance, graveyard,
+  temporal dimension, correspondence between understanding and code.
+
+  The graph can always generate the documents.
+  The documents cannot recover the graph.
+  The graph strictly contains the documents.
+
+  Running in parallel, the graph acts as checksum and diagnostic on the
+  shadow system. Errors invisible in documents become structurally apparent
+  in the graph — measurable geometry, not interpretation.
+
+  The transition from shadow to graph as source of truth requires no flag day.
+  It happens gradually as bedrock accumulates and the graph demonstrates
+  more trustworthiness than the documents.
+depends_on:
+  - elem-confidence-classification
+  - elem-correspondence-layer
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

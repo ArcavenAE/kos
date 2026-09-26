@@ -1,0 +1,125 @@
+id: finding-035-threedoors-bootstrap-complete
+type: finding
+confidence: frontier
+title: "ThreeDoors bootstrap complete: 104 nodes, 6 layers, central finding — codify as infrastructure not instructions"
+content: |
+  ## Summary
+
+  Session-011 completed the full 6-layer bootstrap of ThreeDoors into a
+  kos graph. 104 nodes (52 bedrock, 51 frontier, 1 frontier/deferred),
+  0 validation warnings. First real-scale kos bootstrap — 4x the next
+  largest graph (aae-orc at 35).
+
+  The probe hypothesis was >100 nodes, >100 edges, >10 findings, and
+  3+ actionable findings. All met.
+
+  ## Central finding: codify as infrastructure, not instructions
+
+  Every incident, every governance gap, every stale document traces to
+  the same root: rules encoded as instructions (markdown prose, agent
+  definitions, memory entries) fail under multi-agent concurrent execution.
+  Rules encoded as infrastructure (hooks, CI checks, tooling) work.
+
+  The dark factory discovered this empirically through 4 incidents, and
+  the governance model states it explicitly ("codify as infrastructure
+  rather than as instructions") — but the project hasn't fully acted on
+  it. Advisory registries, agent definitions, and session handoff protocols
+  still carry the primary safety burden.
+
+  This is not a ThreeDoors-specific finding. It's a general principle
+  for multi-agent systems: **the enforcement mechanism must match the
+  execution model.** Concurrent agents need concurrent-safe enforcement
+  (locks, hooks, CI gates), not advisory prose.
+
+  ## Findings by layer
+
+  ### Layer 1 (ADRs): Two disconnected trees
+  The app tree (adr-0001/Go → architecture → adapters → sync) and dark
+  factory tree (adr-0025/stories → pipeline → governance) share no edges.
+  ADR-0030 has a naming collision (two different decisions). No supersedes
+  relationships declared despite clear architectural evolution.
+
+  ### Layer 2 (BOARD): Maintenance drift
+  16 of 34 questions are resolved but still listed as "open." Duplicate
+  IDs across P-009, P-010, P-015, R-016. 15 of 18 genuinely open
+  questions are dark-factory concerns — the app half has settled.
+
+  ### Layer 3 (Incidents): Convergence on adr-0026
+  adr-0026 (self-driving pipeline) is contradicted by 3 of 4 incidents.
+  All 4 share a pattern: soft constraints assumed to enforce hard
+  properties (isolation, mutual exclusion, message delivery).
+
+  ### Layer 4 (Architecture): Stale docs and authority gaps
+  external-apis.md claims "no external APIs" — completely stale (5+
+  adapters exist). Session handoff protocol depends on messaging proven
+  broken by INC-004. Governance authority matrix doesn't include epic
+  number allocation that INC-003 requires. Agent evaluation metrics
+  can't detect silent message drops.
+
+  ### Layer 5 (PRD): Philosophy drift
+  SOUL.md says "three doors not three hundred" but scope expanded to
+  70 epics and 353 stories. SOUL says "no gamification" but Epic 40
+  adds milestone celebrations, heatmaps, animated counters. Local-first
+  privacy claim in tension with agent telemetry infrastructure.
+
+  ### Layer 6 (Dark factory): The experimental half
+  All 4 incidents are governance failures, zero are app bugs. The dark
+  factory is the fragile half. Retrospector has 20+ findings but almost
+  no recommendations — the analysis pipeline is incomplete. 100% CI
+  first-pass success rate across 20 PRs is suspicious (possible
+  survivorship bias). L4 readiness questioned given L3 still produces
+  incidents.
+
+  ## Actionable findings for ThreeDoors
+
+  1. **Update external-apis.md** — currently false, claims no APIs exist
+  2. **Archive resolved BOARD questions** — 16 items creating noise
+  3. **Fix BOARD duplicate IDs** — ADR-0030, P-009, P-010, P-015, R-016
+  4. **Reconcile SOUL.md with reality** — either update the philosophy
+     or rein in gamification features (Epic 40) and scope expansion
+  5. **Add infrastructure enforcement** for epic allocation, message
+     delivery, and checkout isolation — replace advisory prose
+  6. **Update adr-0026** to absorb lessons from 3 contradicting incidents
+  7. **Fix governance authority matrix** — add epic allocation to
+     project-watchdog's CAN list
+  8. **Address session handoff dependency on broken messaging** (INC-004)
+
+  ## What this means for kos
+
+  The toolchain works at scale. 104 nodes, 0 warnings, all edges resolve.
+  YAML-in-git substrate holds (validation <1s). The bootstrap took one
+  session across 6 layers. No kos tooling modifications needed.
+
+  The probe brief's hypothesis is confirmed: a well-documented project
+  with 800 docs produces a graph with >100 nodes and >10 cross-document
+  findings. The review gap gradient (B7) holds — even a project with
+  36 ADRs, incident reports, and a living BOARD has cross-document
+  drift that no single document surfaces.
+
+  The graph's value is not in any individual finding — most were
+  knowable from reading the right documents in the right order. The
+  value is in the connections: seeing that adr-0026 is contradicted
+  by 3 incidents, that SOUL.md's constraint principle is contradicted
+  by the scope, that the dark factory produces all the incidents while
+  the app produces none. These cross-layer patterns are invisible to
+  document-by-document reading.
+
+edges:
+  - target: finding-034-threedoors-bootstrap-layers-1-3
+    type: supersedes
+    note: "Complete finding supersedes partial finding from layers 1-3"
+  - target: finding-028-threedoors-empirical-patterns
+    type: derives
+    note: "Full bootstrap of the project finding-028 identified"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Real-scale validation of the implementation pivot toolchain"
+provenance:
+  created_by: human
+  session: session-011
+  created_at: "2026-03-31"
+tags:
+  - threedoors
+  - bootstrap
+  - cross-document
+  - complete

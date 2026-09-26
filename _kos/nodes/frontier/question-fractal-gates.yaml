@@ -1,0 +1,47 @@
+id: question-fractal-gates
+type: question
+confidence: frontier
+title: "Should success signals (gates) be depth-appropriate rather than uniform?"
+content: |
+  kos probe briefs have a success_signal field with a fixed structure:
+  numbered criteria, confirm/partial/redirect outcomes. This is the
+  same format whether the probe is a multi-session project-scale
+  initiative or a single-session feature fix.
+
+  The lifecycle composition document shows that gates should be fractal:
+  - Product-scale gate: full validation pass, multiple criteria,
+    stakeholder review
+  - Feature-scale gate: does it work, does it drift from parent?
+  - Bug-scale gate: does the fix work, regression test passes
+  - Spike-scale gate: did we learn what we set out to learn?
+
+  Each gate validates the same thing (is this output acceptable?) but
+  at different depth. A bug fix doesn't need a hypothesis/timebox/
+  success-signal template. A project-scale initiative does.
+
+  Hypothesis: the success_signal field in probe briefs should support
+  multiple depth levels. The current format is product-scale. Feature-
+  scale could be a single acceptance criterion. Fix-scale could be
+  "tests pass." Idea-scale has no gate at all.
+
+  This connects to the process subcommands idea: `kos probe` should
+  scaffold an appropriate-depth brief based on the scale of the question
+  it's linked to.
+
+  Testable by: comparing the orient standalone probe (feature-scale,
+  8 FATs) against a fix-scale probe (1 acceptance criterion) and
+  evaluating whether the reduced ceremony loses signal.
+edges:
+  - target: question-fractal-process-ceremony
+    type: derives
+    note: "Fractal gates are one aspect of fractal process ceremony"
+  - target: elem-gate-enforcement
+    type: derives
+    note: "Gate enforcement works; this asks what depth of gate is appropriate"
+  - target: brief-orient-standalone
+    type: derives
+    note: "The orient probe's FATs are one depth level being tested"
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"

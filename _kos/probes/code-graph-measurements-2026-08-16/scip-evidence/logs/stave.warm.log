@@ -1,0 +1,241 @@
+Generating SCIP start...
+rust-analyzer: Loading discovering sysroot
+rust-analyzer: Loading querying project metadata
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading build script proc-macro2 run
+rust-analyzer: Loading build script quote run
+rust-analyzer: Loading build script libc run
+rust-analyzer: Loading build script paste run
+rust-analyzer: Loading build script proc-macro2-diagnostics run
+rust-analyzer: Loading build script uncased run
+rust-analyzer: Loading build script icu_properties_data run
+rust-analyzer: Loading build script num-traits run
+rust-analyzer: Loading build script anyhow run
+rust-analyzer: Loading proc-macro paste built
+rust-analyzer: Loading build script parking_lot_core run
+rust-analyzer: Loading build script assert_cmd run
+rust-analyzer: Loading build script serde_json run
+rust-analyzer: Loading build script serde run
+rust-analyzer: Loading build script httparse run
+rust-analyzer: Loading build script thiserror run
+rust-analyzer: Loading build script icu_normalizer_data run
+rust-analyzer: Loading build script rustix run
+rust-analyzer: Loading build script thiserror run
+rust-analyzer: Loading build script serde_core run
+rust-analyzer: Loading build script generic-array run
+rust-analyzer: Loading build script figment run
+rust-analyzer: Loading build script stave-sdk run
+rust-analyzer: Loading build script getrandom run
+rust-analyzer: Loading proc-macro displaydoc built
+rust-analyzer: Loading proc-macro tracing-attributes built
+rust-analyzer: Loading proc-macro thiserror-impl built
+rust-analyzer: Loading proc-macro clap_derive built
+rust-analyzer: Loading proc-macro serde_derive built
+rust-analyzer: Loading proc-macro tokio-macros built
+rust-analyzer: Loading proc-macro thiserror-impl built
+rust-analyzer: Loading proc-macro futures-macro built
+rust-analyzer: Loading proc-macro zerovec-derive built
+rust-analyzer: Loading build script zmij run
+rust-analyzer: Loading proc-macro zerofrom-derive built
+rust-analyzer: Loading proc-macro pear_codegen built
+rust-analyzer: Loading proc-macro yoke-derive built
+rust-analyzer: Loading build script aws-lc-sys run
+rust-analyzer: Loading build script aws-lc-rs run
+rust-analyzer: Loading build script rustls run
+2026-08-16T15:37:41.843067-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23c81) } })
+2026-08-16T15:37:42.895563-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dd8) } })
+2026-08-16T15:37:42.991856-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(828b) } })
+2026-08-16T15:37:43.288657-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:0:0-279:0 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288703-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:65:11-65:18 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.28871-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:0:0-279:0 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288716-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:104:11-104:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288729-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:65:11-65:18 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288735-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:70:11-70:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.28874-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:209:7-209:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288756-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:147:11-147:22 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288762-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:228:7-228:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288767-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:70:11-70:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288771-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:213:7-213:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288774-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:228:7-228:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288777-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:70:11-70:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288782-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:134:11-134:35 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288787-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:169:11-169:26 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288791-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:104:11-104:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288795-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:241:7-241:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288799-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:104:11-104:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288807-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:104:11-104:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.28881-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:209:7-209:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288813-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:104:11-104:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288818-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:213:7-213:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288821-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:185:7-185:21 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288831-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:241:7-241:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288834-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:169:11-169:26 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288837-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:213:7-213:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288842-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:218:7-218:12 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288844-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:213:7-213:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288847-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:202:7-202:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288849-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:241:7-241:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288853-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:218:7-218:12 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288856-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:0:0-279:0 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288859-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:104:11-104:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288866-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:0:0-279:0 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.28887-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:0:0-279:0 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288874-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:213:7-213:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288877-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:147:11-147:22 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288882-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:185:7-185:21 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288885-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:266:7-266:22 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.28889-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:70:11-70:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288893-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:65:11-65:18 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288896-05:00 ERROR Bug: definition at crates/stave-sdk/src/error.rs:2:2-2:22 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.2889-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:104:11-104:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288904-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:213:7-213:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288906-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:70:11-70:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.28891-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:138:11-138:22 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288912-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:185:7-185:21 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288915-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:202:7-202:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288918-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:65:11-65:18 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288921-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:209:7-209:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288924-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:202:7-202:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288926-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:93:11-93:26 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288929-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:142:11-142:24 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288931-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:266:7-266:22 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288934-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:202:7-202:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288936-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:260:7-260:24 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288938-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:65:11-65:18 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288942-05:00 ERROR Bug: definition at crates/stave-sdk/src/client.rs:66:23-66:30 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288945-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:228:7-228:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288952-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:70:11-70:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288957-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:70:11-70:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288961-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:104:11-104:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288964-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:202:7-202:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.28897-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:253:7-253:15 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288973-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:260:7-260:24 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288976-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:218:7-218:12 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288978-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:65:11-65:18 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288981-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:89:11-89:20 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288985-05:00 ERROR Bug: definition at crates/stave-sdk/src/error.rs:2:2-2:22 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288991-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:0:0-279:0 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.288995-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:70:11-70:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:209:7-209:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289004-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:70:11-70:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289007-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:185:7-185:21 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289012-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:202:7-202:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289015-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:209:7-209:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289018-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:218:7-218:12 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289022-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:0:0-279:0 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289025-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:213:7-213:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289028-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:253:7-253:15 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289031-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:125:11-125:23 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289034-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:65:11-65:18 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289036-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:266:7-266:22 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289039-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:65:11-65:18 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289042-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:0:0-279:0 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289051-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:266:7-266:22 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289057-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:97:11-97:27 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289061-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:209:7-209:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289063-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:275:7-275:24 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289067-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:104:11-104:14 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.28907-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:125:11-125:23 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289075-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:246:7-246:19 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289078-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:85:11-85:22 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289083-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:125:11-125:23 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289089-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:0:0-279:0 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289094-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:209:7-209:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289097-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:213:7-213:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.2891-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:218:7-218:12 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289103-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:209:7-209:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289108-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:275:7-275:24 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289111-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:209:7-209:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289114-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:213:7-213:16 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289116-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:228:7-228:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289119-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:202:7-202:10 should have been in an SCIP document but was not.
+2026-08-16T15:37:43.289122-05:00 ERROR Bug: definition at crates/stave-cli/tests/common/mod.rs:65:11-65:18 should have been in an SCIP document but was not.
+
+Encountered duplicate scip symbols, indicating an internal rust-analyzer bug. These duplicates are
+included in the output, but this causes information lookup to be ambiguous and so information about
+these symbols presented by downstream tools may be incorrect.
+
+Known rust-analyzer bugs that can cause this:
+
+  * Definitions in crate example binaries which have the same symbol as definitions in the library
+    or some other example.
+
+  * Struct/enum/const/static/impl definitions nested in a function do not mention the function name.
+    See #18771.
+
+Duplicate symbols encountered:
+
+crates/stave-cli/tests/profiles.rs:0:0-307:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/tests/permissions.rs:0:0-318:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/tests/paging.rs:0:0-323:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/tests/get_search_limit_since.rs:0:0-598:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/tests/filter.rs:0:0-323:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/tests/enrich.rs:0:0-412:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/tests/emit.rs:0:0-267:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/tests/directory_scopes.rs:0:0-239:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/tests/directory_scopes.rs:25:3-25:14
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 graphql_url().
+
+crates/stave-cli/tests/auth_chain.rs:0:0-741:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/tests/audit_v2.rs:0:0-372:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/src/main.rs:0:0-3462:0
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 crate/
+
+crates/stave-cli/src/main.rs:864:29-864:39
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 run_filter().
+
+crates/stave-cli/src/main.rs:886:27-886:38
+  Duplicate symbol: rust-analyzer cargo stave-cli 0.0.1 auth_status().
+
+crates/stave-sdk/src/lib.rs:0:0-50:0
+  Duplicate symbol: rust-analyzer cargo stave-sdk 0.0.1 crate/
+
+Generating SCIP finished 4.488411s
+        4.66 real         7.59 user         4.65 sys
+          1662648320  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              174065  page reclaims
+                   0  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   1  signals received
+                 585  voluntary context switches
+               19768  involuntary context switches
+        100675627540  instructions retired
+         40730295389  cycles elapsed
+          1531676448  peak memory footprint

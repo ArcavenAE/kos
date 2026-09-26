@@ -1,0 +1,65 @@
+id: elem-classification-residual-categories
+type: element
+confidence: frontier
+title: "Some knowledge is uncodifiable; every classification scheme creates invisible residual categories (Polanyi / Bowker & Star)"
+content: |
+  Polanyi's tacit dimension [@polanyi1966tacit] — "we can know more than
+  we can tell" — bounds what any graph can capture. Collins's taxonomy
+  [@collins2010tacit] refines this: only *collective* tacit knowledge
+  is truly uncodifiable, while relational tacit is capturable in
+  principle (though the cost may be prohibitive). Suchman's *Plans
+  and Situated Actions* [@suchman1987plans] warns against
+  over-formalization — plans are resources for action, not
+  determinants.
+
+  Bowker & Star's *Sorting Things Out* [@bowker1999sorting] documents
+  that every classification scheme produces *residual categories* —
+  the "other" bucket — and makes some things structurally invisible
+  by putting them nowhere. "Torque" is their term for the friction
+  when lived experience does not fit the scheme; the scheme's blind
+  spots become the organization's blind spots.
+
+  KOS exposure:
+  - The typed-edge system, confidence tiers, node types, and schema
+    all impose classification. Anything that fits nowhere becomes
+    residual — invisible to orient, unqueryable, unreachable by
+    seam detection.
+  - Personas, roles, subprocesses that don't map to the taxonomy
+    won't be seen missing.
+  - Cross-project knowledge boundaries are especially exposed —
+    Carlile's syntactic/semantic/pragmatic taxonomy [@carlile2004transferring]
+    identifies pragmatic (differing interests) as the hardest, and
+    schemas cannot resolve it.
+
+  Prescriptive consequence:
+  - Explicitly design for the residual. `_kos/inbox/` (roadmap v3.1
+    Issue 23 extended) is the residual bucket — observations that
+    have no obvious home go there rather than being lost.
+  - Do not assume the graph captures everything that matters.
+    Represent the *boundary* of what is captured (metadata about
+    what is deliberately excluded).
+  - Coexistence with parallel systems (roadmap v3.1 R11–R14) is a
+    residual-management strategy at the system-of-systems level.
+  - Every classification vocabulary — edge types, confidence tiers,
+    node types — must be revisitable. `question-edge-types` is one
+    such live revisitation.
+
+  Cross-refs: elem-shadow-principle (documents as projections;
+  projections are lossy by construction);
+  question-graph-health-without-goodhart (the residual "invisible"
+  is what canaries test).
+
+  Source: docs/kos-prior-work-survey.md §Key Findings #7, §8, §17.
+edges:
+  - target: elem-shadow-principle
+    type: supports
+    note: "Projections are lossy; residual categories are one lossiness mode."
+  - target: question-edge-types
+    type: supports
+    note: "Edge-type taxonomy is one live classification whose residuals need auditing."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md — Key Findings #7; §8; §17"

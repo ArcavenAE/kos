@@ -1,0 +1,33 @@
+id: po-bikeshop-prd
+type: element
+confidence: frontier
+title: "bikeshop-prd: team aggregation server"
+content: |
+  The bikeshop-prd.md defines BikeShop — a team aggregation server that
+  receives enriched OTEL telemetry from multiple BikeRack instances. Key
+  capabilities: ShowRoom dashboard (real-time session tiles), automated push
+  delivery (changelogs, sprint catch-up, notifications), OpenSSH keypair
+  auth (BikeShopPass), connection resilience (local cache + reconnect).
+
+  Phase 2 adds BikeShow (multi-session composed views), analytics, and
+  topic-based notification filtering.
+
+  This is an ambitious PRD: it envisions Pennyfarthing as a team product,
+  not just a solo developer tool. Eight design review decisions (DR-1
+  through DR-8) are incorporated. Terminology table has 11 entries.
+  Forty-six functional and non-functional requirements. Seven user journeys
+  including an 800-word scenario (Journey 8).
+
+  The PRD was revised by M. Pursifull to fix terminology (WheelHub is an
+  implementation detail of BikeRack, not a separate component). This
+  revision itself is evidence of drift — the original PRD had an
+  architecturally incorrect component boundary.
+
+  Source: bikeshop-prd.md.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - bikeshop-prd.md

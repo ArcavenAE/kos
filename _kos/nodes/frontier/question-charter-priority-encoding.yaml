@@ -1,0 +1,19 @@
+id: question-charter-priority-encoding
+type: question
+confidence: frontier
+title: "Does the charter encode priority order clearly enough?"
+content: |
+  Cold-start test (session-002) produced a defensible but divergent
+  priority recommendation. Instance chose Q4; session reasoning favored Q5.
+  Both coherent. Divergence may indicate underspecified priority ordering
+  in the charter's open questions section, or may be normal variance
+  between reasonable reasoners weighting the same evidence differently.
+
+  Watch for recurrence. If subsequent cold-starts diverge consistently,
+  priority encoding is a structural gap. If they converge, this is noise.
+
+  Cannot be evaluated without tracking. Node exists so the tracking happens.
+provenance:
+  created_by: human
+  session: session-002
+  created_at: 2026-03-15

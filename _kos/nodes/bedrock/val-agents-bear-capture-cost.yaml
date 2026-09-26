@@ -1,0 +1,46 @@
+id: val-agents-bear-capture-cost
+type: value
+confidence: bedrock
+title: "Agents bear the capture cost (Grudin guardrail)"
+content: |
+  The survival bet for KOS: any requirement for manual human authoring
+  of nodes, edges, or graveyard entries is a red flag — it replicates
+  the failure mode that killed design rationale, requirements
+  traceability, knowledge management, and MDE
+  [@grudin1996evaluating; @gotel1994analysis; @walsh1991organizational;
+  @hutchinson2014model]. Capture must be a by-product of existing
+  developer workflow (commits, PRs, incidents, agent traces) or paid
+  by AI agents whose incentives align with the retrieval side.
+
+  Operational form:
+  - Node authoring must be cheaper than prose — `kos capture` targets
+    <30 seconds to committed valid node (roadmap v3.1 Issue 31).
+  - `kos adopt` seeds a graph from existing artifacts without hand-
+    written YAML (roadmap v3.1 Issue 32).
+  - MCP agents *propose* observations to `_kos/inbox/`; humans
+    triage (roadmap v3.1 Issue 23 extended). Proposal ≠ promotion.
+  - The graveyard hypothesis rests on this value — whether LLM agents
+    can auto-populate ruled-out records from commit history, PRs,
+    and postmortems is the survey's "further research" item for
+    §2 (see question-ai-borne-capture-solves-grudin).
+
+  Benchmark that would falsify: if pilot data shows humans will
+  voluntarily author ≥ the needed content without incentives, the
+  asymmetry constraint relaxes — but the base rate from KM/DR/LLIS
+  says they will not.
+
+  Source: docs/kos-prior-work-survey.md §Recommendations Stage 1;
+  docs/kos-roadmap-v3.md §Part 0 L1, §MR (Retrieval-First);
+  docs/kos-nine-improvements-reassessed.md §Cost-accounting.
+  Derived from: elem-grudin-asymmetric-cost-benefit.
+edges:
+  - target: elem-grudin-asymmetric-cost-benefit
+    type: derives
+    note: "The literature finding this guardrail is built on."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md §Recommendations Stage 1"
+    - "docs/kos-roadmap-v3.md §Part 0 L1"

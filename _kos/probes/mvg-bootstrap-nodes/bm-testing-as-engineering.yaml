@@ -1,0 +1,19 @@
+id: bm-testing-as-engineering
+type: element
+confidence: frontier
+title: "BMAD TEA: testing-as-engineering.md design philosophy"
+content: |
+  The testing-as-engineering.md is the design philosophy document. Key claims:
+  - Three-part stack: Utilities (Playwright-Utils + pactjs-utils),
+    Process (TEA workflows), Automation Interfaces (Playwright CLI + MCPs)
+  - Explicitly says "eight executable workflows" (line 50)
+  - Lists 8 workflows in table, omitting teach-me-testing
+  - Context engineering via tea-index.csv manifest
+
+  Source: docs/explanation/testing-as-engineering.md
+depends_on:
+  - bm-readme-overview
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-bmad-enterprise-probe"
+  created_at: "2026-03-15"

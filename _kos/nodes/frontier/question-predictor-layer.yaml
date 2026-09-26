@@ -1,0 +1,43 @@
+id: question-predictor-layer
+type: question
+confidence: frontier
+title: "What is the predictor layer and how does it run orthogonally to the cycle?"
+content: |
+  The cognitive architecture (B6) describes three elements:
+  LLM (spark) + KOS (memory) + Executive (cycle).
+
+  A fourth element is missing: a continuous forward model that generates
+  predictions about graph state, weights them by confidence, and updates
+  on surprise. Without it the system is reactive — it queries when prompted,
+  reasons when asked, and gets eaten while it's thinking.
+
+  Biological cognition doesn't wait to be queried. The prediction runs ahead
+  of the event. The gap between prediction and outcome IS the learning signal.
+  The dopamine architecture (reward on correct prediction, strong update on
+  surprise) is the calibration mechanism that turns memory into a system
+  that gets smarter from being wrong.
+
+  KOS currently learns backwards: probe → finding → harvest → bedrock.
+  The predictor would run orthogonally: current graph state → forward model
+  → predicted next states → confidence weights → watch for deviation →
+  update on surprise.
+
+  Key properties the predictor must have:
+  - Runs continuously, not triggered by the cycle
+  - Generates predictions before probes run, not after
+  - Measures surprise magnitude as primary learning signal
+  - Allocates attention without being asked — knows where live edges are,
+    what's about to go stale, what probe is most likely to produce signal
+  - Makes the charter a cold-start fallback, not the primary orientation mechanism
+
+  Open: is this a separate process, an agent, a graph property, or something
+  that emerges from brief+finding pairs used correctly?
+
+depends_on:
+  - elem-cognitive-architecture
+  - grv-human-as-integration-bus
+  - grv-flat-file-context-scaling
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"

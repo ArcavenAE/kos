@@ -1,0 +1,84 @@
+id: grv-git-as-sufficient-substrate
+type: graveyard
+confidence: graveyard
+title: "Git as a sufficient long-term substrate"
+content: |
+  The recursive projection problem: documents are lossy projections of the
+  spec graph. Git repos are lossy projections of the knowledge topology.
+  The file presentation layer is to git what documents are to the spec
+  graph — a human interface that flattens something with more structure
+  than it can represent.
+
+  The pattern:
+    Documents     →  flat projection of  →  Spec graph
+    Git repos     →  flat projection of  →  Knowledge topology
+    File layer    →  flat projection of  →  Content-addressed DAG
+
+  Every layer we've built on has been a human-shaped interface sitting on
+  top of something with more native structure. KOS is an attempt to work
+  at the level of the actual structure rather than the human-interface
+  projection of it. But we keep designing interfaces for humans because
+  humans are in the loop. And every human interface is a projection. And
+  every projection loses information.
+
+  The question underneath B3 isn't "is git the right substrate." It's:
+  what is the right level of abstraction for a system designed to be used
+  by both humans and agents? Humans need projections. Agents don't. They
+  can work directly with the DAG, the fact store, the typed graph. The
+  file presentation layer exists for us, not for them.
+
+  This tension will keep recurring as agents take more of the load.
+
+  Companion to finding-017 (what can't be a node): what can't be a repo?
+  The answer is the same: knowledge that has topology the container can't
+  represent. Tacit knowledge resists nodes because it has no clean edges.
+  Cross-project understanding resists repos because it has no clean
+  boundaries. The failure mode isn't the graph model — it's every
+  container we put the graph in.
+graveyard:
+  approach: |
+    Use git as the primary substrate for KOS. One repo per project.
+    File presentation layer as human interface. Content-addressed
+    storage as the underlying truth.
+  context: |
+    Git is battle-tested, universally understood, cryptographically
+    sound. The file layer works for humans. The DAG works for agents.
+    Appeared sufficient for the current scale.
+  finding: |
+    Git repos are human-shaped containers. They assume one project,
+    file-shaped content, human-paced workflows. KOS will need to span
+    repos (knowledge topology doesn't stop at project boundaries),
+    segment topologically, and potentially use substrates with better
+    performance characteristics. The file presentation layer is a
+    projection — it loses the structure that makes the graph useful.
+    Finding-015 (repo is context) tested the degenerate single-repo
+    case and called it solved. The general case is unsolved.
+  ruling: |
+    B3 revision required. "Git as substrate" becomes "content-addressed
+    immutable fact store with cryptographic integrity and distributed
+    sync — of which git is one implementation, possibly not the
+    long-term one." Git remains valid for current scale. The
+    assumption that it scales to the full vision is ruled out.
+  reopener: |
+    If git's content-addressed DAG can be used directly — stripping
+    the file presentation layer, using semantic commits, topological
+    branching, history as queryable store — the performance and
+    boundary limitations may not manifest at practical KOS scale.
+    Revisit when the graph spans more than one repo or when
+    query latency becomes a friction point.
+edges:
+  - target: finding-015-cold-start-validation
+    type: supersedes
+    signal: evolution
+    note: "finding-015 tested the degenerate single-repo case"
+  - target: finding-017-what-cant-be-a-node
+    type: derives
+    note: "companion question: what can't be a repo?"
+  - target: elem-storage-model
+    type: contradicts
+    signal: evolution
+    note: "B3 assumes git is sufficient; this entry rules that out at scale"
+provenance:
+  created_by: human
+  session: session-003
+  created_at: 2026-03-15

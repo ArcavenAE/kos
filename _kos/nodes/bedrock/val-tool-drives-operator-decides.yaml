@@ -1,0 +1,63 @@
+id: val-tool-drives-operator-decides
+type: value
+confidence: bedrock
+title: "Tool drives the process; operator makes the decisions (Bainbridge rule — roadmap v3.1 standing rule 4)"
+content: |
+  Inversion of the operator burden. Today the operator drives the
+  process and the tool records; the fix is the tool drives the
+  process and the operator makes the decisions.
+
+  Encouraged (automate):
+  - Reminding: session-start hooks, staleness prompts, cadence
+    triggers.
+  - Scheduling: every-Nth-session graveyard audits, fired-reopener
+    surfacing.
+  - Checking: schema validation, dangling-edge rejection, drift
+    detection, decay-signature calculation.
+  - Proposing: `kos capture` default node id/type/tier/edges;
+    `kos adopt` seed plans; MCP-server-emitted observations to
+    `_kos/inbox/`.
+
+  Prohibited (never automate):
+  - Promotion (bedrock ↔ frontier ↔ graveyard confidence transitions).
+  - Meaning (what a finding tells us; what a graveyard entry rules
+    out; whether a signal is drift, error, or evolution).
+  - Dissent (recording that the human overruled an agent proposal,
+    or vice versa).
+
+  Every automated proposal is **confirm-or-override**. Proposal ≠
+  promotion. Suggestion ≠ decision. Filed observation ≠ committed
+  node.
+
+  Rationale: Bainbridge's Ironies [@bainbridge1983ironies] and
+  automation-complacency literature [@parasuraman2010complacency]
+  show that automating judgment produces skill atrophy and bias
+  toward whatever the system usually outputs. The failure mode is
+  exactly the failure mode KOS is supposed to counter — knowledge
+  workers stop exercising judgment about knowledge validity. See
+  elem-automation-complacency-deskilling for the ground.
+
+  ADR-007 (orc) is the ratified boundary for this rule at the
+  platform level ("Automate reminding/checking/proposing, not
+  judging"); SOUL.md §8 (aae-orc) is the platform value form.
+
+  Source: docs/kos-roadmap-v3_1.md §Standing rules #4 ("Bainbridge
+  rule"); docs/kos-use-assessment.md §R2 (hooks fire; humans
+  perform), §R6 (let the graph open the session); §Part 3.
+  Derived from: elem-automation-complacency-deskilling.
+edges:
+  - target: elem-automation-complacency-deskilling
+    type: derives
+    note: "The literature finding that grounds the rule."
+  - target: val-uncertainty-structural
+    type: supports
+    note: "Uncertainty declared as structure requires the pawl — automation cannot pawl."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-roadmap-v3_1.md §Standing rules #4"
+    - "docs/kos-use-assessment.md §R2, §R6"
+    - "aae-orc/decisions/adr-007-bainbridge-automation-boundary.md"
+    - "aae-orc/SOUL.md §8"

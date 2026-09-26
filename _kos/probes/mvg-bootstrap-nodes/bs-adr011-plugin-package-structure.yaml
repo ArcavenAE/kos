@@ -1,0 +1,27 @@
+id: bs-adr011-plugin-package-structure
+type: element
+confidence: frontier
+title: "ADR011: Plugin package naming and directory conventions"
+content: |
+  ADR011 establishes a fixed naming scheme for plugin packages:
+  - x: frontend plugin
+  - x-backend: backend plugin
+  - x-module-<name>: frontend module
+  - x-backend-module-<name>: backend module
+  - x-react: shared frontend widgets/hooks
+  - x-node: shared backend utilities
+  - x-common: isomorphic shared code
+
+  All plugin code lives in plugins/ directory.
+  The packages/ directory is reserved for Backstage core packages.
+  Package names are prefixed with @backstage/plugin-.
+
+  Source: docs/architecture-decisions/adr011-plugin-package-structure.md
+tags:
+  - backstage
+  - plugins
+  - packaging
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-backstage-probe"
+  created_at: "2026-03-15"

@@ -1,0 +1,65 @@
+id: ripple-discovery-boundary
+type: observation
+confidence: frontier
+title: "Ripple is maintenance, not discovery — the boundary between Q2 and Q3"
+content: |
+  ## The insight
+
+  The retrospective test revealed a clean separation between two
+  functions the ripple engine was implicitly expected to perform:
+
+  MAINTENANCE: when a node changes, what else is dirty?
+  → Ripple handles this. Propagate along existing edges.
+
+  DISCOVERY: are there contradictions we haven't found yet?
+  → Ripple cannot handle this. Discovery requires content analysis,
+    cross-document comparison, and pattern recognition.
+
+  The twelve-project probe (session-002) was DISCOVERY. It found
+  contradictions, gaps, and patterns by reading content and building
+  edges that didn't exist. Ripple would not have found ANY of these
+  issues before the probe created the edges.
+
+  After the probe, ripple can MAINTAIN what was found. If a document
+  changes, ripple propagates the dirty flag along the edges the probe
+  created. But if a NEW contradiction is introduced by a new document,
+  ripple can't find it — it doesn't know what edges SHOULD exist.
+
+  ## Implication for system architecture
+
+  The KOS process cycle (Orient → Question → Probe → Harvest → Promote)
+  is the DISCOVERY mechanism. Ripple is the MAINTENANCE mechanism between
+  cycles. The executive loop (Q3) must coordinate both:
+
+  - Run probes periodically to discover new signal
+  - Run ripple continuously to maintain known signal
+  - Escalate when ripple detects convergent dirty flags (multiple
+    DIRTY_SOFT from different sources → possible undiscovered pattern)
+
+  The escalation case is the bridge: ripple can't discover patterns,
+  but it CAN notice that many things are going dirty at once, which
+  is a signal that a probe should run.
+
+  ## Implication for Q2
+
+  The original question was "how does the ripple engine surface conflicts
+  without creating noise?" The answer is cleaner than expected: ripple
+  doesn't surface conflicts at all. Probes surface conflicts. Ripple
+  surfaces STALENESS — it tells you when known relationships might
+  have drifted because something upstream changed.
+
+  The noise problem is therefore different than expected. Noise in
+  ripple is not "false conflicts" — it's "false staleness." A node
+  is marked dirty but hasn't actually changed in meaning. This is
+  manageable: content hashing, distance attenuation, and supersession
+  firebreaks keep false staleness bounded.
+
+edges:
+  - target: ripple-mechanism-proposal
+    type: derives
+  - target: ripple-retrospective-test
+    type: derives
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15

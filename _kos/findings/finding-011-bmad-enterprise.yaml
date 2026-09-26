@@ -1,0 +1,180 @@
+id: finding-011-bmad-enterprise
+type: finding
+confidence: frontier
+title: "BMAD TEA enterprise module: AI-generated docs show drift pattern, not contradiction pattern"
+content: |
+  ## Probe Summary
+
+  Tested the KOS checksum property against the BMAD TEA (Test Engineering
+  Architect) enterprise module — an AI-generated testing workflow system
+  built with the BMAD methodology. This is the first probe against
+  AI-GENERATED planning documents rather than human-written ones.
+
+  ## Documents Examined
+
+  1. README.md — top-level overview, architecture flow, workflow table
+  2. docs/explanation/tea-overview.md — lifecycle diagram, phase mapping,
+     engagement models, workflow catalog
+  3. docs/explanation/testing-as-engineering.md — design philosophy,
+     three-part stack description
+  4. docs/reference/commands.md — workflow reference with inputs/outputs
+  5. docs/reference/configuration.md — config options reference
+  6. docs/explanation/engagement-models.md — 5 engagement models detail
+  7. docs/explanation/step-file-architecture.md — step-file design
+  8. docs/explanation/subagent-architecture.md — orchestration model
+  9. src/agents/tea.agent.yaml — agent persona definition
+  10. src/module.yaml — configuration schema (source of truth)
+  11. src/workflows/testarch/*/steps-c/*.md — actual step implementations
+  12. src/testarch/tea-index.csv — knowledge fragment manifest
+  13. src/testarch/knowledge/ — 42 knowledge fragment files
+
+  ## Findings
+
+  ### What the graph reveals
+
+  3 seam issues found. 0 outright contradictions in intent. 2 count-drift
+  problems (stale numbers). 1 category mismatch between reference doc and
+  implementation.
+
+  **Finding 1: Knowledge fragment count drift** (bm-seam-fragment-count-drift)
+
+  The knowledge base grew from 35 to 42 fragments over time (adding
+  pactjs-utils, pact-mcp, pact-consumer-*, adr-quality-readiness-checklist,
+  playwright-cli, pact-consumer-di entries). Only some documents were
+  updated with the new count:
+
+  - README.md says "40" (wrong)
+  - commands.md Session 7 says "35" (wrong)
+  - MIGRATION.md says "35" (wrong)
+  - tutorials say "35" (wrong)
+  - troubleshooting.md says "42" (correct)
+  - tea-overview.md says "42" (correct)
+  - Actual: 42 files, 42 entries in tea-index.csv
+
+  This is the most common type of AI-generated doc drift: the source of
+  truth (the actual files) evolves but reference documents that mention
+  the count are not systematically updated. A human writing docs would
+  have the same problem. The AI does not escape it.
+
+  **Finding 2: Workflow count inconsistency** (bm-seam-workflow-count-inconsistency)
+
+  testing-as-engineering.md says "eight executable workflows" and lists 8
+  in its table, omitting teach-me-testing. tea-overview.md has a section
+  titled "TEA's 8 Workflows Across Phases" (excluding teach-me-testing
+  from the phase lifecycle). Meanwhile README.md, docs/index.md,
+  CHANGELOG.md, and dozens of other references say "nine workflows" or
+  "9 workflows." The actual implementation has 9 workflow directories.
+
+  This is a definitional seam: teach-me-testing is a learning tool, not
+  a development workflow, so it does not fit the phase lifecycle. The
+  subagent-architecture.md explicitly excludes it. Two documents made a
+  reasonable editorial choice to count only the "real" workflows. But the
+  overall documentation population overwhelmingly says 9, creating a
+  seam for any reader who encounters the 8 count first.
+
+  **Finding 3: NFR categories mismatch** (bm-seam-nfr-categories-mismatch)
+
+  The commands reference (commands.md) lists NFR assessment categories as
+  "Security, Performance, Reliability, Maintainability." The actual
+  implementation has 4 subagent workers for Security, Performance,
+  Reliability, and SCALABILITY. The checklist and report template include
+  both Maintainability and Scalability sections, but only Scalability
+  has a dedicated subagent worker. The reference doc names Maintainability
+  where it should say Scalability (or should list all 5 areas that the
+  checklist covers).
+
+  ### What was NOT found
+
+  - No contradictions between the lifecycle diagram and the actual workflow
+    step implementations. Phase assignments are consistent.
+  - No contradictions between the agent persona definition and the workflow
+    triggers. All 9 menu items in tea.agent.yaml match workflow directories.
+  - No contradictions in the test-review scoring weights: commands.md says
+    Determinism 30%, Isolation 30%, Maintainability 25%, Performance 15%
+    and step-03f-aggregate-scores.md implements exactly these weights.
+  - No contradictions in the execution mode resolution logic: the
+    subagent-architecture.md description matches the actual code in both
+    test-review and nfr-assess step files, including fallback behavior
+    and verbal override normalization.
+  - The module.yaml configuration schema is consistent with the
+    configuration reference doc. All config keys, defaults, and types match.
+  - The engagement models document is internally consistent and matches
+    the phase descriptions in tea-overview.md.
+
+  ### Pattern Analysis
+
+  The dominant pattern is **count drift** — numeric claims about the size
+  of a growing collection that were not updated when the collection grew.
+  This is a different pattern from the Crossplane probe (which found
+  silent abandonment of design decisions) and the Project Alpha probe (which
+  found outright contradictions).
+
+  **AI-generated docs vs human-generated docs:** The BMAD TEA documents
+  show LESS severe seam problems than the human-managed projects tested
+  in earlier probes. The seams found here are all low-severity: stale
+  counts and a category naming mismatch. No structural contradictions.
+  No phase boundary erosion. No architectural claims that contradict
+  implementation.
+
+  Possible explanations:
+  1. The BMAD methodology itself (structured step-by-step generation)
+     produces more internally consistent documents than ad-hoc authoring.
+  2. The project is younger and has had fewer rounds of evolution. The
+     knowledge base grew from 35 to 42 fragments, but the core
+     architecture has not changed fundamentally.
+  3. The step-file architecture enforces consistency at the workflow
+     level — identical orchestration code across workflows (the
+     normalizeUserExecutionMode function is copy-pasted verbatim between
+     test-review and nfr-assess).
+
+  The third point is interesting: copy-paste consistency is not the
+  same as DRY consistency. If the orchestration logic needs to change,
+  it would need to change in every workflow's step file independently.
+  But for now, it produces low seam counts.
+
+  ### Implications for KOS
+
+  1. The checksum property works on AI-generated documentation, not just
+     human-written docs. The seam types are milder but still present.
+  2. Count drift (stale numeric references to growing collections) may
+     be the most common AI-doc seam type, because AI agents generate
+     documents at a point in time but rarely go back to update every
+     reference when a collection grows.
+  3. The BMAD step-file pattern of copy-pasting orchestration code
+     creates consistency now but a maintenance hazard later — exactly
+     the kind of thing a correspondence layer would flag.
+
+  ## Nodes Produced
+
+  Source nodes: bm-readme-overview, bm-tea-overview-architecture,
+  bm-testing-as-engineering, bm-commands-reference,
+  bm-workflow-implementations
+
+  Seam nodes: bm-seam-fragment-count-drift,
+  bm-seam-workflow-count-inconsistency, bm-seam-nfr-categories-mismatch
+edges:
+  - target: question-mvg-bootstrap
+    type: derives
+    note: "This finding addresses the checksum property question"
+  - target: bm-readme-overview
+    type: derives
+    note: "Primary source document analyzed"
+  - target: bm-tea-overview-architecture
+    type: derives
+    note: "Primary architecture document analyzed"
+  - target: bm-testing-as-engineering
+    type: derives
+    note: "Design philosophy document analyzed"
+  - target: bm-commands-reference
+    type: derives
+    note: "Reference document analyzed"
+  - target: bm-workflow-implementations
+    type: derives
+    note: "Implementation files analyzed"
+finding:
+  probe: brief-mvg-bootstrap
+  result: confirms
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-bmad-enterprise-probe"
+  created_at: "2026-03-15"

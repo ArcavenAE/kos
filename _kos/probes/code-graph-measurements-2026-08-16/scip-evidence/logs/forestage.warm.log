@@ -1,0 +1,138 @@
+Generating SCIP start...
+rust-analyzer: Loading discovering sysroot
+rust-analyzer: Loading querying project metadata
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading build script proc-macro2 run
+rust-analyzer: Loading build script quote run
+rust-analyzer: Loading build script instability run
+rust-analyzer: Loading build script rustversion run
+rust-analyzer: Loading proc-macro indoc built
+rust-analyzer: Loading build script num-traits run
+rust-analyzer: Loading build script ring run
+rust-analyzer: Loading build script serde run
+rust-analyzer: Loading build script anyhow run
+rust-analyzer: Loading build script zerocopy run
+rust-analyzer: Loading build script serde_json run
+rust-analyzer: Loading build script parking_lot_core run
+rust-analyzer: Loading proc-macro ref-cast-impl built
+rust-analyzer: Loading proc-macro document-features built
+rust-analyzer: Loading proc-macro clap_derive built
+rust-analyzer: Loading build script thiserror run
+rust-analyzer: Loading build script zmij run
+rust-analyzer: Loading proc-macro zerovec-derive built
+rust-analyzer: Loading proc-macro bytemuck_derive built
+rust-analyzer: Loading proc-macro thiserror-impl built
+rust-analyzer: Loading proc-macro tokio-macros built
+rust-analyzer: Loading proc-macro serde_derive built
+rust-analyzer: Loading build script ratatui-image run
+rust-analyzer: Loading build script thiserror run
+rust-analyzer: Loading build script rustls run
+rust-analyzer: Loading proc-macro darling_macro built
+rust-analyzer: Loading proc-macro zerofrom-derive built
+rust-analyzer: Loading proc-macro yoke-derive built
+rust-analyzer: Loading proc-macro strum_macros built
+rust-analyzer: Loading proc-macro displaydoc built
+rust-analyzer: Loading proc-macro thiserror-impl built
+rust-analyzer: Loading build script crossbeam-utils run
+rust-analyzer: Loading proc-macro palette_derive built
+rust-analyzer: Loading build script getrandom run
+rust-analyzer: Loading proc-macro derive_more-impl built
+rust-analyzer: Loading build script libm run
+rust-analyzer: Loading build script icu_properties_data run
+rust-analyzer: Loading build script rayon-core run
+rust-analyzer: Loading build script ref-cast run
+rust-analyzer: Loading build script serde_core run
+rust-analyzer: Loading build script forestage run
+rust-analyzer: Loading build script palette run
+rust-analyzer: Loading build script rustix run
+rust-analyzer: Loading build script libc run
+rust-analyzer: Loading build script httparse run
+rust-analyzer: Loading build script rustix run
+rust-analyzer: Loading build script icu_normalizer_data run
+rust-analyzer: Loading build script num-traits run
+rust-analyzer: Loading build script signal-hook run
+rust-analyzer: Loading build script radium run
+rust-analyzer: Loading proc-macro rustversion built
+rust-analyzer: Loading build script crc32fast run
+rust-analyzer: Loading build script crossbeam-epoch run
+rust-analyzer: Loading proc-macro instability built
+2026-08-16T15:37:06.209125-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(f526) } })
+2026-08-16T15:37:06.209912-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(f526) } })
+2026-08-16T15:37:06.275137-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23e39) } })
+2026-08-16T15:37:06.275576-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23e39) } })
+2026-08-16T15:37:06.275702-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23e39) } })
+2026-08-16T15:37:06.281618-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23e39) } })
+2026-08-16T15:37:06.359586-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(f526) } })
+2026-08-16T15:37:06.360121-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(f526) } })
+2026-08-16T15:37:06.36294-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3bd37) } })
+2026-08-16T15:37:06.492624-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(231f5) } })
+2026-08-16T15:37:06.514452-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23178) } })
+2026-08-16T15:37:06.514602-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23178) } })
+2026-08-16T15:37:06.514727-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23178) } })
+2026-08-16T15:37:06.522376-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23178) } })
+2026-08-16T15:37:06.814197-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(47f78) } })
+2026-08-16T15:37:06.81427-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(47f78) } })
+2026-08-16T15:37:06.814328-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(47f78) } })
+2026-08-16T15:37:06.931614-05:00 ERROR Bug: definition at src/config.rs:134:23-134:30 should have been in an SCIP document but was not.
+2026-08-16T15:37:06.931676-05:00 ERROR Bug: definition at src/config.rs:164:16-164:21 should have been in an SCIP document but was not.
+2026-08-16T15:37:06.931696-05:00 ERROR Bug: definition at src/protocol.rs:91:16-91:23 should have been in an SCIP document but was not.
+
+Encountered duplicate scip symbols, indicating an internal rust-analyzer bug. These duplicates are
+included in the output, but this causes information lookup to be ambiguous and so information about
+these symbols presented by downstream tools may be incorrect.
+
+Known rust-analyzer bugs that can cause this:
+
+  * Definitions in crate example binaries which have the same symbol as definitions in the library
+    or some other example.
+
+  * Struct/enum/const/static/impl definitions nested in a function do not mention the function name.
+    See #18771.
+
+Duplicate symbols encountered:
+
+tests/persona_cli.rs:0:0-111:0
+  Duplicate symbol: rust-analyzer cargo forestage 0.1.0 crate/
+
+src/main.rs:0:0-789:0
+  Duplicate symbol: rust-analyzer cargo forestage 0.1.0 crate/
+
+src/main.rs:289:3-289:7
+  Duplicate symbol: rust-analyzer cargo forestage 0.1.0 main().
+
+src/lib.rs:0:0-17:0
+  Duplicate symbol: rust-analyzer cargo forestage 0.1.0 crate/
+
+Generating SCIP finished 4.955459s
+        5.18 real        10.29 user         6.84 sys
+          2266185728  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              216009  page reclaims
+                1181  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   1  signals received
+                1694  voluntary context switches
+               23397  involuntary context switches
+        131783123172  instructions retired
+         56158988307  cycles elapsed
+          2108704952  peak memory footprint

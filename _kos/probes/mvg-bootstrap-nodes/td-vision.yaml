@@ -1,0 +1,19 @@
+id: td-vision
+type: element
+confidence: frontier
+title: "ThreeDoors product vision"
+content: |
+  Personal achievement partner that works with human psychology.
+  Presents three diverse task options as "doors" rather than overwhelming lists.
+  Reduces friction to starting. Adapts to context, mood, energy state.
+
+  Core philosophy: "Progress over perfection."
+  Key differentiators: curated options, works with existing tools, adapts to
+  human nature (energy states, mood-task correlations, celebrates progress).
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - executive-summary.md

@@ -1,0 +1,48 @@
+id: elem-predictor-layer
+type: element
+confidence: frontier
+title: "The predictor — fourth element of the cognitive architecture"
+content: |
+  The cognitive architecture requires a fourth element beyond
+  LLM + KOS + Executive:
+
+  PREDICTOR: a continuous forward model that runs orthogonally to the
+  spec cycle, generating predictions about graph state before events
+  occur, weighting by confidence, and updating on surprise.
+
+  Biological analog: the brain's predictive processing architecture.
+  The system doesn't wait to perceive — it generates a model of expected
+  perception and updates when reality deviates. Dopamine signals
+  prediction error, not reward directly. Correct prediction = no update
+  needed. Surprise = strong update signal. Positive surprise = strongest
+  update of all.
+
+  The reactive system (cycle-only) queries when prompted. By the time
+  the query forms, the moment has passed. The saber tooth tiger doesn't
+  wait for you to finish your RAG query.
+
+  Properties:
+  - Orthogonal to the cycle: doesn't wait for orient/question/probe
+  - Continuous: always running against current graph state
+  - Anticipatory: generates predictions before probes run
+  - Surprise-sensitive: weights learning signal by prediction deviation
+  - Attention-allocating: knows where to look without being asked
+
+  Current approximation: none. The brief hypothesis field is the closest
+  existing structure — a prediction before a probe runs. Missing:
+  confidence measurement before, surprise measurement after, continuous
+  operation between cycles.
+
+  Relationship to charter scaling problem: a working predictor makes
+  the charter a cold-start fallback rather than the primary orientation
+  mechanism. The predictor already knows what matters. The charter is
+  for when the predictor isn't running.
+
+depends_on:
+  - elem-cognitive-architecture
+  - question-predictor-layer
+  - question-brief-as-prediction-record
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"

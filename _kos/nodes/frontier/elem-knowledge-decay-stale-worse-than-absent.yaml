@@ -1,0 +1,72 @@
+id: elem-knowledge-decay-stale-worse-than-absent
+type: element
+confidence: frontier
+title: "Captured knowledge decays; stale-but-trusted knowledge is worse than absent"
+content: |
+  Every classification, link, and confidence assignment decays as the
+  world moves past its point of capture. Stale-but-trusted knowledge
+  is worse than absent knowledge because it produces false confidence
+  and shorts the human's judgment loop.
+
+  Concrete evidence:
+  - Traceability decay: link maintainers rarely benefit, so links go
+    stale; Arkley & Riddle name it the "traceability benefit problem"
+    [@gotel1994analysis; @arkley2005overcoming]. Stale links are
+    actively harmful — they carry the authority of the schema without
+    the reality of the target.
+  - Link rot: random web-page half-life ~2 years (a 2016–17 Yahoo!
+    Directory study likewise found ~2 years). A 2002 study of digital
+    libraries found ~3% inaccessible after a year (implied half-life
+    ~23 years) — decay rate is strongly domain-dependent.
+  - Clinical facts: Poynard et al. sampled cirrhosis/hepatitis
+    conclusions from 1945–1999, judged as of 2000 — reported truth
+    half-life ~45 years; contested (measurement window inflates
+    apparent longevity) but illustrative of measurable decay
+    [@arbesman2012halflife].
+  - Schema/ontology evolution changes silently invalidate prior
+    assertions [@noy2004ontology].
+  - ACT-R base-level activation formalizes memory decay as a function
+    of frequency and recency, community default ~0.5 decay parameter —
+    an *existing* rational-analysis model for confidence half-life
+    [@anderson1991reflections; @anderson2004integrated].
+
+  Prescriptive consequence for KOS:
+  - Do not treat any confidence assignment as permanent — bedrock is
+    not immortal.
+  - Version the schema and monitor external-reference decay.
+  - The "decay signature" — days-since-last-graph-touch relative to
+    git activity — is a Reflexion-style [@murphy1995software] onboarding
+    heuristic: code moving while the graph is frozen = decay; both
+    quiet = dormant, fine. Detectable from git alone at zero author
+    cost (roadmap v3.1 R10).
+  - Calibrate decay rates per knowledge type when telemetry exists.
+    Do not invent horizons; adopt ACT-R (see
+    question-act-r-decay-as-confidence-model).
+
+  Cross-refs: elem-ai-improvisation-past-broken-refs (agents confabulate
+  past stale references — same failure class on the read side);
+  elem-drift-propagation-taxonomy (drift as event; decay as erosion).
+
+  Source: docs/kos-prior-work-survey.md §Key Findings #4, §12;
+  docs/kos-roadmap-v3.md §Part 0 L4, §Deferred #3;
+  docs/kos-nine-improvements-reassessed.md §#3 modified;
+  docs/kos-use-assessment.md §R10.
+edges:
+  - target: elem-ai-improvisation-past-broken-refs
+    type: supports
+    note: "The read-side pathology when stale knowledge meets an LLM."
+  - target: elem-drift-propagation-taxonomy
+    type: supports
+    note: "Drift is event-driven; decay is erosion-driven. Both need coverage."
+  - target: question-act-r-decay-as-confidence-model
+    type: supports
+    note: "Open question for the principled decay-rate mechanism."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md — Key Findings #4; §12; §4"
+    - "docs/kos-roadmap-v3.md §Part 0 L4"
+    - "docs/kos-nine-improvements-reassessed.md §#3"
+    - "docs/kos-use-assessment.md §R10"

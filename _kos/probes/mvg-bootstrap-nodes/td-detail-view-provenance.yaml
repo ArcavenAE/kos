@@ -1,0 +1,39 @@
+id: td-detail-view-provenance
+type: element
+confidence: frontier
+title: "ThreeDoors Task Detail View origin claim"
+content: |
+  PROVENANCE CONTRADICTION between two documents about the same feature.
+
+  Source A (high-level-architecture.md, line 53):
+    "Task Detail View: New UI component for deep task interaction
+     (not in original PRD)"
+
+  Source B (product-scope.md, line 11):
+    "Expanded task detail view with status actions"
+    — Listed under Phase 1 In Scope.
+
+  The architecture explicitly claims this feature extends beyond the PRD.
+  The PRD explicitly includes it. One of these is wrong:
+  - Either the PRD was updated after the architecture was written (and the
+    architecture wasn't updated to reflect this), or
+  - The architecture was written without reading the current PRD.
+
+  In either case, the provenance chain is broken. The architecture's claim
+  about its own relationship to the PRD is false. This is invisible when
+  reading either document alone — it only surfaces when you check the
+  cross-reference.
+
+  Graph signal: a depends_on edge from td-arch-phase1 to td-phase1-scope
+  should be validated by checking that claims about the dependency are
+  consistent. This one isn't.
+depends_on:
+  - td-phase1-scope
+  - td-arch-phase1
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - high-level-architecture.md
+    - product-scope.md

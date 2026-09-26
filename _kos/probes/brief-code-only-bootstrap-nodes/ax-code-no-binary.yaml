@@ -1,0 +1,27 @@
+id: ax-code-no-binary
+type: observation
+confidence: frontier
+title: "No binary target — information system with no runnable entry point"
+content: |
+  No crate in the main workspace defines a [[bin]] target. There is no
+  main.rs, no fn main(), no runnable artifact. The entire project is
+  library-only.
+
+  README.md describes project-alpha as a "information system"
+  with performance targets (100K+ EPS, <100ms query, 10 Gbps capture).
+  These imply a running system. The code cannot produce one.
+
+  This is normal for a project in foundation phase building types-first.
+  But the gap between README claims and code reality is structural and
+  detectable from code alone.
+
+  Not caught by finding-003 because document-based probing compares
+  documents, not documents vs. code buildability.
+edges: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - project-alpha/crates/*/Cargo.toml
+    - project-alpha/README.md

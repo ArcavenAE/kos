@@ -1,0 +1,42 @@
+id: rs-async-iterator-correct-seam
+type: element
+confidence: frontier
+title: "RFC 2996 (AsyncIterator) uses the stabilized API forms, not the RFC-era forms"
+content: |
+  RFC 2996 (async iterator, 2020-09-29) defines:
+
+    fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>>
+
+  This matches the stabilized Future::poll signature (Pin<&mut Self>,
+  &mut Context<'_>), not any of the three earlier RFC-era variants.
+  This is correct — RFC 2996 was written after stabilization and
+  references the actual stable API.
+
+  RFC 2996 also correctly links to Future::poll docs at doc.rust-lang.org
+  (the stable docs) rather than to RFC 2592. This is a positive example
+  of a later RFC anchoring to the implemented reality rather than to
+  prior RFC text.
+
+  However, RFC 2996 explicitly notes an unresolved tension: it uses
+  poll_next (poll-based) rather than async fn next because "async methods
+  in traits are not currently supported." RFC 3185 (async fn in traits)
+  was written a year later to address this, but RFC 2996 was stabilized
+  with the poll-based design. The two RFCs don't contradict — 2996
+  explicitly explains why it can't use async fn — but the design was
+  acknowledged as suboptimal at the time of writing.
+edges:
+  - target: rs-future-trait-signature-drift
+    type: derives
+    note: "Shows that later RFCs corrected to stabilized form"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "rust-rfcs/text/2996-async-iterator.md"
+    - "rust-rfcs/text/2592-futures.md"
+    - "rust-rfcs/text/3185-static-async-fn-in-trait.md"
+  reviewed_by: null
+tags:
+  - positive-seam
+  - async-ecosystem

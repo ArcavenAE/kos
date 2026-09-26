@@ -1,0 +1,83 @@
+# Advisory graph validation
+#
+# CI (ci.yml) ignores _kos/** and schema/** on purpose: a graph-only
+# commit must not run the Rust matrix or cut an alpha release. The cost
+# was that nothing looked at the graph at all (aae-orc-1y3g). This
+# workflow runs kos validate on exactly those paths and REPORTS. It
+# never fails the job: the operator ruling on aae-orc-bs28 (2026-08-09)
+# makes the merge gate advisory, so that proposing new edge vocabulary
+# stays cheap. The tool's own exit code is kept intact and surfaced as
+# a warning annotation plus the step summary; policy is applied here,
+# not in the tool.
+name: Graph validate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '_kos/**'
+      - 'schema/**'
+      - '.github/workflows/graph-validate.yml'
+  pull_request:
+    paths:
+      - '_kos/**'
+      - 'schema/**'
+      - '.github/workflows/graph-validate.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+
+jobs:
+  validate:
+    name: kos validate (advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@9af89fc71515a100421586dfdb3dc9c984fbf411 # v2.19.4
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: step-security/dtolnay-rust-toolchain@8dd607977d06adf4ed49b190381e74c17a9dd25f # v1.0.0
+        with:
+          toolchain: stable
+      - uses: step-security/rust-cache@851174d9a2fdc03e0896e02844dcc61d81dd7851 # v2.9.1
+        with:
+          cache-on-failure: true
+
+      - name: Build kos
+        run: cargo build --locked
+
+      - name: Validate the graph (advisory)
+        run: |
+          set -uo pipefail
+          # Run the tool as shipped and keep its verdict; print the full
+          # report either way. The job itself always exits 0 (bs28).
+          ./target/debug/kos validate | tee validate.out
+          status=${PIPESTATUS[0]}
+          {
+            echo '## kos validate (advisory)'
+            echo
+            echo "exit status: ${status}"
+            echo
+            echo '```'
+            cat validate.out
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [[ "$status" -ne 0 ]]; then
+            echo "::warning title=kos validate::exit ${status}. Advisory only (aae-orc-bs28): read the report in the step summary; the merge is not blocked."
+          fi
+          exit 0

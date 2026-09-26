@@ -1,0 +1,207 @@
+id: finding-008-rust-rfcs
+type: finding
+confidence: frontier
+title: "Rust async RFC seam test: cross-RFC API signatures drift without formal supersession records"
+content: |
+  ## Summary
+
+  We decomposed three core Rust async RFCs (2349-Pin, 2394-async_await,
+  2592-futures) plus two later RFCs (2996-AsyncIterator, 3185-async-fn-in-trait)
+  into typed KOS nodes. The decomposition surfaced 7 nodes covering
+  inconsistencies and evolution patterns at the seams between these documents.
+
+  The Rust RFC process is sequential by design: later RFCs supersede earlier
+  ones. Unlike the planning documents tested in findings 001-003, RFCs are not
+  expected to remain mutually consistent — they are snapshots in time. This
+  changes the nature of the seam test. The question is not "do these documents
+  contradict?" but "does the RFC set, read as a whole, give a coherent account
+  of the async runtime model?"
+
+  The answer: partially. Later RFCs (2592, 2996) do acknowledge earlier design
+  changes, but the mechanism is informal — blog post links, historical context
+  paragraphs. The RFC system has no formal "supersedes" or "amends" mechanism
+  for specific claims within an RFC.
+
+  ## Finding 1: Future trait signature appears three different ways
+
+  RFC 2349 shows Future with Item+Error (futures 0.1 style).
+  RFC 2394 uses Future<Output = T> (futures 0.3 style).
+  RFC 2592 defines Future with Output only, explicitly dropping Error.
+
+  The Pin RFC's Future example was motivational, not normative. But a reader
+  treating the RFC chain as a specification would encounter three incompatible
+  trait definitions for the same type. RFC 2592 discusses the Error removal
+  in its rationale, so the drift IS acknowledged — but only in one direction
+  (2592 explains its departure from 0.1, not from 2349 specifically).
+
+  See node: rs-future-trait-signature-drift
+
+  ## Finding 2: Pin type was redesigned between RFCs
+
+  RFC 2349 defines Pin<'a, T> (lifetime + target type).
+  RFC 2394 uses Pin<Self> (doesn't match either form).
+  RFC 2592 uses Pin<&mut Self> (generic over pointer type — the stabilized form).
+
+  RFC 2592 explicitly acknowledges this via a link to the "Rethinking Pin"
+  blog post. This is a positive signal — the later RFC flags the change.
+  But the original RFC 2349 was never amended to note that its core type
+  was redesigned.
+
+  See nodes: rs-pin-type-redesign, rs-pinbox-dropped
+
+  ## Finding 3: PinBox proposed and silently dropped
+
+  RFC 2349 defines PinBox<T> with substantial API surface. No later RFC
+  mentions it. No RFC formally supersedes or graveyards it. The redesign
+  of Pin made PinBox expressible as Pin<Box<T>>, rendering it unnecessary.
+  The "Rethinking Pin" blog post (external to the RFC system) serves as
+  the de facto graveyard entry.
+
+  See node: rs-pinbox-dropped
+
+  ## Finding 4: poll parameter changed across all three RFCs
+
+  RFC 2349: &mut task::Context
+  RFC 2394: &mut ctx (Context implied)
+  RFC 2592: &Waker (not Context)
+  Stabilized: &mut Context<'_> (wrapping Waker)
+
+  The stabilized form matches none of the three RFCs exactly. RFC 2592,
+  written as the stabilization proposal, shows &Waker rather than
+  &mut Context<'_>. This is a late-stage change that happened between
+  the RFC and actual stabilization.
+
+  See node: rs-poll-parameter-evolution
+
+  ## Finding 5: await expansion references undefined trait
+
+  RFC 2394's await expansion uses IntoFuture::into_future(). RFC 2592 does
+  not define IntoFuture. IntoFuture was not stabilized until Rust 1.64
+  (September 2022), four years after the RFCs. The initial async/await
+  stabilization did not use IntoFuture.
+
+  See node: rs-into-future-undefined
+
+  ## Finding 6: Later RFCs anchor to reality, not to earlier RFCs
+
+  RFC 2996 (AsyncIterator, 2020) uses the stabilized API forms — Pin<&mut Self>
+  and &mut Context<'_> — and links to doc.rust-lang.org rather than to
+  earlier RFCs. This is a correct adaptation. The earlier RFC-era forms are
+  NOT propagated forward. RFC 3185 (async fn in traits, 2021) similarly
+  references the stabilized desugaring, not the RFC-era forms.
+
+  See node: rs-async-iterator-correct-seam
+
+  ## Finding 7: Unresolved questions lack resolution tracking
+
+  RFC 2394 lists 5 unresolved questions. None are formally resolved by
+  later RFCs in the set. The most significant — await syntax — was resolved
+  as postfix .await, a form not mentioned in any RFC. The RFC system has
+  no mechanism for marking unresolved questions as resolved in the original
+  document.
+
+  See node: rs-unresolved-questions-resolution
+
+  ## What the graph reveals about the RFC process
+
+  The Rust RFC system has a structural property that the KOS checksum
+  test exposes: RFCs are immutable once merged, but the designs they
+  describe continue to evolve. Later RFCs sometimes acknowledge earlier
+  drift (RFC 2592's historical context section is a good example) but
+  the acknowledgment is informal and one-directional.
+
+  Compared to the planning documents tested in findings 001-003:
+  - Planning docs (Project Alpha, ThreeDoors, penny-orc) are SUPPOSED to be
+    mutually consistent. Contradictions are bugs.
+  - RFCs are sequential snapshots. Later ones supersede earlier ones.
+    The "contradictions" are expected evolution, not bugs.
+
+  But the KOS checksum test still reveals something useful: the RFC
+  set lacks formal supersession links. When Pin was redesigned, no
+  amendment was filed against RFC 2349. When await syntax was decided,
+  no amendment was filed against RFC 2394. The blog posts, lang team
+  meeting notes, and stabilization reports that carry this information
+  are outside the RFC system.
+
+  This is exactly the pattern KOS predicts: the documents are individually
+  coherent projections of a higher-dimensional understanding. The
+  understanding evolved (correctly), but the documents were not updated
+  to reflect that evolution. A reader of only the RFCs gets a partially
+  stale picture of the async runtime model.
+
+  ## Classification
+
+  The findings break into three categories:
+
+  Category 1 — Expected evolution, acknowledged by later RFCs (2 findings):
+  - Future trait signature (Finding 1): 2592 explains the Error removal
+  - Pin redesign (Finding 2): 2592 links to the blog post
+
+  Category 2 — Expected evolution, NOT acknowledged within RFC set (3 findings):
+  - PinBox dropped (Finding 3): no RFC mentions it after 2349
+  - IntoFuture undefined (Finding 5): trait referenced but never defined in RFCs
+  - Unresolved questions (Finding 7): no resolution tracking mechanism
+
+  Category 3 — Positive adaptation (1 finding):
+  - Later RFCs anchor to reality (Finding 6): 2996 and 3185 use stabilized forms
+
+  Category 4 — Still-stale cross-references (1 finding):
+  - poll parameter (Finding 4): even the "stabilization RFC" 2592 shows a
+    signature that differs from what was stabilized
+edges:
+  - target: brief-mvg-bootstrap
+    type: derives
+    note: "This finding was generated by the MVG bootstrap probe"
+  - target: rs-future-trait-signature-drift
+    type: derives
+  - target: rs-pin-type-redesign
+    type: derives
+  - target: rs-pinbox-dropped
+    type: derives
+  - target: rs-poll-parameter-evolution
+    type: derives
+  - target: rs-into-future-undefined
+    type: derives
+  - target: rs-async-iterator-correct-seam
+    type: derives
+  - target: rs-unresolved-questions-resolution
+    type: derives
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - brief-mvg-bootstrap
+    - "rust-rfcs/text/2349-pin.md"
+    - "rust-rfcs/text/2394-async_await.md"
+    - "rust-rfcs/text/2592-futures.md"
+    - "rust-rfcs/text/2996-async-iterator.md"
+    - "rust-rfcs/text/3185-static-async-fn-in-trait.md"
+  reviewed_by: null
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+  details: |
+    The seam test partially confirms the checksum property on a qualitatively
+    different document type: sequential design RFCs rather than parallel
+    planning artifacts.
+
+    Result is PARTIAL (not confirms) because RFCs are inherently sequential
+    — later ones are expected to supersede earlier ones. The "contradictions"
+    found are mostly expected evolution, not bugs. The checksum property still
+    reveals useful information: specifically, that the RFC system lacks formal
+    supersession tracking, and that even the "stabilization RFC" (2592) shows
+    API signatures that differ from what was actually stabilized.
+
+    The strongest signal: PinBox<T> was proposed with full API surface in
+    RFC 2349 and then silently dropped with no RFC-level record. The
+    graveyard entry exists only in a blog post outside the RFC system.
+    This is the exact pattern KOS is designed to catch — understanding
+    that was accumulated (the PinBox design, its evaluation, and its
+    rejection) lives outside the formal artifact chain.
+
+    The weakest signal: most "contradictions" are just time passing.
+    The RFC process is designed for immutable snapshots, and evolution
+    is expected. Flagging these as contradictions overstates the problem.
+    The checksum property is more diagnostic on parallel documents
+    (like the Project Alpha planning set) than on sequential ones (like RFCs).

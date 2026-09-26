@@ -1,0 +1,113 @@
+id: finding-019-undeclared-structure
+type: finding
+confidence: frontier
+title: "The graph captures declared structure, not the structure of ideas themselves"
+content: |
+  ## What happened
+
+  Session-003 produced findings 015-018. The agent had all the evidence:
+  - Finding-015: repo is the context (cold-start validation)
+  - Finding-016: code and docs are complementary lenses (projections)
+  - Finding-017: the graph can't represent negative space or meta-process
+  - B5: documents are lossy projections of the spec graph
+  - B3: git as substrate
+
+  The human observed that git repos are lossy projections of the knowledge
+  topology — the same pattern as documents being lossy projections of the
+  spec graph. The pattern is recursive:
+
+    Documents     →  flat projection of  →  Spec graph
+    Git repos     →  flat projection of  →  Knowledge topology
+    File layer    →  flat projection of  →  Content-addressed DAG
+
+  The agent had all the pieces. The agent did not connect them. The
+  connection existed in the structure of the ideas themselves — they were
+  all instances of the same pattern — but no edge in the graph declared
+  that relationship. The agent processed the evidence faithfully and
+  didn't see the pattern that connected the evidence to itself.
+
+  ## The finding
+
+  The graph captures declared structure. It does not capture the structure
+  of the ideas themselves. Pattern recognition across undeclared conceptual
+  relationships requires something outside the graph — currently, the human.
+
+  This is not a gap waiting to be filled with a new node type. It is a
+  constitutional property of graph-based knowledge representation. Graphs
+  model what you declare. They don't model what you haven't thought to
+  declare yet.
+
+  ## What this means for the collaboration model (B6)
+
+  The human in the loop is not a bottleneck, a CI gate, or a reviewer.
+  The human is the pattern recognizer operating on the graph's blind
+  spot — the conceptual relationships that exist between nodes but
+  haven't been typed and declared yet. Every time the human sees one,
+  it is promoted from tacit to explicit. That is not a temporary role
+  until agents get smarter. That is the fundamental division of labor.
+
+  Agents execute within declared structure. The human expands the
+  declared structure by seeing what it doesn't yet contain.
+
+  This is not a limitation of the current system. This is what the
+  system is for.
+
+  ## Relationship to finding-017
+
+  Finding-017 identified three limits: negative space, meta-process
+  patterns, and epistemological edge flattening. This finding subsumes
+  them under a single principle: the graph can only contain what has
+  been declared. Everything undeclared — unconsidered alternatives,
+  process patterns, the epistemological character of reasoning, and
+  now cross-finding structural patterns — lives outside the graph
+  until a human promotes it in.
+
+  The five categories tested in finding-017 are all instances of
+  undeclared structure:
+  - Negative space: undeclared scope boundary
+  - Meta-process: undeclared pattern about the process
+  - Axiom provenance: undeclared origin outside the graph
+  - Reasoner constraints: undeclared properties of the reasoner
+  - Political/temporal: undeclared social dynamics
+
+  The recursive projection insight itself is undeclared structure that
+  the human saw and the agent didn't — an instance of the thing it
+  describes.
+
+  ## Assessment against Q5 success criteria
+
+  Finding-017 said: "at least 1 class of knowledge genuinely resists."
+  This finding sharpens: undeclared conceptual structure is the single
+  class. Everything that resists is an instance of it.
+
+edges:
+  - target: finding-017-what-cant-be-a-node
+    type: supersedes
+    signal: evolution
+    note: "subsumes the five categories under one principle"
+  - target: finding-015-cold-start-validation
+    type: derives
+    note: "the cold-start finding was one piece of evidence the human connected"
+  - target: finding-016-code-only-bootstrap
+    type: derives
+    note: "the complementary lenses finding was another piece"
+  - target: grv-git-as-sufficient-substrate
+    type: derives
+    note: "the graveyard entry captured the recursive projection the human saw"
+  - target: finding-018-ripple-engine-design
+    type: derives
+    note: "ripple-as-maintenance is another instance: ripple maintains declared structure"
+provenance:
+  created_by: human
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - finding-015-cold-start-validation
+    - finding-016-code-only-bootstrap
+    - finding-017-what-cant-be-a-node
+    - grv-git-as-sufficient-substrate
+    - finding-018-ripple-engine-design
+  reviewed_by: null
+finding:
+  probe: brief-what-cant-be-a-node
+  result: confirms

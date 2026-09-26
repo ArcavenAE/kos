@@ -1,0 +1,145 @@
+id: executive-empirical-kubernetes
+type: finding
+confidence: frontier
+title: "Executive empirical test: Kubernetes KEPs (large team, strong governance, 2 issues)"
+content: |
+  ## Project profile
+
+  Kubernetes: large multi-team project, formal KEP process with SIG
+  review, structured proposal lifecycle. Three cross-SIG KEPs probed
+  (auth + API machinery). 8 nodes extracted. 2 issues found, both
+  gaps (no contradictions). Strongest governance in the sample.
+
+  ## Test 1: Convergence detection
+
+  2 issues found:
+  - Pipeline ordering implicit (gap, not contradiction)
+  - P&F cost model doesn't account for multi-webhook authz latency
+
+  These two issues are structurally related (both involve the request
+  pipeline ordering) but originate from only 2 paths.
+
+  Would threshold fire? NO. 2 paths, below the 3-path threshold.
+
+  Is this correct? YES. These are genuine gaps but not structural
+  convergence. They're two manifestations of the same missing
+  specification (pipeline ordering), not independent paths converging
+  on a problem. The right response is a targeted investigation of
+  pipeline ordering, not an escalation to a broader probe. A single
+  maintenance action (document the pipeline ordering) would resolve
+  both.
+
+  Convergence detection result: CORRECTLY SILENT. No false escalation.
+
+  ## Test 2: Priority function
+
+  k8s-seam-pf-authz-pipeline-ordering (Gap 1):
+    dependency_depth: HIGH (pipeline ordering affects all three KEPs)
+    governance_gap: LOW (strong KEP process, SIG reviews)
+    tractability: HIGH (the ordering is known from source code)
+    adjacent_evidence: MEDIUM (2 issues, but related)
+    COMPOSITE: MEDIUM (high depth × low governance_gap = moderate)
+
+  k8s-claim-pf-webhook-latency-interaction (Gap 2):
+    dependency_depth: MEDIUM (affects P&F + authz interaction only)
+    governance_gap: LOW
+    tractability: MEDIUM (requires cross-SIG discussion)
+    adjacent_evidence: MEDIUM (depends on Gap 1's resolution)
+    COMPOSITE: MEDIUM-LOW
+
+  The priority function ranks Gap 1 above Gap 2. This is correct:
+  Gap 1 (document the pipeline ordering) is a prerequisite for
+  understanding Gap 2 (whether P&F even sees authz latency depends
+  on ordering). A human reviewer would agree: specify the pipeline
+  ordering first, then evaluate whether the cost model needs updating.
+
+  But note: the governance_gap factor DAMPENS both issues. In a
+  project with strong governance, the executive correctly predicts
+  LOWER urgency. The KEP process will likely surface these gaps
+  through normal review. The executive shouldn't scream about issues
+  that the project's own process will catch.
+
+  Priority function result: PRODUCES REASONABLE RANKING, including
+  the governance-gap damping.
+
+  ## Test 3: Human channel necessity
+
+  Gap 2 (P&F cost model vs. webhook latency) requires human judgment:
+  the answer depends on whether P&F runs before or after authorization
+  in the handler chain. If before, authz webhook latency is invisible
+  to P&F. If after, it matters. This is an architectural judgment
+  that requires understanding the request pipeline — currently
+  documented only in source code and a slide deck.
+
+  More importantly: the DECISION about whether to investigate this
+  at all requires judgment about the Kubernetes project's priorities.
+  It's a forward-looking design gap (KEP-1040 predates multi-webhook
+  authz). Whether this matters enough to address depends on adoption
+  patterns for multi-webhook authz — operational data, not spec data.
+
+  Human channel result: Gap 2 requires human judgment about
+  investigation priority. The automated channels can surface it;
+  only a human (likely a SIG lead) can decide whether it matters
+  enough to act on.
+
+  ## Test 4: Graph maturity model
+
+  Kubernetes has a mature process (KEPs with lifecycle stages, SIG
+  reviews, PRR approval). This is the closest analog to a "mature
+  graph" in the maturity model, even though Kubernetes doesn't use
+  KOS.
+
+  Predicted behavior (MATURE/STABLE GRAPH): Maintenance dominates.
+  Discovery is occasional. The executive mostly monitors for drift
+  and triages. Human overrides are rare but high-value.
+
+  Actual need: The 2 gaps found are low-severity. The KEP process
+  itself handles most coordination. The value KOS adds is MARGINAL
+  — making cross-SIG implicit assumptions explicit. This is exactly
+  the "low yield from strong governance" that B7 predicts.
+
+  What the executive should recommend: LOW investment in discovery
+  probes for Kubernetes. OCCASIONAL maintenance passes to check for
+  cross-SIG assumption drift. The executive should NOT prioritize
+  Kubernetes over a project like ThreeDoors.
+
+  Maturity model result: MATCH. Mature governance → maintenance-
+  dominant, low discovery yield.
+
+  ## Test 5: Maintenance vs. discovery balance
+
+  Predicted: Mostly maintenance. The strong governance process means
+  most discovery has already happened through KEP review. KOS adds
+  marginal cross-SIG visibility.
+
+  Actual signal: 2 gaps, both documentation issues that the project
+  could fix through normal process. No contradictions requiring
+  discovery probes.
+
+  Balance result: MAINTENANCE-DOMINANT, matching the mature/stable
+  prediction.
+
+  ## Notable observation: governance-gap damping works
+
+  The most important result from the Kubernetes test is not any
+  individual criterion — it's that the governance_gap factor in the
+  priority function correctly REDUCES the urgency of Kubernetes
+  issues relative to ThreeDoors issues. If the executive were
+  managing both projects simultaneously, it would correctly spend
+  more probe cycles on ThreeDoors (10 issues, high governance gap)
+  than Kubernetes (2 issues, low governance gap). This is B7 in
+  action as a priority weighting, not just a descriptive observation.
+
+edges:
+  - target: brief-executive-empirical-test
+    type: derives
+  - target: finding-007-kubernetes
+    type: derives
+    note: "Kubernetes issue data"
+  - target: executive-mechanism-proposal
+    type: derives
+    note: "mechanism being tested"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15

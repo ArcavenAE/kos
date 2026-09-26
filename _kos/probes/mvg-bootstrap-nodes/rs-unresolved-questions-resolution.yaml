@@ -1,0 +1,57 @@
+id: rs-unresolved-questions-resolution
+type: element
+confidence: frontier
+title: "Unresolved questions in RFC 2394 resolved in ways not tracked by the RFC set"
+content: |
+  RFC 2394 (async/await) lists several unresolved questions. Checking
+  whether later RFCs in the set address them:
+
+  1. "Final syntax for the await expression" — RFC 2394 proposes await!
+     as a compiler built-in macro and discusses multiple syntax options
+     (await future?, await { future }?, (await future)?, await? future).
+     RESOLUTION: Rust settled on postfix .await (expression.await) in
+     2019. This syntax is not mentioned in any of the RFCs examined.
+     No RFC in the set records the resolution.
+
+  2. "for await and processing streams" — deferred.
+     RESOLUTION: RFC 2996 (AsyncIterator) addresses the trait side but
+     explicitly defers the syntax side. for await was not yet stabilized
+     as of 2025. Partial resolution within the RFC set.
+
+  3. "Generators and Streams" — RFC 2394 sketches "async fn foo() yield T"
+     syntax. RFC 2996 discusses "async gen fn" in its future possibilities.
+     RESOLUTION: The generator syntax discussion continued for years.
+     The two RFCs are compatible in aspiration but neither resolves the
+     question.
+
+  4. "Async functions which implement Unpin" — RFC 2394 proposes an
+     annotation to typecheck async fns as Unpin-safe.
+     RESOLUTION: Not addressed by any later RFC in the set. The question
+     appears to have been dropped.
+
+  5. "? operator and control flow in async blocks" — RFC 2394 defers this.
+     RESOLUTION: The ? operator in async blocks was stabilized with
+     async/await in 1.39. The break-from-async-block question remained
+     open longer. No RFC in the set formally resolves this.
+
+  Pattern: RFC 2394's unresolved questions were largely resolved through
+  implementation experience and lang team decisions, not through follow-up
+  RFCs. The RFC system doesn't have a mechanism for marking unresolved
+  questions as resolved in the original document.
+edges:
+  - target: rs-future-trait-signature-drift
+    type: derives
+    note: "Part of the cross-RFC consistency analysis"
+provenance:
+  created_by: agent:claude@opus-4-6[1m]
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - "rust-rfcs/text/2394-async_await.md"
+    - "rust-rfcs/text/2996-async-iterator.md"
+    - "rust-rfcs/text/3185-static-async-fn-in-trait.md"
+  reviewed_by: null
+tags:
+  - gap
+  - process-observation
+  - async-ecosystem

@@ -1,0 +1,40 @@
+id: k8s-claim-sar-version-contract
+type: element
+confidence: frontier
+title: "SubjectAccessReview version contract across KEPs 3221 and 4601"
+content: |
+  KEP-3221 requires webhooks to declare subjectAccessReviewVersion (v1 or v1beta1)
+  and separately declares matchConditionSubjectAccessReviewVersion (v1 only).
+  If the webhook uses v1beta1 for its SAR but matchConditions use v1, the
+  contents are converted before CEL evaluation.
+
+  KEP-4601 extends the SubjectAccessReview ResourceAttributes with
+  FieldSelectorAttributes and LabelSelectorAttributes. These new fields are
+  only meaningful for v1 SubjectAccessReview. The KEP states:
+  "The kube-apiserver will never send a request with rawSelector set" to webhooks,
+  only the parsed requirements form.
+
+  Both KEPs assume the webhook receives a SubjectAccessReview, but KEP-4601
+  adds fields that KEP-3221's matchConditions can reference (via the CEL
+  request variable). KEP-3221's matchCondition examples only filter on
+  namespace, resource, and user groups -- not on selectors. KEP-4601
+  explicitly adds fieldSelector/labelSelector to the CEL authorizer's
+  available functions but does not update KEP-3221's examples or configuration
+  schema description.
+
+  Source: keps/sig-auth/3221 and keps/sig-auth/4601
+edges:
+  - target: k8s-claim-authz-chain-ordering
+    type: derives
+    note: "SAR version is configured per-webhook in the authorization chain"
+  - target: k8s-claim-selector-authz-attributes
+    type: derives
+    note: "Selector attributes are carried in the SAR"
+tags:
+  - k8s
+  - authorization
+  - api-contract
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-k8s-probe"
+  created_at: "2026-03-15"

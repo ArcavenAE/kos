@@ -1,0 +1,1589 @@
+Generating SCIP start...
+rust-analyzer: Loading discovering sysroot
+rust-analyzer: Loading querying project metadata
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: started
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: ?
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading cargo metadata: finished
+rust-analyzer: Loading build script quote run
+rust-analyzer: Loading build script rustversion run
+rust-analyzer: Loading build script paste run
+rust-analyzer: Loading proc-macro rustversion built
+rust-analyzer: Loading build script proc-macro2 run
+rust-analyzer: Loading proc-macro paste built
+rust-analyzer: Loading build script rstest_macros run
+rust-analyzer: Loading build script serde run
+rust-analyzer: Loading build script num-bigint-dig run
+rust-analyzer: Loading build script serde_core run
+rust-analyzer: Loading build script libc run
+rust-analyzer: Loading build script target-triple run
+rust-analyzer: Loading build script parking_lot_core run
+rust-analyzer: Loading build script zerocopy run
+rust-analyzer: Loading build script zmij run
+rust-analyzer: Loading build script libm run
+rust-analyzer: Loading build script getrandom run
+rust-analyzer: Loading proc-macro stability built
+rust-analyzer: Loading build script signal-hook run
+rust-analyzer: Loading proc-macro futures-macro built
+rust-analyzer: Loading build script akey run
+rust-analyzer: Loading build script num-traits run
+rust-analyzer: Loading build script curve25519-dalek run
+rust-analyzer: Loading proc-macro zeroize_derive built
+rust-analyzer: Loading build script generic-array run
+rust-analyzer: Loading proc-macro thiserror-impl built
+rust-analyzer: Loading build script rustix run
+rust-analyzer: Loading proc-macro serial_test_derive built
+rust-analyzer: Loading proc-macro async-trait built
+rust-analyzer: Loading build script thiserror run
+rust-analyzer: Loading proc-macro clap_derive built
+rust-analyzer: Loading proc-macro mockall_derive built
+rust-analyzer: Loading proc-macro serde_derive built
+rust-analyzer: Loading build script assert_cmd run
+rust-analyzer: Loading proc-macro tokio-macros built
+rust-analyzer: Loading proc-macro thiserror-impl built
+rust-analyzer: Loading proc-macro tracing-attributes built
+rust-analyzer: Loading proc-macro rstest_macros built
+rust-analyzer: Loading build script nix run
+rust-analyzer: Loading build script thiserror run
+rust-analyzer: Loading build script getrandom run
+rust-analyzer: Loading build script serde_json run
+rust-analyzer: Loading proc-macro strum_macros built
+2026-08-16T15:38:41.410726-05:00  WARN cyclic deps: akey(Idx::<CrateBuilder>(20)) -> akey(Idx::<CrateBuilder>(20)), alternative path: akey(Idx::<CrateBuilder>(20))
+2026-08-16T15:38:47.652753-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(51cfd) } })
+2026-08-16T15:38:47.653734-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(51cfd) } })
+2026-08-16T15:38:48.11295-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.112995-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.113057-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.113063-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.1132-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.113206-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.113255-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.11326-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.113443-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.113447-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.113519-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.113522-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.113982-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.113986-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.114969-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.114973-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.115042-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.115045-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.115778-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.115783-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.116396-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.1164-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.116488-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.116491-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.116848-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.116854-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.116937-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.116941-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.11699-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24539) } })
+2026-08-16T15:38:48.116993-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24538) } })
+2026-08-16T15:38:48.132277-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.132289-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.132348-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.132352-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.132493-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.132496-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.132544-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.132547-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.132742-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.132752-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.132814-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.132818-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.13324-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.133244-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.134276-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.134281-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.134349-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.134353-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.135165-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.135169-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.135778-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.135781-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.135852-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.135855-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.13624-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.136243-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.136366-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.136369-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.136414-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24541) } })
+2026-08-16T15:38:48.136416-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24540) } })
+2026-08-16T15:38:48.140812-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(24536) } })
+2026-08-16T15:38:48.418968-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22ea9) } })
+2026-08-16T15:38:48.419005-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22ea8) } })
+2026-08-16T15:38:48.454738-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d4c) } })
+2026-08-16T15:38:48.454767-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d4b) } })
+2026-08-16T15:38:48.515748-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e55) } })
+2026-08-16T15:38:48.515781-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e54) } })
+2026-08-16T15:38:48.51872-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e5e) } })
+2026-08-16T15:38:48.518732-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e5d) } })
+2026-08-16T15:38:48.51881-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e5e) } })
+2026-08-16T15:38:48.518815-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e5d) } })
+2026-08-16T15:38:48.520048-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e62) } })
+2026-08-16T15:38:48.520053-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e61) } })
+2026-08-16T15:38:48.521323-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e65) } })
+2026-08-16T15:38:48.521328-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e64) } })
+2026-08-16T15:38:48.535652-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(2450b) } })
+2026-08-16T15:38:48.581232-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.581266-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.581326-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.58133-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.581478-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.581486-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.581539-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.581545-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.581744-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.581748-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.581809-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.581812-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.581987-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.58199-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.582029-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.582032-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.582223-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.582227-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.582642-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.582645-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.583668-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.583672-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.583744-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.583747-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.584613-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.584619-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.585214-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.585218-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.58529-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.585293-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.585706-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.585709-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.585794-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.585799-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.585846-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d26) } })
+2026-08-16T15:38:48.585849-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39d25) } })
+2026-08-16T15:38:48.640052-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7abd) } })
+2026-08-16T15:38:48.640309-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7abd) } })
+2026-08-16T15:38:48.640376-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7abd) } })
+2026-08-16T15:38:48.640431-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7abd) } })
+2026-08-16T15:38:48.64593-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad8) } })
+2026-08-16T15:38:48.645939-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad7) } })
+2026-08-16T15:38:48.645977-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad8) } })
+2026-08-16T15:38:48.645981-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad7) } })
+2026-08-16T15:38:48.646088-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad8) } })
+2026-08-16T15:38:48.646092-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad7) } })
+2026-08-16T15:38:48.646171-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad8) } })
+2026-08-16T15:38:48.646175-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad7) } })
+2026-08-16T15:38:48.64629-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad8) } })
+2026-08-16T15:38:48.646293-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad7) } })
+2026-08-16T15:38:48.646353-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad8) } })
+2026-08-16T15:38:48.646356-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad7) } })
+2026-08-16T15:38:48.646654-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad8) } })
+2026-08-16T15:38:48.646657-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(7ad7) } })
+2026-08-16T15:38:48.904954-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.904989-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.905448-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.905456-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.905846-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.905851-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.905897-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.905901-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.90599-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.905994-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.906079-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.906082-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.906145-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.906148-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.906659-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.906662-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.90675-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.906753-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.907061-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.907065-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.907126-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.907129-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.907388-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.907391-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.90748-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.907483-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.907526-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.907529-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.908122-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.908126-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.90836-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.908363-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.908404-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.908407-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.90849-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f29) } })
+2026-08-16T15:38:48.908493-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f28) } })
+2026-08-16T15:38:48.914581-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.914587-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.914877-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.914881-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.915125-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.915129-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.91517-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.915173-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.915269-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.915272-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.915342-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.915357-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.915416-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.915419-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.91574-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.915744-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.915831-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.915834-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.916097-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.916101-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.916147-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.91615-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.916373-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.916377-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.916471-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.916475-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.916526-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.91653-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.916983-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.916989-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.917179-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.917183-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.917222-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.917224-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:48.9173-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f31) } })
+2026-08-16T15:38:48.917303-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22f30) } })
+2026-08-16T15:38:49.438158-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.438193-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.438257-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.438275-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.438368-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.438373-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.438484-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.438488-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.43854-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.438544-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.43879-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.438794-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.438864-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.438868-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.439329-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.439333-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.44053-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.440535-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.440606-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.440609-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.441632-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.441636-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.442255-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.442259-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.442345-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.442348-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.442754-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.442757-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.442854-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.442857-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.442909-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20e) } })
+2026-08-16T15:38:49.442911-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(3a20d) } })
+2026-08-16T15:38:49.620296-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8cf0d) } })
+2026-08-16T15:38:49.620378-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8cf0d) } })
+2026-08-16T15:38:49.796678-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22e14) } })
+2026-08-16T15:38:49.899332-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e5) } })
+2026-08-16T15:38:49.899435-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e5) } })
+2026-08-16T15:38:49.899492-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e5) } })
+2026-08-16T15:38:49.899565-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e5) } })
+2026-08-16T15:38:49.899628-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e5) } })
+2026-08-16T15:38:49.89978-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e5) } })
+2026-08-16T15:38:49.90156-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e9) } })
+2026-08-16T15:38:49.901612-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e9) } })
+2026-08-16T15:38:49.901666-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e9) } })
+2026-08-16T15:38:49.901717-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e9) } })
+2026-08-16T15:38:49.901821-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(221e9) } })
+2026-08-16T15:38:50.132516-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.13254-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.133311-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.133317-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.134118-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.134124-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.134254-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.134259-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.134768-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.134773-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.135318-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.135322-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.135446-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.13545-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.135983-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.135986-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.136683-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.136687-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.136822-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.136825-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.137221-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17614) } })
+2026-08-16T15:38:50.137224-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(17609) } })
+2026-08-16T15:38:50.332092-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ced4) } })
+2026-08-16T15:38:50.33219-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ced4) } })
+2026-08-16T15:38:50.33225-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ced4) } })
+2026-08-16T15:38:50.372237-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4363e) } })
+2026-08-16T15:38:50.372364-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4363e) } })
+2026-08-16T15:38:50.37244-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4363e) } })
+2026-08-16T15:38:50.372472-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4363e) } })
+2026-08-16T15:38:50.372523-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4363e) } })
+2026-08-16T15:38:50.373919-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(43642) } })
+2026-08-16T15:38:50.373998-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(43642) } })
+2026-08-16T15:38:50.374049-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(43642) } })
+2026-08-16T15:38:50.374077-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(43642) } })
+2026-08-16T15:38:50.374121-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(43642) } })
+2026-08-16T15:38:50.381469-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ceaf) } })
+2026-08-16T15:38:50.381563-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ceaf) } })
+2026-08-16T15:38:50.381615-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ceaf) } })
+2026-08-16T15:38:50.381643-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ceaf) } })
+2026-08-16T15:38:50.381709-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ceaf) } })
+2026-08-16T15:38:50.384191-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ceb5) } })
+2026-08-16T15:38:50.384271-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ceb5) } })
+2026-08-16T15:38:50.384321-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ceb5) } })
+2026-08-16T15:38:50.384349-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ceb5) } })
+2026-08-16T15:38:50.384395-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ceb5) } })
+2026-08-16T15:38:51.08788-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.087918-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.088134-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.08814-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.088269-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.088275-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.08876-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.088764-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.08907-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.089073-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.089491-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.089495-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.089591-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.089594-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.089782-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.089786-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.09127-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.091274-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.092648-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.092652-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.093592-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.093597-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.093721-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.093724-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.095119-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.095123-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.095938-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.095942-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.096059-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.096063-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.096934-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.096938-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.097108-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.097111-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.097201-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b4) } })
+2026-08-16T15:38:51.097204-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486b3) } })
+2026-08-16T15:38:51.117505-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.117519-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.117606-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.11761-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.117848-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.117852-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.118482-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.118486-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.118629-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.118633-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.118734-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.118737-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.120446-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.120465-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.121434-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.12144-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.121551-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.121555-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.122309-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.122312-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.122423-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.122426-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.122506-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bd) } })
+2026-08-16T15:38:51.122509-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bc) } })
+2026-08-16T15:38:51.133356-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.133372-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.134089-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.134098-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.135174-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.135181-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.135314-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.135319-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.136918-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.136925-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.137725-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.13773-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.137878-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.137881-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.139161-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.139165-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.139376-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.13939-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.139494-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.139497-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.141868-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.141873-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.141988-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.141991-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.142935-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.142939-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.143542-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.143546-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.143685-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.143689-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.144151-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.144154-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.144273-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.144276-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.14438-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.144383-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.145682-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.145686-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.146558-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.146562-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.146691-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.146694-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.14706-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486c0) } })
+2026-08-16T15:38:51.147063-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(486bf) } })
+2026-08-16T15:38:51.244077-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c0bb) } })
+2026-08-16T15:38:51.244201-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c0bb) } })
+2026-08-16T15:38:51.244274-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c0bb) } })
+2026-08-16T15:38:51.254568-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(e8a4) } })
+2026-08-16T15:38:51.272845-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c0ae) } })
+2026-08-16T15:38:51.272961-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c0ae) } })
+2026-08-16T15:38:51.272998-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c0ae) } })
+2026-08-16T15:38:51.273247-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c0ae) } })
+2026-08-16T15:38:51.355209-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ce83) } })
+2026-08-16T15:38:51.355303-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ce83) } })
+2026-08-16T15:38:51.355362-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ce83) } })
+2026-08-16T15:38:51.372267-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c15d) } })
+2026-08-16T15:38:51.372456-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c15d) } })
+2026-08-16T15:38:51.379873-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ce90) } })
+2026-08-16T15:38:51.398937-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c0f1) } })
+2026-08-16T15:38:51.696076-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(2310a) } })
+2026-08-16T15:38:51.715999-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23125) } })
+2026-08-16T15:38:51.716289-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23125) } })
+2026-08-16T15:38:51.717234-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23125) } })
+2026-08-16T15:38:51.717299-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23125) } })
+2026-08-16T15:38:51.717969-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23125) } })
+2026-08-16T15:38:51.718629-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23125) } })
+2026-08-16T15:38:51.718695-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23125) } })
+2026-08-16T15:38:51.718995-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23125) } })
+2026-08-16T15:38:51.719122-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23125) } })
+2026-08-16T15:38:51.719163-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(23125) } })
+2026-08-16T15:38:51.769681-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbc) } })
+2026-08-16T15:38:51.769702-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbb) } })
+2026-08-16T15:38:51.770548-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbc) } })
+2026-08-16T15:38:51.770553-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbb) } })
+2026-08-16T15:38:51.771243-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbc) } })
+2026-08-16T15:38:51.771248-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbb) } })
+2026-08-16T15:38:51.771367-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbc) } })
+2026-08-16T15:38:51.77137-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbb) } })
+2026-08-16T15:38:51.772603-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbc) } })
+2026-08-16T15:38:51.772606-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbb) } })
+2026-08-16T15:38:51.773252-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbc) } })
+2026-08-16T15:38:51.773255-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbb) } })
+2026-08-16T15:38:51.773377-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbc) } })
+2026-08-16T15:38:51.77338-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbb) } })
+2026-08-16T15:38:51.774344-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbc) } })
+2026-08-16T15:38:51.774348-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbb) } })
+2026-08-16T15:38:51.774506-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbc) } })
+2026-08-16T15:38:51.774509-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbb) } })
+2026-08-16T15:38:51.774598-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbc) } })
+2026-08-16T15:38:51.774601-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dbb) } })
+2026-08-16T15:38:51.793086-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc2) } })
+2026-08-16T15:38:51.793099-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc1) } })
+2026-08-16T15:38:51.794196-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc2) } })
+2026-08-16T15:38:51.794203-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc1) } })
+2026-08-16T15:38:51.79505-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc2) } })
+2026-08-16T15:38:51.795056-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc1) } })
+2026-08-16T15:38:51.795192-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc2) } })
+2026-08-16T15:38:51.795195-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc1) } })
+2026-08-16T15:38:51.796759-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc2) } })
+2026-08-16T15:38:51.796763-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc1) } })
+2026-08-16T15:38:51.797588-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc2) } })
+2026-08-16T15:38:51.797592-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc1) } })
+2026-08-16T15:38:51.797727-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc2) } })
+2026-08-16T15:38:51.79773-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc1) } })
+2026-08-16T15:38:51.798857-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc2) } })
+2026-08-16T15:38:51.798861-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc1) } })
+2026-08-16T15:38:51.799031-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc2) } })
+2026-08-16T15:38:51.799034-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc1) } })
+2026-08-16T15:38:51.799136-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc2) } })
+2026-08-16T15:38:51.799139-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22dc1) } })
+2026-08-16T15:38:51.832922-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.832939-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.833508-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.833514-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.834456-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.834461-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.834576-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.83458-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.836249-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.836253-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.836897-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.836901-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.837014-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.837017-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.837858-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.837861-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.838041-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.838045-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.838137-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.83814-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.839421-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.839424-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.839924-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.839927-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.840597-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.8406-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.84071-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.840713-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.841759-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.841763-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.842384-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.842388-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.842499-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.842502-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.843356-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.843359-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.843503-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.843506-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.843586-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce4) } })
+2026-08-16T15:38:51.843589-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39ce3) } })
+2026-08-16T15:38:51.860088-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39cde) } })
+2026-08-16T15:38:51.860149-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(39cde) } })
+2026-08-16T15:38:51.969743-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c184) } })
+2026-08-16T15:38:51.972098-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c185) } })
+2026-08-16T15:38:51.972113-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c184) } })
+2026-08-16T15:38:51.972171-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c185) } })
+2026-08-16T15:38:51.972175-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c184) } })
+2026-08-16T15:38:51.972229-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c185) } })
+2026-08-16T15:38:51.972233-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c184) } })
+2026-08-16T15:38:51.972286-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c185) } })
+2026-08-16T15:38:51.972289-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(4c184) } })
+2026-08-16T15:38:52.077429-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ce28) } })
+2026-08-16T15:38:52.077501-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(8ce28) } })
+2026-08-16T15:38:52.257806-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d70) } })
+2026-08-16T15:38:52.257845-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d6f) } })
+2026-08-16T15:38:52.257862-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d70) } })
+2026-08-16T15:38:52.257868-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d6f) } })
+2026-08-16T15:38:52.257905-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d70) } })
+2026-08-16T15:38:52.257909-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d6f) } })
+2026-08-16T15:38:52.257962-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d70) } })
+2026-08-16T15:38:52.257967-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d6f) } })
+2026-08-16T15:38:52.258125-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d70) } })
+2026-08-16T15:38:52.258148-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d6f) } })
+2026-08-16T15:38:52.258201-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d70) } })
+2026-08-16T15:38:52.258206-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d6f) } })
+2026-08-16T15:38:52.259456-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d71) } })
+2026-08-16T15:38:52.263436-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d74) } })
+2026-08-16T15:38:52.263451-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d71) } })
+2026-08-16T15:38:52.263859-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d74) } })
+2026-08-16T15:38:52.263866-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d71) } })
+2026-08-16T15:38:52.266975-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d79) } })
+2026-08-16T15:38:52.267044-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d79) } })
+2026-08-16T15:38:52.2671-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d79) } })
+2026-08-16T15:38:52.267186-05:00 ERROR Encountered enclosing definition with no name def=Module(Module { id: ModuleIdLt { [salsa id]: Id(22d79) } })
+2026-08-16T15:38:52.355802-05:00 ERROR Bug: definition at crates/akey/tests/e2e/mocks.rs:64:11-64:26 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355825-05:00 ERROR Bug: definition at crates/akey/tests/e2e/mocks.rs:76:11-76:14 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355834-05:00 ERROR Bug: definition at crates/akey/src/types.rs:83:16-83:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355842-05:00 ERROR Bug: definition at crates/akey/src/types.rs:253:16-253:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355846-05:00 ERROR Bug: definition at crates/akey/src/types.rs:18:16-18:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355863-05:00 ERROR Bug: definition at crates/akey/src/audit/mod.rs:168:16-168:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355871-05:00 ERROR Bug: definition at crates/akey/src/types.rs:554:23-554:32 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355878-05:00 ERROR Bug: definition at crates/akey/src/types.rs:375:16-375:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355887-05:00 ERROR Bug: definition at crates/akey/src/types.rs:317:23-317:32 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355891-05:00 ERROR Bug: definition at crates/akey/tests/e2e/mocks.rs:0:0-294:0 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355896-05:00 ERROR Bug: definition at crates/akey/tests/e2e/mocks.rs:96:11-96:26 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355902-05:00 ERROR Bug: definition at crates/akey/src/types.rs:375:23-375:32 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355912-05:00 ERROR Bug: definition at crates/akey/src/types.rs:317:16-317:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355931-05:00 ERROR Bug: definition at crates/akey/src/types.rs:40:23-40:32 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355938-05:00 ERROR Bug: definition at crates/akey/src/types.rs:395:16-395:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355949-05:00 ERROR Bug: definition at crates/akey/tests/e2e/mocks.rs:107:11-107:28 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355958-05:00 ERROR Bug: definition at crates/akey/src/types.rs:125:23-125:33 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355965-05:00 ERROR Bug: definition at crates/akey/src/queue/mod.rs:62:16-62:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355972-05:00 ERROR Bug: definition at crates/akey/src/types.rs:18:23-18:30 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355982-05:00 ERROR Bug: definition at crates/akey/src/types.rs:434:16-434:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355993-05:00 ERROR Bug: definition at crates/akey/src/types.rs:571:16-571:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.355998-05:00 ERROR Bug: definition at crates/akey/src/types.rs:331:16-331:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.356001-05:00 ERROR Bug: definition at crates/akey/src/types.rs:554:16-554:21 should have been in an SCIP document but was not.
+2026-08-16T15:38:52.356011-05:00 ERROR Bug: definition at crates/akey/src/types.rs:541:21-541:32 should have been in an SCIP document but was not.
+
+Encountered duplicate scip symbols, indicating an internal rust-analyzer bug. These duplicates are
+included in the output, but this causes information lookup to be ambiguous and so information about
+these symbols presented by downstream tools may be incorrect.
+
+Known rust-analyzer bugs that can cause this:
+
+  * Definitions in crate example binaries which have the same symbol as definitions in the library
+    or some other example.
+
+  * Struct/enum/const/static/impl definitions nested in a function do not mention the function name.
+    See #18771.
+
+Duplicate symbols encountered:
+
+crates/akey/tests/vp_018_reload_atomicity_prop.rs:0:0-634:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/vp010_compile_fail.rs:0:0-24:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/tui_state_machine.rs:0:0-368:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/tui_snapshot_tests.rs:0:0-495:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/tui_notify_self_deadlock_regression.rs:0:0-139:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/tui_integration.rs:0:0-361:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/tui_escalation_threshold_proptest.rs:0:0-250:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/tui_escalation_snapshot_tests.rs:0:0-557:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/tui_escalation_snapshot_tests.rs:109:4-109:17
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 buf_to_string().
+
+crates/akey/tests/tui_auto_reject_proptest.rs:0:0-243:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/tui_auto_reject_integration.rs:0:0-1310:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/tui_auto_reject_integration.rs:85:3-85:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/tui_auto_reject_integration.rs:96:3-96:13
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_queue().
+
+crates/akey/tests/tui_approval_loop.rs:0:0-527:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/story_015_hot_reload.rs:0:0-2036:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/story_015_hot_reload.rs:68:7-68:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/story_015_hot_reload.rs:74:7-74:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/story_015_hot_reload.rs:92:13-92:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/story_015_hot_reload.rs:103:13-103:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/story_015_hot_reload.rs:110:7-110:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/story_015_adversary_pass5.rs:0:0-225:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/story_015_adversary_pass5.rs:68:7-68:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/story_015_adversary_pass5.rs:69:4-69:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/story_015_adversary_pass5.rs:73:7-73:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/story_015_adversary_pass5.rs:86:13-86:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/story_015_adversary_pass5.rs:96:13-96:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/story_015_adversary_pass5.rs:103:7-103:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/story_015_adversary_pass1.rs:0:0-581:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/socket_oversize_frame.rs:0:0-491:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/socket_oversize_frame.rs:299:11-299:31
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 CapturingAuditWriter#
+
+crates/akey/tests/socket_oversize_frame.rs:300:8-300:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 CapturingAuditWriter#entries.
+
+crates/akey/tests/socket_oversize_frame.rs:304:11-304:14
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[CapturingAuditWriter]new().
+
+crates/akey/tests/socket_oversize_frame.rs:310:11-310:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[CapturingAuditWriter]snapshot().
+
+crates/akey/tests/socket_oversize_frame.rs:317:17-317:23
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[CapturingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/socket_oversize_frame.rs:327:17-327:41
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[CapturingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/socket_oversize_frame.rs:334:11-334:26
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[CapturingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/request_identities_integration.rs:0:0-1362:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/queue_vp015_proptest.rs:0:0-556:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/queue_vp015_proptest.rs:49:7-49:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/queue_vp015_proptest.rs:50:4-50:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/queue_vp015_proptest.rs:56:7-56:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/queue_vp015_proptest.rs:74:13-74:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/queue_vp015_proptest.rs:88:13-88:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/queue_vp015_proptest.rs:95:7-95:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/queue_vp015_proptest.rs:105:3-105:23
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_signing_request().
+
+crates/akey/tests/queue_vp011_proptest.rs:0:0-469:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/queue_vp011_proptest.rs:37:3-37:16
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 arb_signature().
+
+crates/akey/tests/queue_vp011_proptest.rs:41:3-41:17
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 arb_transition().
+
+crates/akey/tests/queue_vp010_can_sign_proptest.rs:0:0-252:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/queue_vp010_can_sign_proptest.rs:26:3-26:16
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 arb_signature().
+
+crates/akey/tests/queue_restart_integration.rs:0:0-451:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/queue_restart_integration.rs:36:7-36:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/queue_restart_integration.rs:37:4-37:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/queue_restart_integration.rs:41:7-41:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/queue_restart_integration.rs:47:7-47:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]count().
+
+crates/akey/tests/queue_restart_integration.rs:54:13-54:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/queue_restart_integration.rs:64:13-64:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/queue_restart_integration.rs:71:7-71:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/queue_restart_integration.rs:85:3-85:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/queue_full_ordering_integration.rs:0:0-653:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/queue_full_ordering_integration.rs:97:3-97:7
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 noop().
+
+crates/akey/tests/queue_full_ordering_integration.rs:101:3-101:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/queue_full_ordering_integration.rs:340:10-340:18
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 CAPACITY.
+
+crates/akey/tests/queue_disconnect_integration.rs:0:0-608:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/queue_disconnect_integration.rs:35:7-35:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/queue_disconnect_integration.rs:36:4-36:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/queue_disconnect_integration.rs:40:7-40:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/queue_disconnect_integration.rs:46:7-46:14
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]entries().
+
+crates/akey/tests/queue_disconnect_integration.rs:50:7-50:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]count().
+
+crates/akey/tests/queue_disconnect_integration.rs:57:13-57:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/queue_disconnect_integration.rs:67:13-67:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/queue_disconnect_integration.rs:74:7-74:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/queue_disconnect_integration.rs:82:3-82:7
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 noop().
+
+crates/akey/tests/queue_disconnect_integration.rs:88:3-88:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/queue_burst_integration.rs:0:0-311:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/queue_burst_integration.rs:31:3-31:7
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 noop().
+
+crates/akey/tests/queue_burst_integration.rs:48:3-48:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/queue_burst_integration.rs:161:10-161:20
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 BURST_SIZE.
+
+crates/akey/tests/protocol_vp008_proptest.rs:0:0-523:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/protocol_malformed.rs:0:0-528:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/protocol_malformed.rs:359:11-359:31
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/protocol_malformed.rs:360:8-360:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/protocol_malformed.rs:364:11-364:14
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/protocol_malformed.rs:370:11-370:16
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]count().
+
+crates/akey/tests/protocol_malformed.rs:385:17-385:23
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/protocol_malformed.rs:395:17-395:41
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/protocol_malformed.rs:402:11-402:26
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/protocol_integration.rs:0:0-739:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/protocol_integration.rs:38:6-38:28
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 MSG_REQUEST_IDENTITIES.
+
+crates/akey/tests/protocol_integration.rs:40:6-40:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 MSG_EXTENSION.
+
+crates/akey/tests/protocol_integration.rs:44:6-44:29
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 AGENT_IDENTITIES_ANSWER.
+
+crates/akey/tests/protocol_integration.rs:49:3-49:8
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 frame().
+
+crates/akey/tests/protocol_audit.rs:0:0-911:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/protocol_audit.rs:76:7-76:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/protocol_audit.rs:77:4-77:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/protocol_audit.rs:81:7-81:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/protocol_audit.rs:88:7-88:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]snapshot().
+
+crates/akey/tests/protocol_audit.rs:93:7-93:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]count().
+
+crates/akey/tests/protocol_audit.rs:100:13-100:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/protocol_audit.rs:110:13-110:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/protocol_audit.rs:117:7-117:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/protocol_audit.rs:128:6-128:28
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 MSG_REQUEST_IDENTITIES.
+
+crates/akey/tests/protocol_audit.rs:130:6-130:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 MSG_SIGN_REQUEST.
+
+crates/akey/tests/protocol_audit.rs:132:6-132:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 MSG_EXTENSION.
+
+crates/akey/tests/protocol_audit.rs:136:3-136:8
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 frame().
+
+crates/akey/tests/protocol_audit.rs:143:3-143:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 request_identities_frame().
+
+crates/akey/tests/protocol_audit.rs:170:3-170:18
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 extension_frame().
+
+crates/akey/tests/pipeline_nit1_keys_dir_tilde.rs:0:0-217:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/pipeline_integration.rs:0:0-3179:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/pipeline_integration.rs:86:7-86:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/pipeline_integration.rs:87:4-87:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/pipeline_integration.rs:88:4-88:9
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#calls.
+
+crates/akey/tests/pipeline_integration.rs:92:7-92:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/pipeline_integration.rs:99:7-99:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]snapshot().
+
+crates/akey/tests/pipeline_integration.rs:103:7-103:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]count().
+
+crates/akey/tests/pipeline_integration.rs:110:13-110:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/pipeline_integration.rs:121:13-121:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/pipeline_integration.rs:128:7-128:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/pipeline_integration.rs:141:3-141:23
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_signing_request().
+
+crates/akey/tests/pipeline_ac012_ac013.rs:0:0-2241:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/pipeline_ac012_ac013.rs:78:7-78:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/pipeline_ac012_ac013.rs:79:4-79:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/pipeline_ac012_ac013.rs:80:4-80:9
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#calls.
+
+crates/akey/tests/pipeline_ac012_ac013.rs:84:7-84:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/pipeline_ac012_ac013.rs:91:7-91:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]snapshot().
+
+crates/akey/tests/pipeline_ac012_ac013.rs:95:7-95:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]count().
+
+crates/akey/tests/pipeline_ac012_ac013.rs:102:13-102:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/pipeline_ac012_ac013.rs:111:13-111:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/pipeline_ac012_ac013.rs:118:7-118:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/pipeline_ac012_ac013.rs:128:3-128:23
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_signing_request().
+
+crates/akey/tests/pipeline_ac012_ac013.rs:140:3-140:32
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_autopass_whitelist_entry().
+
+crates/akey/tests/peer_pid_capture.rs:0:0-477:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/peer_pid_capture.rs:78:9-78:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 send_and_recv().
+
+crates/akey/tests/parser_fingerprint_derivation.rs:0:0-290:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/parser_fingerprint_derivation.rs:61:3-61:13
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 hex_decode().
+
+crates/akey/tests/parser_fingerprint_derivation.rs:84:3-84:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 build_sign_request_frame().
+
+crates/akey/tests/hardware_vp016_fido_error.rs:0:0-588:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_vp016_fido_error.rs:42:7-42:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/hardware_vp016_fido_error.rs:43:4-43:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/hardware_vp016_fido_error.rs:47:7-47:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/hardware_vp016_fido_error.rs:60:13-60:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/hardware_vp016_fido_error.rs:70:13-70:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/hardware_vp016_fido_error.rs:77:7-77:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/hardware_vp016_fido_error.rs:87:3-87:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_vp014_touch_timeout.rs:0:0-520:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_vp014_touch_timeout.rs:46:7-46:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/hardware_vp014_touch_timeout.rs:47:4-47:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/hardware_vp014_touch_timeout.rs:51:7-51:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/hardware_vp014_touch_timeout.rs:57:7-57:17
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]last_entry().
+
+crates/akey/tests/hardware_vp014_touch_timeout.rs:64:13-64:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/hardware_vp014_touch_timeout.rs:74:13-74:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/hardware_vp014_touch_timeout.rs:81:7-81:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/hardware_vp014_touch_timeout.rs:91:3-91:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_vp014_touch_timeout.rs:114:3-114:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_whitelist_rule().
+
+crates/akey/tests/hardware_vp013_timeout_bound.rs:0:0-297:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_vp013_timeout_bound.rs:44:3-44:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_vp013_timeout_bound.rs:55:3-55:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_rule().
+
+crates/akey/tests/hardware_vp012_proptest.rs:0:0-110:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_vp012_proptest.rs:23:3-23:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_vp012_proptest.rs:35:3-35:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_rule().
+
+crates/akey/tests/hardware_vp012_multi_device.rs:0:0-289:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_vp012_multi_device.rs:40:3-40:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_vp012_multi_device.rs:51:3-51:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_rule().
+
+crates/akey/tests/hardware_vp012_explicit.rs:0:0-298:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_vp012_explicit.rs:26:3-26:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_vp012_explicit.rs:37:3-37:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_rule().
+
+crates/akey/tests/hardware_vp010_typestate.rs:0:0-151:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_vp010_typestate.rs:24:3-24:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_vp010_typestate.rs:35:3-35:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_rule().
+
+crates/akey/tests/hardware_taxonomy_conformance.rs:0:0-254:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_integration.rs:0:0-1813:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_integration.rs:51:7-51:25
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 FailingAuditWriter#
+
+crates/akey/tests/hardware_integration.rs:55:13-55:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[FailingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/hardware_integration.rs:66:13-66:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[FailingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/hardware_integration.rs:73:7-73:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[FailingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/hardware_integration.rs:88:7-88:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/hardware_integration.rs:89:4-89:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/hardware_integration.rs:93:13-93:16
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/hardware_integration.rs:99:7-99:14
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]entries().
+
+crates/akey/tests/hardware_integration.rs:106:13-106:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/hardware_integration.rs:116:13-116:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/hardware_integration.rs:123:7-123:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/hardware_integration.rs:131:3-131:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_integration.rs:142:3-142:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_rule().
+
+crates/akey/tests/hardware_integration.rs:1384:11-1384:31
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/hardware_integration.rs:1385:8-1385:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/hardware_integration.rs:1386:8-1386:13
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#calls.
+
+crates/akey/tests/hardware_integration.rs:1390:11-1390:14
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/hardware_integration.rs:1397:11-1397:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]snapshot().
+
+crates/akey/tests/hardware_integration.rs:1404:17-1404:23
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/hardware_integration.rs:1415:17-1415:41
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/hardware_integration.rs:1422:11-1422:26
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/hardware_fido2_real_backend_red_gate.rs:0:0-607:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_fido2_real_backend_red_gate.rs:162:3-162:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_fido2_real_backend_red_gate.rs:173:3-173:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_rule().
+
+crates/akey/tests/hardware_fhw003_locate_credential_red_gate.rs:0:0-793:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_fhw003_locate_credential_red_gate.rs:73:3-73:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_fhw003_locate_credential_red_gate.rs:84:3-84:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_rule().
+
+crates/akey/tests/hardware_fhw003_locate_credential_red_gate.rs:101:7-101:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/hardware_fhw003_locate_credential_red_gate.rs:102:4-102:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/hardware_fhw003_locate_credential_red_gate.rs:106:7-106:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/hardware_fhw003_locate_credential_red_gate.rs:112:7-112:17
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]last_entry().
+
+crates/akey/tests/hardware_fhw003_locate_credential_red_gate.rs:119:13-119:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/hardware_fhw003_locate_credential_red_gate.rs:127:13-127:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/hardware_fhw003_locate_credential_red_gate.rs:134:7-134:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/hardware_error_paths_integration.rs:0:0-853:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/hardware_error_paths_integration.rs:45:7-45:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/hardware_error_paths_integration.rs:46:4-46:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/hardware_error_paths_integration.rs:50:7-50:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/hardware_error_paths_integration.rs:56:7-56:17
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]last_entry().
+
+crates/akey/tests/hardware_error_paths_integration.rs:63:13-63:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/hardware_error_paths_integration.rs:73:13-73:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/hardware_error_paths_integration.rs:80:7-80:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/hardware_error_paths_integration.rs:90:3-90:15
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_request().
+
+crates/akey/tests/hardware_error_paths_integration.rs:101:3-101:12
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_rule().
+
+crates/akey/tests/firewall_vp004_compile.rs:0:0-126:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/firewall_vp003_proptest.rs:0:0-210:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/firewall_vp002_proptest.rs:0:0-163:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/firewall_vp001_proptest.rs:0:0-118:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/fingerprint_openssh_parity.rs:0:0-512:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/fingerprint_migration.rs:0:0-695:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/fingerprint_migration.rs:96:3-96:9
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 nibble().
+
+crates/akey/tests/enroll_pin_integration.rs:0:0-1733:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/enroll_integration.rs:0:0-2099:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/enroll_integration.rs:88:6-88:25
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 FINGERPRINT_PATTERN.
+
+crates/akey/tests/enroll_integration.rs:841:30-841:46
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 count_toml_files().
+
+crates/akey/tests/enroll_device_integration.rs:0:0-1351:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/enroll_device_integration.rs:56:6-56:25
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 FINGERPRINT_PATTERN.
+
+crates/akey/tests/enroll_device_integration.rs:97:3-97:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 count_toml_files().
+
+crates/akey/tests/e2e.rs:0:0-2194:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/e2e.rs:133:6-133:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 AGENT_FAILURE.
+
+crates/akey/tests/e2e.rs:137:6-137:36
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 SSH2_AGENTC_REQUEST_IDENTITIES.
+
+crates/akey/tests/e2e.rs:139:6-139:29
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 AGENT_IDENTITIES_ANSWER.
+
+crates/akey/tests/e2e.rs:155:3-155:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 build_sign_request_frame().
+
+crates/akey/tests/e2e.rs:183:3-183:33
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 build_request_identities_frame().
+
+crates/akey/tests/e2e.rs:198:9-198:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 send_and_recv().
+
+crates/akey/tests/e2e.rs:286:35-286:54
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 NoopContextProvider#
+
+crates/akey/tests/e2e.rs:642:7-642:14
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[NoopContextProvider][ContextProvider]resolve().
+
+crates/akey/tests/daemon_tui_wiring.rs:0:0-1921:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/credential_lookup_integration.rs:0:0-495:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/credential_lookup_integration.rs:94:6-94:28
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 SK_ED25519_FINGERPRINT.
+
+crates/akey/tests/context_vp007_proptest.rs:0:0-311:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/context_partial_namespace.rs:0:0-280:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/context_dead_process.rs:0:0-228:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/config_fail_closed.rs:0:0-258:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/cli_vp017_proptest.rs:0:0-181:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/cli_integration.rs:0:0-445:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/audit_write_failure_notification.rs:0:0-693:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/audit_write_failure_notification.rs:137:6-137:18
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 CANONICAL_FP.
+
+crates/akey/tests/audit_write_failure_notification.rs:140:6-140:20
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 CANONICAL_STEM.
+
+crates/akey/tests/audit_write_failure_notification.rs:181:3-181:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 build_sign_request_frame().
+
+crates/akey/tests/audit_write_failure_notification.rs:227:3-227:26
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 write_minimal_whitelist().
+
+crates/akey/tests/audit_write_failure_integration.rs:0:0-395:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/audit_vp014_proptest.rs:0:0-330:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/audit_vp014_proptest.rs:44:7-44:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/audit_vp014_proptest.rs:45:4-45:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/audit_vp014_proptest.rs:49:7-49:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/audit_vp014_proptest.rs:55:7-55:17
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]last_entry().
+
+crates/akey/tests/audit_vp014_proptest.rs:62:13-62:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/audit_vp014_proptest.rs:72:13-72:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/audit_vp014_proptest.rs:79:7-79:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/audit_vp006_proptest.rs:0:0-289:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/audit_vp006_proptest.rs:85:3-85:21
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 arb_operation_type().
+
+crates/akey/tests/audit_vp005_proptest.rs:0:0-233:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/audit_rejected_integration.rs:0:0-368:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/audit_hardware_failure_proptest.rs:0:0-481:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/audit_hardware_failure_proptest.rs:39:7-39:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#
+
+crates/akey/tests/audit_hardware_failure_proptest.rs:40:4-40:11
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 RecordingAuditWriter#entries.
+
+crates/akey/tests/audit_hardware_failure_proptest.rs:44:7-44:10
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]new().
+
+crates/akey/tests/audit_hardware_failure_proptest.rs:50:7-50:17
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter]last_entry().
+
+crates/akey/tests/audit_hardware_failure_proptest.rs:61:13-61:19
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append().
+
+crates/akey/tests/audit_hardware_failure_proptest.rs:71:13-71:37
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_identities_listed().
+
+crates/akey/tests/audit_hardware_failure_proptest.rs:78:7-78:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 impl#[RecordingAuditWriter][AuditWriter]append_blocking().
+
+crates/akey/tests/audit_fail_mode.rs:0:0-2613:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/audit_approved_integration.rs:0:0-303:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/audit_approved_integration.rs:34:3-34:22
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 make_approved_entry().
+
+crates/akey/tests/bin/pid_client.rs:0:0-84:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/tests/bin/pid_client.rs:33:3-33:7
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 main().
+
+crates/akey/src/main.rs:0:0-266:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/src/main.rs:101:9-101:13
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 main().
+
+crates/akey/src/lib.rs:0:0-37:0
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 crate/
+
+crates/akey/src/pipeline.rs:5349:15-5349:25
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 pipeline/emit_audit_write_failure_tests/NoopWriter#
+
+crates/akey/src/pipeline.rs:5353:21-5353:27
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 pipeline/emit_audit_write_failure_tests/impl#[NoopWriter][AuditWriter]append().
+
+crates/akey/src/pipeline.rs:5362:21-5362:45
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 pipeline/emit_audit_write_failure_tests/impl#[NoopWriter][AuditWriter]append_identities_listed().
+
+crates/akey/src/pipeline.rs:5369:15-5369:30
+  Duplicate symbol: rust-analyzer cargo akey 0.1.0 pipeline/emit_audit_write_failure_tests/impl#[NoopWriter][AuditWriter]append_blocking().
+
+Generating SCIP finished 28.118574416s
+       28.29 real        29.94 user         9.11 sys
+          1840594944  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             1273752  page reclaims
+                6051  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                 377  messages sent
+                4144  messages received
+                  65  signals received
+                8864  voluntary context switches
+               63805  involuntary context switches
+        155679542461  instructions retired
+         52329393690  cycles elapsed
+          1806878664  peak memory footprint

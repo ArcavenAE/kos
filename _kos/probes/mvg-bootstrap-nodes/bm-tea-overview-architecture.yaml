@@ -1,0 +1,24 @@
+id: bm-tea-overview-architecture
+type: element
+confidence: frontier
+title: "BMAD TEA: tea-overview.md architecture and lifecycle claims"
+content: |
+  The tea-overview.md is the primary architecture document. Key claims:
+  - 4-phase methodology: Phase 1 (optional), Phase 2, Phase 3, Phase 4
+  - TEA integrates in Phase 3 (Solutioning) and Phase 4 (Implementation)
+  - test-design is dual-mode: system-level (Phase 3, TWO docs) and
+    epic-level (Phase 4, ONE doc)
+  - 5 engagement models: No TEA, TEA Solo, TEA Lite, Integrated Greenfield,
+    Integrated Brownfield
+  - Section header says "TEA's 8 Workflows Across Phases" but rest of doc
+    references "9 workflows"
+  - Knowledge base: "42 fragments" (lines 458, 473)
+  - Mermaid lifecycle diagram maps all workflows to phases
+
+  Source: docs/explanation/tea-overview.md
+depends_on:
+  - bm-readme-overview
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-bmad-enterprise-probe"
+  created_at: "2026-03-15"

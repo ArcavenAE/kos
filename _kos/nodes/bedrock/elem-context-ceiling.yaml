@@ -1,0 +1,51 @@
+id: elem-context-ceiling
+type: element
+confidence: bedrock
+title: "Context ceiling is lower than context window — measured across 5 projects"
+content: |
+  LLM performance degrades before the context window is full. The effective
+  context window is smaller than the raw window, by a margin that is
+  model-dependent. Measured across 5 real projects (3 BMAD, 2 Pennyfarthing):
+
+  - peu-B: 36K tokens (22% of effective capacity)
+  - ccmp-B: 73K tokens (44%)
+  - bcom-P: 88K tokens (53%)
+  - poll-P: 92K tokens (55%)
+  - axia-B: 162K tokens (97% — PM agent has 5K tokens for conversation)
+
+  Evidence from external research:
+  - Effective context length of open-source models is < half training length
+    (An et al. 2024)
+  - Even with perfect retrieval, accuracy degrades: Llama-3.1-8B lost 24.2%
+    on MMLU at 30K tokens (Hsieh et al. 2024)
+  - Frontier models degrade less but are not immune: Claude 3.5 Sonnet showed
+    ~67% degradation on MMLU in same study
+  - "Context rot" documented across 18 models including Claude Opus 4 and
+    Sonnet 4 (Chroma Research 2024)
+
+  This is not BMAD-specific or Pennyfarthing-specific. Any spec-driven
+  approach that loads project artifacts into context hits this ceiling.
+  The structural argument holds regardless of where the exact threshold
+  falls for any given model.
+
+  Implication for kos: the knowledge graph IS the retrieval layer. Instead
+  of loading all project artifacts, load structured graph data and let
+  the LLM traverse what's relevant. This is why orient-as-gathering-layer
+  matters — it's context budget management via structured retrieval.
+edges:
+  - target: question-orient-gathering-vs-interpreting
+    type: derives
+    note: "Context ceiling motivates structured gathering over bulk loading"
+  - target: question-knowledge-layer-requirements
+    type: derives
+    note: "Context ceiling is evidence for why YAML-in-git needs an index"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md §8"
+    - "An et al. 2024 — effective context length study"
+    - "Hsieh et al. 2024 — retrieval degradation study"
+    - "Chroma Research 2024 — context rot across 18 models"
+    - "penny-orc/docs/initiatives/lifecycle-composition/data/context-window-measurement-results.md"

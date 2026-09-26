@@ -1,0 +1,43 @@
+id: py-pep484-type-system-foundation
+type: element
+confidence: frontier
+title: "PEP 484: foundational type hints specification for Python"
+content: |
+  PEP 484 (Python 3.5, 2014) establishes the typing system for Python.
+  Key claims and commitments:
+
+  1. Type hints are optional and Python remains dynamically typed.
+     "Python will remain a dynamically typed language, and the authors
+     have no desire to ever make type hints mandatory, even by convention."
+
+  2. Only NOMINAL subtyping is specified. Classes must explicitly inherit
+     from abstract base classes to be considered subtypes.
+
+  3. Variable types are annotated via TYPE COMMENTS (# type: List[int]).
+     No first-class syntax for variable annotations exists.
+     "No first-class syntax support for explicitly marking variables as
+     being of a specific type is added by this PEP."
+
+  4. Annotations MUST be valid expressions that evaluate without raising
+     exceptions at function definition time.
+
+  5. Union types use Union[X, Y] syntax from typing module.
+
+  6. The typing module ABCs (Iterable, Sized, etc.) provide structural
+     behavior at RUNTIME via isinstance(), but PEP 484 only specifies
+     NOMINAL semantics for static type checking.
+
+  Source: pep-0484.rst (Status: Final)
+edges:
+  - target: py-pep526-variable-annotations
+    type: derives
+    note: "PEP 526 extends 484's variable annotation story"
+  - target: py-pep544-protocols
+    type: derives
+    note: "PEP 544 extends 484's subtyping model"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-probe-010
+  created_at: 2026-03-15
+  derived_from:
+    - pep-0484.rst

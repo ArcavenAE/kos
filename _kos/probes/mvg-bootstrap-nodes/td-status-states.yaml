@@ -1,0 +1,36 @@
+id: td-status-states
+type: element
+confidence: frontier
+title: "ThreeDoors task status state machine"
+content: |
+  CONTRADICTION: PRD and architecture define different status state sets.
+
+  Source A (product-scope.md, line 12):
+    "Task status management: complete, blocked, in progress, expand, fork,
+     procrastinate, rework"
+
+  Source B (high-level-architecture.md, lines 346-358):
+    States: todo, blocked, in-progress, in-review, complete
+    Transitions: todo → in-progress → in-review → complete, etc.
+
+  Discrepancies:
+  - PRD includes "expand, fork, procrastinate, rework" as statuses —
+    architecture treats expand/fork as actions (separate features in Phase 3.5+),
+    and "procrastinate" and "rework" don't exist anywhere in architecture
+  - Architecture includes "todo" and "in-review" — PRD doesn't list these
+  - These are different ontologies: PRD conflates statuses with actions,
+    architecture separates them
+
+  Graph signal: any node depending on "status" means something different
+  depending on which source it was derived from. The dependency edge is
+  type-unsafe — it connects to a different concept under the same name.
+depends_on:
+  - td-phase1-scope
+  - td-arch-phase1
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - product-scope.md
+    - high-level-architecture.md

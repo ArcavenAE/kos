@@ -1,0 +1,59 @@
+id: ax-mvp-scope-inflation
+type: element
+confidence: frontier
+title: "MVP scope inflation from PRD to functional requirements"
+content: |
+  The PRD product-scope.md defines a focused MVP:
+    - Core ingestion (100K EPS)
+    - Detection-as-code (YAML/TOML)
+    - WebUI (React/TypeScript)
+    - Sigma compatibility (90%+)
+    - Multi-tenant architecture
+    - 10 core IT integrations
+    - 3 OT protocols (Modbus, DNP3, S7comm)
+    - OT asset discovery
+    - 50+ OT detection rules
+    - Basic query language
+    - Alert notifications (webhook, email)
+    - Theming system
+    - White-label branding
+    - Internationalization groundwork
+
+  The functional requirements expand MVP well beyond this:
+    - FR1022-FR1027: context engine (MVP) — business hours, holiday
+      calendars, maintenance windows, cron schedules. Not mentioned in product-scope.
+    - FR1028-FR1037: Hybrid Real-Time & Stateful Alert Correlation Engine (MVP) —
+      multi-stage detection DAG, embedded-kv persistent state, per-entity risk scoring,
+      campaign grouping, backfill/replay. Product-scope says "Advanced correlation
+      rules" are Growth.
+    - FR314-FR338: plugin system (MVP) — WASM plugins,
+      plugin SDK, manifest schema. Not mentioned in product-scope.
+    - FR723-FR728: Schema-Native Architecture — full schema normalization at
+      ingestion time. Product-scope says "normalized schema" under the normalization context
+      but doesn't call out the 83 event classes or the proto pipeline.
+    - FR729-FR734, FR1015-FR1021: Two-tier columnar storage, table-per-class,
+      proto-backed events. Product-scope doesn't detail the storage architecture.
+
+  The pattern: product-scope defines a manageable MVP; the functional requirements
+  and architecture keep adding "MVP" features that weren't in the original scope
+  document. Each addition may be individually justified, but collectively they
+  represent significant scope inflation.
+
+  The context engine and correlation engine are particularly
+  notable: the product-scope puts "advanced correlation rules" in Growth, but
+  the functional requirements introduce a multi-stage DAG correlation engine
+  with embedded-kv persistence as MVP.
+depends_on: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - "project-alpha/_planning/prd/product-scope.md"
+    - "project-alpha/_planning/prd/functional-requirements.md"
+  reviewed_by: null
+tags:
+  - scope
+  - mvp
+  - inflation
+  - phase-conflict

@@ -1,0 +1,65 @@
+id: question-intent-under-context-break
+type: question
+confidence: frontier
+title: "How does intent survive context breaks without human as integration bus?"
+content: |
+  grv-human-as-integration-bus establishes that humans carrying context
+  between sessions doesn't scale. xMP demonstrated the failure mode.
+
+  Auftragstaktik solved an analogous problem: how do distributed actors
+  maintain coherent action toward commander's intent when communication
+  breaks down and local conditions diverge from the plan?
+
+  The military solution: push intent down, not instructions. Actors know
+  WHY, not just WHAT. Local judgment within intent boundaries replaces
+  central coordination.
+
+  KOS's version: agents across sessions lose context. The charter is a
+  compression artifact — lossy. The human was compensating for that loss.
+
+  The question: can intent be encoded in the graph at a level that
+  survives context breaks without human re-injection? Not "what to do"
+  (the orient output) but "why this matters and what we're optimizing for"
+  — the commander's intent equivalent.
+
+  The auftragstaktik gap: military intent works because humans have
+  judgment. Agents re-deriving intent from a graph may produce locally
+  coherent but globally divergent behavior — the same failure mode
+  auftragstaktik was designed to prevent, but without the human
+  judgment that makes it work.
+
+  This may be where the substrate hypothesis (finding-036) meets the
+  lifecycle research. The five properties files cannot have — first-class
+  relationships, preserved reasoning chains, on-demand projections,
+  context that survives session breaks, concurrent transaction semantics
+  — are the properties that would make intent survivable across context
+  breaks. The substrate IS the solution to intent persistence.
+
+  Relates to the original Q3 from session-001 ("what does the executive
+  loop look like as software") — this is Q3 sharpened by the graveyard
+  entries and the auftragstaktik mapping.
+edges:
+  - target: grv-human-as-integration-bus
+    type: derives
+    note: "Human-as-bus is graveyarded; this asks what replaces it"
+  - target: elem-auftragstaktik-intent-specs
+    type: derives
+    note: "Military solution to the analogous problem"
+  - target: grv-flat-file-context-scaling
+    type: derives
+    note: "Flat files can't carry intent across context breaks"
+  - target: question-orient-gathering-vs-interpreting
+    type: derives
+    note: "Gathering is necessary but not sufficient — intent requires interpretation"
+  - target: elem-conant-ashby-regulator
+    type: derives
+    note: "Intent is the minimal model that enables regulation without full state"
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "session-001 Q3 (executive loop)"
+    - "grv-human-as-integration-bus (session-013)"
+    - "elem-auftragstaktik-intent-specs (session-013)"
+    - "finding-036-substrate-hypothesis (session-011)"

@@ -1,0 +1,33 @@
+id: grv-documents-as-source
+type: graveyard
+confidence: graveyard
+title: "Documents as source of truth"
+content: |
+  The entire existing SDD ecosystem — PRDs, architecture docs, ADRs —
+  treated as source of truth rather than projection.
+graveyard:
+  approach: >
+    Use documents (PRD, architecture doc, ADRs, epics) as the authoritative
+    source of system understanding. Improve their format and rigor.
+  context: >
+    This is the universal current practice. Appeared to be the most
+    incremental and adoptable improvement path.
+  finding: >
+    Documents have no dependency modeling, no confidence classification,
+    no provenance, no ripple propagation. Agent mismatches against
+    untyped text are undetectable. Corruption is silent. The format
+    cannot be checksummed against reality. Improving document format
+    does not fix the fundamental lossiness.
+  ruling: >
+    Documents survive as rendering format only — a projection for
+    human consumption. They are views over the graph, not the graph.
+  reopener: >
+    If the cost of graph infrastructure proves prohibitive and a
+    typed document format with embedded dependency declarations
+    could approximate the graph properties, revisit. Threshold:
+    must support confidence classification, dependency tracking,
+    and provenance without external tooling.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

@@ -1,0 +1,50 @@
+id: grv-flat-file-context-scaling
+type: element
+confidence: graveyard
+title: "Flat-file context loading does not scale — measured ceiling at ~20 epics"
+content: |
+  Any spec-driven approach that loads project artifacts into a single
+  context window hits a hard ceiling as the project grows. This is
+  structural, not incidental.
+
+  Ruling evidence:
+  - 5 projects measured: context consumption ranges from 22% to 97%
+    of effective capacity BEFORE any work begins
+  - project-alpha (25 epics, 268 stories): 162K tokens, 97% of effective
+    capacity — PM agent has 5K tokens for conversation
+  - Growth drivers are quadratic or worse: stories × epics = linear,
+    cross-epic dependencies = n(n-1)/2, research artifacts accelerate,
+    contributor context multiplies
+  - schema-normalization spike stored research artifacts alongside project docs,
+    inflating partner-orchestrator to 92K (55%) with only 1 epic
+
+  Both BMAD and Pennyfarthing hit this wall. Pennyfarthing's structural
+  sharding (sprint sharding, tiered context, session extraction) defers
+  the wall but doesn't eliminate it. The retrieval problem — given 200
+  artifacts, which 5 are relevant? — remains unsolved by structural
+  sharding alone.
+
+  This is why kos exists. The knowledge graph IS the retrieval layer.
+  Instead of loading all files, load structured graph data. The graph
+  knows relationships; agents traverse rather than bulk-load.
+
+  Graveyarded: flat-file loading as a scaling strategy. Still the
+  current substrate (YAML-in-git) at small scale. But the ceiling
+  is measured and real.
+edges:
+  - target: elem-context-ceiling
+    type: derives
+    note: "Context ceiling is the evidence; this is the conclusion"
+  - target: question-knowledge-layer-requirements
+    type: derives
+    note: "Flat-file failure motivates the knowledge layer requirements"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md §8"
+    - "penny-orc/docs/initiatives/lifecycle-composition/data/context-window-measurement-results.md"
+graveyard:
+  ruling: "Measured data from 5 projects shows ceiling; structural argument holds for any file-backed approach"
+  date: "2026-02-14"

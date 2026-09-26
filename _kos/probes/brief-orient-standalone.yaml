@@ -1,0 +1,139 @@
+id: brief-orient-standalone
+type: brief
+confidence: frontier
+title: "Standalone orient probe — gathering layer for repos outside aae-orc"
+content: |
+  Implement orient for standalone repos (not under an aae-orc orchestrator)
+  and test whether a structured gathering layer produces better orientation
+  than the current string-matching filter.
+
+  This is simultaneously:
+  - A practical fix (orient doesn't work from ~/work/ftc)
+  - A test of the gathering-vs-interpreting hypothesis
+  - The first step toward kos being usable outside its own directory
+
+  ## Approach
+
+  1. Add Workspace::is_standalone() detection
+  2. Build gather_standalone() that reads the local _kos/ graph without
+     target-name filtering — all nodes, findings, probes, ideas, charter
+     items are relevant in a standalone repo
+  3. Refactor existing loaders to accept Option<&str> target (None = no
+     filter for standalone, Some = filter for orchestrator)
+  4. Output both human-readable and JSONL (--json)
+  5. Test from ftc (standalone) and switchboard (subrepo) to verify no
+     regression
+
+  The probe tests the gathering-vs-interpreting question by comparing:
+  - kos orient (human output) from ftc — what does the CLI show?
+  - kos orient --json from ftc piped into an LLM session — what does
+    the LLM synthesize from the same structured data?
+  - Manual orientation (LLM reads charter + graph directly) — baseline
+
+  ## Implementation details
+
+  Paths that need fixing for standalone _kos/ layout:
+  - Charter: workspace.root.join("charter.md") — correct path but must
+    show ALL items, not filter by target name
+  - Findings: must use _kos/findings/ not legacy kos_root/findings/
+  - Nodes: must use _kos/nodes/{bedrock,frontier,graveyard}/ not legacy
+  - Probes: _kos/probes/ (not shown in current orient at all)
+  - Ideas: _kos/ideas/ (not shown in current orient at all)
+
+  Orchestrator path (gather) is untouched — branching at run() level.
+
+depends_on:
+  - question-orient-gathering-vs-interpreting
+edges:
+  - target: question-orient-gathering-vs-interpreting
+    type: derives
+    note: "This probe tests the gathering-vs-interpreting hypothesis"
+  - target: question-standalone-kos-distribution
+    type: derives
+    note: "Standalone orient requires the binary to be reachable"
+  - target: brief-kos-orient
+    type: derives
+    note: "Extends the original orient probe to standalone repos"
+  - target: finding-037-bootstrap-seeding-gap
+    type: derives
+    note: "F037-F4 identified the workflow gap this probe addresses"
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"
+brief:
+  hypothesis: |
+    A standalone-aware gathering layer that outputs complete, unfiltered
+    graph data will:
+    (a) Fix the immediate problem (orient works from ftc)
+    (b) Produce richer orientation when consumed by an LLM than the
+        current string-matching filter produces for humans
+    (c) Not regress the orchestrator/subrepo use cases
+
+    If (a) and (c) but not (b): the fix is still valuable, but the
+    gathering-vs-interpreting split is not proven. The human output
+    may be sufficient.
+
+    If (a), (b), and (c): confirms that orient should evolve toward
+    structured gathering with LLM interpretation on top. The human
+    output becomes a convenience, not the primary interface.
+
+    If (a) fails: the standalone workspace model needs deeper work
+    than a codepath branch.
+  excluded_scope: |
+    - Process subcommands (kos idea, kos question, etc.) — separate work
+    - Built-in docs / help system — separate work
+    - Universal bridge framework — separate work
+    - Changes to the kos README
+    - Automated LLM integration (the LLM test is manual: pipe --json
+      output into a session and compare)
+  success_signal: |
+    Functional acceptance tests — run from standalone repo (~/work/ftc)
+    and orchestrator subrepo (aae-orc/switchboard):
+
+    FAT-1: Standalone discovery
+      cd ~/work/ftc && kos orient
+      Expected: header shows standalone indicator (e.g. "(standalone)").
+      Does NOT show "(no items found)" or suggest aae-orc targets.
+
+    FAT-2: Charter items shown unfiltered
+      cd ~/work/ftc && kos orient
+      Expected: ALL Bedrock/Frontier/Graveyard items from ftc/charter.md
+      listed. Not filtered by target name.
+
+    FAT-3: Nodes by confidence tier
+      cd ~/work/ftc && kos orient  (after adding nodes to _kos/nodes/)
+      Expected: bedrock, frontier, graveyard nodes listed by tier with
+      id and title. Empty tiers omitted or shown as empty.
+
+    FAT-4: Findings, probes, ideas displayed
+      cd ~/work/ftc && kos orient  (after adding to _kos/)
+      Expected: findings from _kos/findings/, probes from _kos/probes/,
+      ideas from _kos/ideas/ all appear.
+
+    FAT-5: Empty graph gives useful hint
+      cd ~/work/ftc && kos orient  (freshly initialized, no nodes)
+      Expected: charter items if charter exists. For empty sections,
+      hint says "add nodes to _kos/nodes/" — NOT "Try: kos orient kos".
+
+    FAT-6: Orchestrator subrepo unchanged
+      cd ~/work/aae-orc/switchboard && kos orient
+      Expected: same output as before — charter items filtered by
+      "switchboard", aae-orc RD briefs, findings. No regression.
+
+    FAT-7: kos repo itself unchanged
+      cd ~/work/aae-orc/kos && kos orient kos
+      Expected: same output as before. No regression.
+
+    FAT-8: JSONL includes standalone fields
+      cd ~/work/ftc && kos orient --json
+      Expected: JSONL includes node entries with confidence, probe
+      entries, idea entries. Machine-consumable.
+
+    Gathering-vs-interpreting comparison (manual, not automated):
+    FAT-9: Feed kos orient --json output into a Claude session.
+      Ask the LLM to orient on the project using only that data.
+      Compare quality against FAT-2 human output and against manual
+      orientation (LLM reads charter directly). Record which produced
+      better orientation and why.
+  timebox: "Session-013 (this session for implementation, testing may span)"

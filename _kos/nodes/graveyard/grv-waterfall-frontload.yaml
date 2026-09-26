@@ -1,0 +1,32 @@
+id: grv-waterfall-frontload
+type: graveyard
+confidence: graveyard
+title: "Comprehensive upfront specification"
+content: |
+  Exhaustive planning before implementation — the waterfall assumption.
+graveyard:
+  approach: >
+    Front-load design investment. Write complete specs before building.
+    Treat the unknown as a planning failure rather than a discovery opportunity.
+  context: >
+    Justified when code was expensive to write and impossible to throw away.
+    Remains dominant practice in most organizations.
+  finding: >
+    Code is now cheap enough to be a learning instrument. The assumption
+    that knowledge is front-loaded and execution is back-loaded is broken.
+    Front-loading produces false confidence in early stages and expensive
+    late-stage discovery of wrong assumptions. You don't know what you
+    don't know — and massive early investment assumes you do.
+  ruling: >
+    Inverted. Build to learn, encode findings into spec. The spec evolves
+    from probe evidence, not from planning sessions. The Charter Kernel
+    is the only front-loaded artifact — and it is deliberately thin.
+  reopener: >
+    For systems with genuine hard constraints known upfront (regulatory,
+    safety-critical, fixed external interfaces), partial front-loading
+    of those constraints as bedrock is appropriate. The constraint is
+    bedrock. Everything else follows the probe model.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

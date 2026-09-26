@@ -1,0 +1,89 @@
+id: grv-toulmin-argumentation-fields
+type: graveyard
+confidence: graveyard
+title: "Toulmin argumentation fields (grounds/warrant/rebuttal_conditions) as a general schema block — partially killed"
+content: |
+  Improvement #4 proposed adding Toulmin argumentation fields to nodes:
+  `claim` (title), `grounds` (edge refs to evidence), `warrant` (why
+  grounds support claim, one sentence), `rebuttal_conditions` (what
+  observation would defeat this). The reasoning became queryable in
+  principle: "show me every bedrock whose warrant depends on
+  single-operator observation."
+
+  The literature survey killed it. Argumentation formalisms are the
+  *canonical* Grudin victim [@grudin1996evaluating]: gIBIS
+  [@conklin1988gibis], QOC, and the whole design-rationale program
+  died on exactly this intrusiveness [@shipman1997design].
+  "Formality Considered Harmful" [@shipman1999formality] reads as a
+  pre-written obituary. The original proposal's own graveyard risk
+  ("if authors skip it, another soft constraint") understated the
+  case — the literature says authors WILL skip it, universally,
+  across four decades of attempts.
+
+  What survives: `rebuttal_conditions` on **bedrock only**, and only
+  because a machine consumes it — it doubles as Issue 24's
+  machine-checkable reopener trigger vocabulary. It is retained not as
+  argumentation but as trigger data. The generalized lesson is
+  captured in elem-machine-consumption-earns-formal-structure.
+
+  What is killed: `grounds` (edge refs of a special sub-type),
+  `warrant` (one-sentence justification prose), and the general
+  Toulmin block as a required or expected schema. Prose in `content:`
+  is where argumentation goes; edge type `derives` already carries
+  grounds-shaped relationships when they matter.
+graveyard:
+  approach: "Add Toulmin-model structured argumentation fields (claim/grounds/warrant/rebuttal_conditions) as a general schema block on nodes; `kos why <node>` traversal renderer."
+  context: |
+    The substrate hypothesis named "preserved reasoning chains" as a
+    property files can't provide. Structured argumentation looked like
+    it captured 60% of that property at schema level, no migration.
+    The instinct was correct that reasoning currently lives in prose
+    and dies there. What the proposal missed was cost incidence: authors
+    would carry the entire cost of adding structure while readers (or
+    a machine that would traverse it) provided the benefit — Grudin's
+    asymmetry expressed as schema.
+  finding: |
+    Argumentation formalisms are documented to fail specifically because
+    contributors resist fitting fluid ideas into rigid slots — even
+    contributors who WROTE the argument. The literature is unusually
+    definitive: gIBIS/QOC/IBIS all died from this. Any KOS proposal that
+    demands a warrant sentence per bedrock node is going to be skipped,
+    and the missing warrants will neither be caught nor filled in later.
+    Structured argumentation for HUMAN traversal is dead weight; structured
+    triggers for MACHINE traversal are infrastructure.
+  ruling: |
+    Reject: the general Toulmin block, warrant sentences on every bedrock
+    node, `kos why` as a warrant-traversal renderer.
+    Retain: `rebuttal_conditions` on bedrock (Improvement #4's single
+    survivor, and only because Issue 24 makes it machine-checkable
+    reopener vocabulary).
+    Generalize: "Formal structure earns admission only when a machine
+    consumes it" (elem-machine-consumption-earns-formal-structure).
+  reopener: |
+    Reopen only if: (a) a new tool consumes warrant/grounds structure
+    beyond `rebuttal_conditions` — the tool must exist or be scheduled,
+    not aspirational; OR (b) telemetry (roadmap v3 Issue 20) shows the
+    absence of structured argumentation is measurably preventing
+    retrieval on identifiable queries; OR (c) the Grudin cost/benefit
+    calculus flips because LLM agents demonstrably carry the authoring
+    load without heroic discipline (see question-ai-borne-capture-solves-grudin
+    and question-automate-incremental-formalization).
+edges:
+  - target: elem-formality-considered-harmful
+    type: derives
+    note: "The Shipman & Marshall literature is the ground for this graveyard."
+  - target: elem-machine-consumption-earns-formal-structure
+    type: instantiates
+    note: "This graveyard produced the generalized rule."
+  - target: elem-grudin-asymmetric-cost-benefit
+    type: derives
+    note: "Author-taxed at write time is the failure vector — see the cost-posture table in elem-who-pays-survival-predictor."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-nine-improvements.md §Improvement #4"
+    - "docs/kos-nine-improvements-reassessed.md §Partially Killed #4"
+    - "docs/kos-prior-work-survey.md §3, §13"
+    - "docs/kos-roadmap-v3.md §Deferred (Toulmin)"

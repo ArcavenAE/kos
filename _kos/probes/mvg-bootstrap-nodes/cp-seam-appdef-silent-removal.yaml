@@ -1,0 +1,42 @@
+id: cp-seam-appdef-silent-removal
+type: finding
+confidence: frontier
+title: "ApplicationDefinition removed without graveyard entry"
+content: |
+  Category 2 (Gap): Silent removal of a major design component
+
+  The original design-doc-composition.md proposed four resource kinds:
+  ApplicationDefinition, InfrastructureDefinition, InfrastructurePublication,
+  and Composition. ApplicationDefinition was a first-class concept with its
+  own detailed section, examples (Wordpress), and use cases.
+
+  The top-of-document note mentions that InfrastructureDefinition became
+  CompositeResourceDefinition and InfrastructurePublication's "publish"
+  became "offer". But ApplicationDefinition is not mentioned at all in the
+  note, nor in any of the later design documents.
+
+  The beta functions design and the revisions one-pager speak only of
+  Composite Resources (XRs) — the unified concept that absorbed both
+  infrastructure and application definitions. But no document records:
+  - When ApplicationDefinition was dropped
+  - Why the app/infra distinction was collapsed
+  - What was lost or gained by the unification
+  - Whether the application composition use case is still served
+
+  The original design spent significant effort distinguishing app-scoped
+  (namespaced) from infra-scoped (cluster) composition. That distinction
+  appears to have been abandoned, but the reasoning is not captured.
+edges:
+  - target: cp-composition-original-goals
+    type: derives
+    note: "Source of the ApplicationDefinition concept"
+  - target: cp-composition-beta-functions
+    type: derives
+    note: "Later design that does not reference ApplicationDefinition"
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

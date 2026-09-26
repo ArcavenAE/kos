@@ -1,0 +1,35 @@
+id: td-phase-structure
+type: element
+confidence: frontier
+title: "ThreeDoors phase organization"
+content: |
+  Product-scope.md defines the following phases:
+    Phase 1, Phase 2, Phase 3, Phase 3.5, Phase 3.5+ (twice, for different features),
+    Phase 4 (defined TWICE with overlapping content, lines 139 and 157),
+    Phase 4+, Phase 4.5, Phase 5 (defined TWICE — "Future Expansion" AND
+    "Feature Richness"), Phase 5.5, Phase 5.5+, Phase 6, Phase 6+, Phase 7, Phase 8
+
+  STRUCTURAL PROBLEMS:
+  1. Phase 4 appears twice. First definition (line 139): Jira, Apple Reminders,
+     sync hardening, Todoist. Second definition (line 157): same header, adds
+     CLI/TUI adapter wiring parity. The epic numbers differ.
+  2. Phase 5 appears twice. First (line 173): "Future Expansion (12+ months out)"
+     duplicating Phase 4 content (Jira, Apple Reminders, Todoist). Second (line 209):
+     "Feature Richness" with different content (Daily Planning, Snooze, Dependencies).
+  3. Features migrate between phases without trace: Jira integration is in
+     Phase 4 AND Phase 5.
+  4. Phase numbering uses ad-hoc suffixes (3.5, 3.5+, 4+, 4.5, 5.5, 5.5+, 6+)
+     suggesting phases were inserted after the original plan without restructuring.
+
+  Graph signal: phase nodes have duplicate IDs (violating uniqueness), overlapping
+  scope (violating clean dependency), and features with multiple parent phases
+  (violating single-source ownership). The phase structure itself is inconsistent
+  independent of whether any individual phase is correct.
+depends_on:
+  - td-vision
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - product-scope.md

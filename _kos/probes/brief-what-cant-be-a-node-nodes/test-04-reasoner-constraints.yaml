@@ -1,0 +1,80 @@
+id: test-04-reasoner-constraints
+type: observation
+confidence: frontier
+title: "Test: can the graph capture why a specific reasoner made a specific choice?"
+content: |
+  ## Decision tested
+
+  Session-003: agent recommended Q4 (code-only bootstrap) over Q5
+  (where does this break). Stated reasons: B7 targeting principle,
+  concrete and falsifiable, existing test subjects.
+
+  ## Unstated factor
+
+  Q4 is a better agent task than Q5. Code analysis (grep, read, compare)
+  is squarely within agent capability. "Where does this break" requires
+  philosophical probing, adversarial thinking about the system's own
+  assumptions, and the kind of skepticism that benefits from the human's
+  outside perspective.
+
+  The agent's capability profile influenced the recommendation. Not
+  consciously — the agent didn't think "I'm choosing this because it's
+  easier for me." But the reasoning naturally weighted factors that
+  the agent could evaluate (concreteness, falsifiability, available
+  data) over factors that require capabilities the agent is weaker at
+  (adversarial skepticism, meta-reasoning).
+
+  ## Attempt to decompose
+
+    id: meta-agent-capability-bias
+    type: observation
+    content: "Agent recommendations may favor tasks within agent
+      capability profile."
+    edges:
+      - target: question-charter-priority-encoding
+        type: derives
+
+  The node is writable. But notice: the agent writing this node is
+  describing its own blind spot POST HOC. At the time of the decision,
+  this factor was not available to the reasoner. The graph can record
+  the observation after the fact, but it couldn't have GENERATED the
+  observation as a live signal during the decision.
+
+  ## What resists
+
+  Provenance captures WHO made a node (agent:claude@opus-4-6). It does
+  not capture WHAT THAT REASONER'S CONSTRAINTS WERE. The graph treats
+  all provenance as equivalent: human-created and agent-created nodes
+  have the same schema, the same edge types, the same confidence levels.
+
+  But they're NOT equivalent. A human-created bedrock value carries
+  the weight of experience and judgment. An agent-created bedrock
+  finding carries the weight of systematic analysis within a session.
+  These are different KINDS of confidence, collapsed into the same
+  enum. The derives edge from a finding to a recommendation means
+  "supported by evidence." The derives edge from an axiom to a
+  recommendation means "motivated by conviction." The graph doesn't
+  distinguish these.
+
+  ## Category: TACIT / REASONER-DEPENDENT
+
+  The graph flattens epistemological character. A technical claim, a
+  value judgment, a political constraint, and a capability-limited
+  recommendation all become: a node with content and edges. The schema
+  distinguishes node TYPES (value, finding, question) but edges are
+  untyped with respect to epistemological character. A derives edge
+  from empirical evidence behaves identically to a derives edge from
+  prior conviction.
+
+  ## Severity
+
+  MEDIUM. The type system partially addresses this (values vs findings
+  vs observations). But edges don't carry the distinction forward.
+  When you traverse the graph, you lose WHY each edge exists in the
+  epistemological sense. "This node derives from that node" tells you
+  topology, not epistemology.
+edges: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15

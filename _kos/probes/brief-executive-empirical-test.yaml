@@ -1,0 +1,101 @@
+id: brief-executive-empirical-test
+type: brief
+confidence: frontier
+title: "Q3 empirical test: executive mechanism against ThreeDoors, Kubernetes, OpenHands"
+content: |
+  The executive mechanism proposal (executive-mechanism-proposal) was
+  designed from KOS's own history and validated against the same history.
+  That's circular. This probe tests it against independent data: three
+  real projects with maximally different governance profiles.
+
+  ## Sample
+
+  ThreeDoors — solo developer, weak governance, 10 issues (finding-001)
+  Kubernetes KEPs — large team, strong governance, 2 issues (finding-007)
+  OpenHands — mid-size team in architectural transition, 7 issues (finding-012)
+
+  Selection rationale: polar governance profiles to test whether the
+  mechanism works across the governance gradient (B7), not just at one
+  point. All three have decomposed findings with typed nodes — real
+  data to test convergence detection against.
+
+  ## What we're testing
+
+  For each project, apply the executive mechanism's claims and check
+  whether they hold:
+
+  1. CONVERGENCE DETECTION: Do the issues in each project exhibit
+     convergence patterns (multiple independent paths to the same
+     structural region)? If yes, would the proposed thresholds
+     (3+ paths, 2-hop radius) have fired? If not, is that correct
+     (no convergence = no escalation needed)?
+
+  2. PRIORITY FUNCTION: Given the issues found, does the composite
+     score (dependency_depth × governance_gap × tractability ×
+     adjacent_evidence) produce sensible rankings? Would the
+     highest-ranked issue be the right one to investigate first?
+
+  3. HUMAN CHANNEL NECESSITY: Which issues required judgment that
+     the automated channels cannot provide? Is this consistent with
+     finding-019 (human as meta-epistemologist)?
+
+  4. GRAPH MATURITY MODEL: ThreeDoors = young/absent graph,
+     K8s = mature process (proxy for stable graph), OpenHands =
+     transitioning (proxy for growing graph). Do the proposed
+     maturity-dependent behaviors match what each project needs?
+
+  5. MAINTENANCE VS. DISCOVERY BALANCE: For each project, what
+     ratio of maintenance to discovery work would the executive
+     recommend? Does this match the actual signal profile?
+
+  ## Success criteria
+
+  1. Convergence detection fires on at least one project where the
+     issues genuinely cluster (not just co-occur).
+  2. Convergence detection does NOT fire on K8s (2 issues, both
+     gaps — no convergence expected).
+  3. The priority function ranks issues in an order a human reviewer
+     would agree is reasonable for at least 2 of 3 projects.
+  4. At least one issue per project is identified where the human
+     channel would have been necessary.
+  5. The maturity model's predicted behavior matches actual signal
+     profile for all 3 projects.
+
+  If all 5: confirms (executive mechanism holds across governance).
+  If 3-4: partial (mechanism needs tuning, not redesign).
+  If <3: disconfirms (mechanism is fitted to KOS, not general).
+
+depends_on:
+  - executive-mechanism-proposal
+edges:
+  - target: executive-mechanism-proposal
+    type: derives
+    note: "mechanism being tested"
+  - target: finding-001-mvg-bootstrap
+    type: derives
+    note: "ThreeDoors test data"
+  - target: finding-007-kubernetes
+    type: derives
+    note: "Kubernetes test data"
+  - target: finding-012-openhands
+    type: derives
+    note: "OpenHands test data"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-15
+brief:
+  hypothesis: |
+    The executive mechanism is general enough to produce correct
+    behavior across three maximally different governance profiles.
+    If convergence detection, the priority function, and the
+    maturity model hold against independent project data, the
+    mechanism is not overfitted to KOS.
+  excluded_scope: |
+    - The remaining 9 projects (tested after the three-project pass)
+    - Implementation (still mechanism design, not code)
+    - Calibrating exact threshold values (that requires more data)
+  success_signal: |
+    See success criteria above. The bar is 5/5 for confirms,
+    3-4 for partial, <3 for disconfirms.
+  timebox: "Session-004, second probe cycle"

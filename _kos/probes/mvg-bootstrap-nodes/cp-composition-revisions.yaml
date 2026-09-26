@@ -1,0 +1,28 @@
+id: cp-composition-revisions
+type: element
+confidence: frontier
+title: "CompositionRevision design for controlled rollout"
+content: |
+  The CompositionRevision one-pager (Nic Cope) introduces immutable snapshots
+  of Compositions. Key points:
+  - Each Composition update creates a CompositionRevision
+  - XRs pin to a specific revision via compositionRevisionRef
+  - compositionUpdatePolicy: Automatic (default) or Manual
+  - CompositionRevision schema is a superset of Composition schema
+  - Garbage collection deferred (many revisions may be in use simultaneously)
+
+  This design was written when Compositions used only P&T resources.
+  It does not mention Functions at all.
+
+  Source: /tmp/kos-probes/crossplane/design/one-pager-composition-revisions.md
+edges:
+  - target: cp-composition-original-goals
+    type: derives
+    note: "Extends the original Composition design with versioning"
+  - target: cp-fn-rollout
+    type: derives
+    note: "Function rollout design builds on this foundation"
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

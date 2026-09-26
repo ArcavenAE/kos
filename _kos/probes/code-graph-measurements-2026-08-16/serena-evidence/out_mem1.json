@@ -1,0 +1,29 @@
+[
+  {
+    "label": "__initialize__",
+    "seconds": 2.37
+  },
+  {
+    "label": "write-mem",
+    "tool": "write_memory",
+    "args": {
+      "memory_name": "probe_marker",
+      "content": "Probe marker written by aae-orc-5lbu at test time. If a later session reads this, memories persist across server restarts."
+    },
+    "seconds": 0.865,
+    "error": null,
+    "chars": 28,
+    "text": "Memory probe_marker written.",
+    "ts": "15:38:04"
+  },
+  {
+    "label": "list-after-write",
+    "tool": "list_memories",
+    "args": {},
+    "seconds": 0.106,
+    "error": null,
+    "chars": 52,
+    "text": "{\"memories\": [\"memory_maintenance\", \"probe_marker\"]}",
+    "ts": "15:38:04"
+  }
+]

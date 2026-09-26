@@ -1,0 +1,35 @@
+id: question-brief-as-prediction-record
+type: question
+confidence: frontier
+title: "Is the brief already a prediction record, missing only the confidence measurement?"
+content: |
+  Every probe brief contains a hypothesis — a prediction about what the
+  probe will find. The finding records the outcome. The gap between them
+  is the prediction error signal.
+
+  Currently that signal is discarded. The brief and finding are linked
+  by a derives edge but the delta — how confident was the prediction,
+  how wrong was it, in what direction — is never measured or recorded.
+
+  If briefs recorded predicted confidence before probes run, and findings
+  recorded actual outcome with surprise magnitude, the existing
+  brief→finding structure becomes a calibration instrument.
+
+  This requires one schema addition: predicted_confidence on briefs,
+  and surprise_magnitude (or prediction_delta) on findings.
+
+  The hypothesis: this single measurement discipline, applied consistently,
+  turns KOS from a record-keeping system into a system that knows how well
+  it predicts its own findings — and can weight future predictions
+  accordingly. No new architecture. The existing structure used correctly.
+
+  Test: add predicted_confidence to the next three briefs before probes run.
+  Measure deviation at harvest. See if the delta carries signal.
+
+depends_on:
+  - question-predictor-layer
+  - elem-spec-cycle
+provenance:
+  created_by: human
+  session: session-013
+  created_at: "2026-04-05"

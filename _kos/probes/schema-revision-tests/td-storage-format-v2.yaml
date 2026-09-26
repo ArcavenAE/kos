@@ -1,0 +1,39 @@
+# SCHEMA REVISION TEST: td-storage-format re-expressed with typed edges
+#
+# Original version: contradiction encoded in content field as prose.
+# This version: contradiction expressed as a typed edge.
+#
+# The test: is the contradiction structurally detectable from the edges
+# alone, without reading the content?
+
+id: td-storage-format
+type: element
+confidence: frontier
+title: "ThreeDoors Phase 1 task storage format"
+content: |
+  Two documents make incompatible claims about storage format.
+  PRD: tasks.txt (plain text). Architecture: tasks.yaml (structured YAML).
+  Different data models — line-per-task vs. structured records.
+edges:
+  - target: td-phase1-scope
+    type: derives
+  - target: td-arch-phase1
+    type: derives
+  - target: td-arch-phase1
+    # THIS IS THE NEW PART: the contradiction is a typed edge, not prose.
+    # A tool scanning for "contradicts" edges can find this without reading
+    # the content. The node becomes structurally flagged.
+    type: contradicts
+    note: "PRD claims tasks.txt; architecture claims tasks.yaml"
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+
+# ASSESSMENT:
+# - The contradiction is now in the edge, not the content.
+# - A tool can find all contradicts edges without reading any content.
+# - The content still has the explanation for human readers.
+# - The note field on the edge gives a one-line summary.
+# - VERDICT: improvement. The content field is still useful but the
+#   structural signal is now in the graph topology.

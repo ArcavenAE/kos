@@ -1,0 +1,42 @@
+id: cp-seam-validation-stale-api
+type: finding
+confidence: frontier
+title: "Validation webhook references alpha Functions API, not beta"
+content: |
+  Category 2 (Gap): Stale cross-reference
+
+  The Composition Validating Webhook design (design-doc-composition-validating-webhook.md)
+  references the `functions` field on Compositions:
+
+    "functions: a list of Composition Functions that can be used to generate
+     or modify the Composed Resources. Given that it's an alpha feature..."
+
+  The beta design replaced `functions` with `pipeline` and changed the
+  Composition to use `mode: Pipeline`. The webhook design's discussion of
+  how to handle Functions — "short-circuit any unnecessary check" when
+  functions are present — is based on the alpha model.
+
+  The webhook design's Status is "Draft", which may explain the staleness.
+  But the document remains in the active design/ directory, not defunct/,
+  and a reader could reasonably treat its claims about Functions as current.
+
+  The practical impact: any implementation following this design would need
+  to be reconciled with the beta API (pipeline steps, functionRef, input)
+  rather than the alpha API (functions array, type: Container).
+edges:
+  - target: cp-validation-webhook
+    type: derives
+    note: "The webhook design contains the stale reference"
+  - target: cp-composition-beta-functions
+    type: derives
+    note: "The beta design that the webhook should reference"
+  - target: cp-composition-alpha-functions
+    type: derives
+    note: "The defunct alpha API that the webhook actually references"
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

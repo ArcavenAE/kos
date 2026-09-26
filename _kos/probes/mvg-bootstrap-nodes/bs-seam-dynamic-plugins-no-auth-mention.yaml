@@ -1,0 +1,49 @@
+id: bs-seam-dynamic-plugins-no-auth-mention
+type: element
+confidence: frontier
+title: "Gap: BEP-0002 dynamic plugins does not address auth for dynamically loaded code"
+content: |
+  Category 2 (Gap).
+
+  BEP-0003 establishes that all plugin routes are protected by default
+  via HttpRouterService, and that plugins must explicitly opt out using
+  addAuthPolicy. BEP-0002 proposes loading arbitrary frontend plugin
+  code at runtime via Module Federation.
+
+  BEP-0002 makes no mention of:
+  - How dynamic plugins interact with the auth architecture
+  - Whether dynamically loaded plugins can call backend APIs that
+    require authentication
+  - How the singleton sharing of auth-related packages (e.g.,
+    @backstage/frontend-plugin-api) ensures the auth context is
+    properly propagated to dynamic plugins
+  - Whether a dynamic plugin's backend counterpart needs any
+    special auth configuration
+
+  BEP-0002 lists react, react-dom, react-router-dom as singleton
+  "must have" shared packages but does not list any @backstage/core
+  auth packages. If the auth context is provided via React context
+  (which BEP-0002's own section on React context sharing confirms works),
+  the auth packages would need to be singletons too. This is not stated.
+
+  This is a gap rather than a contradiction because BEP-0002 is
+  "provisional" status and explicitly marks several sections as TBD.
+  But it is a gap at a security-critical seam: dynamic code loading
+  and authentication are deeply entangled concerns.
+
+  Sources: BEP-0002 (singleton "must have" list), BEP-0003 (AuthService design)
+edges:
+  - target: bs-bep0002-dynamic-frontend-plugins
+    type: derives
+  - target: bs-bep0003-auth-evolution
+    type: derives
+tags:
+  - backstage
+  - seam
+  - auth
+  - dynamic-plugins
+  - security
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-backstage-probe"
+  created_at: "2026-03-15"

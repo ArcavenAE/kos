@@ -1,0 +1,20 @@
+id: oh-runtime-readme-impl-mismatch
+type: claim
+confidence: frontier
+claim:
+  text: >
+    openhands/runtime/README.md states there are "currently four
+    implementations: Docker, Remote, Modal, Runloop" in the ./impl/
+    directory. The actual ./impl/ directory contains: docker, remote,
+    local, cli, action_execution, kubernetes. Modal and Runloop are not
+    in ./impl/ — they live under third_party/runtime/impl/ (along with
+    daytona and e2b). Meanwhile, Local, CLI, and Kubernetes runtimes
+    exist in ./impl/ but are not mentioned in the README's enumeration
+    of four. The README's count and listing are both stale.
+  source_doc: openhands/runtime/README.md
+  contradicted_by:
+    - openhands/runtime/impl/ (directory listing)
+    - third_party/runtime/impl/ (directory listing)
+  severity: medium
+  category: stale-enumeration
+tags: [seam, runtime, documentation, stale]

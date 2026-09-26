@@ -1,0 +1,192 @@
+id: finding-001-mvg-bootstrap
+type: finding
+confidence: frontier
+title: "MVG Bootstrap Finding: the checksum property is real, but the graph's value is structural, not observational"
+content: |
+  ## Summary
+
+  We decomposed three ThreeDoors planning documents (executive-summary.md,
+  product-scope.md, high-level-architecture.md) into 12 typed KOS nodes with
+  declared dependencies. The decomposition surfaced 10 inconsistencies across
+  the document set. The probe question was: does the graph make these
+  inconsistencies structurally visible, or does it just require careful reading?
+
+  ## Answer: PARTIAL — with an important distinction
+
+  The inconsistencies fall into two categories, and the graph handles them
+  differently:
+
+  ### Category 1: Contradictions (graph DOES surface these structurally)
+
+  These are cases where two nodes claim different values for the same thing.
+  In the graph, they manifest as two nodes that SHOULD share a dependency
+  but CAN'T, because they describe incompatible states:
+
+  - **td-storage-format**: PRD says tasks.txt, architecture says tasks.yaml.
+    In the graph: td-phase1-scope and td-arch-phase1 both claim to define
+    storage, but their content is incompatible. A downstream node (e.g., a
+    data-model node) cannot depend_on both without inheriting a contradiction.
+
+  - **td-door-keys**: PRD says A/W/D, architecture says 1/2/3.
+    Same structure — incompatible claims under the same concept.
+
+  - **td-status-states**: PRD conflates statuses with actions; architecture
+    separates them. This is the deepest inconsistency — it's not just a
+    different value, it's a different ONTOLOGY for the same concept.
+
+  - **td-detail-view-provenance**: Architecture explicitly claims a feature
+    is "not in original PRD" when it IS in the PRD. The provenance metadata
+    is false. In graph terms: the architecture node's stated relationship to
+    the PRD node contradicts the PRD node's actual content.
+
+  **Graph signal for Category 1**: When you try to write a depends_on edge
+  from an implementation node to both a PRD node and an architecture node,
+  and those nodes disagree, the dependency graph becomes INCONSISTENT.
+  You can't build a clean graph. The act of trying to connect them forces
+  the contradiction to surface. This is structural — you don't need to read
+  the documents to find it. You just need to try to build the graph.
+
+  ### Category 2: Gaps (graph surfaces these, but less automatically)
+
+  These are cases where a node exists in one document but has no corresponding
+  node in another document where it should:
+
+  - **td-personas**: Defined in vision, never referenced by scope or architecture.
+    Graph signal: a node with depends_on edges TO it from no implementation node.
+    The graph shows this as an orphan — a leaf with no consumers. Visible, but
+    only if you're looking for nodes that SHOULD have consumers.
+
+  - **td-mood-tracking**: Success criterion depends on feature depends on
+    architecture that doesn't include it. Graph signal: a broken dependency
+    chain. The path from td-mood-tracking to td-arch-phase1 goes through
+    td-phase1-scope, but td-arch-phase1 has no mood component. The chain
+    breaks. This IS structurally visible — you can trace the path and find
+    the gap.
+
+  - **td-val-progress**: Value declared in vision, reduced to UI message in
+    scope, absent from architecture. Graph signal: a value node with no
+    dependency path to architectural decisions. Visible as structural isolation.
+
+  - **td-phase-structure**: Phases with duplicate IDs, overlapping scope,
+    features assigned to multiple phases. Graph signal: violates uniqueness
+    constraints and creates ambiguous dependency targets.
+
+  ### Category 3: Temporal drift (graph doesn't surface this well)
+
+  - Phase 1 marked VALIDATED in exec summary but still "In Scope" in product
+    scope. This is a temporal consistency problem — the documents are snapshots
+    at different times. The current schema has no mechanism for temporal state;
+    confidence is the closest analog but it's not the same thing.
+
+  ## Assessment against success criteria
+
+  From brief-mvg-bootstrap:
+
+  1. "We can take one real SDD document and decompose it into typed nodes
+     that conform to the schema" — **YES**. The schema handled all three
+     documents. No fields were missing. The type system (element, value)
+     was sufficient. depends_on worked for expressing inter-document
+     relationships.
+
+  2. "The dependency graph between those nodes is expressible in depends_on"
+     — **YES**, but with a caveat. depends_on can express that node A was
+     derived from node B. It CANNOT express that node A CONTRADICTS node B.
+     We had to encode contradictions in the content field, not in the
+     relationship structure. The schema has no edge type for "contradicts"
+     or "supersedes."
+
+  3. "At least one inconsistency is structurally apparent in the graph that
+     is NOT apparent reading the source document" — **YES, multiple**.
+     The strongest example: td-mood-tracking's broken dependency chain is
+     invisible when reading any single document. Executive summary says mood
+     correlation is a success criterion. Product scope says mood tracking is
+     Phase 1. Architecture doesn't include mood in Phase 1. Each document
+     is internally consistent. The inconsistency only exists BETWEEN them,
+     and the graph makes it visible as a broken path.
+
+  ## Schema observations
+
+  Things the schema handled well:
+  - type enum was sufficient (element, value covered everything)
+  - depends_on expressed cross-document relationships
+  - content field was flexible enough for contradiction documentation
+  - One-node-per-file kept each claim isolated and traceable
+
+  Things the schema needs:
+  - **Edge types beyond depends_on**: contradicts, supersedes, implements,
+    refines. depends_on is necessary but not sufficient. The PRD-to-architecture
+    relationship is "implements" not "depends_on" — the architecture depends
+    on the PRD, but it also CLAIMS to implement it, and that claim can be
+    checked.
+  - **Temporal state**: confidence (bedrock/frontier/graveyard) doesn't
+    capture "completed" or "validated." Phase 1 is bedrock by evidence
+    but the schema has no way to say "this was frontier, is now done."
+  - **Contradiction edges**: When two nodes disagree, the graph should
+    be able to express that disagreement as a typed relationship, not
+    just as content in a third node that documents the conflict.
+
+  ## What the -rs.md would say
+
+  The lifecycle-improvement-rs.md identifies "implementation drift invisible"
+  and "changes ripple without tracking" as structural problems. This probe
+  confirmed both:
+  - Implementation drift: architecture drifted from PRD on storage format,
+    key bindings, status states, and provenance claims. Each drift is invisible
+    in the drifting document.
+  - Ripple without tracking: Phase structure grew (3.5, 3.5+, 4+, etc.)
+    without updating the documents that reference phases. Features migrated
+    between phases without trace.
+
+  The graph didn't just confirm these problems exist — it made them enumerable
+  and traceable. That's the checksum property: not that the graph finds
+  problems a human can't, but that it makes problems COUNTABLE and CONNECTED
+  rather than anecdotal.
+depends_on:
+  - brief-mvg-bootstrap
+  - question-mvg-bootstrap
+  - val-spec-is-product
+  - elem-shadow-principle
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - brief-mvg-bootstrap
+    - td-storage-format
+    - td-door-keys
+    - td-status-states
+    - td-phase1-scope
+    - td-arch-phase1
+    - td-vision
+    - td-val-progress
+    - td-personas
+    - td-mood-tracking
+    - td-phase-structure
+    - td-detail-view-provenance
+    - td-arch-phase23
+  reviewed_by: null
+finding:
+  probe: brief-mvg-bootstrap
+  result: partial
+  details: |
+    The checksum property is confirmed: the graph surfaces inter-document
+    inconsistencies that are invisible in individual documents. However,
+    the result is PARTIAL, not CONFIRMS, because:
+
+    1. The schema needs edge types beyond depends_on to fully express
+       relationships (implements, contradicts, supersedes)
+    2. Temporal state (completed, validated) is not captured by the
+       confidence classification
+    3. Category 1 contradictions are structurally forced to surface
+       (you can't build a clean graph), but Category 2 gaps require
+       actively looking for missing edges — they're visible but not
+       automatic
+
+    The partial result spawns new questions:
+    - question-edge-types: What relationship types beyond depends_on
+      does the schema need?
+    - question-temporal-state: How should the schema handle temporal
+      status (done, validated, superseded) vs. epistemic confidence?
+    - question-automated-detection: Can gap detection (Category 2) be
+      made automatic through schema constraints rather than manual
+      inspection?

@@ -1,0 +1,46 @@
+id: val-incremental-formalization
+type: value
+confidence: bedrock
+title: "Incremental formalization — never require up-front classification (Shipman & Marshall guardrail)"
+content: |
+  Never require up-front classification. Let structure emerge on
+  demand. This is Shipman & Marshall's escape hatch from the
+  "Formality Considered Harmful" trap [@shipman1999formality;
+  @marshall2003which] — the pattern that killed gIBIS, QOC, and the
+  Semantic Web's agent vision.
+
+  Operational form for KOS:
+  - Schema minimum: id, type, confidence, title, content. Everything
+    else optional at write time.
+  - Fields the tooling acts on may become required (e.g., typed edges
+    for `kos orient --ready`), but only for the subset of nodes the
+    tooling will consult. Formality is earned per node, not demanded
+    of the schema.
+  - `kos capture` proposes defaults for id/type/tier/edges; every
+    field human-confirmed. Default-with-override replaces blank-page-
+    with-schema (roadmap v3.1 R3/Issue 31).
+  - `kos finding` interrogates at authorship — "which brief?
+    [none → post_hoc: true]" — teaching the schema at the point of
+    use, not up front (roadmap v3.1 R4/Issue 4 extended).
+
+  Sharpened form: formal structure earns admission only when a
+  machine consumes it. See elem-machine-consumption-earns-formal-structure.
+
+  Source: docs/kos-prior-work-survey.md §Recommendations Stage 1;
+  docs/kos-roadmap-v3.md §M1 (Enforcement Inversion posture);
+  docs/kos-roadmap-v3_1.md §Issue 4 extended, §Issue 31.
+  Derived from: elem-formality-considered-harmful.
+edges:
+  - target: elem-formality-considered-harmful
+    type: derives
+    note: "The literature finding this guardrail is built on."
+  - target: elem-machine-consumption-earns-formal-structure
+    type: supports
+    note: "The sharpened operational form."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md §Recommendations Stage 1"
+    - "docs/kos-roadmap-v3_1.md §Issue 4, §Issue 31"

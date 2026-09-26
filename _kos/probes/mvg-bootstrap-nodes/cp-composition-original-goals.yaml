@@ -1,0 +1,31 @@
+id: cp-composition-original-goals
+type: element
+confidence: frontier
+title: "Original Composition design goals (design-doc-composition.md)"
+content: |
+  The original Composition design (Nic Cope, ~2020) established these goals:
+  - Empower platform teams to provide opinionated infrastructure abstractions
+  - Enable portable abstractions across infrastructure providers and runtimes
+  - Enable sharing and reuse of abstractions
+  - Leverage KRM for declarative, low/no-code modeling
+  - Avoid imposing unnecessary opinions about how apps/infra should function
+
+  The design proposed four new resource kinds: ApplicationDefinition,
+  InfrastructureDefinition, InfrastructurePublication, and Composition.
+  Composition was intentionally limited — no conditionals, no iteration,
+  no DSL. The "extension points" section explicitly anticipated future
+  HelmComposition, KustomizeComposition variants as separate types.
+
+  Key structural decision: Compositions should be immutable. Updates to a
+  'from' resource propagate to 'to' resources, but the set of 'to' resources
+  is stable over the lifetime of the composite resource.
+
+  Source: /tmp/kos-probes/crossplane/design/design-doc-composition.md
+edges:
+  - target: cp-composition-beta-functions
+    type: derives
+    note: "Beta functions design builds on these original goals"
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-crossplane-probe"
+  created_at: "2026-03-15"

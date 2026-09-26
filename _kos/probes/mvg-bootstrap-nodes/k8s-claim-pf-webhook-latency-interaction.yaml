@@ -1,0 +1,50 @@
+id: k8s-claim-pf-webhook-latency-interaction
+type: element
+confidence: frontier
+title: "P&F concurrency accounting vs authorization webhook latency"
+content: |
+  KEP-1040 accounts for request concurrency from the point a request enters
+  the P&F filter until it completes. A request occupies a "seat" during
+  this time.
+
+  KEP-3221 allows multiple authorization webhooks with configurable timeouts
+  (max 30s each) and configurable failure policies. Authorization happens
+  as part of request processing, so webhook latency is part of the time
+  the request occupies a P&F concurrency seat.
+
+  This means:
+  - Adding more authorization webhooks (enabled by KEP-3221) increases per-request
+    latency, which increases seat occupancy time in P&F.
+  - A slow or unreachable authorization webhook (timeout up to 30s) occupies
+    a P&F seat for the full timeout duration.
+  - With multiple webhooks in the chain, worst-case seat occupancy is
+    sum of all webhook timeouts.
+
+  KEP-3221 acknowledges this indirectly: "the only case where API Server
+  requests would be impacted is when the cluster administrator defines
+  multiple webhooks."
+
+  KEP-1040 does not account for authorization webhook latency as a factor
+  in seat cost estimation. Its width/cost model focuses on request execution
+  (etcd operations, serialization) not pre-authorization pipeline stages.
+  This is a gap rather than a contradiction -- the KEPs were developed at
+  different times and P&F's cost model was designed before multi-webhook
+  authorization was an option.
+
+  Source: KEPs 1040, 3221
+edges:
+  - target: k8s-claim-authz-chain-ordering
+    type: derives
+    note: "Multiple webhooks in the chain compound latency"
+  - target: k8s-claim-pf-request-categorization
+    type: derives
+    note: "P&F seat occupancy is affected by authz latency"
+tags:
+  - k8s
+  - authorization
+  - flow-control
+  - latency
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-k8s-probe"
+  created_at: "2026-03-15"

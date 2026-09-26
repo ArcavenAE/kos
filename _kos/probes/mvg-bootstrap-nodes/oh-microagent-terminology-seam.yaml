@@ -1,0 +1,30 @@
+id: oh-microagent-terminology-seam
+type: claim
+confidence: frontier
+claim:
+  text: >
+    The skills/README.md carefully distinguishes V0 "microagents" from V1
+    "skills" and documents the directory migration (.openhands/microagents/
+    to .openhands/skills/). However, at least five other documents continue
+    to use "microagent" terminology exclusively without V0/V1 qualification:
+    (1) AGENTS.md refers to "Public Microagents" and "Repository Microagents"
+    with no mention of "skills" or V1; (2) the glossary at
+    .openhands/microagents/glossary.md defines "Microagent", "Public
+    Microagent", "Repository Microagent" with no V1 terminology;
+    (3) skills/add_agent.md instructs creating files in
+    .openhands/microagents/ (the V0 path) and its triggers include
+    "microagent" but not "skill"; (4) openhands/resolver/README.md
+    refers only to "repository microagent"; (5) skills/default-tools.md
+    self-describes as "a repo microagent". The V0 terminology has not
+    been updated in peripheral docs to match the V1 transition described
+    in skills/README.md.
+  source_doc: skills/README.md
+  contradicted_by:
+    - AGENTS.md
+    - .openhands/microagents/glossary.md
+    - skills/add_agent.md
+    - openhands/resolver/README.md
+    - skills/default-tools.md
+  severity: low
+  category: stale-terminology
+tags: [seam, v0-v1, microagent, skills, terminology]

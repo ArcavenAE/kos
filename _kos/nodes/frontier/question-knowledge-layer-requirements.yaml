@@ -1,0 +1,57 @@
+id: question-knowledge-layer-requirements
+type: question
+confidence: frontier
+title: "Where does YAML-in-git break, and what's the minimum additional infrastructure needed?"
+content: |
+  Revised from session-005's initial framing ("what properties must the
+  knowledge layer have?"). The original question asked for theoretical
+  requirements before evaluating architectures — an approach that violates
+  G3 (waterfall front-loading) and delays building indefinitely.
+
+  The revised question: the knowledge layer is currently YAML nodes in git,
+  read by humans and agents via file I/O. The aae-orc ecosystem already
+  uses this approach through RD briefs (sprint/rd/*.md), charter items,
+  and CLAUDE.md files. ThreeDoors uses JSONL (retrospector-findings.jsonl)
+  for structured per-PR metrics. These are working at current scale.
+
+  At what scale and complexity does this approach break, and what is the
+  minimum additional infrastructure needed when it does?
+
+  Known pressure points (from session-005 analysis):
+  - Cross-repo orientation: starting in a subrepo loses orchestrator
+    context (marvel F-08, charter F10). Requires reading multiple files
+    across repos and filtering by relevance. Currently manual.
+  - Finding retrieval: 48 RD findings across 2 repos + 26 kos findings
+    in a third. No unified query. Grep works today; won't at 200+.
+  - Edge traversal: schema has typed edges but no tooling follows them.
+    Checking whether a finding's dependencies are still valid requires
+    manual YAML reading.
+  - Ripple propagation: designed (finding-018) but never implemented.
+    The simplest version (hash content, walk derives edges, flag dirty
+    consumers) doesn't need infrastructure beyond what exists.
+
+  The answer comes from building: implement the simplest tools (orient
+  CLI, schema validator, graph renderer, drift detector) on the current
+  YAML-in-git substrate. Where they hit limits, those limits ARE the
+  requirements list — discovered empirically, not theorized.
+
+  Candidate architectures remain relevant but are evaluated AFTER the
+  simple approach demonstrates its failure modes, not before.
+edges:
+  - target: elem-cognitive-architecture
+    type: derives
+    note: "Knowledge layer is one of three layers in B6"
+  - target: elem-storage-model
+    type: derives
+    note: "Current substrate is git; G5 already flagged its limits"
+  - target: elem-shadow-principle
+    type: derives
+    note: "The knowledge layer must hold what projections lose"
+  - target: finding-027-implementation-pivot
+    type: derives
+    note: "Session-005 analysis grounded this question in ecosystem needs"
+provenance:
+  created_by: human
+  session: session-005
+  created_at: 2026-03-29
+  reviewed_by: null

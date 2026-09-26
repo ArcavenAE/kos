@@ -1,0 +1,115 @@
+id: brief-signal-to-noise
+type: brief
+confidence: frontier
+title: "Q5 probe: signal-to-noise — do the issues the graph finds actually matter?"
+content: |
+  Open question 5, untested angle: signal-to-noise. The graph finds
+  issues at document seams. Twelve projects, dozens of issues. But do
+  they matter? Did they cause bugs? Did anyone fix them? Did they get
+  ignored because they're noise?
+
+  This is the validation question. Everything else KOS has established
+  (the checksum property, the ripple engine, the executive mechanism)
+  assumes the signal is worth finding. If the signal doesn't matter,
+  the system is an expensive way to generate false alarms.
+
+  ## Approach
+
+  For each of three projects (ThreeDoors, OpenClaw, Atmos), ask:
+
+  1. CONSEQUENCE: Did any of the issues the graph would find cause
+     real problems? Bugs filed, user confusion, implementation errors,
+     wasted effort? Evidence from GitHub issues, commit history, and
+     project artifacts.
+
+  2. RESPONSE: Were any of the issues independently discovered and
+     fixed by the project? If so, how long between the issue existing
+     and being fixed? The graph should find things faster than organic
+     discovery — if it doesn't, it's not adding value.
+
+  3. NOISE: Which issues are technically real but practically
+     irrelevant? Stale counts that nobody reads, terminology drift
+     that causes no confusion, contradictions between docs that
+     nobody consults? These are true positives that don't matter —
+     the worst kind of signal, because they train people to ignore
+     the system.
+
+  4. MISSING: What problems does the project ACTUALLY have that the
+     graph missed? Check GitHub issues for complaints about docs,
+     confusion, implementation mismatches. If the real pain is in
+     places the graph doesn't look, the graph is measuring the wrong
+     thing.
+
+  For ThreeDoors: the owner (Michael) can provide ground truth.
+  For OpenClaw and Atmos: GitHub issues, commit history, and
+  community discussions are the evidence.
+
+  ## Starting sample
+
+  ThreeDoors — control, owner provides ground truth on all 10 issues.
+  OpenClaw — massive, active, rich issue tracker to cross-reference.
+  Atmos — has ADRs, schema-driven, real governance. Different signal
+  class expected.
+
+  After the three-project test, expand to more from the active lineup.
+
+  ## Design constraints
+
+  - This is an EMPIRICAL probe, not a design probe. We need data.
+  - For ThreeDoors, the human IS the ground truth.
+  - For OpenClaw and Atmos, we need to actually probe the projects
+    first (they're new to the lineup), then check our findings
+    against their issue trackers and history.
+  - The graph's value is not "finds issues" but "finds issues that
+    matter faster than organic discovery." The bar is not zero noise
+    — it's better signal-to-noise than the alternative (no graph).
+
+depends_on:
+  - finding-022-executive-twelve-project-synthesis
+edges:
+  - target: finding-022-executive-twelve-project-synthesis
+    type: derives
+    note: "twelve-project data established that the graph finds signal — this tests whether the signal matters"
+  - target: finding-001-mvg-bootstrap
+    type: derives
+    note: "ThreeDoors ground truth from original probe"
+  - target: project-lineup
+    type: derives
+    note: "project selection from expanded lineup"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-004
+  created_at: 2026-03-16
+brief:
+  hypothesis: |
+    At least half the issues the graph finds at document seams have
+    real consequences (bugs, confusion, wasted effort, or delayed
+    discovery of problems). The other half are noise — true but
+    practically irrelevant. The graph's value is in the consequential
+    half, and the noise is manageable if it can be filtered by the
+    executive mechanism's priority function.
+
+    If the consequential fraction is below 30%, the graph is too
+    noisy to be useful without significant filtering. If above 70%,
+    the graph is remarkably precise and the noise concern is
+    overstated.
+  excluded_scope: |
+    - Redundancy angle (separate probe — do code and docs produce
+      the same signal?)
+    - Fixing the issues found (this probe detects, doesn't repair)
+    - Tooling for noise filtering (executive mechanism handles this)
+  success_signal: |
+    1. For ThreeDoors: human ground truth on all 10 issues — which
+       mattered, which didn't, which caused real problems
+    2. For OpenClaw: at least 3 issues found, cross-referenced against
+       GitHub issues for independent discovery
+    3. For Atmos: at least 3 issues found, cross-referenced against
+       ADRs and issue tracker
+    4. A signal-to-noise ratio calculated across all three projects
+    5. At least one issue the graph missed that the project's own
+       community found (the MISSING category)
+
+    If ratio ≥ 50% consequential: confirms (signal is worth finding).
+    If 30-50%: partial (signal exists but noise is a real problem).
+    If < 30%: disconfirms (graph generates more noise than signal).
+  timebox: "Session-004, third probe cycle"

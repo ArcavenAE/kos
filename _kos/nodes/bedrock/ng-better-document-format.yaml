@@ -1,0 +1,14 @@
+id: ng-better-document-format
+type: non-goal
+confidence: bedrock
+title: "Not a better document format"
+content: |
+  Documents are a rendering format for human consumption — a projection
+  of the graph, not the source of truth. KOS is not a new document schema,
+  a new wiki, or a new way to organize markdown files.
+
+  The graph is the source. Documents are views over it.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

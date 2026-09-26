@@ -1,0 +1,49 @@
+id: question-delivery-finding-channel
+type: question
+confidence: frontier
+title: "Should kos implement the delivery finding channel — upward flow from implementation to spec?"
+content: |
+  The lifecycle composition document (§5) identifies that implementation
+  drift has no upward channel in BMAD. Stories don't get delivered exactly
+  as specified. The drift is invisible — the story closes, the spec stays
+  unchanged, the gap grows silently.
+
+  The proposed solution: every implementation divergence flows upward as
+  a structured Delivery Finding — what changed, why, and what spec
+  artifacts are now stale. The architecture authority reviews and either
+  updates the spec or flags the implementation.
+
+  kos already has:
+  - findings (the node type)
+  - edges with types (derives, contradicts, supersedes)
+  - drift detection (content hash + edge walk)
+
+  kos does NOT have:
+  - A mechanism to create findings from code changes automatically
+  - A way to link code commits to graph nodes bidirectionally
+  - A "delivery finding" node type that specifically captures
+    implementation-spec divergence
+  - An upward channel that routes drift to a spec authority
+
+  Hypothesis: kos's finding type + edge types + drift detection could
+  implement the delivery finding channel if the bridge framework provides
+  the bidirectional link between code and graph. The mechanism exists;
+  the wiring doesn't.
+
+  This is related to the universal bridge idea (read-in from code) and
+  the code-only bootstrap finding (finding-016 — code produces different
+  signal than documents).
+edges:
+  - target: elem-drift-propagation-taxonomy
+    type: derives
+    note: "Delivery findings need propagation classification"
+  - target: elem-ai-improvisation-past-broken-refs
+    type: derives
+    note: "Without upward channel, agents improvise past drift"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-013
+  created_at: "2026-04-05"
+  derived_from:
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md §5"
+    - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-tier-comm-protocol.md"

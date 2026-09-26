@@ -1,0 +1,16 @@
+id: val-spec-is-product
+type: value
+confidence: bedrock
+title: "The spec is the product"
+content: |
+  Code is a sketch medium. Cheap, parallel, disposable. What is expensive
+  is accumulated understanding. The spec is where that lives. Code implements
+  the spec. Code is evidence. Understanding is the deliverable.
+
+  This principle inverts the classical order: build to learn, then encode
+  what was learned into the spec. The spec matures from probe findings,
+  not from upfront planning.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

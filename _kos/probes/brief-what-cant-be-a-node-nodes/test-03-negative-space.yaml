@@ -1,0 +1,79 @@
+id: test-03-negative-space
+type: observation
+confidence: frontier
+title: "Test: can the graph represent what was never considered?"
+content: |
+  ## Decision tested
+
+  KOS chose a graph model. What alternatives were NOT considered?
+  - Relational database model (tables of requirements with foreign keys)
+  - Flat document index (enhanced search over existing docs)
+  - Wiki with backlinks (Obsidian/Roam-style)
+  - Formal methods (TLA+, Alloy — specification as proof)
+
+  Were these tried and rejected (graveyard)? Or never considered
+  (negative space)?
+
+  The graveyard has 4 entries (G1-G4). None of them are "relational
+  model" or "wiki" or "formal methods." G1 (documents as primary
+  artifact) is closest to the flat index, but it's about documents-as-
+  truth, not documents-as-searchable-index.
+
+  ## Attempt to decompose
+
+  You could write a graveyard node for each:
+    id: grv-relational-model
+    content: "Not considered. No evidence of evaluation."
+    graveyard:
+      approach: "Relational database model for requirements"
+      finding: "Never evaluated."
+      ruling: "N/A — not tried."
+
+  But this is dishonest. A graveyard entry says "tried, ruled out,
+  permanently recorded." These weren't tried. Writing a graveyard node
+  for something never considered performs knowledge that doesn't exist.
+
+  ## What resists
+
+  The graph has two states for alternatives:
+  - GRAVEYARD: tried, rejected, here's why
+  - ABSENT: not in the graph at all
+
+  There is no third state: "not tried, not rejected, simply outside the
+  space of things that were considered." Negative space is the complement
+  of the graph — everything the graph DOESN'T contain. By definition, it
+  can't be IN the graph without becoming positive space.
+
+  The graph can't represent its own boundaries. It can say "we tried X
+  and it failed" (graveyard). It cannot say "we never thought of X."
+  The absence of a node is not a node.
+
+  ## Category: NEGATIVE SPACE
+
+  Genuine structural resistance. Not "hard to express" — logically
+  impossible without changing what the graph IS. To represent negative
+  space, you'd need a meta-graph that describes the SCOPE of the
+  object graph, which is a different artifact.
+
+  ## Severity
+
+  HIGH for completeness claims, LOW for practical use. The graph never
+  claims to be complete — val-uncertainty-structural says uncertainty is
+  first-class. But if someone asks "did you consider approach X?", the
+  graph's silence means either "we graveyarded it and I can't find the
+  entry" or "we never thought of it" — and those have very different
+  implications. The graph can't distinguish its own gaps from its own
+  decisions.
+
+  ## Possible mitigation
+
+  A "scope" node type that declares what the graph COVERS — not what
+  it decided, but what it considered. Everything outside declared scope
+  is acknowledged negative space. This doesn't eliminate the problem
+  (the scope node itself has a boundary) but it moves the boundary
+  from invisible to declared.
+edges: []
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15

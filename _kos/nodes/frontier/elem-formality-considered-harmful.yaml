@@ -1,0 +1,59 @@
+id: elem-formality-considered-harmful
+type: element
+confidence: frontier
+title: "Formality is costly and frequently counterproductive; incremental formalization is the escape hatch (Shipman & Marshall)"
+content: |
+  Shipman & Marshall's "Formality Considered Harmful" [@shipman1999formality]
+  and Marshall & Shipman's "Which Semantic Web?" [@marshall2003which] show
+  forced premature classification drives abandonment. Contributors resist
+  fitting fluid ideas into rigid node/link types; the cost of learning a
+  formal representation and then expressing an idea in it is much higher
+  than expressing the same idea informally, even for people who have paid
+  the learning cost.
+
+  Concrete evidence:
+  - gIBIS/QOC design rationale systems failed on exactly this
+    intrusiveness [@conklin1988gibis; @shipman1997design].
+  - Semantic Web / Cyc-scale ontologies underestimated authoring cost;
+    Cyc has run since 1984 with hundreds of person-years invested and
+    has not yielded general common-sense AI [@lenat1990cyc;
+    @marshall2003which].
+  - Enterprise wikis are frequently abandoned when they demand
+    up-front structure.
+
+  The escape hatch: **incremental formalization**. Never require
+  up-front classification. Let structure emerge on demand — the LLM
+  or human adds type/edges/tier only when the tooling is about to act
+  on that structure. The default is prose or a placeholder; formality
+  is earned by machine consumption, not demanded by policy. See
+  elem-machine-consumption-earns-formal-structure for the sharpened
+  form of this rule.
+
+  Prescriptive consequence for KOS: no schema field is required at
+  authoring time except id/type/confidence/title/content. Everything
+  else — edges, warrants, decay classes, rebuttal conditions — must
+  either be optional-at-write or filled in by tooling that already
+  earns the ceremony. Charter-inflation vs. cheap-node-authoring is a
+  live symptom of this constraint (see finding-041-charter-inflation-as-graph-gap).
+
+  Source: docs/kos-prior-work-survey.md §Key Findings #2, §3, §13;
+  docs/kos-roadmap-v3.md §M1 (Enforcement Inversion posture);
+  docs/kos-roadmap-v3_1.md R3–R4 (cheap-node authoring, fail-visibly-at-authorship).
+edges:
+  - target: val-incremental-formalization
+    type: supports
+    note: "This is the ground for the incremental-formalization guardrail."
+  - target: grv-toulmin-argumentation-fields
+    type: supports
+    note: "Toulmin argumentation is the canonical Grudin/Shipman victim."
+  - target: elem-machine-consumption-earns-formal-structure
+    type: supports
+    note: "Sharpened form of the incremental-formalization rule."
+provenance:
+  created_by: agent
+  session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
+  created_at: "2026-07-05"
+  derived_from:
+    - "docs/kos-prior-work-survey.md — Key Findings #2; §3, §13"
+    - "docs/kos-roadmap-v3.md §M1"
+    - "docs/kos-roadmap-v3_1.md §MR Issue 31, Issue 4 extended"

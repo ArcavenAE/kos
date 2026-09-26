@@ -1,0 +1,29 @@
+id: po-rs-drift-invisible
+type: element
+confidence: frontier
+title: "RS claim: implementation drift has no upward channel"
+content: |
+  The rs.md argues that when stories are delivered differently than specified,
+  BMAD has no mechanism to flow that information upward. The story closes,
+  the spec stays unchanged, and the gap grows silently. In AI-agent systems,
+  drift is uniquely dangerous: a broken reference causes the agent to
+  improvise rather than fail, propagating errors silently.
+
+  The rs.md proposes a "Delivery Finding" channel — structured upward
+  communication from implementation to spec authority. The Tier Communication
+  Protocol companion document formalizes this.
+
+  This claim directly contradicts the practice visible in the project's own
+  PRDs, which show no mechanism for drift detection or upward flow. The
+  bikeshop-prd.md describes a system with elaborate real-time telemetry
+  but no channel for "the implementation diverged from the spec."
+
+  Source: lifecycle-improvement-rs.md, section 5.
+depends_on:
+  - po-rs-lifecycle-incomplete
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - lifecycle-improvement-rs.md

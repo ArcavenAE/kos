@@ -1,0 +1,111 @@
+id: ripple-mechanism-proposal
+type: element
+confidence: frontier
+title: "Ripple engine: dirty-flag propagation with typed attenuation"
+content: |
+  ## Core mechanism
+
+  When a node's content hash changes, propagate a dirty flag along its
+  outgoing edges. Not all edges propagate equally.
+
+  ## Propagation rules by edge type
+
+  **contradicts edges: ALWAYS PROPAGATE (full strength)**
+  If either end of a contradicts edge changes, the other end is
+  DIRTY_HARD. These are the highest-severity signals. A resolved
+  contradiction (edge removed) clears the dirty flag.
+
+  **derives edges: PROPAGATE DOWNSTREAM with attenuation**
+  If B derives from A and A changes, B is dirty. Directionality:
+  source→dependent (A changed, so things derived from A may be stale).
+  Attenuation by distance:
+  - Distance 1: DIRTY_HARD (direct dependency changed)
+  - Distance 2: DIRTY_SOFT (indirect dependency, may be absorbed)
+  - Distance 3+: DIRTY_STALE (distant change, batch reviewable)
+  Multiple DIRTY_SOFT signals from different sources escalate to
+  DIRTY_HARD (convergent evidence of staleness).
+
+  **implements edges: PROPAGATE BIDIRECTIONALLY, asymmetric**
+  Spec changes → implementation is DIRTY_HARD (spec ahead of code).
+  Implementation changes → spec is DIRTY_SOFT (code ahead of spec,
+  lower severity because code changes more frequently, many are
+  spec-irrelevant).
+
+  **supersedes edges: STOP PROPAGATION (firebreak)**
+  If A supersedes B and B changes, nothing happens. B is no longer
+  authoritative. The supersedes edge absorbs the ripple. This is how
+  the graph handles intentional evolution without cascading dirty flags
+  through history.
+
+  ## Cross-lens propagation (correspondence layer)
+
+  Code-derived and doc-derived nodes connect via correspondence edges.
+  Propagation strength depends on correspondence confidence:
+  - declared: propagate at full strength
+  - inferred: propagate as DIRTY_STALE (lower confidence in the link)
+  - stale: generate "re-evaluate link" signal, don't dirty the target
+
+  This handles finding-016's complementary lenses. A code change
+  ripples through inferred correspondence at reduced strength. A doc
+  change ripples through declared correspondence at full strength.
+
+  ## Source-type weighting
+
+  The epistemological flattening problem (finding-017) is partially
+  mitigated by weighting propagation depth by source node type:
+  - type: value change → propagate to full depth (foundational)
+  - type: finding change → propagate to depth 2 (evidence is local)
+  - type: observation change → propagate to depth 1 (ephemeral)
+
+  This uses the existing type system as a proxy for epistemological
+  character without requiring new edge types.
+
+  ## Signal classification interaction
+
+  Edges already carry optional signal classification (error/evolution/
+  drift). The ripple engine uses this:
+  - signal: error → always DIRTY_HARD regardless of distance
+  - signal: evolution → DIRTY_SOFT (acknowledged change, verify handling)
+  - signal: drift → DIRTY_STALE (known staleness, batch update)
+  - unclassified → use distance-based attenuation defaults
+
+  ## Dirty states
+
+  DIRTY_HARD: requires human review. Direct contradiction or dependency
+  change. Cannot be auto-resolved.
+
+  DIRTY_SOFT: may require review. Indirect dependency or code-ahead-of-
+  spec. Accumulates — multiple soft from different sources → hard.
+
+  DIRTY_STALE: low priority. Known drift, inferred correspondence,
+  distant changes. Batch reviewable.
+
+  CLEAN: no upstream changes pending, or all reviewed and confirmed.
+
+  ## What ripple does NOT do
+
+  Ripple is MAINTENANCE, not DISCOVERY. It propagates consequences of
+  changes along EXISTING edges. It does not:
+  - Find contradictions that haven't been encoded as edges
+  - Discover missing edges (gaps)
+  - Identify phase boundary erosion (a structural pattern, not an edge)
+  - Look inside node content for inconsistencies
+
+  Discovery is the probe cycle's job. Ripple maintains the graph after
+  probes have identified the structure. The executive loop (Q3)
+  coordinates between discovery (probes) and maintenance (ripple).
+
+edges:
+  - target: finding-016-code-only-bootstrap
+    type: derives
+    note: "cross-lens propagation requirement"
+  - target: finding-017-what-cant-be-a-node
+    type: derives
+    note: "epistemological flattening constraint → source-type weighting"
+  - target: finding-014-twelve-project-synthesis
+    type: derives
+    note: "signal classification interaction"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15

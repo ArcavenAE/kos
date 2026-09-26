@@ -1,0 +1,33 @@
+id: ax-code-parser-divergence
+type: observation
+confidence: frontier
+title: "Spike uses parser-A; main uses parser-B — technology migration visible from code alone"
+content: |
+  spike/Cargo.toml declares parser-A + parser-A-derive as workspace dependencies.
+  spike/crates/alpha-detection/Cargo.toml and spike/crates/alpha-query/Cargo.toml
+  both depend on parser-A.
+
+  Main Cargo.toml declares parser-B = "0.10" with comment "architecture decision:
+  parser-B over parser-A." Main crates alpha-detection and alpha-query depend on
+  parser-B (workspace).
+
+  docs/.archive/diagrams/architecture/index.md still references "parser-A DSL."
+
+  .claude/known-spec-conflicts.md acknowledges this as SC-STORY-1-1-PEST:
+  "Historical artifact... Pest was later replaced by parser-B (Feb 2026
+  architecture decision)."
+
+  Code-only signal: the contradiction is detectable, and the project already
+  caught and triaged it. But the stale docs/.archive reference persists.
+edges:
+  - target: ax-detection-dsl-parser
+    type: implements
+    note: "same contradiction, independently rediscovered from code"
+provenance:
+  created_by: agent:claude@opus-4-6
+  session: session-003
+  created_at: 2026-03-15
+  derived_from:
+    - project-alpha/Cargo.toml
+    - project-alpha/spike/Cargo.toml
+    - project-alpha/.claude/known-spec-conflicts.md

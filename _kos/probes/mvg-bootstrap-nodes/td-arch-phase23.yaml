@@ -1,0 +1,37 @@
+id: td-arch-phase23
+type: element
+confidence: frontier
+title: "ThreeDoors Phase 2-3 five-layer architecture"
+content: |
+  Post-MVP architecture evolves to five layers:
+  1. TUI Layer (internal/tui)
+  2. Core Domain (internal/core)
+  3. Adapter Layer (internal/adapters) — TaskProvider interface
+  4. Sync Engine (internal/sync)
+  5. Intelligence Layer (internal/intelligence) — calendar, LLM, learning
+
+  Key principles: dependency inversion, adapter registry, offline-first,
+  local-first calendar (no OAuth), no external services at runtime.
+
+  SCOPE MISMATCH with product-scope.md:
+  - Architecture assigns Adapter Registry to "Epic 7" and Phase 3
+  - Product scope puts adapter pattern in Phase 2
+  - Architecture says Intelligence Layer is Phase 3-4
+  - Product scope puts mood tracking (intelligence prerequisite) in Phase 1
+  - The five layers don't map cleanly to phases — layer 3 spans Phases 2-3,
+    layer 5 spans Phases 2-4, with no clear handoff points
+
+  Graph signal: the architecture claims to implement the scope, but the
+  phase mapping between them is inconsistent. A depends_on edge from
+  arch-phase23 to phase2-scope would fail validation because the scope
+  boundary differs between documents.
+depends_on:
+  - td-arch-phase1
+  - td-phase1-scope
+provenance:
+  created_by: agent:claude@opus-4
+  session: session-002
+  created_at: 2026-03-15
+  derived_from:
+    - high-level-architecture.md
+    - product-scope.md

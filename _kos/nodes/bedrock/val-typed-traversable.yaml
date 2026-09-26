@@ -1,0 +1,17 @@
+id: val-typed-traversable
+type: value
+confidence: bedrock
+title: "Understanding-execution relationship must be typed and traversable"
+content: |
+  The relationship between spec understanding and code execution must be
+  typed, versioned, and traversable in both directions — or it will
+  silently corrupt.
+
+  Untyped relationships decay. Changes propagate invisibly. Agent
+  mismatches produce plausible-looking wrong output. The correspondence
+  layer exists because a hyperlink and a foreign key constraint both
+  reference something, but only one tells you when the reference breaks.
+provenance:
+  created_by: human
+  session: session-001
+  created_at: 2026-03-15

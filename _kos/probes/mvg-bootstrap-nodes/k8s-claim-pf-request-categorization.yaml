@@ -1,0 +1,38 @@
+id: k8s-claim-pf-request-categorization
+type: element
+confidence: frontier
+title: "KEP-1040 categorizes requests by FlowSchema for priority and fairness"
+content: |
+  KEP-1040 introduces FlowSchema and RequestPriority (later PriorityLevelConfiguration)
+  objects. Each request is matched to a FlowSchema, which assigns it to a priority
+  level and flow.
+
+  FlowSchemas match on authenticated request attributes: user identity (username,
+  groups) and work characteristics (resource, namespace, verb, API group).
+  The matching is a boolean predicate built from atomic tests (ANDed, then ORed).
+
+  Key behaviors:
+  - system:masters are matched to an exempt priority level (system-top) and bypass
+    concurrency limits entirely. This is hardcoded as a backstop: "Whenever a request
+    whose groups include system:masters is not matched by any actual FlowSchema object,
+    a backstop equivalent to the system-top object is considered to exist."
+  - Requests categorized at exempt priority are never queued or rejected.
+  - Non-exempt requests are dispatched via fair queuing with shuffle sharding.
+
+  The FlowSchema matching uses user/group identity from authentication but
+  does NOT reference authorization decisions. P&F acts on the request
+  AFTER authentication but independently of authorization outcome.
+
+  Source: keps/sig-api-machinery/1040-priority-and-fairness/README.md
+edges:
+  - target: k8s-claim-pf-system-masters
+    type: derives
+    note: "system:masters is the key boundary between exempt and non-exempt"
+tags:
+  - k8s
+  - api-machinery
+  - flow-control
+provenance:
+  created_by: "agent:claude-opus-4-6@1m"
+  session: "session-kos-k8s-probe"
+  created_at: "2026-03-15"
