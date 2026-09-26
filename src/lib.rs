@@ -8,6 +8,7 @@ pub mod doctor;
 pub mod drift;
 pub mod error;
 pub mod findings;
+mod gitenv;
 pub mod graph;
 pub mod init;
 pub mod model;

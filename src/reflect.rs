@@ -293,9 +293,8 @@ fn build_reflection(
 // ── Git helpers ──────────────────────────────────────────────
 
 fn run_git(root: &Path, args: &[&str]) -> Option<String> {
-    std::process::Command::new("git")
+    crate::gitenv::git_in(root)
         .args(args)
-        .current_dir(root)
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::null())
         .output()
@@ -1199,7 +1198,6 @@ fn short(s: &str) -> &str {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use std::process::Command;
 
     use super::*;
 
@@ -1233,9 +1231,12 @@ mod tests {
     // ── shared git fixture ───────────────────────────────────────
 
     /// Run git in `dir` with an isolated identity and signing disabled, so
-    /// fixtures never touch the developer's global gitconfig or a signing key.
+    /// fixtures never touch the developer's global gitconfig or a signing key,
+    /// and with the repository-local variables dropped, so a GIT_DIR inherited
+    /// from a hook cannot turn `git init` and `git commit` here into commits on
+    /// the repository being pushed.
     fn git(dir: &Path, args: &[&str]) {
-        let status = Command::new("git")
+        let status = crate::gitenv::git_in(dir)
             .args([
                 "-c",
                 "user.name=kos-test",
@@ -1247,7 +1248,6 @@ mod tests {
                 "init.defaultBranch=main",
             ])
             .args(args)
-            .current_dir(dir)
             .status()
             .expect("git runnable");
         assert!(status.success(), "git {args:?} failed");
