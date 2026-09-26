@@ -4,10 +4,9 @@
 **Author seat:** arcaven-architect-g5-0, on an operator commission relayed by
 director (brief `2026-09-25-kos-opaque-finding-ids`)
 **Status:** design and plan only. Nothing here is built. Where this note
-departs from the 2026-09-16 ruling, it says **PROPOSAL** and the ruling stands
-until the operator rules again. **Ruled since:** the prefix (2.3), on
-2026-09-25. Hash inputs, the length floor, the citation key and the gate are
-still proposals.
+departed from the 2026-09-16 ruling, it made a proposal; every one has since
+been **RULED 2026-09-25** by the operator (section 4) and is marked so where
+it appears.
 **Decision of record:** `_kos/nodes/bedrock/elem-kos-artifact-id-scheme.yaml`.
 **Study:** `_kos/findings/finding-173-kos-artifact-id-allocation-study.md`.
 **Implementation ticket:** `aae-orc-wmna4`.
@@ -58,7 +57,7 @@ retry loop, which is why it fixes `CreatedAt` before minting. kos writes the id
 into the file once and never recomputes it, so nobody ever needs to derive the
 same id twice.
 
-**Recommendation (PROPOSAL, changes the ruling's reference inputs):** draw 16
+**RULED 2026-09-25 (amends the 2026-09-16 reference inputs):** draw 16
 bytes from the OS random source for each attempt and encode them with bd's
 base36 and byte widths. Keep bd's attempt loop (ten tries per length, then grow
 toward 8) so exhaustion behaves the same. Record `created_at` in the file's
@@ -92,7 +91,7 @@ population n. The chance of any clash among m blind mints at length L is
 At L=3 the space is also smaller than it looks: bd consumes 2 bytes (65,536
 values) mod 46,656, so the effective space is about 41,600.
 
-**Recommendation (PROPOSAL, changes bd's MinLength of 3):**
+**RULED 2026-09-25 (departs from bd's MinLength of 3):**
 
 - Set the floor to 4 in every graph. Keep bd's adaptive growth over n, because
   it still sizes the retry cost against merged findings.
@@ -102,7 +101,7 @@ values) mod 46,656, so the effective space is about 41,600.
 - The duplicate check in `kos validate` stays the backstop for the residue,
   which the table puts under 0.1 percent per fan-out even at 50 arms.
 
-### 2.3 Prefix (ruled 2026-09-25)
+### 2.3 Prefix (RULED 2026-09-25)
 
 **Ruling (operator, 2026-09-25, on kos#110):** keep a prefix. The prefix is
 the project that owns the finding, which names the scope of the id namespace:
@@ -190,7 +189,8 @@ What must change is classification:
   empty, so the key is the whole stem, slug included. Two minted findings
   that collide on id with different slugs get different keys, and the
   duplicate check, the backstop for the blind set in 2.2, never sees the
-  collision. The key change has to land before the first minted finding.
+  collision. **RULED 2026-09-25:** the key change (`aae-orc-ottn4`) lands
+  before any id is minted.
 - **Resolution.** Every reader resolves the same forms through one function in
   `findings.rs`:
   - the key (`finding-173`, `finding-aae-orc-k3m9`);
@@ -210,11 +210,11 @@ What must change is classification:
     which keeps orc `finding-173` and kos `finding-173` apart without edits.
     Opaque ids need no such rule.
 
-**Slug as citation key (PROPOSAL, changes "slug kept ... as the citation
+**Citation key (RULED 2026-09-25, amends "slug kept ... as the citation
 key"):** fan-out arms handed one topic are the case most likely to pick the
 same slug. Two graphs picking the same slug is harmless, because the prefix
 separates them. Two findings in one graph picking the same slug is the real
-case, and there the slug cannot be the key. I recommend:
+case, and there the slug cannot be the key. So:
 
 - The canonical citation is the id (`finding-aae-orc-k3m9`).
 - The slug stays in the filename for readers and resolves as an alias while it
@@ -269,15 +269,16 @@ facts argue for keeping it advisory until the migration lands:
 - The orc has no CI at all, so for the graph that collides most there is
   nothing to make required yet. Wiring comes first (`aae-orc-bs28`).
 
-**Recommendation, a ruling request, not a change:**
+**RULED 2026-09-25:**
 
-- Once the validate key change ships and 175/177 are renumbered, make only the
-  duplicate-id section of `kos validate` a required check, in kos CI now and in
-  orc CI when bs28 wires it.
+- Once the validate key change (`aae-orc-ottn4`) ships and 175/177 are
+  renumbered (`aae-orc-rr5h2`), only the duplicate-id section of
+  `kos validate` becomes a required check: in kos CI then, and in orc CI when
+  `aae-orc-bs28` wires it. That needs the section runnable on its own with its
+  own exit status, so a required job can run it beside the advisory one.
 - Everything else in validate stays advisory: warnings, drift, and the
   numbered-above-marker warning.
-- Default if the operator does not rule: stays advisory. Nothing ships without
-  a ruling. Expiry: revisit at the first fan-out after adoption.
+- Revisit at the first fan-out after adoption.
 
 ## 3. Plan
 
@@ -292,25 +293,25 @@ are pieces that land in their own PR.
 | 4 | `aq finding` and `aq harvest` accept prefixed keys with a prefix-aware match instead of the slug glob | orc: `tools/aq` | fixture dir with `finding-aae-orc-k3m9-x.md` and a slug containing `k3m9`: `aq finding finding-aae-orc-k3m9`, `aq finding k3m9` and `aq finding x` each print only the finding; a numbered key still pads | 1 | `aae-orc-6di8d` |
 | 5 | Authoring guidance and adoption: set `numbered_through` per graph, change "next free number" text to the mint verbs | orc: `CLAUDE.md`, `.claude/rules/` where findings are authored; kos: `CLAUDE.md`; each graph's `kos.yaml` | `grep -rn 'next free number\|max.plus.one'` in authoring docs returns only historical findings | 2 | `aae-orc-ul2h` (notes; its guidance item) |
 | 6 | Renumber orc 175 and 177 duplicates (the later-merged of each pair), forwarding notes | orc: `_kos/findings/` | `kos validate` in the orc reports 0 duplicate-id failures | none | `aae-orc-rr5h2` |
-| 7 | Gate: duplicate-id section required | kos CI now; orc CI via `aae-orc-bs28` | a PR adding a duplicate id fails that one check; a warning-only PR passes | 1, 6, operator ruling | ruling request, no ticket until ruled |
+| 7 | Gate: duplicate-id section required, run on its own with its own exit status | kos: `src/validate.rs`, `src/main.rs`, `.github/workflows/`; orc CI via `aae-orc-bs28` | a PR adding a duplicate id fails that one check; a warnings-only PR passes | 1, 6 | `aae-orc-dq328` |
 
 Items 1 and 6 can start now and run in parallel. Item 2 cannot merge before 1
-(section 2.4). Items 3 and 4 follow 1 and do not depend on 2, because a fixture
+(ruled, section 2.4). Item 7 follows 1 and 6. Items 3 and 4 follow 1 and do not depend on 2, because a fixture
 can hold an opaque file.
 
-## 4. Ruling requests for the operator
+## 4. Rulings (operator, 2026-09-25, relayed by director)
 
-Each has a default that applies if no ruling comes.
+All five items this note raised are ruled. They amend the 2026-09-16 ruling
+and are to be harvested into `elem-kos-artifact-id-scheme` as its record.
 
-1. **Hash inputs** (2.1): random bytes per attempt in place of
-   title|description|creator|created_at. Default: adopt, since the ruling's
-   inputs separate nothing in kos beyond the timestamp.
-2. **Floor of 4** (2.2). Default: adopt.
-3. **Prefix: RULED 2026-09-25.** Keep a project prefix naming the owning
-   graph (2.3). The earlier proposal to drop it is withdrawn.
-4. **Id, not slug, as the canonical citation** (2.4). Default: adopt, slug
-   kept as an alias.
-5. **Duplicate-id section required** (2.7). Default: stays advisory.
+1. **Prefix** (2.3): keep a project prefix naming the owning graph.
+2. **Hash input and floor** (2.1, 2.2): 16 OS random bytes per attempt, length
+   floor 4, bd's widths and attempt loop otherwise.
+3. **Order** (2.4): the `finding_key` fix (`aae-orc-ottn4`) lands before any
+   id is minted.
+4. **Citation key** (2.4): the id is canonical; the slug is an alias.
+5. **Gate** (2.7): only the duplicate-id check becomes required, after
+   `aae-orc-ottn4` and `aae-orc-rr5h2` land.
 
 ## 5. Not decided here
 
