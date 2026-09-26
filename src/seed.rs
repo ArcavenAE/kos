@@ -731,9 +731,8 @@ fn collect_git_stats(root: &Path) -> Option<GitStats> {
 }
 
 fn run_git(root: &Path, args: &[&str]) -> Option<String> {
-    std::process::Command::new("git")
+    crate::gitenv::git_in(root)
         .args(args)
-        .current_dir(root)
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::null())
         .output()
