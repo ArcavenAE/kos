@@ -99,6 +99,8 @@ provenance:
   created_by: agent
   session: arcaven-author-g5-0, 2026-09-27, operator ask relayed via director and arcaven-supervisor
   created_at: "2026-09-27"
+  derived_from:
+    - "finding-042-sdd-system-survey: Survey of 12 SDD systems: each has a unique directory fingerprint and parseable version detection, and their artifacts map onto shared knowledge categories (decisions, specifications, work items, principles, evidence)."
 tags:
   - projection
   - brownfield

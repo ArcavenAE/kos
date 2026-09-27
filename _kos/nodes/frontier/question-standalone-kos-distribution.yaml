@@ -44,3 +44,5 @@ provenance:
   created_by: human
   session: session-012
   created_at: "2026-04-04"
+  derived_from:
+    - "finding-038-distribution-pipeline: Per-commit signed releases from main, a Homebrew formula and a self-update command made kos installable outside the orchestrator; the Workspace root == kos_root workaround for standalone repos remained open."

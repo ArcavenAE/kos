@@ -28,3 +28,5 @@ provenance:
   created_by: human
   session: session-001
   created_at: 2026-03-15
+  derived_from:
+    - "finding-014-twelve-project-synthesis: Twelve-project synthesis that revised this element's claim from 'errors become apparent' to 'surfaces signal, classification requires human judgment', and observed the highest yield where governance was loosest."

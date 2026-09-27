@@ -27,3 +27,5 @@ provenance:
   created_by: human
   session: session-052
   created_at: "2026-07-02"
+  derived_from:
+    - "finding-032-rd-bridge-probe: The inbound bridge verb extracted 48 of 48 numbered findings from two RD briefs by regex, but the records are an index, not graph nodes (no typed edges; confidence explicit for only 10 of 48)."

@@ -41,3 +41,6 @@ provenance:
   derived_from:
     - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md §3"
     - "pursifull_2026a — xMP lessons learned, Findings #5, #7, Theme 8"
+    - "finding-026-gitlab-issues-as-spec: Enforcement gap class: GitLab's Definition of Done lists about 25 requirements while the MR template covers about 8, and the permission model keeps some actors from complying."
+    - "finding-028-threedoors-empirical-patterns: ThreeDoors INC-001 as an enforcement gap at agent speed: the agent definition did not prohibit checkout in a shared space, and the agent followed the wrong definition faithfully."
+    - "finding-035-threedoors-bootstrap-complete: Central finding of the ThreeDoors bootstrap: every incident traced to rules encoded as instructions rather than infrastructure, so concurrent agents need concurrent-safe enforcement (locks, hooks, CI gates)."

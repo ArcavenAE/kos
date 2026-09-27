@@ -46,3 +46,4 @@ provenance:
   created_at: "2026-04-05"
   derived_from:
     - "penny-orc/docs/initiatives/lifecycle-composition/lifecycle-improvement-rs.md §A, §1"
+    - "finding-039-lifecycle-composition-extraction: Extraction from the lifecycle composition research that created this question; it mapped each of the research's eight structural problems to a kos capability that exists, is at question stage, or is unbuilt."
