@@ -13,8 +13,9 @@ content: |
   > selected bmad, vsdd-factory, spectacle versions"
 
   Subject test: kos is the subject (spec projection out of a graph, and
-  the ingest that feeds it). bmad, vsdd-factory and spectacle are output
-  targets; the brownfield repository and its history are inputs.
+  the ingest that feeds it). bmad, vsdd-factory and spectacle are formats
+  to import and export; the brownfield repository and its history are
+  inputs.
 
   Why a new node and not an edit to question-projection-seam: that node
   owns the seam (one subsystem, inbound parse and outbound `kos project`,
@@ -34,30 +35,43 @@ content: |
      code for behaviour (SOUL section 5). Where the evidence diverges,
      how is the divergence surfaced as a node rather than silently
      reconciled into one story?
-  3. Projection. One graph, three output formats. How is each format
+  3. Import and round trip. Can existing bmad or vsdd-factory documents
+     come in as nodes (with provenance naming the document and its format
+     version), so that any supported format can go out: bmad or
+     vsdd-factory in, into the graph, spectacle, bmad or vsdd-factory
+     out? What is lost on each leg, and how is the loss recorded?
+  4. Projection. One graph, three output formats. How is each format
      pinned to a selected upstream version, the way sideshow pins packs,
      so a regenerated spec names the format version it was written to?
-  4. Workflow reuse. Can the system drive the chosen bmad, vsdd-factory
+  5. Workflow reuse. Can the system drive the chosen bmad, vsdd-factory
      and spectacle workflow versions (for example bmad's
      document-project workflow, present in the orc's installed bmad
      6.10.0 as `bmad-document-project`, "Document brownfield projects
      for AI context"; and the workflows in the vsdd-factory fork at
      aae-orc forks/vsdd-factory) rather than reimplementing them?
-  5. Verbatim authority (aae-orc F25). Sources stay verbatim and cited;
+  6. Verbatim authority (aae-orc F25). Sources stay verbatim and cited;
      any generated summary is marked as authored. How does a generated
      spec show which sentences are quoted evidence and which are
      composed?
-  6. Evaluation. How are the generated specs judged? One candidate: a
+  7. Evaluation. How are the generated specs judged? One candidate: a
      brownfield repository that already has hand-written specs, used as
      ground truth with those specs withheld.
 
-  Tension left for the operator, not resolved here: aae-orc G3
-  (grv-bmad-format) rules the BMAD document format out as proprietary,
-  and ADR-001 (elem-ieee-standards) chooses IEEE/ISO formats. Here bmad
-  is an OUTPUT target. aae-orc question-kos-spec-projection-fidelity
-  already argues that emitting BMAD for external consumers is separable
-  from adopting it internally; whether that separation holds for this
-  system is the operator's call.
+  Settled context, not an open question. The operator (2026-09-27):
+
+  > "i see no conflict over bmad. it exists and i'm asking for it. we
+  > chose not to make it our standard, thus: spectacle. that doesnt mean
+  > we should not be able to export, import and work with that format.
+  > it just justified our own format (or rather IEEE formats, for more
+  > mature and universal use; bmad is still the most mature light format
+  > in use)"
+
+  - IEEE formats through spectacle stay the house standard (ADR-001,
+    aae-orc elem-ieee-standards).
+  - bmad and vsdd-factory are first-class formats to import, export and
+    work with.
+  - aae-orc G3 (grv-bmad-format) ruled only on adopting BMAD as the
+    platform's own standard, not on interoperability with it.
 
   Prior art not linked by edge because it is not a node: K5 in aae-orc
   docs/roadmap.md (the `kos project` outbound engine) and spectacle's
@@ -77,10 +91,10 @@ edges:
     note: "Spectacle is the manual projection layer this would automate for one of its three formats."
   - target: aae-orc::elem-ieee-standards
     type: derives
-    note: "ADR-001: standards-based formats are the platform's own; spectacle's templates are the IEEE/ISO output."
+    note: "ADR-001: IEEE formats through spectacle stay the house standard; other formats are interoperability, not a change of standard."
   - target: aae-orc::grv-bmad-format
-    type: contradicts
-    note: "Tension, not a ruling: G3 rules BMAD out as a format, and this question names bmad as an output target. Left for the operator."
+    type: derives
+    note: "G3 ruled only on adopting BMAD as the platform's own standard; importing, exporting and working with bmad is outside that ruling (operator, 2026-09-27)."
 provenance:
   created_by: agent
   session: arcaven-author-g5-0, 2026-09-27, operator ask relayed via director and arcaven-supervisor
