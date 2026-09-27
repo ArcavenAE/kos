@@ -209,6 +209,30 @@ What must change is classification:
   - A bare numbered citation resolves in the citing file's own graph first,
     which keeps orc `finding-173` and kos `finding-173` apart without edits.
     Opaque ids need no such rule.
+  - A bare number that does not resolve in the citing graph stays a WARN
+    ("unresolved finding citation"). It never falls back to another graph,
+    because a silent cross-graph guess is the same failure as the shadowing
+    case below.
+
+**Prose cross-graph citations.** Own-graph-first is only safe for citations
+that mean their own graph. Subrepo graphs also cite orc findings in prose, as
+`orc finding-N` or `aae-orc finding-N` (66 occurrences in 44 files on the
+2026-09-26 review count, against 6 uses of `graph::finding-N`). The resolver
+reads only the `finding-N` token, so where the citing graph has its own
+finding at N, the citation resolves to the local file with no warning. Today
+these are unresolved-edge warnings; after item 3 they would resolve wrongly.
+Two live cases:
+
+- `marvel/_kos/nodes/bedrock/elem-runtime-adapter-framework.yaml:119` cites
+  "orc finding-024". marvel's own finding-024 is
+  `compaction-corpus-and-the-shipped-detector`.
+- `kos/_kos/nodes/frontier/question-kos-ask-retrieval-value.yaml:93` cites
+  "aae-orc finding-133". kos has its own finding-133.
+
+The fix is a sweep, not a resolver rule for the prose form: rewrite each
+`<graph> finding-N` to `<graph_id>::finding-N` (item 8). Parsing prose
+qualifiers in the resolver would make an English phrase load-bearing. After
+the sweep, validate WARNs on the prose form so it does not grow back.
 
 **Citation key (RULED 2026-09-25, amends "slug kept ... as the citation
 key"):** fan-out arms handed one topic are the case most likely to pick the
@@ -287,15 +311,20 @@ are pieces that land in their own PR.
 
 | # | Work item | Repo, files | Proving test | Blocked by | Ticket |
 |---|---|---|---|---|---|
-| 1 | Finding key classification: numbered vs prefixed opaque (longest known prefix), integer compare, unrecognised-id WARN, prefix-differs-from-owner WARN, duplicate-slug WARN, `numbered_through` WARN, graph_id shape check; rename the two bd-named kos findings | kos: `src/findings.rs` (`finding_key`), `src/validate.rs`, `src/model.rs` (manifest field), `_kos/findings/` (two renames with forwarding notes) | table test: `finding-aae-orc-k3m9-x` and `finding-aae-orc-k3m9-y` collide; `finding-aae-orc-k3m9-x` and `finding-kos-k3m9-x` do not; `finding-019-a` and `finding-19-b` collide; `finding-kos-0173-x` is opaque, not 173; same slug under two ids WARNs, does not fail | none | `aae-orc-ottn4` |
+| 1 | Finding key classification: numbered vs prefixed opaque (longest known prefix), integer compare, unrecognised-id WARN, prefix-differs-from-owner WARN, duplicate-slug WARN, `numbered_through` WARN, graph_id shape check; rename the two bd-named kos findings and retarget their citers | kos: `src/findings.rs` (`finding_key`), `src/validate.rs`, `src/model.rs` (manifest field), `_kos/findings/` (two renames with forwarding notes); citers of `finding-aae-orc-5lbu` and `finding-aae-orc-msqx`: `_kos/nodes/bedrock/elem-live-lsp-beats-grep-on-symbol-workloads.yaml`, `_kos/nodes/graveyard/grv-live-lsp-serves-non-symbol-workloads.yaml`, `_kos/nodes/graveyard/grv-native-rust-lsp-rewrite-fixes-memory.yaml`, `_kos/nodes/frontier/question-code-graph-correspondence.yaml`, `_kos/probes/brief-scip-cost.md`, `_kos/ideas/code-graph-as-second-lens.md` | table test: `finding-aae-orc-k3m9-x` and `finding-aae-orc-k3m9-y` collide; `finding-aae-orc-k3m9-x` and `finding-kos-k3m9-x` do not; `finding-019-a` and `finding-19-b` collide; `finding-kos-0173-x` is opaque, not 173; same slug under two ids WARNs, does not fail. Retarget: `grep -rE 'finding-aae-orc-(5lbu\|msqx)' _kos` returns only the forwarding notes | none | `aae-orc-ottn4` |
 | 2 | Mint: `src/id.rs` (prefix = owning graph_id lowercased; random 16 bytes per attempt, bd base36 widths, floor 4, adaptive over the graph's count, ten tries per length); `kos finding` mints and writes `.md` by default; `kos id finding` prints id and filename | kos: `src/id.rs`, `src/process.rs`, `src/main.rs`, `Cargo.toml` (`getrandom`) | unit: adaptive length at the kos count (51) and orc count (187) gives 4; injected RNG covers the existence retry and growth to the next length; minted ids carry the owning prefix. Integration (wmna4 acceptance): clone one base commit twice, run `kos finding same-slug --title same` in each, assert distinct ids and that `kos validate` passes on the union | 1 | `aae-orc-wmna4` (REMAINING updated) |
-| 3 | One resolver for citations (key, stem, unique slug, `graph::` form, own graph first, ambiguity lists candidates) used by ask, validate's edge check, charter render | kos: `src/findings.rs`, `src/ask.rs`, `src/validate.rs`, `src/charter.rs` | resolver table test over a fixture graph with numbered, opaque, duplicate-slug and cross-graph entries; validate no longer warns on a short citation that resolves | 1 | `aae-orc-cnnim` |
+| 3 | One resolver for citations (key, stem, unique slug, `graph::` form, own graph first, ambiguity lists candidates) used by ask, validate's edge check, charter render | kos: `src/findings.rs`, `src/ask.rs`, `src/validate.rs`, `src/charter.rs` | resolver table test over a fixture graph with numbered, opaque, duplicate-slug and cross-graph entries, including a local number that shadows the orc number a `graph::` citation means (local `finding-024` present, `aae-orc::finding-024` resolves to the orc file) and a bare number absent locally (WARN, no fallback); validate no longer warns on a short citation that resolves | 1 | `aae-orc-cnnim` |
 | 4 | `aq finding` and `aq harvest` accept prefixed keys with a prefix-aware match instead of the slug glob | orc: `tools/aq` | fixture dir with `finding-aae-orc-k3m9-x.md` and a slug containing `k3m9`: `aq finding finding-aae-orc-k3m9`, `aq finding k3m9` and `aq finding x` each print only the finding; a numbered key still pads | 1 | `aae-orc-6di8d` |
 | 5 | Authoring guidance and adoption: set `numbered_through` per graph, change "next free number" text to the mint verbs | orc: `CLAUDE.md`, `.claude/rules/` where findings are authored; kos: `CLAUDE.md`; each graph's `kos.yaml` | `grep -rn 'next free number\|max.plus.one'` in authoring docs returns only historical findings | 2 | `aae-orc-ul2h` (notes; its guidance item) |
-| 6 | Renumber orc 175 and 177 duplicates (the later-merged of each pair), forwarding notes | orc: `_kos/findings/` | `kos validate` in the orc reports 0 duplicate-id failures | none | `aae-orc-rr5h2` |
+| 6 | Renumber orc 175 and 177 duplicates (the later-merged of each pair), forwarding notes, and retarget every citer of a moved file | orc: `_kos/findings/`; citers found by `grep -rlE 'finding-17[57]([^0-9]\|$)' _kos docs .claude */_kos */docs` at the time of the move (2026-09-26: for 175, `.claude/rules/task-workflow.md`, `docs/design/backend-swaps-native-mixed-mode.md`, two frontier nodes, findings 180 and 181, director finding-007, marvel idea `inference-backend-registry-and-quota-estimation.md`; for 177, `question-tooling-friction-capture.yaml`, findings 178 and 179, two design docs and two drafts). A bare `finding-175` is ambiguous between the pair, so the author reads each citer and retargets only those that mean the moved file | `kos validate` in the orc reports 0 duplicate-id failures, and no citation of a moved file's slug still carries the old number (`grep -rE 'finding-17[57]-<moved-slug>'` returns only its forwarding note) | none | `aae-orc-rr5h2` |
+| 8 | Sweep prose cross-graph citations (`orc finding-N`, `aae-orc finding-N`) to `aae-orc::finding-N`; validate WARNs on the prose form afterwards | every graph that cites the orc: `*/_kos`, `*/docs` (subrepo checkouts, never worktrees); kos: `src/validate.rs` for the WARN | `grep -rhoE '(orc\|aae-orc)[^a-z0-9:]{1,3}finding-[0-9]{2,3}' */_kos */docs` returns 0; the two shadow cases in 2.4 resolve to the orc files | 3 | none yet (file at adoption) |
 | 7 | Gate: duplicate-id section required, run on its own with its own exit status | kos: `src/validate.rs`, `src/main.rs`, `.github/workflows/`; orc CI via `aae-orc-bs28` | a PR adding a duplicate id fails that one check; a warnings-only PR passes | 1, 6 | `aae-orc-dq328` |
 
-Items 1 and 6 can start now and run in parallel. Item 2 cannot merge before 1
+Items 1 and 6 can start now and run in parallel. Item 8 follows 3, and no kos
+release carries item 3 before item 8's sweep lands, since until then a
+resolving citation can be a wrong one. `numbered_through` (item 5) is
+read from each graph's tree at adoption, not from the counts in this note; orc
+main has moved past them. Item 2 cannot merge before 1
 (ruled, section 2.4). Item 7 follows 1 and 6. Items 3 and 4 follow 1 and do not depend on 2, because a fixture
 can hold an opaque file.
 
