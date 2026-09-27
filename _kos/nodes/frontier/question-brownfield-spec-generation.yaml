@@ -1,0 +1,92 @@
+id: question-brownfield-spec-generation
+type: question
+confidence: frontier
+title: "Can kos take a brownfield project and generate bmad, vsdd-factory and spectacle style specs from all its evidence?"
+content: |
+  The operator's words (2026-09-27, relayed via director and
+  arcaven-supervisor):
+
+  > "can we design a system that takes a brownfield project, and
+  > generates bmad, vsdd-factory, and spectacle style spec documents,
+  > that leverages kos, code, design docs, PR and commit messages, bd
+  > history, gh issues all to great effect and uses workflows from
+  > selected bmad, vsdd-factory, spectacle versions"
+
+  Subject test: kos is the subject (spec projection out of a graph, and
+  the ingest that feeds it). bmad, vsdd-factory and spectacle are output
+  targets; the brownfield repository and its history are inputs.
+
+  Why a new node and not an edit to question-projection-seam: that node
+  owns the seam (one subsystem, inbound parse and outbound `kos project`,
+  formats as projection packs) and already names "the brownfield story"
+  as reading an existing SRS into nodes. This question is wider on the
+  inbound side (many evidence sources, not one SRS) and adds
+  reconciliation, workflow reuse and evaluation, so it derives from the
+  seam rather than rewriting it.
+
+  Sub-questions, stated as questions:
+
+  1. Ingest. Which sources, and how does each become nodes with
+     provenance and a confidence tier: code, design docs, PRs and commit
+     messages, bd history, GitHub issues? Which of them carry intent, and
+     which only carry behaviour or history?
+  2. Reconciliation. The spec is the source of truth for intent and the
+     code for behaviour (SOUL section 5). Where the evidence diverges,
+     how is the divergence surfaced as a node rather than silently
+     reconciled into one story?
+  3. Projection. One graph, three output formats. How is each format
+     pinned to a selected upstream version, the way sideshow pins packs,
+     so a regenerated spec names the format version it was written to?
+  4. Workflow reuse. Can the system drive the chosen bmad, vsdd-factory
+     and spectacle workflow versions (for example bmad's
+     document-project workflow, present in the orc's installed bmad
+     6.10.0 as `bmad-document-project`, "Document brownfield projects
+     for AI context"; and the workflows in the vsdd-factory fork at
+     aae-orc forks/vsdd-factory) rather than reimplementing them?
+  5. Verbatim authority (aae-orc F25). Sources stay verbatim and cited;
+     any generated summary is marked as authored. How does a generated
+     spec show which sentences are quoted evidence and which are
+     composed?
+  6. Evaluation. How are the generated specs judged? One candidate: a
+     brownfield repository that already has hand-written specs, used as
+     ground truth with those specs withheld.
+
+  Tension left for the operator, not resolved here: aae-orc G3
+  (grv-bmad-format) rules the BMAD document format out as proprietary,
+  and ADR-001 (elem-ieee-standards) chooses IEEE/ISO formats. Here bmad
+  is an OUTPUT target. aae-orc question-kos-spec-projection-fidelity
+  already argues that emitting BMAD for external consumers is separable
+  from adopting it internally; whether that separation holds for this
+  system is the operator's call.
+
+  Prior art not linked by edge because it is not a node: K5 in aae-orc
+  docs/roadmap.md (the `kos project` outbound engine) and spectacle's
+  kos-bridge.md (the node-type to template-section map).
+edges:
+  - target: question-projection-seam
+    type: derives
+    note: "Brownfield generation is the seam's inbound side widened to many evidence sources, plus reconciliation, workflow reuse and evaluation."
+  - target: aae-orc::question-kos-bridge
+    type: derives
+    note: "Charter F4, the kos bridge: the designed, unimplemented mapping from nodes to spectacle template sections."
+  - target: aae-orc::question-kos-spec-projection-fidelity
+    type: supports
+    note: "A brownfield generator with an evaluation harness is one way to measure projection fidelity."
+  - target: aae-orc::elem-spectacle-projection
+    type: derives
+    note: "Spectacle is the manual projection layer this would automate for one of its three formats."
+  - target: aae-orc::elem-ieee-standards
+    type: derives
+    note: "ADR-001: standards-based formats are the platform's own; spectacle's templates are the IEEE/ISO output."
+  - target: aae-orc::grv-bmad-format
+    type: contradicts
+    note: "Tension, not a ruling: G3 rules BMAD out as a format, and this question names bmad as an output target. Left for the operator."
+provenance:
+  created_by: agent
+  session: arcaven-author-g5-0, 2026-09-27, operator ask relayed via director and arcaven-supervisor
+  created_at: "2026-09-27"
+tags:
+  - projection
+  - brownfield
+  - ingest
+  - spectacle
