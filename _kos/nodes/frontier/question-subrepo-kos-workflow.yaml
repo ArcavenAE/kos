@@ -38,3 +38,6 @@ provenance:
   created_by: human
   session: session-012
   created_at: "2026-04-04"
+  derived_from:
+    - "finding-031-distributed-graph-pattern: Proposed a three-tier graph model (orchestrator, repo-local, tool graph) with one-directional includes composition and the _kos/ directory convention."
+    - "finding-037-bootstrap-seeding-gap: Bootstrapping switchboard and one standalone repo showed the process has no seed step for encoding existing knowledge and no defined answer to where kos is run from."

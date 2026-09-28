@@ -51,3 +51,5 @@ provenance:
   created_at: 2026-03-15
   derived_from:
     - finding-001-mvg-bootstrap
+    - "finding-014-twelve-project-synthesis: Schema v0.3 added signal classification (error, evolution, drift) on edges and recorded silent abandonment as a graph pattern (a missing supersedes edge) rather than as a new edge type."
+    - "finding-043-beads-deep-dive: Beads deep dive recommends a discovered-from edge type (R1) and a blocking versus non-blocking distinction on edges (R6), the latter to support ready-work computation."

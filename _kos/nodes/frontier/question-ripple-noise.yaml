@@ -13,3 +13,9 @@ provenance:
   created_by: human
   session: session-001
   created_at: 2026-03-15
+  derived_from:
+    - "finding-024-openclaw-seam-test: OpenClaw seam test for the signal-to-noise probe: 7 issues (2 high severity), two of the three consequential ones also reported independently by the community, and a new analysis-versus-operations divergence class."
+    - "finding-025-atmos-seam-test: Atmos seam test for the signal-to-noise probe: 8 issues; the most consequential is Cursor rules and CLAUDE.md giving contradictory mandatory testing guidance, recorded as a new AI configuration seam class."
+    - "finding-026-gitlab-issues-as-spec: GitLab issues-as-spec probe: the highest signal-to-noise in the four-project sample (4 of 6 consequential, none noise) and three new classes: enforcement gap, authority surface fragmentation, permission asymmetry."
+    - "finding-028-threedoors-empirical-patterns: ThreeDoors' retrospector JSONL (per-PR ac_match, ci_first_pass, conflicts) works as a minimal drift detector with no graph infrastructure."
+    - "finding-033-drift-probe: Simplest drift (content hash plus reverse edge walk) flagged 6 dependents from one root change with no formatting false positives, but 56% edge coverage left 11 of 25 nodes invisible to it."

@@ -13,3 +13,8 @@ provenance:
   created_by: human
   session: session-001
   created_at: 2026-03-15
+  derived_from:
+    - "finding-020-executive-mechanism: Proposed the executive as an event-driven priority queue over human, convergence, question and dirty-flag channels; the retrospective accounted for 8 of 8 decision points. Placeholder confidence; superseded by finding-022."
+    - "finding-021-executive-empirical-three-projects: Three-project test (ThreeDoors, Kubernetes KEPs, OpenHands) met 5 of 5 criteria and found one gap: no acknowledged-debt input to annotate issues a team already tracks. Superseded by finding-022."
+    - "finding-022-executive-twelve-project-synthesis: Twelve-project test: convergence fired on 11 clusters across 8 projects with no false positives or negatives observed; review_gap replaced visibility_gap as the signal-yield factor, and synthesis was named as a third work type for sequential documents."
+    - "finding-043-beads-deep-dive: Beads' ready-work computation is an existing mechanism that derives the next actionable item from dependency state; recommendation R2 proposes the same for kos orient."

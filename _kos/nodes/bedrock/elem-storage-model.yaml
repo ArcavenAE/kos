@@ -30,3 +30,5 @@ provenance:
   created_by: human
   session: session-001
   created_at: 2026-03-15
+  derived_from:
+    - "finding-043-beads-deep-dive: Beads deep dive recommendation R5 advises keeping YAML over git rather than adopting Dolt, to be reconsidered past about 1000 nodes or once concurrent multi-agent writes to one graph are required."

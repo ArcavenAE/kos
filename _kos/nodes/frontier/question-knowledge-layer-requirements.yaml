@@ -55,3 +55,5 @@ provenance:
   session: session-005
   created_at: 2026-03-29
   reviewed_by: null
+  derived_from:
+    - "finding-029-kos-orient-probe: kos orient read about 100 artifacts in 3 to 11 ms with plain file I/O and no index, so YAML-in-git was not the bottleneck for read-only orientation at that scale."

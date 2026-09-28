@@ -21,3 +21,18 @@ provenance:
   created_by: human
   session: session-001
   created_at: 2026-03-15
+  derived_from:
+    - "finding-002: Seam test on four documents from one solo project, decomposed into 17 nodes (result: partial). The research critique and the PRDs do not share a model of what matters, e.g. execution telemetry built with no drift measure, and a PRD that pushes more context to agents than the critique's measured ceiling allows."
+    - "finding-003-alpha: Project Alpha PRD and architecture decomposed into 14 nodes (result: confirms). Found 6 contradictions, 2 gaps and systematic MVP phase-boundary erosion that the project's own coverage-only validation did not catch."
+    - "finding-005-backstage: Backstage ADR and BEP seam test (result: confirms). 5 issues and no hard contradictions; gaps dominate because no BEP references any ADR, and the dynamic-plugins proposal does not mention auth."
+    - "finding-006-crossplane: Crossplane Composition design docs (result: confirms). 4 gaps and no contradictions; the pattern is silent abandonment (Composition immutability, ApplicationDefinition), while the alpha-to-beta Functions supersession was recorded cleanly."
+    - "finding-007-kubernetes: Three cross-SIG KEPs on the API server request pipeline (result: partial). No contradictions and two gaps, one being a pipeline ordering that only the source code specifies."
+    - "finding-008-rust-rfcs: Rust async RFCs (result: partial). Later RFCs drift from earlier ones with no formal supersession record (PinBox was proposed and dropped, its only graveyard entry a blog post); the checksum property looks more diagnostic on parallel documents than on sequential ones."
+    - "finding-009-go-proposals: Go 2 drafts and formal proposals (result: partial). Supersession within a feature line was handled well; one cross-feature seam went unacknowledged, where error values dropped its abandoned check/handle companion without saying so."
+    - "finding-010-python-peps: Python typing PEPs 484, 526, 544 and 604 (result: partial). Managed evolution with three seams (incomplete supersession, a spec-runtime gap, rule bifurcation) and a proposed four-way seam classification."
+    - "finding-011-bmad-enterprise: First probe of AI-generated planning docs, the BMAD TEA module (result: confirms). 3 low-severity seams, mostly stale counts of a growing collection (35 to 42 knowledge fragments)."
+    - "finding-012-openhands: OpenHands V0-to-V1 transition (result: confirms). 7 seams where the central docs moved to V1 and peripheral docs (glossary, runtime README, AGENTS.md) kept V0 assumptions."
+    - "finding-013-autogen: AutoGen v0.2-to-v0.4 transition (result: partial). A migration guide kept the version-boundary seam small for Python users; the more actionable seams sit inside the v0.4 docs, e.g. three different agent-key constraints, none validated in code."
+    - "finding-014-twelve-project-synthesis: Synthesis of the twelve seam tests: every project produced signal at document seams and the three original categories held; silent abandonment, acknowledged evolution and count drift led to signal classification on edges in schema v0.3."
+    - "finding-034-threedoors-bootstrap-layers-1-3: First real-scale bootstrap, ThreeDoors layers 1 to 3: 65 nodes, 0 validation warnings, and 3 of 4 incidents contradicting adr-0026. Partial; superseded by finding-035."
+    - "finding-035-threedoors-bootstrap-complete: Full six-layer ThreeDoors bootstrap: 104 nodes, 0 validation warnings, no kos tooling changes needed; the value was in cross-layer connections that document-by-document reading does not surface."
