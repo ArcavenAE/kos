@@ -411,6 +411,18 @@ pub struct GraphManifest {
     pub schema_version: String,
     #[serde(default)]
     pub includes: Vec<GraphInclude>,
+    /// Finding-id policy for this graph (opaque-finding-ids design, 2.4).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub findings: Option<FindingsPolicy>,
+}
+
+/// The `findings:` block of kos.yaml.
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct FindingsPolicy {
+    /// The last numbered finding this graph issued before it adopted minted
+    /// ids. validate WARNs on a numbered finding above it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub numbered_through: Option<u64>,
 }
 
 /// A graph scope — orchestrator (composes subrepo graphs) or repo (standalone).

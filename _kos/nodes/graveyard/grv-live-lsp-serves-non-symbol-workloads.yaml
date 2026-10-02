@@ -3,7 +3,7 @@ type: element
 confidence: graveyard
 title: "Live LSP does not serve orientation, history, cross-repo scope, or provenance (ruled out)"
 content: |
-  RULED OUT 2026-08-16 by finding-aae-orc-5lbu. A live language server does not
+  RULED OUT 2026-08-16 by finding-kos-wre7. A live language server does not
   serve the non-symbol workloads a session in this fleet actually runs, and the
   reason in each case is structural (a property of what a language server is)
   rather than a matter of configuration or version. This is the companion to
@@ -63,4 +63,4 @@ provenance:
   session: "session-2026-08-16-code-graph-harvest"
   created_at: "2026-08-16"
   evidence:
-    - _kos/findings/finding-aae-orc-5lbu-serena-live-lsp-baseline.md
+    - _kos/findings/finding-kos-wre7-serena-live-lsp-baseline.md

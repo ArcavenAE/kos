@@ -1,5 +1,7 @@
 # Finding: SCIP indexing cost across the fleet (aae-orc-msqx, Q1 + Q5)
 
+**Formerly:** `finding-aae-orc-msqx-scip-indexing-cost`. Renamed under the opaque-finding-ids design (kos#114): the kos graph does not mint the `aae-orc` prefix, so the old name read as an orc-minted finding. The bd ticket is unchanged: aae-orc-msqx.
+
 Status: final
 Date: 2026-08-16
 Host: kinu (Apple M3 Max, 16 cores, 128 GB RAM, macOS 26.5.2)
@@ -14,7 +16,7 @@ This finding measures what a compiler-grade SCIP index COSTS to build, in wall
 time and peak memory, at each cadence. That is Q1 and Q5, and it is the cost
 half of sub-question B. It does NOT answer the decision-forcing half: whether
 the raw SCIP facts, once built, can ADDRESS the workloads that live LSP failed
-in the sibling probe (finding-aae-orc-5lbu): W6 (prior-session history), W7
+in the sibling probe (finding-kos-wre7): W6 (prior-session history), W7
 (one query across the whole fleet), and W8 (typed, ranked, provenanced answers
 to "why"). Cheap-to-produce and answers-the-question are different claims. This
 finding settles the first. The second is a separate probe, still open, and it

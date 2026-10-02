@@ -226,7 +226,7 @@ Cost thresholds I will apply when reading the numbers:
 ## Deliverables
 
 - This brief.
-- `finding-aae-orc-msqx-scip-indexing-cost.md`: the numbers table, the Q1 verdict
+- `finding-kos-ndz7-scip-indexing-cost.md`: the numbers table, the Q1 verdict
   against the decision criterion, the Q5 cadence answer, an explicit
   ruling on the near-free hypothesis, and any repo that failed to index
   with its error verbatim.

@@ -1,5 +1,7 @@
 # Finding: Serena as the measured live-LSP baseline
 
+**Formerly:** `finding-aae-orc-5lbu-serena-live-lsp-baseline`. Renamed under the opaque-finding-ids design (kos#114): the kos graph does not mint the `aae-orc` prefix, so the old name read as an orc-minted finding. The bd ticket is unchanged: aae-orc-5lbu.
+
 **bd:** aae-orc-5lbu
 **Question node:** `question-code-graph-correspondence`, sub-question A (does live LSP suffice, making an ingest optional?)
 **Probe brief:** `_kos/probes/brief-serena-baseline.md` (written and locked before install)

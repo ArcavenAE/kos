@@ -3,7 +3,7 @@ type: element
 confidence: graveyard
 title: "A native Rust LSP-client rewrite does not fix the memory profile (ruled out)"
 content: |
-  RULED OUT 2026-08-16 by finding-aae-orc-5lbu, measured false. If the fleet
+  RULED OUT 2026-08-16 by finding-kos-wre7, measured false. If the fleet
   keeps the live-LSP pattern for symbol workloads and reimplements the client
   natively in Rust (the finding's own recommendation, chosen over adopting
   Serena), a tempting assumption rides along: that a native client also fixes
@@ -37,7 +37,7 @@ content: |
   cost of running symbol resolution across a concurrent fleet.
 
   CROSS-REFERENCE. The independent SCIP-index cost measurement
-  (finding-aae-orc-msqx) found the same shape from the other direction: for
+  (finding-kos-ndz7) found the same shape from the other direction: for
   Rust, memory (0.55 to 2.16 GB peak per run, unrelated to repo size), not time,
   is the binding constraint. Whether the resident cost comes from a live server
   or from a batch indexer, Rust code intelligence is memory-bound on this stack,
@@ -56,5 +56,5 @@ provenance:
   session: "session-2026-08-16-code-graph-harvest"
   created_at: "2026-08-16"
   evidence:
-    - _kos/findings/finding-aae-orc-5lbu-serena-live-lsp-baseline.md
-    - _kos/findings/finding-aae-orc-msqx-scip-indexing-cost.md
+    - _kos/findings/finding-kos-wre7-serena-live-lsp-baseline.md
+    - _kos/findings/finding-kos-ndz7-scip-indexing-cost.md

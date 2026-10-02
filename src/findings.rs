@@ -24,7 +24,7 @@ use std::path::{Path, PathBuf};
 use serde::Deserialize;
 
 use crate::error::{KosError, Result};
-use crate::model::{Confidence, Edge, EdgeType, Node, NodeType, Provenance};
+use crate::model::{Confidence, Edge, EdgeType, GraphManifest, Node, NodeType, Provenance};
 
 /// Best-effort edge extraction from bare markdown stops after this many
 /// distinct targets. A finding that names hundreds of references is not more
@@ -121,19 +121,148 @@ pub fn load_finding_nodes(dir: &Path) -> Result<Vec<Node>> {
         .collect())
 }
 
-/// The canonical finding number (`finding-123`) used to detect two files that
-/// claim the same finding, even when their slugs differ. Two distinct findings
-/// sharing a number is the collision validate must catch. Falls back to the
-/// full id, lowercased, when the id is not a numbered finding.
-pub fn finding_key(id: &str) -> String {
+/// How a finding id keys for duplicate detection (opaque-finding-ids design,
+/// 2.4). The lead word decides: after `finding-`, an all-digit segment is a
+/// numbered finding; the longest known prefix followed by `-` is a minted
+/// opaque id; anything else is unrecognised.
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum FindingClass {
+    /// `finding-<digits>-<slug>`: unique only within its graph. The number is
+    /// `None` only when the digit run does not fit a u64.
+    Numbered(Option<u64>),
+    /// `finding-<prefix>-<suffix>-<slug>`, where the prefix is a known
+    /// graph_id. Unique across graphs, because the prefix names the minter.
+    Opaque { prefix: String },
+    /// Starts with `finding-` but is neither numbered nor known-prefixed.
+    Unrecognised,
+    /// Not a finding id at all (no `finding-` lead word).
+    NotAFinding,
+}
+
+/// A classified finding id: the key two files must not share, the class, and
+/// the slug after the key when there is one.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FindingKey {
+    pub key: String,
+    pub class: FindingClass,
+    pub slug: Option<String>,
+}
+
+/// Classify a finding id against the prefixes the graph knows (see
+/// [`known_prefixes`]). Numbered keys compare as integers, so `finding-019`
+/// and `finding-19` are one key, written zero-padded to three digits. An
+/// unrecognised or non-finding id keys on its full id, lowercased, and so is
+/// never a duplicate of another file.
+pub fn classify_finding_id(id: &str, known_prefixes: &[String]) -> FindingKey {
     let lower = id.to_lowercase();
-    if let Some(rest) = lower.strip_prefix("finding-") {
-        let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
-        if !digits.is_empty() {
-            return format!("finding-{digits}");
+    let Some(rest) = lower.strip_prefix("finding-") else {
+        return FindingKey {
+            key: lower,
+            class: FindingClass::NotAFinding,
+            slug: None,
+        };
+    };
+
+    let (segment, after) = split_segment(rest);
+    if !segment.is_empty() && segment.bytes().all(|b| b.is_ascii_digit()) {
+        let trimmed = segment.trim_start_matches('0');
+        let digits = if trimmed.is_empty() { "0" } else { trimmed };
+        return FindingKey {
+            key: format!("finding-{digits:0>3}"),
+            class: FindingClass::Numbered(digits.parse().ok()),
+            slug: after.map(str::to_string),
+        };
+    }
+
+    let mut by_length: Vec<&String> = known_prefixes.iter().collect();
+    by_length.sort_by_key(|p| std::cmp::Reverse(p.len()));
+    for prefix in by_length {
+        let Some(tail) = rest
+            .strip_prefix(prefix.as_str())
+            .and_then(|t| t.strip_prefix('-'))
+        else {
+            continue;
+        };
+        let (suffix, slug) = split_segment(tail);
+        if suffix.is_empty() {
+            continue;
+        }
+        return FindingKey {
+            key: format!("finding-{prefix}-{suffix}"),
+            class: FindingClass::Opaque {
+                prefix: prefix.clone(),
+            },
+            slug: slug.map(str::to_string),
+        };
+    }
+
+    FindingKey {
+        key: lower.clone(),
+        class: FindingClass::Unrecognised,
+        slug: None,
+    }
+}
+
+/// The key two finding files must not share. See [`classify_finding_id`].
+pub fn finding_key(id: &str, known_prefixes: &[String]) -> String {
+    classify_finding_id(id, known_prefixes).key
+}
+
+/// Split `a-b-c` into `a` and `Some("b-c")`; a lone segment has no rest.
+fn split_segment(s: &str) -> (&str, Option<&str>) {
+    match s.split_once('-') {
+        Some((head, tail)) if !tail.is_empty() => (head, Some(tail)),
+        Some((head, _)) => (head, None),
+        None => (s, None),
+    }
+}
+
+/// Read a graph's kos.yaml. `None` when it is absent or does not parse.
+pub fn load_manifest(kos_root: &Path) -> Option<GraphManifest> {
+    let text = std::fs::read_to_string(kos_root.join("kos.yaml")).ok()?;
+    serde_yaml::from_str(&text).ok()
+}
+
+/// The graph_ids a graph declares, as written: its own first, then (at an
+/// orchestrator root) each included graph's. Includes are resolved against the
+/// orchestrator root, the parent of `kos_root`. Unreadable manifests are
+/// skipped.
+pub fn declared_graph_ids(kos_root: &Path) -> Vec<String> {
+    let Some(manifest) = load_manifest(kos_root) else {
+        return Vec::new();
+    };
+    let mut ids = vec![manifest.graph_id.clone()];
+    if let Some(base) = kos_root.parent() {
+        for include in &manifest.includes {
+            if let Some(m) = load_manifest(&base.join(&include.path)) {
+                ids.push(m.graph_id);
+            }
         }
     }
-    lower
+    ids
+}
+
+/// The id prefixes a graph knows: its own graph_id and, at an orchestrator
+/// root, those of its included graphs, lowercased and deduplicated.
+pub fn known_prefixes(kos_root: &Path) -> Vec<String> {
+    let mut out: Vec<String> = Vec::new();
+    for id in declared_graph_ids(kos_root) {
+        let lower = id.to_lowercase();
+        if !out.contains(&lower) {
+            out.push(lower);
+        }
+    }
+    out
+}
+
+/// Whether a graph_id can serve as a finding-id prefix: it starts with a
+/// letter and uses only `[a-z0-9-]` once lowercased.
+pub fn graph_id_is_prefix_shaped(id: &str) -> bool {
+    let lower = id.to_lowercase();
+    let mut chars = lower.chars();
+    matches!(chars.next(), Some(c) if c.is_ascii_lowercase())
+        && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
 }
 
 // ── YAML shape ───────────────────────────────────────────────
@@ -450,11 +579,83 @@ mod tests {
 
     #[test]
     fn finding_key_extracts_number_and_ignores_slug() {
-        assert_eq!(finding_key("finding-123-harness-invocation"), "finding-123");
-        assert_eq!(finding_key("finding-123-org-owned-fork"), "finding-123");
-        assert_eq!(finding_key("finding-009-terminal"), "finding-009");
-        // Non-numbered ids fall back to the whole id, lowercased.
-        assert_eq!(finding_key("Elem-Foo"), "elem-foo");
+        assert_eq!(
+            finding_key("finding-123-harness-invocation", &[]),
+            "finding-123"
+        );
+        assert_eq!(
+            finding_key("finding-123-org-owned-fork", &[]),
+            "finding-123"
+        );
+        assert_eq!(finding_key("finding-009-terminal", &[]), "finding-009");
+        // Non-finding ids fall back to the whole id, lowercased.
+        assert_eq!(finding_key("Elem-Foo", &[]), "elem-foo");
+    }
+
+    // The table from the opaque-finding-ids design, plan item 1.
+    #[test]
+    fn finding_key_classifies_numbered_and_prefixed_opaque_ids() {
+        let known = vec!["aae-orc".to_string(), "kos".to_string()];
+        let k = |id: &str| finding_key(id, &known);
+        // One minted id under two slugs is one finding: a collision.
+        assert_eq!(k("finding-aae-orc-k3m9-x"), k("finding-aae-orc-k3m9-y"));
+        assert_eq!(k("finding-aae-orc-k3m9-x"), "finding-aae-orc-k3m9");
+        // The same suffix under two prefixes is two findings.
+        assert_ne!(k("finding-aae-orc-k3m9-x"), k("finding-kos-k3m9-x"));
+        // Numbered keys compare as integers: 019 and 19 are one key.
+        assert_eq!(k("finding-019-a"), k("finding-19-b"));
+        // An all-digit suffix behind a prefix is opaque, never number 173.
+        assert_eq!(k("finding-kos-0173-x"), "finding-kos-0173");
+        assert_ne!(k("finding-kos-0173-x"), k("finding-173-y"));
+    }
+
+    #[test]
+    fn finding_key_takes_the_longest_known_prefix() {
+        let known = vec!["aae".to_string(), "aae-orc".to_string()];
+        assert_eq!(
+            finding_key("finding-aae-orc-k3m9-x", &known),
+            "finding-aae-orc-k3m9"
+        );
+        assert_eq!(
+            finding_key("finding-aae-p2ab-x", &known),
+            "finding-aae-p2ab"
+        );
+    }
+
+    #[test]
+    fn finding_key_without_a_known_prefix_keys_on_the_full_stem() {
+        // Unrecognised: never a duplicate of another file.
+        let known = vec!["kos".to_string()];
+        assert_eq!(
+            finding_key("finding-aae-orc-5lbu-x", &known),
+            "finding-aae-orc-5lbu-x"
+        );
+        assert_ne!(
+            finding_key("finding-aae-orc-5lbu-x", &known),
+            finding_key("finding-aae-orc-5lbu-y", &known)
+        );
+    }
+
+    #[test]
+    fn known_prefixes_reads_the_graph_and_its_includes() {
+        let dir = tempfile::tempdir().unwrap();
+        let orc = dir.path().join("_kos");
+        let sub = dir.path().join("sub").join("_kos");
+        fs::create_dir_all(&orc).unwrap();
+        fs::create_dir_all(&sub).unwrap();
+        fs::write(
+            orc.join("kos.yaml"),
+            "graph_id: AAE-orc\nscope: orchestrator\nschema_version: '0.3'\nincludes:\n- path: sub/_kos\n",
+        )
+        .unwrap();
+        fs::write(
+            sub.join("kos.yaml"),
+            "graph_id: BetterDials\nscope: repo\nschema_version: '0.3'\n",
+        )
+        .unwrap();
+        let mut got = known_prefixes(&orc);
+        got.sort();
+        assert_eq!(got, vec!["aae-orc".to_string(), "betterdials".to_string()]);
     }
 
     #[test]
