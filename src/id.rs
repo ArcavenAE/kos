@@ -1,6 +1,15 @@
 //! Minted finding ids (opaque-finding-ids design, sections 2.1 to 2.3).
+//!
+//! A finding id is `finding-<prefix>-<suffix>`: the prefix is the owning
+//! graph's graph_id, lowercased, and the suffix is base36 of OS random bytes,
+//! sized by bd's adaptive rule with a floor of 4. The id is minted at
+//! authoring, so parallel sessions never allocate the same number.
 
-use crate::error::Result;
+use std::collections::HashSet;
+use std::path::Path;
+
+use crate::error::{KosError, Result};
+use crate::findings::{self, FindingLoad};
 
 /// The shortest suffix minted in any graph (ruled 2026-09-25; bd's is 3).
 pub const MIN_LENGTH: usize = 4;
@@ -11,24 +20,135 @@ pub const MAX_COLLISION_PROBABILITY: f64 = 0.25;
 /// Attempts at each length before growing, as in bd.
 pub const TRIES_PER_LENGTH: usize = 10;
 
-/// The suffix length for a graph holding `count` findings.
-pub fn adaptive_length(_count: usize) -> usize {
-    0
+const BASE36: &[u8; 36] = b"0123456789abcdefghijklmnopqrstuvwxyz";
+
+/// The suffix length for a graph holding `count` findings: the shortest length
+/// from [`MIN_LENGTH`] whose birthday-bound collision probability over the
+/// count is at or under [`MAX_COLLISION_PROBABILITY`] (bd's
+/// `ComputeAdaptiveLength`, with the floor raised to 4).
+pub fn adaptive_length(count: usize) -> usize {
+    #[allow(clippy::cast_precision_loss)]
+    let n = count as f64;
+    for length in MIN_LENGTH..=MAX_LENGTH {
+        #[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+        let space = 36f64.powi(length as i32);
+        let probability = 1.0 - (-(n * n) / (2.0 * space)).exp();
+        if probability <= MAX_COLLISION_PROBABILITY {
+            return length;
+        }
+    }
+    MAX_LENGTH
 }
 
-/// Encode `data` as base36 of exactly `length` characters, bd's way.
-pub fn encode_base36(_data: &[u8], _length: usize) -> String {
-    String::new()
+/// How many random bytes bd encodes for a suffix of `length` characters.
+fn byte_width(length: usize) -> usize {
+    match length {
+        3 => 2,
+        5 | 6 => 4,
+        7 | 8 => 5,
+        _ => 3,
+    }
 }
 
-/// Mint `finding-<prefix>-<suffix>`.
+/// Encode `data` (at most 16 bytes) as base36 of exactly `length` characters,
+/// bd's way: big-endian integer, zero-padded on the left, and truncated to the
+/// least significant digits when longer.
+pub fn encode_base36(data: &[u8], length: usize) -> String {
+    let mut n: u128 = data
+        .iter()
+        .take(16)
+        .fold(0u128, |acc, &b| (acc << 8) | u128::from(b));
+    let mut digits: Vec<u8> = Vec::new();
+    while n > 0 {
+        let d = usize::try_from(n % 36).unwrap_or(0);
+        digits.push(BASE36[d]);
+        n /= 36;
+    }
+    while digits.len() < length {
+        digits.push(b'0');
+    }
+    digits.truncate(length);
+    digits.reverse();
+    String::from_utf8(digits).unwrap_or_default()
+}
+
+/// Mint `finding-<prefix>-<suffix>` with an injected random source and
+/// existence check: sixteen random bytes per attempt, bd's byte widths and
+/// base36, ten attempts per length starting at [`adaptive_length`] of
+/// `count`, growing through [`MAX_LENGTH`].
 pub fn mint_with(
-    _prefix: &str,
-    _count: usize,
-    _exists: &dyn Fn(&str) -> bool,
-    _random: &mut dyn FnMut(&mut [u8; 16]) -> Result<()>,
+    prefix: &str,
+    count: usize,
+    exists: &dyn Fn(&str) -> bool,
+    random: &mut dyn FnMut(&mut [u8; 16]) -> Result<()>,
 ) -> Result<String> {
-    Ok(String::new())
+    let start = adaptive_length(count);
+    for length in start..=MAX_LENGTH {
+        for _ in 0..TRIES_PER_LENGTH {
+            let mut bytes = [0u8; 16];
+            random(&mut bytes)?;
+            let suffix = encode_base36(&bytes[..byte_width(length)], length);
+            let id = format!("finding-{prefix}-{suffix}");
+            if !exists(&id) {
+                return Ok(id);
+            }
+        }
+    }
+    Err(KosError::Id {
+        message: format!(
+            "could not mint a finding id with prefix '{prefix}' after {TRIES_PER_LENGTH} attempts at each length {start} to {MAX_LENGTH}"
+        ),
+    })
+}
+
+/// Fill `buf` from the operating system's random source.
+fn os_random(buf: &mut [u8; 16]) -> Result<()> {
+    getrandom::getrandom(buf).map_err(|e| KosError::Id {
+        message: format!("the OS random source failed: {e}"),
+    })
+}
+
+/// Mint a finding id for the graph at `graph_root`. The prefix is the graph's
+/// graph_id, lowercased; the existence check and the adaptive length run over
+/// the findings already in the graph's `findings/`.
+pub fn mint_finding_id(graph_root: &Path) -> Result<String> {
+    let manifest = findings::load_manifest(graph_root).ok_or_else(|| KosError::Id {
+        message: format!(
+            "no readable kos.yaml at {}; a minted id takes its prefix from graph_id",
+            graph_root.display()
+        ),
+    })?;
+    let prefix = manifest.graph_id.to_lowercase();
+    if !findings::graph_id_is_prefix_shaped(&prefix) {
+        return Err(KosError::Id {
+            message: format!(
+                "graph_id '{}' cannot be a finding-id prefix: it must start with a letter and use only [a-z0-9-] once lowercased",
+                manifest.graph_id
+            ),
+        });
+    }
+    let known = findings::known_prefixes(graph_root);
+    let loads = findings::load_findings(&graph_root.join("findings"))?;
+    let mut taken: HashSet<String> = HashSet::new();
+    for load in &loads {
+        match load {
+            FindingLoad::Loaded(l) => {
+                taken.insert(findings::finding_key(&l.node.id, &known));
+                taken.insert(findings::finding_key(&l.stem, &known));
+            }
+            FindingLoad::Unloadable { path, .. } => {
+                if let Some(stem) = path.file_stem().and_then(|s| s.to_str()) {
+                    taken.insert(findings::finding_key(stem, &known));
+                }
+            }
+        }
+    }
+    mint_with(
+        &prefix,
+        loads.len(),
+        &|id| taken.contains(id),
+        &mut os_random,
+    )
 }
 
 #[cfg(test)]

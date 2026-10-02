@@ -129,27 +129,42 @@ provenance:
     Ok(())
 }
 
-/// Create a finding in _kos/findings/finding-{NNN}-{slug}.yaml.
+/// Create a finding with a minted id: `findings/finding-<prefix>-<suffix>-<slug>.md`
+/// (markdown with frontmatter by default; `yaml` keeps the YAML node shape).
 ///
-/// Findings are probe results — evidence, not opinion. Auto-numbered
-/// by scanning existing findings.
-pub fn finding(workspace: &Workspace, cwd: &Path, slug: &str, title: &str) -> Result<()> {
+/// Findings are probe results: evidence, not opinion. The id is minted at
+/// authoring (opaque-finding-ids design), so parallel sessions never take the
+/// same id; the slug stays in the filename as a readable alias.
+pub fn finding(
+    workspace: &Workspace,
+    cwd: &Path,
+    slug: &str,
+    title: &str,
+    yaml: bool,
+) -> Result<()> {
     let graph_root = resolve_graph_root(workspace, cwd);
     let findings_dir = graph_root.join("findings");
     ensure_dir(&findings_dir)?;
 
-    let next_num = next_finding_number(&findings_dir)?;
-    let finding_id = format!("finding-{next_num:03}-{slug}");
-    let filename = format!("{finding_id}.yaml");
+    let id = crate::id::mint_finding_id(&graph_root)?;
+    let stem = format!("{id}-{slug}");
+    let filename = format!("{stem}.{}", if yaml { "yaml" } else { "md" });
     let path = findings_dir.join(&filename);
+    if path.exists() {
+        return Err(KosError::Id {
+            message: format!("finding already exists: {}", path.display()),
+        });
+    }
 
     let today = today_iso();
-    let content = format!(
-        "\
-id: {finding_id}
+    let quoted_title = yaml_quoted(title);
+    let content = if yaml {
+        format!(
+            "\
+id: {stem}
 type: finding
 confidence: frontier
-title: \"{title}\"
+title: {quoted_title}
 content: |
   ## Summary
 
@@ -167,17 +182,53 @@ finding:
   result: partial
   surprise_magnitude: null
 "
-    );
+        )
+    } else {
+        format!(
+            "\
+---
+id: {stem}
+type: finding
+confidence: frontier
+title: {quoted_title}
+created_at: \"{today}\"
+edges: []
+---
+# {title}
+
+## Summary
+
+## Findings
+
+## Assessment
+"
+        )
+    };
 
     std::fs::write(&path, content).map_err(KosError::Io)?;
 
     let rel = relative_display(&path, &workspace.root);
     println!("Created finding: {rel}");
-    println!("  id: {finding_id}");
+    println!("  id: {id} (cite it by this id; the slug is an alias)");
     println!("  Fill in the content, link to the probe brief, set result.");
     println!("  Then harvest: update affected nodes, charter if bedrock changed.");
 
     Ok(())
+}
+
+/// Print a minted finding id and the filename it goes with, without writing a
+/// file, for an author who writes the finding by hand.
+pub fn id_finding(workspace: &Workspace, cwd: &Path, slug: &str, yaml: bool) -> Result<()> {
+    let graph_root = resolve_graph_root(workspace, cwd);
+    let id = crate::id::mint_finding_id(&graph_root)?;
+    println!("{id}");
+    println!("{id}-{slug}.{}", if yaml { "yaml" } else { "md" });
+    Ok(())
+}
+
+/// A YAML double-quoted scalar for `text`.
+fn yaml_quoted(text: &str) -> String {
+    format!("\"{}\"", text.replace('\\', "\\\\").replace('"', "\\\""))
 }
 
 /// Create an exploration brief in _kos/probes/brief-{slug}.yaml.
@@ -280,29 +331,6 @@ pub fn days_to_date(days_since_epoch: u64) -> (u64, u64, u64) {
     (y, m, d)
 }
 
-fn next_finding_number(findings_dir: &Path) -> Result<u32> {
-    if !findings_dir.exists() {
-        return Ok(1);
-    }
-
-    let mut max = 0u32;
-    for entry in std::fs::read_dir(findings_dir).map_err(KosError::Io)? {
-        let entry = entry.map_err(KosError::Io)?;
-        let name = entry.file_name();
-        let name = name.to_string_lossy();
-        // Match finding-NNN-*.yaml
-        if let Some(rest) = name.strip_prefix("finding-") {
-            if let Some(num_str) = rest.split('-').next() {
-                if let Ok(n) = num_str.parse::<u32>() {
-                    max = max.max(n);
-                }
-            }
-        }
-    }
-
-    Ok(max + 1)
-}
-
 fn relative_display(path: &Path, root: &Path) -> String {
     path.strip_prefix(root)
         .map(|p| p.display().to_string())
@@ -322,33 +350,5 @@ mod tests {
     fn days_to_date_known_date() {
         // 2026-04-05 = day 20548 since epoch
         assert_eq!(days_to_date(20548), (2026, 4, 5));
-    }
-
-    #[test]
-    fn next_finding_number_empty_dir() {
-        let dir = std::env::temp_dir().join("kos-test-empty-findings");
-        let _ = std::fs::remove_dir_all(&dir);
-        std::fs::create_dir_all(&dir).unwrap();
-        assert_eq!(next_finding_number(&dir).unwrap(), 1);
-        std::fs::remove_dir_all(&dir).unwrap();
-    }
-
-    #[test]
-    fn next_finding_number_with_existing() {
-        let dir = std::env::temp_dir().join("kos-test-findings");
-        let _ = std::fs::remove_dir_all(&dir);
-        std::fs::create_dir_all(&dir).unwrap();
-        std::fs::write(dir.join("finding-001-foo.yaml"), "").unwrap();
-        std::fs::write(dir.join("finding-005-bar.yaml"), "").unwrap();
-        std::fs::write(dir.join("finding-003-baz.yaml"), "").unwrap();
-        assert_eq!(next_finding_number(&dir).unwrap(), 6);
-        std::fs::remove_dir_all(&dir).unwrap();
-    }
-
-    #[test]
-    fn next_finding_number_nonexistent_dir() {
-        let dir = std::env::temp_dir().join("kos-test-no-such-findings");
-        let _ = std::fs::remove_dir_all(&dir);
-        assert_eq!(next_finding_number(&dir).unwrap(), 1);
     }
 }

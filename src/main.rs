@@ -193,7 +193,7 @@ enum Commands {
         dir: Option<PathBuf>,
     },
 
-    /// Create a finding; probe result with auto-numbered ID
+    /// Create a finding with a minted id (finding-<graph_id>-<suffix>-<slug>)
     Finding {
         /// Slug for the finding (e.g., "charter-inflation")
         slug: String,
@@ -201,9 +201,23 @@ enum Commands {
         /// Title for the finding
         title: String,
 
+        /// Write markdown with frontmatter (the default)
+        #[arg(long, conflicts_with = "yaml")]
+        md: bool,
+
+        /// Write the YAML node shape instead of markdown
+        #[arg(long)]
+        yaml: bool,
+
         /// Target directory (defaults to cwd)
         #[arg(long)]
         dir: Option<PathBuf>,
+    },
+
+    /// Mint an id without writing a file
+    Id {
+        #[command(subcommand)]
+        kind: IdKind,
     },
 
     /// Create an exploration brief; plan for a probe
@@ -233,6 +247,23 @@ enum Commands {
 
     /// Show version, commit, tag (release reference), build time, and channel
     Version,
+}
+
+#[derive(clap::Subcommand)]
+enum IdKind {
+    /// Print a minted finding id and its filename; writes nothing
+    Finding {
+        /// Slug the filename will carry
+        slug: String,
+
+        /// Print a .yaml filename instead of .md
+        #[arg(long)]
+        yaml: bool,
+
+        /// Target directory (defaults to cwd)
+        #[arg(long)]
+        dir: Option<PathBuf>,
+    },
 }
 
 #[derive(clap::Subcommand)]
@@ -527,10 +558,24 @@ fn main() -> anyhow::Result<()> {
             kos::process::question(&workspace, &cwd, &slug, &title)?;
         }
 
-        Commands::Finding { slug, title, dir } => {
+        Commands::Finding {
+            slug,
+            title,
+            md: _,
+            yaml,
+            dir,
+        } => {
             let cwd = dir.unwrap_or(std::env::current_dir()?);
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
-            kos::process::finding(&workspace, &cwd, &slug, &title)?;
+            kos::process::finding(&workspace, &cwd, &slug, &title, yaml)?;
+        }
+
+        Commands::Id {
+            kind: IdKind::Finding { slug, yaml, dir },
+        } => {
+            let cwd = dir.unwrap_or(std::env::current_dir()?);
+            let workspace = kos::workspace::Workspace::discover(&cwd)?;
+            kos::process::id_finding(&workspace, &cwd, &slug, yaml)?;
         }
 
         Commands::Probe { slug, title, dir } => {

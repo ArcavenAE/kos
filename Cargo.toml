@@ -26,6 +26,9 @@ petgraph = "0.7"
 # File system traversal
 walkdir = "2"
 
+# OS random bytes for minted finding ids (opaque-finding-ids design, 2.1)
+getrandom = "0.2"
+
 # Usage logging (opt-in)
 chrono = { version = "0.4", features = ["serde"] }
 dirs-next = "2"
