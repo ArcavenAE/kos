@@ -107,9 +107,12 @@ fn two_clones_mint_distinct_ids_and_the_union_validates() {
     let stdout = String::from_utf8_lossy(&out.stdout);
     assert!(out.status.success(), "union must validate:\n{stdout}");
     assert!(
-        stdout.contains("3 findings: 0 duplicate-id failures, 0 warnings"),
+        stdout.contains("3 findings: 0 duplicate-id failures"),
         "{stdout}"
     );
+    // Both arms picked one slug: the ids differ, so that is a warning, not a
+    // failure (design 2.4, citation key).
+    assert!(stdout.contains("slug 'same-slug'"), "{stdout}");
 }
 
 #[test]
