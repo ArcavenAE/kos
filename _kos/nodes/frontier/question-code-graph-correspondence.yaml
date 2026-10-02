@@ -42,7 +42,7 @@ content: |
   ── Sub-questions ──────────────────────────────────────────────
 
   A. Does live LSP suffice, making an ingest optional? (aae-orc-5lbu)
-     MEASURED. finding-aae-orc-5lbu-serena-live-lsp-baseline. Split verdict:
+     MEASURED. finding-kos-wre7-serena-live-lsp-baseline. Split verdict:
      live LSP (rust-analyzer / gopls via a symbol adapter) beats grep on
      correctness for symbol-resolution workloads (found an implementation grep
      missed; dropped 9 false positives from a blast-radius estimate), and
@@ -52,7 +52,7 @@ content: |
      are complementary, not competing. Answers the briefing's Q2 and R2.
 
   B. Is compiler-grade indexing affordable at our cadence? (aae-orc-msqx)
-     MEASURED, cost half only. finding-aae-orc-msqx-scip-indexing-cost. Cheap
+     MEASURED, cost half only. finding-kos-ndz7-scip-indexing-cost. Cheap
      in wall time, expensive in memory for Rust (0.55 to 2.16 GB peak per run,
      unrelated to repo size); near-free for Go. Warm fleet sweep 44.31 s / cold
      294.24 s / 60.83 MB index. Per-push is the defensible fleet default; the CI
@@ -160,8 +160,8 @@ provenance:
   created_at: "2026-08-16"
   evidence:
     - _kos/ideas/code-graph-as-second-lens.md
-    - _kos/findings/finding-aae-orc-5lbu-serena-live-lsp-baseline.md
-    - _kos/findings/finding-aae-orc-msqx-scip-indexing-cost.md
+    - _kos/findings/finding-kos-wre7-serena-live-lsp-baseline.md
+    - _kos/findings/finding-kos-ndz7-scip-indexing-cost.md
     - docs/research/2026-08-08-code-graph-briefing.md
 notes: >
   Same-graph edge targets are bare kos-graph ids: elem-correspondence-layer,

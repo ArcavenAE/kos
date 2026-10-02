@@ -110,7 +110,7 @@ uncomfortable.
 
 The contradiction: if the durable value is the method and the tools are
 disposable, that argues against building anything heavy now. But the symbol-
-workload measurement (`finding-aae-orc-5lbu`) found live LSP genuinely beating
+workload measurement (`finding-kos-wre7`) found live LSP genuinely beating
 grep on correctness, which is a concrete capability, not a method. Both can be
 true. I am recording the tension, not dissolving it.
 
@@ -136,11 +136,11 @@ true. I am recording the tension, not dissolving it.
 
 ## What has already left this file
 
-- Sub-question A (does live LSP suffice) became `finding-aae-orc-5lbu`. Measured:
+- Sub-question A (does live LSP suffice) became `finding-kos-wre7`. Measured:
   live LSP wins on symbol workloads and cannot serve orientation, history,
   cross-repo scope, or provenance. A split, not a verdict.
 - Sub-question B (is compiler-grade indexing affordable) became
-  `finding-aae-orc-msqx`. Measured: cheap in time, expensive in memory for Rust,
+  `finding-kos-ndz7`. Measured: cheap in time, expensive in memory for Rust,
   near-free for Go, with a silent-degradation failure mode that a zero exit code
   hides.
 

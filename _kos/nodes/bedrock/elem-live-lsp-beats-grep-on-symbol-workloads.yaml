@@ -17,7 +17,7 @@ content: |
   cross-repo scope, or provenance, which the companion graveyard node
   grv-live-lsp-serves-non-symbol-workloads rules out on the same evidence.
 
-  WHAT WAS MEASURED (finding-aae-orc-5lbu, kos + marvel, workloads W1-W5):
+  WHAT WAS MEASURED (finding-kos-wre7, kos + marvel, workloads W1-W5):
 
   - W1 (who implements runtime.Adapter, marvel/Go): the language server returned
     seven implementations to my six. The seventh, feedlessAdapter in a test
@@ -65,4 +65,4 @@ provenance:
   session: "session-2026-08-16-code-graph-harvest"
   created_at: "2026-08-16"
   evidence:
-    - _kos/findings/finding-aae-orc-5lbu-serena-live-lsp-baseline.md
+    - _kos/findings/finding-kos-wre7-serena-live-lsp-baseline.md
