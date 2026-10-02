@@ -10,6 +10,7 @@ pub mod error;
 pub mod findings;
 mod gitenv;
 pub mod graph;
+pub mod id;
 pub mod init;
 pub mod model;
 pub mod orient;
