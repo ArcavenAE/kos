@@ -31,6 +31,9 @@ pub enum KosError {
 
     #[error("update error: {message}")]
     Update { message: String },
+
+    #[error("id error: {message}")]
+    Id { message: String },
 }
 
 pub type Result<T> = std::result::Result<T, KosError>;

@@ -769,6 +769,7 @@ dependencies = [
  "chrono",
  "clap",
  "dirs-next",
+ "getrandom 0.2.17",
  "insta",
  "petgraph",
  "regex",
