@@ -125,7 +125,7 @@ pub fn load_finding_nodes(dir: &Path) -> Result<Vec<Node>> {
 /// claim the same finding, even when their slugs differ. Two distinct findings
 /// sharing a number is the collision validate must catch. Falls back to the
 /// full id, lowercased, when the id is not a numbered finding.
-pub fn finding_key(id: &str) -> String {
+pub fn finding_key(id: &str, _known_prefixes: &[String]) -> String {
     let lower = id.to_lowercase();
     if let Some(rest) = lower.strip_prefix("finding-") {
         let digits: String = rest.chars().take_while(char::is_ascii_digit).collect();
@@ -134,6 +134,12 @@ pub fn finding_key(id: &str) -> String {
         }
     }
     lower
+}
+
+/// The id prefixes a graph knows: its own graph_id and, at an orchestrator
+/// root, those of its included graphs, lowercased.
+pub fn known_prefixes(_kos_root: &Path) -> Vec<String> {
+    Vec::new()
 }
 
 // ── YAML shape ───────────────────────────────────────────────
@@ -450,11 +456,83 @@ mod tests {
 
     #[test]
     fn finding_key_extracts_number_and_ignores_slug() {
-        assert_eq!(finding_key("finding-123-harness-invocation"), "finding-123");
-        assert_eq!(finding_key("finding-123-org-owned-fork"), "finding-123");
-        assert_eq!(finding_key("finding-009-terminal"), "finding-009");
-        // Non-numbered ids fall back to the whole id, lowercased.
-        assert_eq!(finding_key("Elem-Foo"), "elem-foo");
+        assert_eq!(
+            finding_key("finding-123-harness-invocation", &[]),
+            "finding-123"
+        );
+        assert_eq!(
+            finding_key("finding-123-org-owned-fork", &[]),
+            "finding-123"
+        );
+        assert_eq!(finding_key("finding-009-terminal", &[]), "finding-009");
+        // Non-finding ids fall back to the whole id, lowercased.
+        assert_eq!(finding_key("Elem-Foo", &[]), "elem-foo");
+    }
+
+    // The table from the opaque-finding-ids design, plan item 1.
+    #[test]
+    fn finding_key_classifies_numbered_and_prefixed_opaque_ids() {
+        let known = vec!["aae-orc".to_string(), "kos".to_string()];
+        let k = |id: &str| finding_key(id, &known);
+        // One minted id under two slugs is one finding: a collision.
+        assert_eq!(k("finding-aae-orc-k3m9-x"), k("finding-aae-orc-k3m9-y"));
+        assert_eq!(k("finding-aae-orc-k3m9-x"), "finding-aae-orc-k3m9");
+        // The same suffix under two prefixes is two findings.
+        assert_ne!(k("finding-aae-orc-k3m9-x"), k("finding-kos-k3m9-x"));
+        // Numbered keys compare as integers: 019 and 19 are one key.
+        assert_eq!(k("finding-019-a"), k("finding-19-b"));
+        // An all-digit suffix behind a prefix is opaque, never number 173.
+        assert_eq!(k("finding-kos-0173-x"), "finding-kos-0173");
+        assert_ne!(k("finding-kos-0173-x"), k("finding-173-y"));
+    }
+
+    #[test]
+    fn finding_key_takes_the_longest_known_prefix() {
+        let known = vec!["aae".to_string(), "aae-orc".to_string()];
+        assert_eq!(
+            finding_key("finding-aae-orc-k3m9-x", &known),
+            "finding-aae-orc-k3m9"
+        );
+        assert_eq!(
+            finding_key("finding-aae-p2ab-x", &known),
+            "finding-aae-p2ab"
+        );
+    }
+
+    #[test]
+    fn finding_key_without_a_known_prefix_keys_on_the_full_stem() {
+        // Unrecognised: never a duplicate of another file.
+        let known = vec!["kos".to_string()];
+        assert_eq!(
+            finding_key("finding-aae-orc-5lbu-x", &known),
+            "finding-aae-orc-5lbu-x"
+        );
+        assert_ne!(
+            finding_key("finding-aae-orc-5lbu-x", &known),
+            finding_key("finding-aae-orc-5lbu-y", &known)
+        );
+    }
+
+    #[test]
+    fn known_prefixes_reads_the_graph_and_its_includes() {
+        let dir = tempfile::tempdir().unwrap();
+        let orc = dir.path().join("_kos");
+        let sub = dir.path().join("sub").join("_kos");
+        fs::create_dir_all(&orc).unwrap();
+        fs::create_dir_all(&sub).unwrap();
+        fs::write(
+            orc.join("kos.yaml"),
+            "graph_id: AAE-orc\nscope: orchestrator\nschema_version: '0.3'\nincludes:\n- path: sub/_kos\n",
+        )
+        .unwrap();
+        fs::write(
+            sub.join("kos.yaml"),
+            "graph_id: BetterDials\nscope: repo\nschema_version: '0.3'\n",
+        )
+        .unwrap();
+        let mut got = known_prefixes(&orc);
+        got.sort();
+        assert_eq!(got, vec!["aae-orc".to_string(), "betterdials".to_string()]);
     }
 
     #[test]

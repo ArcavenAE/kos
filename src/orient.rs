@@ -258,9 +258,13 @@ fn load_finding_ids(findings_dir: &Path) -> std::collections::HashSet<String> {
     // Uses the shared loader so md findings (frontmatter and legacy bare md)
     // resolve blockers alongside yaml ones. Both the full id and the finding
     // number are inserted, so an edge that names either form resolves.
+    let known = findings_dir
+        .parent()
+        .map(crate::findings::known_prefixes)
+        .unwrap_or_default();
     if let Ok(nodes) = crate::findings::load_finding_nodes(findings_dir) {
         for node in nodes {
-            ids.insert(crate::findings::finding_key(&node.id));
+            ids.insert(crate::findings::finding_key(&node.id, &known));
             ids.insert(node.id);
         }
     }

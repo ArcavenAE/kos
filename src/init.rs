@@ -211,6 +211,7 @@ fn write_manifest(
         description: None,
         schema_version: SCHEMA_VERSION.to_string(),
         includes: includes.to_vec(),
+        findings: None,
     };
     write_manifest_raw(&kos_dir.join(MANIFEST_FILE), &manifest)
 }
