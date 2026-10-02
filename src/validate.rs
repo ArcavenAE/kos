@@ -1,8 +1,8 @@
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::path::{Path, PathBuf};
 
 use crate::error::{KosError, Result};
-use crate::findings::{self, FindingLoad};
+use crate::findings::{self, FindingClass, FindingLoad};
 use crate::model::{LEGAL_EDGE_TYPES, Node, NodeType};
 use crate::workspace::{KOS_DIR, MANIFEST_FILE, Workspace};
 
@@ -199,7 +199,7 @@ pub fn run(kos_root: &Path) -> Result<Summary> {
     // Findings pass; a second section over _kos/findings/. Findings are not
     // under nodes/, so the node passes above never saw them; the collision
     // between two files claiming the same finding number went unnoticed.
-    let findings = validate_findings(&kos_root.join("findings"));
+    let findings = validate_findings(kos_root);
 
     Ok(Summary {
         total,
@@ -226,11 +226,42 @@ struct FindingsReport {
 /// error; pure yaml, md+frontmatter, and legacy bare md are all valid. A
 /// duplicate id is structural well-formedness (may gate per ADR-007), not a
 /// health metric.
-fn validate_findings(findings_dir: &Path) -> FindingsReport {
+fn validate_findings(kos_root: &Path) -> FindingsReport {
     let mut report = FindingsReport::default();
+    let findings_dir = kos_root.join("findings");
     if !findings_dir.exists() {
         return report;
     }
+    let findings_dir = findings_dir.as_path();
+
+    // The prefixes this graph knows, its owner, and where its numbered
+    // sequence was closed (opaque-finding-ids design, 2.3 and 2.4).
+    let manifest = findings::load_manifest(kos_root);
+    let owner = manifest.as_ref().map(|m| m.graph_id.to_lowercase());
+    let numbered_through = manifest
+        .as_ref()
+        .and_then(|m| m.findings.as_ref())
+        .and_then(|f| f.numbered_through);
+    let declared = findings::declared_graph_ids(kos_root);
+    let known = findings::known_prefixes(kos_root);
+    let mut id_warnings: Vec<String> = Vec::new();
+    let mut seen_ids: BTreeMap<String, usize> = BTreeMap::new();
+    for id in &declared {
+        if !findings::graph_id_is_prefix_shaped(id) {
+            id_warnings.push(format!(
+                "graph_id '{id}' cannot be a finding-id prefix: it must start with a letter and use only [a-z0-9-] once lowercased"
+            ));
+        }
+        *seen_ids.entry(id.to_lowercase()).or_default() += 1;
+    }
+    for (id, n) in &seen_ids {
+        if *n > 1 {
+            id_warnings.push(format!(
+                "graph_id '{id}' is declared by {n} graphs; a finding-id prefix must name one graph"
+            ));
+        }
+    }
+    let mut by_slug: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
 
     let loads = match findings::load_findings(findings_dir) {
         Ok(l) => l,
@@ -252,9 +283,42 @@ fn validate_findings(findings_dir: &Path) -> FindingsReport {
         match load {
             FindingLoad::Loaded(l) => {
                 report.total += 1;
-                let key = findings::finding_key(&l.node.id, &[]);
+                let class = findings::classify_finding_id(&l.node.id, &known);
+                match &class.class {
+                    FindingClass::Unrecognised => id_warnings.push(format!(
+                        "unrecognised finding id '{}': not numbered, and no known prefix ({})",
+                        l.node.id,
+                        if known.is_empty() {
+                            "none declared".to_string()
+                        } else {
+                            known.join(", ")
+                        }
+                    )),
+                    FindingClass::Opaque { prefix } => {
+                        if let Some(owner) = owner.as_deref().filter(|o| *o != prefix) {
+                            id_warnings.push(format!(
+                                "finding id '{}' carries prefix '{prefix}' but this graph is '{owner}'; a relocated finding keeps its id, so record it in the relocation index",
+                                l.node.id
+                            ));
+                        }
+                    }
+                    FindingClass::Numbered(number) => {
+                        if let Some(through) = numbered_through {
+                            if number.is_none_or(|n| n > through) {
+                                id_warnings.push(format!(
+                                    "numbered finding '{}' is above findings.numbered_through ({through}); new findings take minted ids",
+                                    l.node.id
+                                ));
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+                if let Some(slug) = findings::classify_finding_id(&l.stem, &known).slug {
+                    by_slug.entry(slug).or_default().insert(class.key.clone());
+                }
                 by_key
-                    .entry(key)
+                    .entry(class.key)
                     .or_default()
                     .push((l.node.id.clone(), l.stem.clone()));
                 if l.node.id != l.stem {
@@ -298,6 +362,27 @@ fn validate_findings(findings_dir: &Path) -> FindingsReport {
     for (id, stem) in &drift {
         report.warnings += 1;
         println!("  WARN  id '{id}' does not match filename stem '{stem}'");
+    }
+
+    // Finding-id shape: unrecognised ids, relocated prefixes, numbers above
+    // the closed sequence, and graph_ids that cannot serve as prefixes.
+    for w in &id_warnings {
+        report.warnings += 1;
+        println!("  WARN  {w}");
+    }
+
+    // One slug under distinct ids: the id is the citation, so the slug stops
+    // resolving as an alias. A warning, because the ids are still distinct.
+    for (slug, keys) in &by_slug {
+        if keys.len() > 1 {
+            report.warnings += 1;
+            let keys: Vec<&str> = keys.iter().map(String::as_str).collect();
+            println!(
+                "  WARN  slug '{slug}' is used by {} distinct finding ids ({}); cite these by id",
+                keys.len(),
+                keys.join(", ")
+            );
+        }
     }
 
     // Files that would not load at all; kept visible as a warning.
