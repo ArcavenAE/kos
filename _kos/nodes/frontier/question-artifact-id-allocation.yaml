@@ -102,11 +102,16 @@ content: |
   numbered `finding-039`, `finding-039-b69n-contract-lane-harvest.md` (marvel
   0b908f46, 2026-09-14, #251) and
   `finding-039-two-release-runs-race-on-the-tap-push.md` (marvel 422eb11b,
-  2026-09-15, #271), merged about eighteen hours apart, one from a finding PR
-  and one from a CI PR. The arcaven harvest reports that `kos validate` in
-  marvel exits 1 on it (not re-run here). That is consistent with the race
-  shape named above; when each PR was opened was not checked. Whether marvel's pair should be renumbered to opaque ids is marvel's
-  call; this node records it as a specimen. Two other reported collisions were
+  2026-09-15, #271), one from a finding PR and one from a CI PR. This is
+  neither a race nor a fan-out. #271 is one commit whose parent 135015d (#269)
+  already contained #251's `finding-039`, and #271 was opened about eighteen
+  hours after #251 merged (2026-09-14T22:33Z to 2026-09-15T16:35Z). So the
+  second `finding-039` was committed on a tree that already held the first:
+  the number was not read from the tree it landed on, which is the case minted
+  ids (`kos id finding`) fix most directly. Review 5403982290 ran `kos validate`
+  on marvel's `_kos` at b003cd3 and got exit 1, FAIL duplicate 'finding-039'.
+  Whether marvel's pair should be renumbered to opaque ids is marvel's call;
+  this node records it as a specimen. Two other reported collisions were
   not confirmed and are not recorded: a beadle `finding-025` is held by an
   open PR (beadle#95) while the next number merged (#98), which is a gap, not
   a duplicate; a "next free 062" mislabel could not be traced to a file.
