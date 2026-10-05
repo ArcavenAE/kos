@@ -394,17 +394,24 @@ fn main() -> anyhow::Result<()> {
                     });
                 }
                 eprintln!();
-                eprintln!(
-                    "all graphs: {} nodes, {} passed, {} warnings, {} failed, {} parse errors; {} findings, {} duplicate-id failures, {} findings warnings",
-                    combined.total,
-                    combined.passed,
-                    combined.warnings,
-                    combined.failed,
-                    combined.parse_errors,
-                    combined.findings_total,
-                    combined.findings_failed,
-                    combined.findings_warnings
-                );
+                if only.is_some() {
+                    eprintln!(
+                        "all graphs: {} findings, {} duplicate-id failures",
+                        combined.findings_total, combined.findings_failed
+                    );
+                } else {
+                    eprintln!(
+                        "all graphs: {} nodes, {} passed, {} warnings, {} failed, {} parse errors; {} findings, {} duplicate-id failures, {} findings warnings",
+                        combined.total,
+                        combined.passed,
+                        combined.warnings,
+                        combined.failed,
+                        combined.parse_errors,
+                        combined.findings_total,
+                        combined.findings_failed,
+                        combined.findings_warnings
+                    );
+                }
                 if !combined.clean() || io_errors > 0 {
                     std::process::exit(1);
                 }

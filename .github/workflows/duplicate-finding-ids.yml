@@ -1,8 +1,9 @@
 # Duplicate finding ids (a required check)
 #
 # Two files claiming one finding number is a structural failure, and ADR-007
-# lets structural validity gate. The operator ruled (2026-09-25, aae-orc-dq328)
-# that only this section of kos validate becomes required; everything else
+# lets structural validity gate. The operator ruled (2026-09-25, aae-orc-dq328;
+# docs/design/opaque-finding-ids.md, the RULED 2026-09-25 note under the
+# duplicate-id check) that only this section of kos validate becomes required; everything else
 # stays advisory in graph-validate.yml. This runs `kos validate --only
 # duplicate-ids`, which prints no node results and no warnings and exits 1 only
 # on a duplicate id.
