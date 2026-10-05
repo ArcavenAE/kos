@@ -77,6 +77,12 @@ enum Commands {
         /// Validate all discovered graphs (orchestrator + includes + subrepos)
         #[arg(long, alias = "all")]
         merged: bool,
+
+        /// Run only one section, with its own exit status. `duplicate-ids`
+        /// checks that no two findings share a number and nothing else: no
+        /// node results, no warnings, and node failures do not fail it.
+        #[arg(long, value_enum)]
+        only: Option<ValidateOnly>,
     },
 
     /// Render the node graph as mermaid or dot
@@ -249,6 +255,13 @@ enum Commands {
     Version,
 }
 
+/// A section of `kos validate` that can run alone, with its own exit status.
+#[derive(Clone, Copy, clap::ValueEnum)]
+enum ValidateOnly {
+    /// Two findings claiming one finding number (structural, may gate).
+    DuplicateIds,
+}
+
 #[derive(clap::Subcommand)]
 enum IdKind {
     /// Print a minted finding id and its filename; writes nothing
@@ -346,7 +359,7 @@ fn main() -> anyhow::Result<()> {
             kos::ask::run(&workspace, &cwd, target.as_deref(), &query, limit, json)?;
         }
 
-        Commands::Validate { merged } => {
+        Commands::Validate { merged, only } => {
             let cwd = std::env::current_dir()?;
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
 
@@ -357,7 +370,13 @@ fn main() -> anyhow::Result<()> {
                 let mut io_errors = 0;
                 for graph in &workspace.graphs {
                     eprintln!("Validating graph: {} ({})", graph.graph_id, graph.scope);
-                    match kos::validate::run(&graph.path) {
+                    let ran = match only {
+                        Some(ValidateOnly::DuplicateIds) => {
+                            kos::validate::run_duplicate_ids(&graph.path)
+                        }
+                        None => kos::validate::run(&graph.path),
+                    };
+                    match ran {
                         Ok(summary) => combined.merge(&summary),
                         Err(e) => {
                             eprintln!("  error: {e}");
@@ -367,7 +386,12 @@ fn main() -> anyhow::Result<()> {
                 }
                 // Also validate legacy layout if no _kos/ graphs found
                 if workspace.graphs.is_empty() {
-                    combined.merge(&kos::validate::run(&workspace.kos_root)?);
+                    combined.merge(&match only {
+                        Some(ValidateOnly::DuplicateIds) => {
+                            kos::validate::run_duplicate_ids(&workspace.kos_root)?
+                        }
+                        None => kos::validate::run(&workspace.kos_root)?,
+                    });
                 }
                 eprintln!();
                 eprintln!(
@@ -389,7 +413,13 @@ fn main() -> anyhow::Result<()> {
                 // when inside one, the orchestrator graph at orc root.
                 // Previously this always resolved to the kos repo's own graph
                 // regardless of cwd (aae-orc-z67m / finding-060 anomaly 1).
-                match kos::validate::run_nearest(&workspace, &cwd)? {
+                let scoped = match only {
+                    Some(ValidateOnly::DuplicateIds) => {
+                        kos::validate::run_nearest_duplicate_ids(&workspace, &cwd)?
+                    }
+                    None => kos::validate::run_nearest(&workspace, &cwd)?,
+                };
+                match scoped {
                     kos::validate::ScopedValidation::Validated(summary) => {
                         if !summary.clean() {
                             std::process::exit(1);
