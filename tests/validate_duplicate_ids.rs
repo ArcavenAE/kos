@@ -166,3 +166,77 @@ fn merged_runs_the_only_check_on_every_graph() {
     );
     assert_eq!(out.status.code(), Some(1), "{}", text(&out));
 }
+
+/// An orchestrator root graph that includes `n` subrepo graphs, each clean.
+fn orc_with_subs(root: &Path, n: usize) {
+    let includes: String = (1..=n).map(|i| format!("- path: sub{i}/_kos\n")).collect();
+    write(
+        &root.join("_kos/kos.yaml"),
+        &format!(
+            "graph_id: fixture\nscope: orchestrator\nschema_version: '0.3'\nincludes:\n{includes}"
+        ),
+    );
+    write(
+        &root.join("_kos/findings/finding-001-root.md"),
+        "# root\n\nbody\n",
+    );
+    for i in 1..=n {
+        write(
+            &root.join(format!("sub{i}/_kos/kos.yaml")),
+            &format!("graph_id: sub{i}\nscope: repo\nschema_version: '0.3'\n"),
+        );
+        write(
+            &root.join(format!("sub{i}/_kos/findings/finding-001-a.md")),
+            "# a\n\nbody\n",
+        );
+    }
+}
+
+#[test]
+fn merged_catches_a_duplicate_in_the_root_graph_alone() {
+    // A merged run that skipped the first graph would hide the orchestrator's
+    // own duplicates (the orc is the graph that collides most).
+    let tmp = tempfile::tempdir().unwrap();
+    orc_with_subs(tmp.path(), 2);
+    write(
+        &tmp.path().join("_kos/findings/finding-001-root-again.md"),
+        "# again\n\nbody\n",
+    );
+    let out = kos(
+        tmp.path(),
+        &["validate", "--merged", "--only", "duplicate-ids"],
+    );
+    assert_eq!(out.status.code(), Some(1), "{}", text(&out));
+}
+
+#[test]
+fn merged_catches_a_duplicate_in_the_last_graph_alone() {
+    let tmp = tempfile::tempdir().unwrap();
+    orc_with_subs(tmp.path(), 2);
+    write(
+        &tmp.path().join("sub2/_kos/findings/finding-001-b.md"),
+        "# b\n\nbody\n",
+    );
+    let out = kos(
+        tmp.path(),
+        &["validate", "--merged", "--only", "duplicate-ids"],
+    );
+    assert_eq!(out.status.code(), Some(1), "{}", text(&out));
+}
+
+#[test]
+fn merged_only_summary_does_not_pretend_a_node_pass_ran() {
+    let tmp = tempfile::tempdir().unwrap();
+    orc_with_subs(tmp.path(), 1);
+    let out = kos(
+        tmp.path(),
+        &["validate", "--merged", "--only", "duplicate-ids"],
+    );
+    assert_eq!(out.status.code(), Some(0), "{}", text(&out));
+    assert!(!text(&out).contains("0 nodes"), "{}", text(&out));
+    assert!(
+        text(&out).contains("all graphs: 2 findings, 0 duplicate-id failures"),
+        "{}",
+        text(&out)
+    );
+}
