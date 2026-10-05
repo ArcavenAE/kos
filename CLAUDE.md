@@ -47,7 +47,7 @@ Always accompany a move with a commit message explaining the evidence.
 ### Probe and Finding Files
 Exploration briefs live in _kos/probes/[brief-slug].yaml
 Probe work products (decomposed nodes, test artifacts) live in _kos/probes/[probe-slug]-nodes/
-Findings live in _kos/findings/finding-NNN-[slug].yaml (numbered sequentially)
+Findings live in _kos/findings/ under a minted id (`kos id finding <slug>` prints the id and filename)
 These are separate from _kos/nodes/ — probe artifacts are evidence, not graph nodes.
 
 ### Ideas (pre-hypothesis brainstorming)
@@ -68,6 +68,7 @@ pointing to what it became.
 3. Write an Exploration Brief in _kos/probes/
 4. Do the probe work
 5. Write a finding in _kos/findings/
+   Mint the id with `kos id finding <slug>`; never hand-allocate a number.
 6. Harvest: update affected NODES (`_kos/nodes/{bedrock,frontier,graveyard}/*.yaml`),
    move files if confidence changed. KOS-charter.md is renderer output
    (per orc F22, `kos charter render`); do NOT hand-edit charter prose
