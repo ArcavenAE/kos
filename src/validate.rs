@@ -124,17 +124,44 @@ fn nearest_bare_kos(cwd: &Path, stop_at: &Path) -> Option<PathBuf> {
 /// [`ScopedValidation::BareKosDir`] instead of validating a walked-up parent
 /// graph and reporting it as this repo's.
 pub fn run_nearest(workspace: &Workspace, cwd: &Path) -> Result<ScopedValidation> {
+    run_nearest_with(workspace, cwd, run)
+}
+
+/// [`run_nearest`] for the duplicate-id section alone (`--only duplicate-ids`).
+pub fn run_nearest_duplicate_ids(workspace: &Workspace, cwd: &Path) -> Result<ScopedValidation> {
+    run_nearest_with(workspace, cwd, run_duplicate_ids)
+}
+
+fn run_nearest_with(
+    workspace: &Workspace,
+    cwd: &Path,
+    pass: fn(&Path) -> Result<Summary>,
+) -> Result<ScopedValidation> {
     if let Some(bare) = nearest_bare_kos(cwd, &workspace.root) {
         return Ok(ScopedValidation::BareKosDir(bare));
     }
 
     let summary = if let Some(graph) = workspace.nearest_graph(cwd) {
         eprintln!("Validating graph: {} ({})", graph.graph_id, graph.scope);
-        run(&graph.path)?
+        pass(&graph.path)?
     } else {
-        run(&workspace.node_root())?
+        pass(&workspace.node_root())?
     };
     Ok(ScopedValidation::Validated(summary))
+}
+
+/// Run only the duplicate-finding-id section, with its own exit status
+/// (aae-orc-dq328). A duplicate id is structural, so it may gate (ADR-007);
+/// everything else `run` reports stays advisory. This prints no node results
+/// and no warnings, and the returned `Summary` carries only the findings
+/// counts, so `clean()` is false exactly when two files claim one number.
+pub fn run_duplicate_ids(kos_root: &Path) -> Result<Summary> {
+    let findings = validate_findings(kos_root, true);
+    Ok(Summary {
+        findings_total: findings.total,
+        findings_failed: findings.failed,
+        ..Summary::default()
+    })
 }
 
 /// Run the validate subcommand against all nodes in the kos root.
@@ -199,7 +226,7 @@ pub fn run(kos_root: &Path) -> Result<Summary> {
     // Findings pass; a second section over _kos/findings/. Findings are not
     // under nodes/, so the node passes above never saw them; the collision
     // between two files claiming the same finding number went unnoticed.
-    let findings = validate_findings(kos_root);
+    let findings = validate_findings(kos_root, false);
 
     Ok(Summary {
         total,
@@ -226,7 +253,7 @@ struct FindingsReport {
 /// error; pure yaml, md+frontmatter, and legacy bare md are all valid. A
 /// duplicate id is structural well-formedness (may gate per ADR-007), not a
 /// health metric.
-fn validate_findings(kos_root: &Path) -> FindingsReport {
+fn validate_findings(kos_root: &Path, duplicates_only: bool) -> FindingsReport {
     let mut report = FindingsReport::default();
     let findings_dir = kos_root.join("findings");
     if !findings_dir.exists() {
@@ -359,21 +386,21 @@ fn validate_findings(kos_root: &Path) -> FindingsReport {
     }
 
     // id/filename drift; a warning, not a failure.
-    for (id, stem) in &drift {
+    for (id, stem) in drift.iter().filter(|_| !duplicates_only) {
         report.warnings += 1;
         println!("  WARN  id '{id}' does not match filename stem '{stem}'");
     }
 
     // Finding-id shape: unrecognised ids, relocated prefixes, numbers above
     // the closed sequence, and graph_ids that cannot serve as prefixes.
-    for w in &id_warnings {
+    for w in id_warnings.iter().filter(|_| !duplicates_only) {
         report.warnings += 1;
         println!("  WARN  {w}");
     }
 
     // One slug under distinct ids: the id is the citation, so the slug stops
     // resolving as an alias. A warning, because the ids are still distinct.
-    for (slug, keys) in &by_slug {
+    for (slug, keys) in by_slug.iter().filter(|_| !duplicates_only) {
         if keys.len() > 1 {
             report.warnings += 1;
             let keys: Vec<&str> = keys.iter().map(String::as_str).collect();
@@ -386,16 +413,23 @@ fn validate_findings(kos_root: &Path) -> FindingsReport {
     }
 
     // Files that would not load at all; kept visible as a warning.
-    for (name, error) in &unloadable {
+    for (name, error) in unloadable.iter().filter(|_| !duplicates_only) {
         report.warnings += 1;
         println!("  WARN  could not load {name}: {error}");
     }
 
     println!();
-    println!(
-        "{} findings: {} duplicate-id failures, {} warnings",
-        report.total, report.failed, report.warnings
-    );
+    if duplicates_only {
+        println!(
+            "{} findings: {} duplicate-id failures",
+            report.total, report.failed
+        );
+    } else {
+        println!(
+            "{} findings: {} duplicate-id failures, {} warnings",
+            report.total, report.failed, report.warnings
+        );
+    }
 
     report
 }

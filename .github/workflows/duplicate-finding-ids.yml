@@ -1,0 +1,60 @@
+# Duplicate finding ids (a required check)
+#
+# Two files claiming one finding number is a structural failure, and ADR-007
+# lets structural validity gate. The operator ruled (2026-09-25, aae-orc-dq328;
+# docs/design/opaque-finding-ids.md, the RULED 2026-09-25 note under the
+# duplicate-id check) that only this section of kos validate becomes required; everything else
+# stays advisory in graph-validate.yml. This runs `kos validate --only
+# duplicate-ids`, which prints no node results and no warnings and exits 1 only
+# on a duplicate id.
+#
+# It runs on every pull request, with no path filter: a required check that a
+# path filter skips never reports, and the merge would wait on it forever.
+# Making the job required in branch protection is a repository setting, not a
+# file, and is left to the operator.
+name: Duplicate finding ids
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+
+jobs:
+  duplicate-ids:
+    name: duplicate finding ids
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - uses: step-security/dtolnay-rust-toolchain@8dd607977d06adf4ed49b190381e74c17a9dd25f # v1.0.0
+        with:
+          toolchain: stable
+      - uses: step-security/rust-cache@8871c8ba063416da7c32246932ea6ae08700453e # v2.9.2
+        with:
+          cache-on-failure: true
+
+      - name: Build kos
+        run: cargo build --locked
+
+      - name: No two findings share a number
+        run: ./target/debug/kos validate --only duplicate-ids
