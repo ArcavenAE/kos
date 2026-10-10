@@ -2,5 +2,47 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>ArcavenAE/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "description": "Pinned by an operator ruling relayed 2026-10-09: the next version is a breaking change, and an upgrade investigation is tracked.",
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchPackageNames": [
+        "petgraph"
+      ],
+      "allowedVersions": "<0.8"
+    },
+    {
+      "description": "Pinned by an operator ruling relayed 2026-10-09: the next version is a breaking change, and an upgrade investigation is tracked.",
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchPackageNames": [
+        "getrandom"
+      ],
+      "allowedVersions": "<0.3"
+    },
+    {
+      "description": "Pinned by an operator ruling relayed 2026-10-09: the next version is a breaking change, and an upgrade investigation is tracked.",
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchPackageNames": [
+        "sha2"
+      ],
+      "allowedVersions": "<0.11"
+    },
+    {
+      "description": "Pinned by an operator ruling relayed 2026-10-09: the next version is a breaking change, and an upgrade investigation is tracked.",
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchPackageNames": [
+        "reqwest"
+      ],
+      "allowedVersions": "<0.13"
+    }
   ]
 }
