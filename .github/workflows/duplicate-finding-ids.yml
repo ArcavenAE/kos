@@ -33,7 +33,7 @@ env:
 
 jobs:
   duplicate-ids:
-    name: duplicate finding ids
+    name: duplicate-finding-ids
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
