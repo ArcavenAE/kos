@@ -54,7 +54,7 @@ src/
 - Workspace-level dependency declarations in root `Cargo.toml`
 - Edition 2024, MSRV 1.85+
 - Key crates:
-  - `serde` / `serde-saphyr` (YAML serialization — the graph substrate)
+  - `serde` / `serde-saphyr` (YAML serialization; the graph substrate)
   - `serde_json` (JSONL output)
   - `clap` (CLI parsing with derive)
   - `thiserror` (error types)
