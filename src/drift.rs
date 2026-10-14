@@ -78,7 +78,7 @@ fn load_nodes(nodes_dir: &Path) -> Result<Vec<Node>> {
         }
 
         let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
-        match serde_yaml::from_str::<Node>(&content) {
+        match serde_saphyr::from_str::<Node>(&content) {
             Ok(mut node) => {
                 node.source_path = path.to_path_buf();
                 nodes.push(node);

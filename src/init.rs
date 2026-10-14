@@ -131,7 +131,7 @@ fn run_update(target: &Path, kos_dir: &Path) -> Result<()> {
     let manifest_path = kos_dir.join(MANIFEST_FILE);
     let content = std::fs::read_to_string(&manifest_path).map_err(KosError::Io)?;
     let mut manifest: GraphManifest =
-        serde_yaml::from_str(&content).map_err(|e| KosError::Manifest {
+        serde_saphyr::from_str(&content).map_err(|e| KosError::Manifest {
             path: manifest_path.display().to_string(),
             message: e.to_string(),
         })?;
@@ -217,7 +217,7 @@ fn write_manifest(
 }
 
 fn write_manifest_raw(path: &Path, manifest: &GraphManifest) -> Result<()> {
-    let yaml = serde_yaml::to_string(manifest).map_err(|e| KosError::Manifest {
+    let yaml = serde_saphyr::to_string(manifest).map_err(|e| KosError::Manifest {
         path: path.display().to_string(),
         message: e.to_string(),
     })?;

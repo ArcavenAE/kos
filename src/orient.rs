@@ -240,7 +240,7 @@ pub(crate) fn load_all_nodes(nodes_dir: &Path) -> Result<Vec<Node>> {
             continue;
         }
         let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
-        match serde_yaml::from_str::<Node>(&content) {
+        match serde_saphyr::from_str::<Node>(&content) {
             Ok(mut node) => {
                 node.source_path = path.to_path_buf();
                 results.push(node);
@@ -620,7 +620,7 @@ fn load_nodes_by_confidence(nodes_dir: &Path, confidence: &Confidence) -> Result
 
         let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
 
-        match serde_yaml::from_str::<Node>(&content) {
+        match serde_saphyr::from_str::<Node>(&content) {
             Ok(mut node) => {
                 node.source_path = path.to_path_buf();
                 results.push(node);
@@ -921,7 +921,7 @@ fn load_frontier_questions(frontier_dir: &Path, target: &str) -> Result<Vec<Node
 
         // Include if it mentions the target or if target is "kos" (all questions are kos-relevant)
         if target_lower == "kos" || content.to_lowercase().contains(&target_lower) {
-            match serde_yaml::from_str::<Node>(&content) {
+            match serde_saphyr::from_str::<Node>(&content) {
                 Ok(mut node) => {
                     node.source_path = path.to_path_buf();
                     results.push(node);
