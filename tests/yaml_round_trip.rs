@@ -112,3 +112,82 @@ fn finding_with_a_prose_block_keeps_the_block_as_searchable_content_in_order() {
     assert!(z < a, "source order is kept: {}", node.content);
     assert!(node.content.contains("count"), "{}", node.content);
 }
+
+fn load_node_content(dir: &Path, file: &str, yaml: &str) -> (usize, usize) {
+    write(
+        &dir.join("_kos/kos.yaml"),
+        "graph_id: fixture\nscope: repo\nschema_version: '0.3'\n",
+    );
+    write(&dir.join("_kos/nodes/bedrock").join(file), yaml);
+    let s = validate::run(&dir.join("_kos")).unwrap();
+    (s.total, s.parse_errors)
+}
+
+#[test]
+fn node_with_a_null_or_empty_title_or_content_still_loads() {
+    for (name, yaml) in [
+        (
+            "tilde-title",
+            "id: a\ntype: element\nconfidence: bedrock\ntitle: ~\ncontent: c\n",
+        ),
+        (
+            "empty-title",
+            "id: a\ntype: element\nconfidence: bedrock\ntitle:\ncontent: c\n",
+        ),
+        (
+            "tilde-content",
+            "id: a\ntype: element\nconfidence: bedrock\ntitle: t\ncontent: ~\n",
+        ),
+        (
+            "empty-content",
+            "id: a\ntype: element\nconfidence: bedrock\ntitle: t\ncontent:\n",
+        ),
+    ] {
+        let tmp = tempfile::tempdir().unwrap();
+        let (total, parse_errors) = load_node_content(tmp.path(), "n.yaml", yaml);
+        assert_eq!((total, parse_errors), (1, 0), "{name} must load");
+    }
+}
+
+#[test]
+fn finding_with_an_empty_title_keeps_its_top_level_content() {
+    let tmp = tempfile::tempdir().unwrap();
+    let path = tmp.path().join("finding-zz-2-empty.yaml");
+    write(
+        &path,
+        "id: finding-zz-2-empty\ntype: finding\nconfidence: frontier\ntitle:\ncontent: c\n",
+    );
+    let node = load_finding_file(&path).expect("loads");
+    assert_eq!(node.content, "c", "typed parse must win over the fallback");
+}
+
+#[test]
+fn fallback_reads_yaml_1_2_scalars_as_the_old_parser_did() {
+    for word in ["on", "yes", "no", "off"] {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("finding-zz-3-word.yaml");
+        write(
+            &path,
+            &format!("id: finding-zz-3-word\ntitle: {word}\nfinding:\n  verdict: {word}\n"),
+        );
+        let node = load_finding_file(&path).expect("loads");
+        assert_eq!(node.title, word, "title {word} is a string");
+        assert!(
+            node.content.contains(&format!("verdict: {word}")),
+            "{word} stays a word in content: {}",
+            node.content
+        );
+    }
+}
+
+#[test]
+fn fallback_keeps_a_non_finite_float_block_loadable() {
+    let tmp = tempfile::tempdir().unwrap();
+    let path = tmp.path().join("finding-zz-4-inf.yaml");
+    write(
+        &path,
+        "id: finding-zz-4-inf\ntitle: t\nfinding:\n  ratio: .inf\n  note: kept\n",
+    );
+    let node = load_finding_file(&path).expect("a .inf value must not drop the finding");
+    assert!(node.content.contains("note: kept"), "{}", node.content);
+}
