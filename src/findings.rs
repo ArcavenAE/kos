@@ -221,7 +221,7 @@ fn split_segment(s: &str) -> (&str, Option<&str>) {
 /// Read a graph's kos.yaml. `None` when it is absent or does not parse.
 pub fn load_manifest(kos_root: &Path) -> Option<GraphManifest> {
     let text = std::fs::read_to_string(kos_root.join("kos.yaml")).ok()?;
-    serde_saphyr::from_str(&text).ok()
+    crate::yaml::from_str(&text).ok()
 }
 
 /// The graph_ids a graph declares, as written: its own first, then (at an
@@ -268,7 +268,7 @@ pub fn graph_id_is_prefix_shaped(id: &str) -> bool {
 // ── YAML shape ───────────────────────────────────────────────
 
 fn yaml_finding(path: &Path, _stem: &str, text: &str) -> FindingLoad {
-    match serde_saphyr::from_str::<Node>(text) {
+    match crate::yaml::from_str::<Node>(text) {
         Ok(mut node) => {
             node.source_path = path.to_path_buf();
             loaded(node, path)
@@ -292,16 +292,19 @@ fn yaml_finding(path: &Path, _stem: &str, text: &str) -> FindingLoad {
 /// confidence from the top level and flattens the `finding` block into content
 /// so the text is still matchable. Preserved from ask's original loader.
 fn finding_node_fallback(text: &str) -> Option<Node> {
-    let value: serde_json::Value = serde_saphyr::from_str(text).ok()?;
-    let id = value.get("id")?.as_str()?.to_string();
-    let title = value
-        .get("title")
-        .and_then(serde_json::Value::as_str)
-        .unwrap_or("")
-        .to_string();
-    let content = value
-        .get("finding")
-        .and_then(|f| serde_saphyr::to_string(f).ok())
+    // id and title are read as typed strings, so `title: on` or `title: 017`
+    // stays the text it was written as; only the prose block is untyped.
+    #[derive(Deserialize)]
+    struct Head {
+        id: String,
+        #[serde(default, deserialize_with = "crate::model::null_as_empty")]
+        title: String,
+        #[serde(default)]
+        finding: Option<serde_json::Value>,
+    }
+    let Head { id, title, finding } = crate::yaml::from_str(text).ok()?;
+    let content = finding
+        .and_then(|f| serde_saphyr::to_string(&f).ok())
         .unwrap_or_default();
 
     Some(finding_node(
@@ -337,7 +340,7 @@ struct Frontmatter {
 /// degrade to the bare-markdown derivation so the finding stays visible.
 fn md_finding(path: &Path, stem: &str, text: &str) -> LoadedFinding {
     if let Some((fm_text, body)) = split_frontmatter(text) {
-        match serde_saphyr::from_str::<Frontmatter>(fm_text) {
+        match crate::yaml::from_str::<Frontmatter>(fm_text) {
             Ok(fm) => return frontmatter_node(path, stem, fm, body),
             // Fence present but malformed: fall through to bare-md over the body
             // so the prose is still searchable and the file is not dropped.

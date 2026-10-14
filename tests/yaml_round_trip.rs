@@ -173,8 +173,10 @@ fn fallback_reads_yaml_1_2_scalars_as_the_old_parser_did() {
         let node = load_finding_file(&path).expect("loads");
         assert_eq!(node.title, word, "title {word} is a string");
         assert!(
-            node.content.contains(&format!("verdict: {word}")),
-            "{word} stays a word in content: {}",
+            node.content.contains(word)
+                && !node.content.contains("true")
+                && !node.content.contains("false"),
+            "{word} stays a word, not a boolean, in content: {}",
             node.content
         );
     }

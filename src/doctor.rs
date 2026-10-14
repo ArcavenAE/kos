@@ -402,7 +402,7 @@ fn load_all_nodes_counting_failures(kos_dir: &Path) -> (Vec<Node>, usize) {
             .is_some_and(|ext| ext == "yaml" || ext == "yml")
         {
             match std::fs::read_to_string(path) {
-                Ok(content) => match serde_saphyr::from_str::<Node>(&content) {
+                Ok(content) => match crate::yaml::from_str::<Node>(&content) {
                     Ok(mut node) => {
                         node.source_path = path.to_path_buf();
                         nodes.push(node);

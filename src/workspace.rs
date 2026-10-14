@@ -273,7 +273,7 @@ fn discover_graphs(root: &Path) -> Vec<GraphSource> {
 fn load_graph_source(kos_dir: &Path) -> Option<GraphSource> {
     let manifest_path = kos_dir.join(MANIFEST_FILE);
     let content = std::fs::read_to_string(&manifest_path).ok()?;
-    let manifest: GraphManifest = serde_saphyr::from_str(&content).ok()?;
+    let manifest: GraphManifest = crate::yaml::from_str(&content).ok()?;
 
     Some(GraphSource {
         graph_id: manifest.graph_id.clone(),

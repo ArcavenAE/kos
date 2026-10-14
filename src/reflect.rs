@@ -618,7 +618,7 @@ fn stem(path: &str) -> &str {
 
 fn load_node_at(path: &Path) -> Option<Node> {
     let content = std::fs::read_to_string(path).ok()?;
-    let mut node: Node = serde_saphyr::from_str(&content).ok()?;
+    let mut node: Node = crate::yaml::from_str(&content).ok()?;
     node.source_path = path.to_path_buf();
     Some(node)
 }

@@ -224,7 +224,7 @@ fn load_tier(nodes_dir: &Path, confidence: &Confidence) -> Result<Vec<Node>> {
             continue;
         }
         let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
-        match serde_saphyr::from_str::<Node>(&content) {
+        match crate::yaml::from_str::<Node>(&content) {
             Ok(mut node) => {
                 node.source_path = path.to_path_buf();
                 results.push(node);

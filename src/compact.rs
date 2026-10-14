@@ -55,7 +55,7 @@ pub fn list_by_size(workspace: &Workspace, cwd: &Path) -> Result<Vec<NodeSizeEnt
         }
 
         let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
-        let node: Node = match serde_saphyr::from_str(&content) {
+        let node: Node = match crate::yaml::from_str(&content) {
             Ok(n) => n,
             Err(e) => {
                 eprintln!("warning: skipping {}: {e}", path.display());
@@ -94,7 +94,7 @@ pub fn apply_compaction(
     let node_path = find_node_file(&graph_root, node_id)?;
     let original_content = std::fs::read_to_string(&node_path).map_err(KosError::Io)?;
 
-    let node: Node = serde_saphyr::from_str(&original_content).map_err(|e| KosError::Yaml {
+    let node: Node = crate::yaml::from_str(&original_content).map_err(|e| KosError::Yaml {
         path: node_path.display().to_string(),
         source: Box::new(e),
     })?;
