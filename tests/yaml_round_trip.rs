@@ -193,3 +193,17 @@ fn fallback_keeps_a_non_finite_float_block_loadable() {
     let node = load_finding_file(&path).expect("a .inf value must not drop the finding");
     assert!(node.content.contains("note: kept"), "{}", node.content);
 }
+
+#[test]
+fn fallback_title_that_looks_like_a_number_stays_text() {
+    for title in ["017", "1_000", "1.10", "0o17"] {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = tmp.path().join("finding-zz-5-num.yaml");
+        write(
+            &path,
+            &format!("id: finding-zz-5-num\ntitle: {title}\nfinding:\n  note: kept\n"),
+        );
+        let node = load_finding_file(&path).expect("loads");
+        assert_eq!(node.title, title, "title {title} is read as text");
+    }
+}
