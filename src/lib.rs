@@ -20,3 +20,4 @@ pub mod seed;
 pub mod updater;
 pub mod validate;
 pub mod workspace;
+pub mod yaml;

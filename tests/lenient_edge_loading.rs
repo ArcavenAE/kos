@@ -75,7 +75,7 @@ fn unknown_edge_type_preserves_the_author_string_verbatim() {
     // what the author actually wrote instead of a lossy normalization.
     let yaml = "id: elem-x\ntype: element\nconfidence: bedrock\ntitle: \"t\"\ncontent: \"c\"\n\
                 edges:\n  - target: elem-y\n    type: leaves-open\n";
-    let node: Node = serde_yaml::from_str(yaml).unwrap();
+    let node: Node = kos::yaml::from_str(yaml).unwrap();
 
     assert_eq!(node.edges.len(), 1);
     assert_eq!(node.edges[0].edge_type.unknown_value(), Some("leaves-open"));

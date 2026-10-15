@@ -461,7 +461,7 @@ fn load_all_nodes(nodes_dir: &Path) -> Result<(Vec<LoadedNode>, HashSet<String>)
             .to_string();
 
         let content = std::fs::read_to_string(path).map_err(KosError::Io)?;
-        match serde_yaml::from_str::<Node>(&content) {
+        match crate::yaml::from_str::<Node>(&content) {
             Ok(mut node) => {
                 node.source_path = path.to_path_buf();
                 known_ids.insert(node.id.clone());

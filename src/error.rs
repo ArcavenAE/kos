@@ -9,7 +9,7 @@ pub enum KosError {
     #[error("yaml parse error in {path}: {source}")]
     Yaml {
         path: String,
-        source: serde_yaml::Error,
+        source: Box<serde_saphyr::Error>,
     },
 
     #[error(

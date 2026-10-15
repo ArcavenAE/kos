@@ -10,7 +10,9 @@ pub struct Node {
     #[serde(rename = "type")]
     pub node_type: NodeType,
     pub confidence: Confidence,
+    #[serde(deserialize_with = "null_as_empty")]
     pub title: String,
+    #[serde(deserialize_with = "null_as_empty")]
     pub content: String,
     /// v0.2+ typed edges
     #[serde(default)]
@@ -350,8 +352,9 @@ pub struct Finding {
     /// Optional — some findings (e.g., in aae-orc) omit this field.
     #[serde(default = "Finding::default_confidence")]
     pub confidence: Confidence,
+    #[serde(deserialize_with = "null_as_empty")]
     pub title: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "null_as_empty")]
     pub content: String,
     #[serde(skip)]
     pub source_path: PathBuf,
@@ -460,4 +463,14 @@ pub struct GraphSource {
     pub scope: GraphScope,
     /// The full parsed manifest.
     pub manifest: GraphManifest,
+}
+
+/// A string field that may be written as `~`, `null` or left empty. serde_yaml
+/// read those as text; serde-saphyr refuses null into `String`, which would
+/// drop the whole node, so null reads as empty.
+pub(crate) fn null_as_empty<'de, D>(d: D) -> Result<String, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    Ok(Option::<String>::deserialize(d)?.unwrap_or_default())
 }
