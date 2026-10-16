@@ -87,10 +87,18 @@ content: |
      the field's exact weakness into kos.
 
   E. One retrieval surface or two? (aae-orc-di23)
-     OPEN. flyloft-mcp federation vs a kos epistemic API as the single MCP
-     surface. The briefing's R5 models an indexed repo as a flyloft batten (held
-     vs cataloged, index-on-demand as interlibrary loan), which would yield one
-     retrieval surface across code and documents rather than two.
+     ANSWERED, by decision: `docs/decisions/adr-009-read-surface-single-query-engine.md`
+     (Accepted, 2026-08-16). One query engine with three faces over time: the
+     `kos ask` CLI verb now, a kos-side read-only MCP after the M0 schema
+     repair, and flyloft-mcp federation when flyloft is real, fronting the same
+     engine. Two permanent co-equal servers were rejected, because they would
+     mean two rankings and two provenance stories over one graph. The briefing's
+     R5 (an indexed repo as a flyloft batten) survives as the federation face,
+     not as a second surface. What stays open is whether verb-first-then-MCP is
+     the right order, and that is held in question-read-surface-sequencing, not
+     here. The decision was first filed in the orchestrator's decision log as
+     its ADR-009 and moved to kos the same day; the orchestrator later reused
+     that number for an unrelated decision, so cite this one by its kos path.
 
   F. Where does ranking live now that forestage is retired? (aae-orc-rhdj)
      OPEN, and re-hosted. The briefing's R3 (reimplement Aider's personalised
@@ -133,8 +141,8 @@ content: |
 
   This question closes when the arc is decided (kos as sink or not, substrate
   chosen, mission split resolved), not when the two cost probes finished. A and
-  B are answered; C through G are open; the decision-forcing half of B is the
-  nearest open probe.
+  B are answered, and E is answered by decision (2026-10-16 harvest); C, D, F
+  and G are open; the decision-forcing half of B is the nearest open probe.
 edges:
   - target: elem-correspondence-layer
     type: derives
@@ -151,6 +159,9 @@ edges:
   - target: finding-023-signal-to-noise-four-projects
     type: supports
     note: "independent-discovery criterion; two projects arriving at confidence-tagging is weak evidence the structure is real (briefing sec 7)"
+  - target: question-read-surface-sequencing
+    type: supports
+    note: "holds the one residual of sub-question E, whether the verb-first-then-MCP order is right"
   - target: aae-orc::question-kos-multi-writer-concurrency
     type: supports
     note: "shared substrate and multi-writer concern feeding sub-question C"
@@ -163,6 +174,7 @@ provenance:
     - _kos/findings/finding-kos-wre7-serena-live-lsp-baseline.md
     - _kos/findings/finding-kos-ndz7-scip-indexing-cost.md
     - docs/research/2026-08-08-code-graph-briefing.md
+    - docs/decisions/adr-009-read-surface-single-query-engine.md
 notes: >
   Same-graph edge targets are bare kos-graph ids: elem-correspondence-layer,
   finding-036, finding-040, grv-flat-file-context-scaling, finding-023 all
