@@ -1,0 +1,85 @@
+id: question-kos-fact-store-substrate
+type: question
+confidence: frontier
+title: "Fact store substrate: what storage engine holds kos facts once compiler-sourced code facts arrive, and does a versioned store plus in-Rust traversal hold at that scale?"
+content: |
+  This is the question node aae-orc-isie asks for before its two probes run.
+  It splits out sub-question C of question-code-graph-correspondence, because
+  the answer outlives the code graph: it decides kos's storage for every kind
+  of fact, not only symbol edges.
+
+  WHICH "SUBSTRATE". In kos the word names two things. This node means
+  STORAGE: the engine that holds, versions, transacts and time-travels facts.
+  It does not mean the CONFIDENCE-model "substrate" of aae-orc-e8wn (where
+  not-yet-noticed things sit). The two are orthogonal. Whatever confidence
+  model e8wn chooses is one or two more attributes in an EAV fact log, so this
+  question's probes may run before e8wn resolves. Schema work (aae-orc-pwnh,
+  aae-orc-e689) may not.
+
+  MEASURED SCALE (2026-10-20, from the 2026-10-16 SCIP indexes). marvel at
+  ac67c078 yields 47,306 candidate facts at one commit: 10,139 DEFINES, 36,855
+  distinct (document, symbol) REFERENCES and 312 IMPLEMENTS. kos at 829c392
+  yields 4,384. The flat-file substrate was ruled out at a few hundred nodes
+  (grv-flat-file-context-scaling). One repository at one commit is two orders
+  of magnitude past it. The ceiling argument in isie is now a measurement,
+  not an assertion.
+
+  STATED HYPOTHESIS, from isie's design field: a versioned fact store below
+  (an append-only EAV log, facts(e, a, v, tx)), an in-memory graph index above
+  (rebuilt on load), traversal in Rust where it already lives, and writes back
+  through the gate. The store is asked to store, version, transact and
+  time-travel, not to traverse.
+
+  REGISTERED PREDICTION (the recommending analysis, carried from isie): 0.7
+  that the answer is LAYERED. A versioned store holds the bulk, regenerable
+  symbol table; kos holds only promoted correspondence facts; a bridge joins
+  them.
+
+  FALSIFIER (pre-registered in isie, restated): if kos's primary workload
+  becomes deep multi-hop retrieval over 10^7 or more edges, graph-native
+  storage starts to earn its cost and this hypothesis ages badly. Check it at
+  probe time.
+
+  ── Sub-questions ──────────────────────────────────────────────
+
+  A. Does Dolt hold the measured scale, with AS OF diffs between two commits'
+     fact sets and a cherry-pick harvest of a promoted subset? (Probe A)
+  B. Does an SQLite fact log with four covering indexes (EAVT, AEVT, AVET,
+     VAET) do the same inside one session's build timebox? (Probe B)
+  C. Do both briefs answer the three MDE killers (tool lock-in, round-trip
+     breakage, skill asymmetry), as kos roadmap v3 M4 requires before any
+     substrate probe runs?
+  D. Does the bridge pattern support a separate code-fact subgraph joined to
+     kos (briefing Q4)?
+
+  This question closes when a store is chosen, or when both probes fail and
+  the flat-file ceiling is restated as binding.
+edges:
+  - target: question-code-graph-correspondence
+    type: derives
+    note: "splits out its sub-question C, which is broader than the code graph"
+  - target: grv-flat-file-context-scaling
+    type: supports
+    note: "the ruled ceiling; one repository at one commit is about 100 times past it (measured 2026-10-20)"
+  - target: finding-036-substrate-hypothesis
+    type: supports
+    note: "substrate hypothesis"
+  - target: finding-040-substrate-ceiling-convergence
+    type: supports
+    note: "measured flat-file ceiling"
+  - target: finding-kos-ndz7-scip-indexing-cost
+    type: supports
+    note: "the cost half; this node adds the count half"
+provenance:
+  created_by: human
+  session: "session-2026-10-20-code-graph-probe1"
+  created_at: "2026-10-20"
+  evidence:
+    - _kos/findings/finding-kos-ndz7-scip-indexing-cost.md
+    - docs/kos-roadmap-v3.md
+    - _kos/probes/code-graph-measurements-2026-10-20/fact-count.md
+notes: >
+  Drafted by the arcaven research-supervisor from the 2026-10-20 code graph
+  probe. The fact counts are in
+  _kos/probes/code-graph-measurements-2026-10-20/fact-count.md. Bare ids are
+  kos-graph nodes. Refs: aae-orc-isie, aae-orc-e8wn, kos#77.
