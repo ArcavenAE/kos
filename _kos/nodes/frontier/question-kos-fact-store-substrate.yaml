@@ -17,9 +17,11 @@ content: |
   aae-orc-e689) may not.
 
   MEASURED SCALE (2026-10-20, from the 2026-10-16 SCIP indexes). marvel at
-  ac67c078 yields 47,306 candidate facts at one commit: 10,139 DEFINES, 36,855
-  distinct (document, symbol) REFERENCES and 312 IMPLEMENTS. kos at 829c392
-  yields 4,384. The flat-file substrate was ruled out at a few hundred nodes
+  ac67c078 yields 43,284 candidate facts at one commit from its tracked files:
+  9,796 DEFINES, 33,176 distinct (document, symbol) REFERENCES and 312
+  IMPLEMENTS. kos at 829c392 yields 4,384. The method and the reconciliation
+  of documents against files are in the fact-count evidence. The flat-file
+  substrate was ruled out at a few hundred nodes
   (grv-flat-file-context-scaling). One repository at one commit is two orders
   of magnitude past it. The ceiling argument in isie is now a measurement,
   not an assertion.
@@ -60,7 +62,7 @@ edges:
     note: "splits out its sub-question C, which is broader than the code graph"
   - target: grv-flat-file-context-scaling
     type: supports
-    note: "the ruled ceiling; one repository at one commit is about 100 times past it (measured 2026-10-20)"
+    note: "the ruled ceiling; one repository at one commit is two orders of magnitude past it (measured 2026-10-20)"
   - target: finding-036-substrate-hypothesis
     type: supports
     note: "substrate hypothesis"

@@ -12,17 +12,21 @@ promoted subset be harvested into kos without carrying the bulk along.
 
 ## Decision criterion
 
-Probe A passes when all four hold on marvel's measured scale (about 47k
-candidate facts per commit):
+Probe A passes when all four hold on marvel's measured scale (about 43k
+candidate facts per commit from tracked files):
 1. **Load.** Both commits' facts load in under 60 s each, from a SCIP index to
    rows.
 2. **Diff.** An AS OF query lists the facts added and removed between the two
    commits, and its counts equal a set difference computed outside Dolt.
 3. **Harvest.** A chosen subset of 100 facts is cherry-picked to a branch and
    exported to kos YAML, and the bulk does not travel with it.
-4. **Traverse.** After load, a two-to-three-hop traversal (callers of a
-   function's callers) runs in Rust over the loaded rows, not in SQL, in under
-   1 s.
+4. **Traverse.** After load, a three-hop traversal over the counted fact
+   model runs in Rust over the loaded rows, not in SQL. From a symbol S: hop 1
+   is the documents that REFERENCE S, hop 2 the symbols DEFINED in those
+   documents, hop 3 the documents that REFERENCE those symbols. Run it from
+   100 symbols drawn from DEFINES with a fixed, recorded seed. Pass: the
+   slowest of the 100 finishes in under 1 s, and every result set equals the
+   same join computed as plain set operations outside the store.
 
 If any fails, the finding names which one and by how much.
 
@@ -67,7 +71,7 @@ analysis's, not new.
 
 ## Falsifier
 
-If a two-hop traversal cannot run in Rust without pulling the whole log into
+If the criterion 4 traversal cannot run in Rust without pulling the whole log into
 memory, or the load exceeds 60 s per commit, the versioned-store-below shape
 fails at this scale.
 

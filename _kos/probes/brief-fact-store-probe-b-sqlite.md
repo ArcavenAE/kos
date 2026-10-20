@@ -15,9 +15,12 @@ harvested subset and a fast traversal, built inside one session.
 ## Decision criterion
 
 The same four criteria as Probe A (load, diff, harvest, traverse), with the
-same thresholds, plus a fifth:
-- **Build cost.** The whole thing, schema and loader, fits in one session's
-  timebox.
+same thresholds and the same criterion 4 traversal over the counted fact model
+(REFERENCES and DEFINES hops, 100 seeded symbols, slowest under 1 s, results
+equal to the plain set join), plus a fifth:
+- **Build cost.** The whole thing, schema and loader, is written and
+  loaded inside the 4-hour timebox below, measured from the first line of
+  schema to the first passing criterion 1 load.
 
 Time travel is the `tx` column, not engine versioning, so the diff is a query
 over `tx`.
@@ -36,8 +39,8 @@ over `tx`.
 
 - **Inputs:** the same two indexes as Probe A, under the same run conditions.
 - **Store:** one SQLite file in scratch; no server.
-- **Timebox:** one session, as isie states. If the timebox runs out, that is
-  recorded as a result, not an extension.
+- **Timebox:** 4 hours of working time, one session, as isie states. If the
+  timebox runs out, that is recorded as a result, not an extension.
 
 ## What it adds over Probe A
 
