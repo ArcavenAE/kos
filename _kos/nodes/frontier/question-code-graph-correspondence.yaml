@@ -75,6 +75,7 @@ content: |
      Dolt, or both (bedrock facts in kos, raw symbol table in Dolt) is the
      briefing's Q3 / R1-vs-R6, and it shares the multi-writer concern with
      question-kos-multi-writer-concurrency.
+     MEASURED 2026-10-20: one marvel commit yields 43,284 candidate facts from tracked files and kos 4,384; the question is now question-kos-fact-store-substrate.
 
   D. How do source grade and confidence tier stay separate? (aae-orc-pwnh)
      OPEN. The schema test. A compiler-resolved edge is high source grade but is
