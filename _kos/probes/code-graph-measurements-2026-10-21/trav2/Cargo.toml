@@ -1,0 +1,8 @@
+[package]
+name = "trav2"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "any", "sqlite", "mysql"] }
+tokio = { version = "1", features = ["rt", "macros"] }

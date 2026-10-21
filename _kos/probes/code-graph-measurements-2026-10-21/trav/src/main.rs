@@ -85,17 +85,19 @@ async fn main() {
         let ms = t0.elapsed().as_secs_f64() * 1000.0;
         worst = worst.max(ms);
         lookups_total += n_lookups;
-        let res: Vec<String> = hop3.iter().map(|x| esc(x)).collect();
+        let j = |set: &BTreeSet<String>| set.iter().map(|x| esc(x)).collect::<Vec<_>>().join(",");
         writeln!(
             fh,
-            "{{\"s\":{},\"hop1\":{},\"hop2\":{},\"hop3\":{},\"lookups\":{},\"ms\":{:.3},\"result\":[{}]}}",
+            "{{\"s\":{},\"hop1\":{},\"hop2\":{},\"hop3\":{},\"lookups\":{},\"ms\":{:.3},\"hop1_set\":[{}],\"hop2_set\":[{}],\"result\":[{}]}}",
             esc(s),
             hop1.len(),
             hop2.len(),
             hop3.len(),
             n_lookups,
             ms,
-            res.join(",")
+            j(&hop1),
+            j(&hop2),
+            j(&hop3)
         )
         .expect("write");
     }

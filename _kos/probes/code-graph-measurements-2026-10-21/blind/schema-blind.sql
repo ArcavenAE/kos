@@ -1,0 +1,9 @@
+CREATE TABLE facts (
+  k CHAR(64) NOT NULL PRIMARY KEY,
+  e VARCHAR(2048) NOT NULL,
+  a VARCHAR(32) NOT NULL,
+  v VARCHAR(2048) NOT NULL,
+  tx CHAR(40) NOT NULL,
+  INDEX av (a, v),
+  INDEX ae (a, e)
+);
