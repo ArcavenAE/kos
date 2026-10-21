@@ -1,0 +1,67 @@
+# Results log for finding-kos-8bmj, re-run 2026-10-21 on kinu from the scratch outputs (run conditions as in the finding).
+# Each block: the command, then its output verbatim. Blocks marked TRANSCRIBED are copied from the original run's terminal output, not re-run.
+
+## sha256 (16) and bytes of outputs kept out of the PR
+612ecd9342df82d8 21862996 in/marvel-ac67c078.scip
+1544aec3ad5d6909 23867654 in/marvel-d0616f98.scip
+6fdb630ddfe2ed2b 7048711 out/facts-ac67c078.jsonl
+947d0b203a0372a1 7749249 out/facts-d0616f98.jsonl
+026bdfcfdae06f87 76521472 db/b.sqlite
+3cf53f30c70f644e 36495360 db/b-vt.sqlite
+45d9191711b99df5 15615475 out/b-export.jsonl
+1dc6c01029b45436 17613845 out/a-export.jsonl
+f226d856d2a56e75 964226 out/b-trav-sets.jsonl
+127847e98738a3ab 964233 out/a-trav-sets.jsonl
+0d6abcb15cee7289 964948 out/b-trav-hot.jsonl
+791ce92bbf4dee28 965021 out/a-trav-hot.jsonl
+
+## du -sk of the Dolt stores and remotes
+5336	db/dolt-a/.dolt
+24	db/remote-harvest
+2792	db/remote-main
+48	blind/h
+32424	db/dolt-blind/.dolt
+
+## $ setdiff.py facts-ac67c078.jsonl facts-d0616f98.jsonl
+outside: added 4862 removed 553
+added_by_a [('DEFINES', 998), ('IMPLEMENTS', 71), ('REFERENCES', 3793)]
+removed_by_a [('DEFINES', 59), ('IMPLEMENTS', 30), ('REFERENCES', 464)]
+
+## un-normalized diff: facts.extract with norm disabled
+facts 43263 47572 added 34536 removed 30227
+added_by_a [('DEFINES', 10714), ('IMPLEMENTS', 353), ('REFERENCES', 23469)] removed_by_a [('DEFINES', 9775), ('IMPLEMENTS', 312), ('REFERENCES', 20140)]
+
+## $ load_sqlite_vt.py (re-run into a fresh file)
+rows 48125 bytes 36487168 load_s 1.78
+at tx1 43263 at tx2 47572 added 4862 removed 553
+
+## $ join_check.py on the set-emitting runs (every hop compared as a set)
+SQLite:
+equal 100 differ 0 hop sets compared 100 empty results 34 max result 285
+Dolt:
+equal 100 differ 0 hop sets compared 100 empty results 34 max result 285
+
+## TRANSCRIBED: trav runs (criterion seeds), as printed
+SQLite run 1: seeds=100 slowest_ms=32.442 total_ms=477.0 lookups=6859
+SQLite run 2: seeds=100 slowest_ms=18.217 total_ms=296.3 lookups=6859
+SQLite run 3: seeds=100 slowest_ms=16.865 total_ms=391.6 lookups=6859
+Dolt run 1: seeds=100 slowest_ms=57.401 total_ms=1138.6 lookups=6859
+Dolt run 2: seeds=100 slowest_ms=69.305 total_ms=1118.9 lookups=6859
+Dolt run 3: seeds=100 slowest_ms=71.420 total_ms=1128.2 lookups=6859
+SQLite sets run: seeds=100 slowest_ms=58.975 total_ms=752.8 lookups=6859
+Dolt sets run: seeds=100 slowest_ms=68.315 total_ms=1129.5 lookups=6859
+blind batched, criterion seeds, runs 1-3: slowest_ms=128.620, 126.445, 127.080
+
+## TRANSCRIBED: /usr/bin/time -l on trav (criterion seeds)
+Dolt:   seeds=100 slowest_ms=66.692 total_ms=1081.6 lookups=6859; 4194304 maximum resident set size
+SQLite: seeds=100 slowest_ms=42.075 total_ms=684.7 lookups=6859; 7880704 maximum resident set size
+blind batched, hot seeds: seeds=100 slowest_ms=8247.153 total_ms=116004.3; 11108352 maximum resident set size
+Dolt sql-server RSS after the runs (ps -o rss, KiB): 179888
+
+## TRANSCRIBED: loads
+tx=1 commit=ac67c078 facts=43263 extract_s=1.11 insert_s=0.33 total_s=1.44
+tx=2 commit=d0616f98 facts=47572 extract_s=1.18 insert_s=0.70 total_s=1.87
+commit=ac67c078 facts=43263 kept_from_prev=0 extract_s=1.05 read_prev_s=0.08 csv_s=0.09 import_commit_s=0.79 total_s=2.02 head=43263,43263
+commit=d0616f98 facts=47572 kept_from_prev=42710 extract_s=1.17 read_prev_s=0.30 csv_s=0.75 import_commit_s=0.81 total_s=3.03 head=47572,4862
+SQLite harvest: harvest rows 100 harvest file bytes 24576 source bytes 76521472; yaml bytes 16121 round-trip equal True harvest db equal True
+SQLite lock-in: counts src [(1, 43263), (2, 47572)] dst [(1, 43263), (2, 47572)]; set equal True export_s 0.43 import_s 0.16 jsonl_bytes 15615475

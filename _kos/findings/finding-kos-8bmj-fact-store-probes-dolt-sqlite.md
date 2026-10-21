@@ -1,6 +1,6 @@
 # Finding: fact store Probes A (Dolt) and B (SQLite), measured on marvel (aae-orc-isie)
 
-Status: draft, revision 2 (after review by the corporate research seat)
+Status: draft, revision 3 (after the corporate research review and kos#141 review round 1)
 Date: 2026-10-21
 Host: kinu (Apple M3 Max, 128 GB RAM, macOS 26.5.2)
 bd: aae-orc-isie
@@ -305,19 +305,42 @@ For the kos PR, the evidence goes under
 2026-10-20 directory. The research holding area copy is not durable after a
 reclone. It contains:
 - `bin/`: the scripts, the sandbox profile `run.sb`, and the run wrappers
-  `runc.sh` and `dq.sh`. After the runs, the wrappers and the profile had the
+  `runc.sh` and `dq.sh`. `bin/scipdec.py` is a byte-identical copy of the
+  published decoder in `code-graph-measurements-2026-10-20/` (sha256
+  a58a5d1f64c02722), shipped here because `facts.py` imports it from its own
+  directory. After the runs, the wrappers and the profile had the
   scratch path replaced by a `PROBE_DIR` variable; the controls were re-run
   through the edited wrapper with the same results;
 - `trav/`: the Rust traversal crate and its lockfile; `trav2/`: the batched IN
   traversal written for the blind run;
 - `blind/`: the blind design's schema and its 100 harvest keys;
-- `results/`: the seeds, both harvest YAML files, the 100-fact pick, and the
-  per-seed timings with result sets left out, including the blind and crossed
-  runs.
+- `results/`: the seeds, both harvest YAML files (`b-harvest.yaml`,
+  `a-harvest.yaml`), the 100-fact pick, and the per-seed timings with result
+  sets left out, including the blind and crossed runs;
+- `results/log.txt`: the numbers with no other file behind them. Re-run on
+  2026-10-21 from the kept-out outputs: the outside set difference, the
+  un-normalized counts, the valid-time SQLite load, the per-hop set equality
+  on the set-emitting runs, and the sizes. The re-run valid-time file came to
+  36,487,168 bytes against 36,495,360 the first time; the rows and diff counts
+  are equal. Copied from the original terminal output and marked TRANSCRIBED:
+  runs 2 and 3, the RSS figures and the load and harvest lines.
 
-The large outputs stay in kinu scratch: the fact files (7.0 and 7.7 MB), the
-exports, the stores and the full traversal results. Their sha256 prefixes:
-- SQLite export: 45d9191711b99df5
-- Dolt export: 1dc6c01029b45436
-- harvest YAML, SQLite: 2ea54bf1c061b645
-- harvest YAML, Dolt: 2df23dc6f3615307
+These stay out of the PR, in kinu scratch, listed by sha256 prefix and bytes:
+
+| output | sha256 (16) | bytes |
+|---|---|---:|
+| SCIP index, ac67c078 | 612ecd9342df82d8 | 21,862,996 |
+| SCIP index, d0616f98 | 1544aec3ad5d6909 | 23,867,654 |
+| fact file, ac67c078 | 6fdb630ddfe2ed2b | 7,048,711 |
+| fact file, d0616f98 | 947d0b203a0372a1 | 7,749,249 |
+| SQLite store, snapshot layout | 026bdfcfdae06f87 | 76,521,472 |
+| SQLite store, valid-time layout | 3cf53f30c70f644e | 36,495,360 |
+| SQLite export (JSONL) | 45d9191711b99df5 | 15,615,475 |
+| Dolt export (JSONL) | 1dc6c01029b45436 | 17,613,845 |
+| traversal with hop sets, SQLite | f226d856d2a56e75 | 964,226 |
+| traversal with hop sets, Dolt | 127847e98738a3ab | 964,233 |
+| traversal, hot seeds, SQLite | 0d6abcb15cee7289 | 964,948 |
+| traversal, hot seeds, Dolt | 791ce92bbf4dee28 | 965,021 |
+
+The Dolt repositories (5.3 MB and 32 MB on disk) and their file remotes are
+directories, sized in `results/log.txt` rather than hashed.
