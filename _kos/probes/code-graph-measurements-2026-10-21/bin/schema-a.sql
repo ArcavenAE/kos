@@ -1,0 +1,8 @@
+CREATE TABLE facts (
+  e VARCHAR(255) NOT NULL,
+  a VARCHAR(16) NOT NULL,
+  v VARCHAR(255) NOT NULL,
+  tx VARCHAR(16) NOT NULL,
+  PRIMARY KEY (e, a, v),
+  INDEX avet (a, v, e)
+);
