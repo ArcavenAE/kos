@@ -71,7 +71,7 @@ Run conditions for the fresh index and for every store step:
 
 The Dolt server ran on 127.0.0.1:42498, a random free port. Every saved command
 names that address (`bin/dq.sh:6`); `trav` takes the URL as an argument, and its
-invocations were not saved, so the fleet's bd server on port 3307 was configured
+invocations were not saved. So the fleet's bd server on port 3307 was configured
 out, not prevented. The probe profile, `bin/run.sb`, allows network-outbound to
 `localhost:*` with no port denies, so no sandbox control would have refused a
 connection to 3307. No script or saved log in the probe names any other port;
