@@ -1,6 +1,11 @@
 # Brief: fact store Probe B, SQLite fact log with covering indexes (aae-orc-isie)
 
-Status: DRAFT, written before any measurement. Lock it before the probe runs.
+Status: LOCKED. Locked by its merge in kos#139 (41fccf5), before any probe ran;
+the probe was run and reported in finding-kos-8bmj (kos#141). One step was added
+after the lock: the loader's own-module version normalization, which replaces
+marvel's own `--module-version` token with `.` so marvel symbols survive from
+one commit to the next. Criterion 2's numbers depend on it; the finding gives
+the counts without it.
 Date: 2026-10-20
 Question node: question-kos-fact-store-substrate, sub-questions B and C
 

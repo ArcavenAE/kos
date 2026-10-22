@@ -56,6 +56,31 @@ content: |
 
   This question closes when a store is chosen, or when both probes fail and
   the flat-file ceiling is restated as binding.
+
+  ── Probes A and B, measured (2026-10-21, finding-kos-8bmj) ───
+
+  Both probes ran on marvel at two commits (ac67c078, 43,263 facts;
+  d0616f98, 47,572 facts) and both passed every criterion. Load 1.44 to 3.03 s
+  per commit against 60 s; diff counts equal to an outside set difference on
+  both (4,862 added, 553 removed); a 100-fact harvest of about 24 KB on both,
+  with the bulk left behind; the criterion 4 Rust traversal slowest at 32 ms on
+  SQLite and 71 ms on Dolt against 1 s. Probe B's build took 86 s of its 4 h
+  box. The falsifier did not fire (peak traversal RSS 7.9 MB and 4.0 MB).
+
+  Per sub-question:
+  A. Yes at this scale, with AS OF and dolt_diff giving the diff natively.
+     The hot tail stays under 1 s only with point lookups over a covering
+     index (646 ms; 2.8 to 8.3 s otherwise).
+  B. Yes, inside the timebox.
+  C. Yes: all three MDE killers were answered before the runs and measured
+     during them (JSONL exit under 1 s and about 3 s; YAML round trip equal in
+     the probe's own shape; Dolt verbs listed, and a blind second design ran
+     as written).
+  D. Not tested by these probes. Still open.
+
+  The measurements do not choose a store, so this question stays open. The
+  test named as the one that would separate the stores is growth with
+  history: many commits, not two, for both layouts.
 edges:
   - target: question-code-graph-correspondence
     type: derives
@@ -72,6 +97,9 @@ edges:
   - target: finding-kos-ndz7-scip-indexing-cost
     type: supports
     note: "the cost half; this node adds the count half"
+  - target: finding-kos-8bmj-fact-store-probes-dolt-sqlite
+    type: supports
+    note: "Probes A and B measured: both pass every criterion at two commits; no store chosen; sub-question D untested"
 provenance:
   created_by: human
   session: "session-2026-10-20-code-graph-probe1"
@@ -80,6 +108,7 @@ provenance:
     - _kos/findings/finding-kos-ndz7-scip-indexing-cost.md
     - docs/kos-roadmap-v3.md
     - _kos/probes/code-graph-measurements-2026-10-20/fact-count.md
+    - _kos/findings/finding-kos-8bmj-fact-store-probes-dolt-sqlite.md
 notes: >
   Drafted by the arcaven research-supervisor from the 2026-10-20 code graph
   probe. The fact counts are in
