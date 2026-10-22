@@ -2,6 +2,7 @@
 
 Status: draft, revision 3 (after the corporate research review and kos#141 review round 1)
 Date: 2026-10-21
+Corrected: 2026-10-22, the Dolt server paragraph under the sandbox controls (wording only, no result changed)
 Host: kinu (Apple M3 Max, 128 GB RAM, macOS 26.5.2)
 bd: aae-orc-isie
 Question node: `question-kos-fact-store-substrate`, sub-questions A to D
@@ -68,9 +69,14 @@ Run conditions for the fresh index and for every store step:
   rule. The review asked for a write to the real home, quoting the rule's
   earlier text; that was not done, for this reason.
 
-The Dolt server ran on 127.0.0.1:42498, a random free port. The fleet's bd
-server (port 3307) and its data directory were not touched. The scratch server
-was stopped by its pid, and `kill -0` confirmed it was gone.
+The Dolt server ran on 127.0.0.1:42498, a random free port. Every saved command
+names that address (`bin/dq.sh:6`); `trav` takes the URL as an argument, and its
+invocations were not saved, so the fleet's bd server on port 3307 was configured
+out, not prevented. The probe profile, `bin/run.sb`, allows network-outbound to
+`localhost:*` with no port denies, so no sandbox control would have refused a
+connection to 3307. No script or saved log in the probe names any other port;
+the logs do not record connections, so they cannot show that none was made. The
+scratch server was stopped by its pid, and `kill -0` confirmed it was gone.
 
 ## Fact model as loaded
 
