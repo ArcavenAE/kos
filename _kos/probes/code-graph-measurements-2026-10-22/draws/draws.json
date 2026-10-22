@@ -1,0 +1,98 @@
+{
+ "indexed": 200,
+ "indexed_list_sha256": "2cd9ecf15de8eba47d0ca7082b865ca2eebe6a78dacf5a2ab64bd16c2938ca12",
+ "g4_sha256": "07ff41dee2d480bbaafd2d70b7d016cd1f7615e36ff2f8369226a189df9a0d16",
+ "pair_list": "all (i, j), i < j, over indexed.txt, in lexicographic order of (i, j)",
+ "pair_list_size": 19900,
+ "g3_sha256": "a63b511560020d7d88f77f34b4d6f68704008bee34ac4a1755910b43c160aa67",
+ "seed_pool": 4899,
+ "seeds": 100,
+ "seeds_sha256": "cf1598f3e0ac385a8dc60e6831326c00cba688060452ce0b4f2d5dbc08f009ba",
+ "hot_sha256": "f36bd38a6d1c3689f38d59a5ace3b644ffe5f15319f385338bf311f769886495",
+ "empty_counts": {
+  "e84283eb": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "319ec612": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "985fad1e": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "efd2a715": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "e5b6a23c": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "da3565c9": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "535d167e": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "8bf8e4d5": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "057d3095": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "469df060": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "1387ecdb": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "2780ca1a": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "7561643a": {
+   "seeds_empty": 0,
+   "hot_empty": 9
+  },
+  "10029bb0": {
+   "seeds_empty": 0,
+   "hot_empty": 7
+  },
+  "07a45570": {
+   "seeds_empty": 0,
+   "hot_empty": 7
+  },
+  "f6f33d96": {
+   "seeds_empty": 0,
+   "hot_empty": 7
+  },
+  "59e9e3ce": {
+   "seeds_empty": 0,
+   "hot_empty": 0
+  },
+  "30e4f548": {
+   "seeds_empty": 0,
+   "hot_empty": 0
+  },
+  "f9e43155": {
+   "seeds_empty": 0,
+   "hot_empty": 0
+  },
+  "95238b40": {
+   "seeds_empty": 0,
+   "hot_empty": 0
+  },
+  "d0616f98": {
+   "seeds_empty": 0,
+   "hot_empty": 0
+  }
+ }
+}

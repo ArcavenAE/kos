@@ -1,0 +1,4 @@
+free_kb_before_index=410662432
+free_kb_after_index=399123552
+4134228	/private/tmp/pc22/idx
+1225468	/private/tmp/pc22/facts

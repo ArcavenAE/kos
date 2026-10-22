@@ -1,0 +1,407 @@
+kind: harvested-facts
+source:
+  repo: ArcavenAE/marvel
+  commit: d0616f9841bcb4bd78479d64ded42151b8ab0816
+  arm: D
+  seed: 20261022
+facts:
+- e: cmd/marvel/accountlimits_e2e_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/cmd/marvel`/newCtxForwardCmd().
+  tx: e84283eb
+- e: cmd/marvel/accountstamp.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 `crypto/sha256`/Sum256().
+  tx: e84283eb
+- e: cmd/marvel/accountstamp.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 os/ReadFile().
+  tx: e84283eb
+- e: cmd/marvel/accountstamp_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 `io/fs`/FileMode#Perm().
+  tx: e84283eb
+- e: cmd/marvel/cost_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/SessionRunning.
+  tx: 5c48e097
+- e: cmd/marvel/describe_daemon_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 reflect/StructField#Anonymous.
+  tx: e84283eb
+- e: cmd/marvel/fit_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/Session#Role.
+  tx: e84283eb
+- e: cmd/marvel/getoutput.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/cmd/marvel`/observedRole#Sessions.
+  tx: 16118d30
+- e: cmd/marvel/header.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/bus`/
+  tx: e84283eb
+- e: cmd/marvel/header_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 testing/common#Helper().
+  tx: e84283eb
+- e: cmd/marvel/main.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/cmd/marvel`/keysTrustDialOptions().
+  tx: 493de327
+- e: cmd/marvel/main.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/cmd/marvel`/renderHeader().
+  tx: e84283eb
+- e: cmd/marvel/main.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/cmd/marvel`/watchLoopConfig#deadline.
+  tx: 80c02877
+- e: cmd/marvel/main.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/admission`/Row#Window.
+  tx: e84283eb
+- e: cmd/marvel/main.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/daemon`/KeyInfo#Fingerprint.
+  tx: e84283eb
+- e: cmd/marvel/main.go
+  a: REFERENCES
+  v: scip-go gomod github.com/spf13/cobra v1.10.2 `github.com/spf13/cobra`/Command#Root().
+  tx: e5b6a23c
+- e: cmd/marvel/reexec_preflight.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/daemon`/BuildInfo#PID.
+  tx: ccb3caf0
+- e: cmd/marvel/reexec_request.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/daemonrpc`/Response#Result.
+  tx: 337da64f
+- e: cmd/marvel/reexec_request_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 strings/Builder#String().
+  tx: 3ddef966
+- e: cmd/marvel/view_cmd.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/daemonrpc`/
+  tx: da6de326
+- e: cmd/marvel/workroot.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 `path/filepath`/
+  tx: e84283eb
+- e: cmd/rolescheck/binary_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 testing/
+  tx: 186c4f4e
+- e: contracts/go/envelope/envelope.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/contracts/go/envelope`/
+  tx: e84283eb
+- e: internal/admission/admission_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/admission`/Row#Window.
+  tx: e84283eb
+- e: internal/api/account.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/AccountWindow#
+  tx: e84283eb
+- e: internal/api/backend_overlay.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/backendCompetitorSelectors.
+  tx: e84283eb
+- e: internal/api/backend_test.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/TestResolveBackend().
+  tx: e84283eb
+- e: internal/api/budget.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/Budget#Declared().
+  tx: e84283eb
+- e: internal/api/duties.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/DutyJiraWrite.
+  tx: 1b03db3a
+- e: internal/api/heartbeat_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/HeartbeatRequest#ContextPercent.
+  tx: e84283eb
+- e: internal/api/manifest.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/ManifestBudget#MaxSessions.
+  tx: e84283eb
+- e: internal/api/manifest.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/normalizeWrites().
+  tx: c73259b6
+- e: internal/api/manifest.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/Policy#Settings.
+  tx: e84283eb
+- e: internal/api/placement.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/Placement#
+  tx: 17230fb1
+- e: internal/api/redact.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 reflect/Value#Type().
+  tx: 7ca49271
+- e: internal/api/schedule_clock.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/cronSpec#
+  tx: 9e47465a
+- e: internal/api/store_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/Store#DeleteWorkspace().
+  tx: e84283eb
+- e: internal/api/teamload_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/Session#ActiveTicks.
+  tx: b14bd854
+- e: internal/api/teamload_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/Session#Name.
+  tx: b14bd854
+- e: internal/api/types.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/SessionContext#SpendOut.
+  tx: e84283eb
+- e: internal/broker/broker_test.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/broker`/recordingDriver#Issue().
+  tx: f9e43155
+- e: internal/bus/declared_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 testing/common#Errorf().
+  tx: e84283eb
+- e: internal/bus/health_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 `os/exec`/Cmd#Stdout.
+  tx: e84283eb
+- e: internal/bus/leaf_observed_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/bus`/Supervisor#leafPoll.
+  tx: e84283eb
+- e: internal/bus/proctable_test.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/bus`/procTable#register().
+  tx: 76a7db93
+- e: internal/bus/provision_transport_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 time/Now().
+  tx: e84283eb
+- e: internal/bus/render_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 testing/common#Skip().
+  tx: e84283eb
+- e: internal/bus/signal_source_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 testing/T#Run().
+  tx: 76a7db93
+- e: internal/daemon/account_rows_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/daemon`/Daemon#accounts.
+  tx: e84283eb
+- e: internal/daemon/capture_escapes_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/daemon`/captureOf().
+  tx: e84283eb
+- e: internal/daemon/daemon.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/daemon`/Injector#Session.
+  tx: e84283eb
+- e: internal/daemon/daemon.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/Store#ListSessions().
+  tx: e84283eb
+- e: internal/daemon/inject_bare_digit_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 strings/Contains().
+  tx: e84283eb
+- e: internal/daemon/limitwiring_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 testing/T#Parallel().
+  tx: e84283eb
+- e: internal/daemon/plan_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/daemonrpc`/Response#Result.
+  tx: 337da64f
+- e: internal/daemon/reexec_target_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 errors/
+  tx: 3ddef966
+- e: internal/daemon/remote_client_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 testing/T#Setenv().
+  tx: a96476a9
+- e: internal/daemon/response_source_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/daemon`/isResponse().
+  tx: 7ca49271
+- e: internal/daemon/response_source_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 `go/types`/Type#Underlying().
+  tx: 7ca49271
+- e: internal/daemon/scope_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 testing/common#Fatal().
+  tx: e84283eb
+- e: internal/daemon/sshserver.go
+  a: REFERENCES
+  v: scip-go gomod golang.org/x/crypto v0.58.0 `golang.org/x/crypto/ssh`/NewServerConn().
+  tx: ec17f5a0
+- e: internal/daemon/status_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/daemon`/caller#
+  tx: e84283eb
+- e: internal/events/events.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/events`/Event#Role.
+  tx: e84283eb
+- e: internal/knownhosts/home_guard_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/paths`/Layout#Config().
+  tx: 0e6dd4db
+- e: internal/limitmenu/fixtures_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 strings/
+  tx: e84283eb
+- e: internal/panemenu/source_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 strings/Join().
+  tx: e84283eb
+- e: internal/panestate/parked_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/panestate`/Control().
+  tx: 563f901a
+- e: internal/panestate/range_test.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/panestate`/TestClassifyHighInsideRangeLowOutside().
+  tx: 38286b6c
+- e: internal/runtime/adapter_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 os/MkdirAll().
+  tx: e84283eb
+- e: internal/runtime/claudecode/parser.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/runtime/claudecode`/resultBody#Subtype.
+  tx: e84283eb
+- e: internal/runtime/claudecode/parser.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/runtime/events`/ModelUsage#ContextWindow.
+  tx: e84283eb
+- e: internal/runtime/codex/parser.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/runtime/events`/ToolResultData#Output.
+  tx: e84283eb
+- e: internal/runtime/crush/config_test.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/runtime/crush`/TestAScanOfAMissingDirectoryFails().
+  tx: 74224ee0
+- e: internal/runtime/events/events.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/runtime/events`/RequestUsage#Cost.
+  tx: e84283eb
+- e: internal/runtime/feature_matrix_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 strings/Builder#
+  tx: 3f3fc04f
+- e: internal/runtime/instance_tmux.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 `sync/atomic`/Int32#Load().
+  tx: e84283eb
+- e: internal/runtime/instance_tmux_test.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/runtime`/TestFIFONameFlattensSessionKey().
+  tx: e84283eb
+- e: internal/runtime/opencode.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/runtime`/StreamSpec#Path.
+  tx: e84283eb
+- e: internal/runtime/opencode/parser.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/runtime/opencode`/Parser#handleText().
+  tx: e84283eb
+- e: internal/seaturi/seaturi_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 testing/T#Parallel().
+  tx: 10029bb0
+- e: internal/session/backend_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 testing/common#Error().
+  tx: e84283eb
+- e: internal/session/manager.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/HealthUnknown.
+  tx: e84283eb
+- e: internal/session/run_record.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 fmt/
+  tx: e84283eb
+- e: internal/session/stream_codex_opencode_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/tmux`/
+  tx: e84283eb
+- e: internal/simulator/home_guard_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/homeguard`/Run().
+  tx: 10398daf
+- e: internal/team/admission_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/api`/Runtime#Args.
+  tx: e84283eb
+- e: internal/team/controller.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/team`/Controller#reconcileShift().
+  tx: e84283eb
+- e: internal/team/controller.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/admission`/TriggerShift.
+  tx: e84283eb
+- e: internal/team/controller.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/team`/Controller#admissionVerdict().
+  tx: e84283eb
+- e: internal/team/schedule_clock.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 time/Time#Sub().
+  tx: 9e47465a
+- e: internal/team/shift_handoff.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 strings/CutPrefix().
+  tx: e84283eb
+- e: internal/team/test_hygiene_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 errors/New().
+  tx: a9fba253
+- e: internal/tmux/absence_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 os/Remove().
+  tx: 11f63817
+- e: internal/tmux/tmuxtest/sweep_followup_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/tmux/tmuxtest`/socketDir().
+  tx: c9919bc5
+- e: internal/upgrade/store_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 `net/http/httptest`/Server#Close().
+  tx: d0616f98
+- e: internal/usage/compaction_band_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/usage`/newRecordSink().
+  tx: e84283eb
+- e: internal/view/keeper_test.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/view`/kRig#advance().
+  tx: e84283eb
+- e: internal/view/view_integration_test.go
+  a: REFERENCES
+  v: scip-go gomod github.com/golang/go/src go1.26.0 os/MkdirAll().
+  tx: e84283eb
+- e: internal/watcherprobe/home_guard_test.go
+  a: DEFINES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/watcherprobe`/
+  tx: 10398daf
+- e: internal/watcherprobe/watcherprobe.go
+  a: REFERENCES
+  v: scip-go gomod github.com/arcavenae/marvel . `github.com/arcavenae/marvel/internal/watcherprobe`/c10().
+  tx: ab963875

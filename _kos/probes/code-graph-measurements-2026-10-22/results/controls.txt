@@ -1,0 +1,19 @@
+== ports
+47997 refused: Operation not permitted
+47998 connected
+47999 refused: Operation not permitted
+== public
+public refused: Operation not permitted
+== outside write
+/private/tmp/pc22/work/ctl.sh: line 8: /private/tmp/pc22-outside-probe: Operation not permitted
+rc=1
+== inside write
+rc=0
+x
+== env
+HOME=/private/tmp/pc22/home
+PROBE_DIR=/private/tmp/pc22
+TMPDIR=/private/tmp/pc22/tmp
+/private/tmp/pc22/work
+ls: /private/tmp/pc22-outside-probe: No such file or directory
+public connected outside sandbox
