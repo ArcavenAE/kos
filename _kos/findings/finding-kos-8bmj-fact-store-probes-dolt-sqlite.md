@@ -73,9 +73,10 @@ The Dolt server ran on 127.0.0.1:42498, a random free port. Every command
 named that address (`bin/dq.sh:6`; `trav` takes the URL as an argument), so the
 fleet's bd server on port 3307 was configured out, not prevented. The probe
 profile, `bin/run.sb`, allows network-outbound to `localhost:*` with no port
-denies, so no sandbox control would have refused a connection to 3307. The
-saved logs show no connection to 3307, 4222, 4242, 7422 or 7442. The scratch
-server was stopped by its pid, and `kill -0` confirmed it was gone.
+denies, so no sandbox control would have refused a connection to 3307. No
+script or saved log in the probe names any other port; the logs do not record
+connections, so they cannot show that none was made. The scratch server was
+stopped by its pid, and `kill -0` confirmed it was gone.
 
 ## Fact model as loaded
 
