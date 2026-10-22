@@ -1,0 +1,1 @@
+{"export_s": 0.22, "import_s": 0.48, "export_bytes": 9641306, "commits": 200, "per_commit_counts_equal": 200, "pairs": 50, "pair_diffs_equal": 50, "harvest_rows": 100, "yaml_round_trip_equal": true, "source_commit_back": true}

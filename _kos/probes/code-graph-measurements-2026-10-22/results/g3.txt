@@ -1,0 +1,2 @@
+vt {"pairs": 50, "equal": 50, "differ": 0, "p95_ms": 674.459, "max_ms": 688.935, "median_ms": 176.477}
+d {"pairs": 50, "equal": 50, "differ": 0, "p95_ms": 15.336, "max_ms": 21.005, "median_ms": 5.194}

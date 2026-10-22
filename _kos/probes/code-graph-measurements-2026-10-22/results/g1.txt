@@ -1,0 +1,6 @@
+## G1 (2026-10-22, after the last commit loads, before G3-G5)
+vt allocated_kb 41588 apparent_kb 41241
+d allocated_kb 12276 apparent_kb 12251
+snap allocated_kb 1294400 apparent_kb 1288653
+-rw-r--r--@ 1 michael.pursifull  wheel  1319579648 Oct 21 22:31 snap.sqlite
+-rw-r--r--@ 1 michael.pursifull  wheel  42229760 Oct 21 22:25 vt.sqlite

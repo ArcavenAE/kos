@@ -1,0 +1,10 @@
+# sha256 and bytes of outputs kept out of the evidence (scratch /private/tmp/pc22)
+b40586497bb50c66 42229760 run2/db/vt/vt.sqlite
+f3f4741e17afddf0 1319579648 run2/db/snap/snap.sqlite
+240e8b21a502e42b 9641306 run2/mde/vt-export.jsonl
+51bc808de45bcd73 10015781 run2/mde/d-export.jsonl
+de6dd49d41f135aa 4492496 target/release/trav
+ec6a75af12d63267 4405536 target/release/qtime
+facts dir: 200 files, combined sha256 of sorted per-file hashes: 785433110415f5ff
+idx dir: 200 .scip, combined: 4c8ce5da26a8a078
+g4/g5 traversal set files: 201 + 12 files, combined: 7ef4ee4a27733b4f

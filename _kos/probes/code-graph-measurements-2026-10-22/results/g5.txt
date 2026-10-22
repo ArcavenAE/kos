@@ -1,0 +1,4 @@
+{"arm": "vt200", "runs": {"1": 80.81, "2": 81.475, "3": 80.043}, "median_of_slowest_ms": 80.81, "traversals_checked": 100, "hop_sets_differ": 0, "empty_seed_by_commit": {"d0616f98": 0}}
+{"arm": "vt1", "runs": {"1": 78.086, "2": 77.089, "3": 74.716}, "median_of_slowest_ms": 77.089, "traversals_checked": 100, "hop_sets_differ": 0, "empty_seed_by_commit": {"d0616f98": 0}}
+{"arm": "d200", "runs": {"1": 353.797, "2": 353.865, "3": 299.58}, "median_of_slowest_ms": 353.797, "traversals_checked": 100, "hop_sets_differ": 0, "empty_seed_by_commit": {"d0616f98": 0}}
+{"arm": "d1", "runs": {"1": 349.654, "2": 342.023, "3": 309.109}, "median_of_slowest_ms": 342.023, "traversals_checked": 100, "hop_sets_differ": 0, "empty_seed_by_commit": {"d0616f98": 0}}
