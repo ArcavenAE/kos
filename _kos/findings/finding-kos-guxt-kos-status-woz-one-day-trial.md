@@ -4,7 +4,7 @@ Status: final
 Date: 2026-10-24
 Brief: `_kos/probes/brief-kos-status-woz.md` (opened 2026-07-04)
 Issue: kos#64 (roadmap#29, `kos status`), open
-Instrument: `aae-orc/tools/kos-status`, added in aae-orc 96f09a6 (2026-07-04) and unchanged since
+Instrument: `tools/kos-status` in the orchestrator repo, added 2026-07-04 and unchanged since
 
 ## Headline
 
@@ -17,7 +17,7 @@ is neither confirmed nor falsified by this probe.
 
 ## What was recorded
 
-- **The one day.** The aae-orc session log entry for 2026-07-04..05 records
+- **The one day.** The orchestrator's session log entry for 2026-07-04..05 records
   that tools/kos-status shipped with this brief's kill criterion, was used
   voluntarily as a pre-harvest orient, and correctly surfaced the harvest
   surface. That is one voluntary invocation in
@@ -29,8 +29,8 @@ is neither confirmed nor falsified by this probe.
   that added it.
 - **The telemetry is not on this host.** The script appends every invocation
   to `~/.kos-status-woz/<date>.jsonl` and creates that directory on each run.
-  On corporate the directory does not exist (checked 2026-10-24), so the script
-  has never run there. The 2026-07-04 run's log, if it survives, is on the host
+  On the host this finding was written on, the directory does not exist
+  (checked 2026-10-24), so the script has never run there. The 2026-07-04 run's log, if it survives, is on the host
   that session ran on; it was not read for this finding.
 
 ## What it means for the brief
