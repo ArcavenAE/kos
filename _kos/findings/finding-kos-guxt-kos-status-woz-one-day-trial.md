@@ -20,19 +20,27 @@ is neither confirmed nor falsified by this probe.
 - **The one day.** The orchestrator's session log entry for 2026-07-04..05 records
   that tools/kos-status shipped with this brief's kill criterion, was used
   voluntarily as a pre-harvest orient, and correctly surfaced the harvest
-  surface. That is one voluntary invocation in one session, and one surfaced
-  obligation acted on. It meets the brief's success signal for a single
-  session ("at least one session where the surfaced obligation (e.g.
-  unharvested finding) was acted on"), not its habit signal.
-- **No later use on record.** No session log entry after 2026-07-05 names
-  kos-status or the WoZ, and `tools/kos-status` has no commit after the one
-  that added it.
-- **The telemetry is not on this host.** The script appends every invocation
-  to `~/.kos-status-woz/<date>.jsonl` and creates that directory on each run.
+  surface. The session log describes voluntary use and one surfaced
+  obligation acted on; it does not count invocations. The brief's success
+  signal reads "at least one session where the surfaced obligation (e.g.
+  unharvested finding) was acted on and would plausibly have been missed
+  otherwise". The session log shows the first half. It does not say the
+  harvest would have been missed without the verb, so the single-session
+  signal is met only in part, and the habit signal not at all.
+- **The telemetry.** The script appends every invocation to
+  `~/.kos-status-woz/<date>.jsonl`. On the host the 2026-07-04 session ran
+  on, the directory holds one file, `2026-07-04.jsonl`, with five lines, per
+  the review of 3ab80438 on kos#151 (read on that host, not re-read for this
+  revision). Four parse as invocations, at 2026-07-04T22:31Z and
+  2026-07-05T03:08Z, 03:57Z and 04:42Z; a fifth line at 05:20Z names no
+  graph. So the verb ran four or five times over about seven hours in that one
+  session. The log does not record which runs were voluntary, so the
+  per-session voluntary count the kill criterion uses is not settled by it.
   On the host this finding was written on, the directory does not exist
-  (checked 2026-10-24), so the script has never run there. The 2026-07-04
-  run's log, if it survives, is on the host that session ran on; it was not
-  read for this finding.
+  (checked 2026-10-24).
+- **No later use on record.** The log has nothing after 2026-07-05, no
+  session log entry after that date names kos-status or the WoZ, and
+  `tools/kos-status` has no commit after the one that added it.
 
 ## What it means for the brief
 
