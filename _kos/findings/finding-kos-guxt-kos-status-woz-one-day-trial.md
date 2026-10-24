@@ -20,18 +20,19 @@ is neither confirmed nor falsified by this probe.
 - **The one day.** The orchestrator's session log entry for 2026-07-04..05 records
   that tools/kos-status shipped with this brief's kill criterion, was used
   voluntarily as a pre-harvest orient, and correctly surfaced the harvest
-  surface. That is one voluntary invocation in
-  one session, and one surfaced obligation acted on. It meets the brief's
-  success signal for a single session ("at least one session where the
-  surfaced obligation was acted on"), not its habit signal.
+  surface. That is one voluntary invocation in one session, and one surfaced
+  obligation acted on. It meets the brief's success signal for a single
+  session ("at least one session where the surfaced obligation (e.g.
+  unharvested finding) was acted on"), not its habit signal.
 - **No later use on record.** No session log entry after 2026-07-05 names
   kos-status or the WoZ, and `tools/kos-status` has no commit after the one
   that added it.
 - **The telemetry is not on this host.** The script appends every invocation
   to `~/.kos-status-woz/<date>.jsonl` and creates that directory on each run.
   On the host this finding was written on, the directory does not exist
-  (checked 2026-10-24), so the script has never run there. The 2026-07-04 run's log, if it survives, is on the host
-  that session ran on; it was not read for this finding.
+  (checked 2026-10-24), so the script has never run there. The 2026-07-04
+  run's log, if it survives, is on the host that session ran on; it was not
+  read for this finding.
 
 ## What it means for the brief
 
