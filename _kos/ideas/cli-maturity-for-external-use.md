@@ -124,3 +124,31 @@ docs.
   convention that should live elsewhere (spectacle? a standard)?
 - Process subcommands assume the process is stable. Is it? Or will
   the first few external uses change the cycle?
+
+## 2026-10-24 re-audit
+
+Checked against the installed alpha (c4f93c2) and the clap definitions
+in `src/main.rs` at 17852f2; the subcommand set is the same in both.
+
+Now present:
+
+- `kos idea`, `kos question`, `kos probe` and `kos finding` scaffold
+  their files (the brief carries the hypothesis, success signal,
+  timebox and predicted confidence fields).
+- Orient for standalone repos: `kos orient` in a fresh `kos init` repo
+  prints `(standalone)` and lists bedrock nodes, findings, open
+  questions, active probes and ideas (closed kos#1, kos#4).
+
+Remaining gaps:
+
+- `kos promote` does not exist: kos#147.
+- `kos probe` and `kos finding` do not link to their question or probe
+  (`edges: []`, `finding.probe: null`, `result` defaults to `partial`);
+  no `kos harvest`: kos#148.
+- `kos help --full` / `--help-llm` (sections 3 and 4): kos#149.
+- User documentation and topic help (`kos help getting-started`):
+  kos#150. README accuracy is the separate kos#54.
+
+Noted, not filed: `kos init`'s next steps still say "Add your first
+frontier question: _kos/nodes/frontier/question-*.yaml" rather than
+pointing at `kos question`.
