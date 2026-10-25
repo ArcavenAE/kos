@@ -1,5 +1,7 @@
 # Brief: SCIP indexing cost across the fleet (aae-orc-msqx, Q1 + Q5)
 
+Closed 2026-10-25: probe done
+
 Status: locked (written before measurement; probe now complete)
 Date: 2026-08-16
 Host: kinu (Apple M3 Max, 16 cores, 128 GB RAM, macOS 26.5.2)

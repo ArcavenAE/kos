@@ -1,5 +1,7 @@
 # kos-read-path-gap
 
+Closed 2026-10-25: pointers closed
+
 *Criticism received and accepted: kos seeks to encode knowledge, but
 query/reading is non-existent. Cache writes are expensive — and more
 so if you never read. Captured 2026-07-15; an area Michael was

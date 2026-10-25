@@ -1,5 +1,7 @@
 # Beads as prior art for kos substrate and lifecycle evolution
 
+Closed 2026-10-25: kos and bd boundary settled, grv-kos-as-task-tracker
+
 *Idea — pre-hypothesis brainstorming. Generative, uncommitted.*
 
 ## The observation

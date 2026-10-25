@@ -1,5 +1,7 @@
 # Remaining SDD systems to survey for seed scanner
 
+Dropped 2026-10-25: survey goal superseded
+
 *Idea — pre-hypothesis brainstorming. Generative, uncommitted.*
 
 ## Surveyed (session-014)
