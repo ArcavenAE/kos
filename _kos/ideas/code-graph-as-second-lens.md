@@ -1,5 +1,7 @@
 # Idea: the code graph as a second lens
 
+Closed 2026-10-25: pointers closed
+
 Pre-hypothesis capture of the 2026-08-08 code-graph research input. Generative,
 possibly contradictory, no commitment. This file holds the readings of the
 briefing while they are still readings, before any of them is a claim I would

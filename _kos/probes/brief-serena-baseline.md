@@ -1,5 +1,7 @@
 # Exploration Brief: Serena as the measured live-LSP baseline
 
+Closed 2026-10-25: probe done
+
 **bd:** aae-orc-5lbu
 **Status:** locked, written before any tool was installed or measured
 **Date:** 2026-08-16
