@@ -1,5 +1,9 @@
 # Exploration Brief — kos status Wizard-of-Oz (roadmap#29 / kos#64)
 
+**Status:** closed 2026-10-24. The trial ran one day, not the three cycles
+the timebox named, so the kill criterion was never evaluated. Result:
+`_kos/findings/finding-kos-guxt-kos-status-woz-one-day-trial.md`.
+
 **Date opened:** 2026-07-04
 **Question:** Does a session-entry status verb — "where am I in the
 cycle, what's the next verb" — actually get consulted and change
