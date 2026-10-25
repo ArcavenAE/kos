@@ -151,3 +151,32 @@ Net effect on the operator, stated once: fifteen memorized duties become
 one habit (`kos status`), two confirm-flows (`capture`, `adopt`), and a
 set of prompts that arrive when due. The judgments — promotion, meaning,
 dissent — remain exactly where the SOUL put them.
+
+---
+
+## Lifecycle fold (2026-10-25): proposed, awaiting the operator's ratification
+
+> Proposed placement, not yet a roadmap decision. Two ideas are folded
+> here so they stop reading as open:
+> `_kos/ideas/eight-lifecycle-problems-as-kos-roadmap.md` and
+> `_kos/ideas/kos-as-lifecycle-knowledge-layer.md`. Placing a problem under
+> a milestone is the operator's call; this table is a draft for that
+> decision, built from the v3 milestones and the v3.1 issues above. No v3
+> or v3.1 issue changes. "Unscheduled" means no current issue carries the
+> work, and the idea's own status line is kept as the reason.
+
+| # | lifecycle problem (eight-lifecycle-problems) | proposed placement | why there |
+|---|---|---|---|
+| 1 | Lifecycle stops at "shipped" (kos as the feedback loop) | unscheduled | orient and drift exist; the bridge framework that extends them to other projects is idea-stage and has no issue |
+| 2 | Only works at one scale (fractal process ceremony) | unscheduled | question-stage (question-fractal-process-ceremony) |
+| 3a | Hub-and-spoke execution (cross-repo knowledge) | MR, nearest Issue 21 | Issue 21's subgraph context and query commands are where cross-repo edge traversal would be read; the traversal itself is not yet specified there |
+| 3b | Human as integration bus (gathering layer) | MR, Issue 22 | task-conditional orient is the gathering-vs-interpreting question in issue form |
+| 3c | Single workflow type (composable process variants) | unscheduled | idea-stage (composable-process-variants.md) |
+| 4 | No post-1.0 answers (multiple input channels, seed=sync) | unscheduled | idea-stage (universal-bridge-intermediary.md); the seed=sync insight is not yet promoted |
+| 5 | Implementation drift invisible (delivery finding channel) | unscheduled | question-stage (question-delivery-finding-channel) |
+| 6 | Changes ripple untracked (ripple engine) | unscheduled | drift is basic; elem-drift-propagation-taxonomy is bedrock but no issue implements it |
+| 7 | Process not composable (variants, overlays, chains) | unscheduled | the same idea as 3c, so one future issue would serve both |
+| 8 | Context doesn't fit (knowledge graph as retrieval) | MR | MR is this milestone: retrieval first (Issues 20 to 24) |
+| L | kos as the lifecycle's knowledge layer (kos-as-lifecycle-knowledge-layer) | M5, Issue 16 | whether kos grows toward lifecycle support or stays a knowledge substrate is the mission split Issue 16 decides |
+
+Once ratified, the two idea files carry a closed line pointing here.

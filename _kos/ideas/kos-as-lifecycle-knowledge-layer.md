@@ -1,5 +1,7 @@
 # kos as the Lifecycle's Knowledge Layer
 
+Closed 2026-10-25: folded into docs/kos-roadmap-v3_1.md, Lifecycle fold
+
 *Idea — pre-hypothesis brainstorming. Generative, uncommitted.*
 
 ## The observation
