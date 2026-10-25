@@ -478,7 +478,11 @@ fn load_all_nodes(nodes_dir: &Path) -> Result<(Vec<LoadedNode>, HashSet<String>)
     Ok((nodes, known_ids))
 }
 
-fn validate_node(node: &Node, rel_path: &str, known_ids: &HashSet<String>) -> ValidationResult {
+pub(crate) fn validate_node(
+    node: &Node,
+    rel_path: &str,
+    known_ids: &HashSet<String>,
+) -> ValidationResult {
     let mut errors = Vec::new();
     let mut warnings = Vec::new();
 

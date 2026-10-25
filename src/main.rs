@@ -226,6 +226,24 @@ enum Commands {
         kind: IdKind,
     },
 
+    /// Move a node up a confidence tier (placeholder, frontier, bedrock)
+    ///
+    /// Rewrites the node's `confidence:` line, runs the validate checks on
+    /// the moved node before anything is written, and prints the commit line.
+    /// Upward moves only: a demotion, a move out of the graveyard and a move
+    /// to the same tier are refused and change no file.
+    Promote {
+        /// Id of the node to move (e.g., question-x)
+        node_id: String,
+
+        /// Target tier: placeholder, frontier or bedrock
+        tier: String,
+
+        /// Directory the graph is found from (defaults to cwd)
+        #[arg(long)]
+        dir: Option<PathBuf>,
+    },
+
     /// Create an exploration brief; plan for a probe
     Probe {
         /// Slug for the brief (e.g., "substrate" → brief-substrate)
@@ -613,6 +631,12 @@ fn main() -> anyhow::Result<()> {
             let cwd = dir.unwrap_or(std::env::current_dir()?);
             let workspace = kos::workspace::Workspace::discover(&cwd)?;
             kos::process::id_finding(&workspace, &cwd, &slug, yaml)?;
+        }
+
+        Commands::Promote { node_id, tier, dir } => {
+            let cwd = dir.unwrap_or(std::env::current_dir()?);
+            let workspace = kos::workspace::Workspace::discover(&cwd)?;
+            kos::promote::promote(&workspace, &cwd, &node_id, &tier)?;
         }
 
         Commands::Probe { slug, title, dir } => {
