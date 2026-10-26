@@ -166,8 +166,16 @@ fn a_move_out_of_graveyard_is_refused() {
         "id: grv-old\ntype: element\nconfidence: graveyard\ntitle: old\ncontent: c\n",
     );
     for tier in ["frontier", "bedrock", "placeholder"] {
-        assert_refused(tmp.path(), "grv-old", tier, "graveyard");
+        assert_refused(tmp.path(), "grv-old", tier, "out of the graveyard");
     }
+}
+
+#[test]
+fn a_move_into_graveyard_is_refused() {
+    let tmp = tempfile::tempdir().unwrap();
+    base(tmp.path());
+    assert_refused(tmp.path(), "question-x", "graveyard", "not a promotion");
+    assert_refused(tmp.path(), "elem-anchor", "graveyard", "not a promotion");
 }
 
 #[test]
