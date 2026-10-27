@@ -1400,4 +1400,48 @@ mod tests {
         );
         Workspace::from_explicit(root).unwrap()
     }
+
+    // ── fixture commits are signed, never with the developer's key ─
+
+    /// A guard over this test module's own source: the one git helper signs
+    /// with the fixture's throwaway key and reads no host config, and no
+    /// other site makes git objects or writes a ref. The patterns are
+    /// bracketed so that they cannot match the lines that hold them.
+    #[test]
+    fn fixture_commits_go_through_the_signing_helper() {
+        let src = include_str!("reflect.rs");
+        let tests = &src[src.find("#[cfg(test)]\nmod tests").unwrap()..];
+        let helper_start = tests.find("    fn git(").expect("the git helper exists");
+        let helper_len = tests[helper_start..].find("\n    }\n").unwrap();
+        let helper = &tests[helper_start..helper_start + helper_len];
+        for want in [
+            r"commit\.gpgsign=[t]rue",
+            r"gpg\.format=[s]sh",
+            r"user\.signingkey=",
+            r"gpg\.ssh\.program=[s]sh-keygen",
+            r#""GIT_CONFIG_[G]LOBAL""#,
+            r#""GIT_CONFIG_[N]OSYSTEM""#,
+        ] {
+            let re = regex::Regex::new(want).unwrap();
+            assert!(re.is_match(helper), "the git helper lacks {want}");
+        }
+        for banned in [
+            r"gpgsign=[f]alse",
+            r"--no-gpg-[s]ign",
+            r"commit-[t]ree",
+            r"fast-[i]mport",
+            r"\bmk[t]ag\b",
+            r"update-[r]ef",
+            r#"Command::new\("[g]it"\)"#,
+        ] {
+            let re = regex::Regex::new(banned).unwrap();
+            assert!(!re.is_match(tests), "the test module holds {banned}");
+        }
+        let spawns = regex::Regex::new(r"gitenv::git_[i]n\(").unwrap();
+        let outside = spawns.find_iter(tests).filter(|m| {
+            let at = m.start();
+            at < helper_start || at > helper_start + helper_len
+        });
+        assert_eq!(outside.count(), 0, "a git spawn outside the helper");
+    }
 }
