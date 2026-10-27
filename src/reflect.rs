@@ -1252,13 +1252,25 @@ mod tests {
     /// fixtures never make an unsigned commit and never read the developer's
     /// gitconfig or key, and with the repository-local variables dropped, so
     /// a GIT_DIR inherited from a hook cannot turn `git init` and
-    /// `git commit` here into commits on the repository being pushed.
+    /// `git commit` here into commits on the repository being pushed. A
+    /// caller cannot pass its own config or directory, and after every call
+    /// each commit any ref reaches must carry a signature.
     fn git(dir: &Path, args: &[&str]) {
+        for a in args {
+            assert!(
+                !(*a == "-c" || *a == "-C" || a.starts_with("--config-env")),
+                "the git helper refuses caller config or directory: {a}"
+            );
+        }
         let key = dir.parent().unwrap().join("signing-key");
         assert!(key.is_file(), "no fixture signing key beside {dir:?}");
-        let status = crate::gitenv::git_in(dir)
-            .env("GIT_CONFIG_GLOBAL", "/dev/null")
-            .env("GIT_CONFIG_NOSYSTEM", "1")
+        let fixture_git = || {
+            let mut cmd = crate::gitenv::git_in(dir);
+            cmd.env("GIT_CONFIG_GLOBAL", "/dev/null")
+                .env("GIT_CONFIG_NOSYSTEM", "1");
+            cmd
+        };
+        let status = fixture_git()
             .args([
                 "-c",
                 "user.name=kos-test",
@@ -1279,9 +1291,14 @@ mod tests {
             .status()
             .expect("git runnable");
         assert!(status.success(), "git {args:?} failed");
-        if args.first() == Some(&"commit") {
-            let object = crate::gitenv::git_in(dir)
-                .args(["cat-file", "commit", "HEAD"])
+        let commits = fixture_git()
+            .args(["rev-list", "--all"])
+            .output()
+            .expect("git runnable");
+        assert!(commits.status.success(), "git rev-list --all failed");
+        for sha in String::from_utf8_lossy(&commits.stdout).lines() {
+            let object = fixture_git()
+                .args(["cat-file", "commit", sha])
                 .output()
                 .expect("git runnable");
             let object = String::from_utf8_lossy(&object.stdout);
@@ -1450,7 +1467,7 @@ mod tests {
         let helper_len = tests[helper_start..].find("\n    }\n").unwrap();
         let helper = &tests[helper_start..helper_start + helper_len];
         for want in [
-            r"commit\.gpgsign=[t]rue",
+            r"commit\.gpg[s]ign=[t]rue",
             r"gpg\.format=[s]sh",
             r"user\.signingkey=",
             r"gpg\.ssh\.program=[s]sh-keygen",
@@ -1462,16 +1479,32 @@ mod tests {
             }
         }
         for banned in [
-            r"gpgsign=[f]alse",
             r"--no-gpg-[s]ign",
             r"commit-[t]ree",
             r"fast-[i]mport",
             r"\bmk[t]ag\b",
             r"update-[r]ef",
-            r#"Command::new\("[g]it"\)"#,
         ] {
             if regex::Regex::new(banned).unwrap().is_match(tests) {
                 out.push(format!("the test module holds {banned}"));
+            }
+        }
+        // Signing is set in the helper only: any other mention, in any case
+        // and with any value, is a way to turn it off.
+        let rest = format!(
+            "{}{}",
+            &tests[..helper_start],
+            &tests[helper_start + helper_len..]
+        );
+        if regex::Regex::new(r"(?i)gpg[s]ign").unwrap().is_match(&rest) {
+            out.push("a signing setting outside the helper".to_string());
+        }
+        // The one program spawned directly is ssh-keygen, for the key; git
+        // only runs through the helper, by name or through a variable.
+        let spawn = regex::Regex::new(r"Command::ne[w]\(").unwrap();
+        for m in spawn.find_iter(tests) {
+            if !tests[m.end()..].starts_with("\"ssh-keygen\")") {
+                out.push("a program spawned outside the helper".to_string());
             }
         }
         let spawns = regex::Regex::new(r"gitenv::git_[i]n\(").unwrap();
