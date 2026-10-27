@@ -1258,8 +1258,8 @@ mod tests {
     fn git(dir: &Path, args: &[&str]) {
         for a in args {
             assert!(
-                !(*a == "-c" || *a == "-C" || a.starts_with("--config-env")),
-                "the git helper refuses caller config or directory: {a}"
+                !refused_arg(a),
+                "the git helper refuses caller config, directory or signing: {a}"
             );
         }
         let key = dir.parent().unwrap().join("signing-key");
@@ -1303,10 +1303,25 @@ mod tests {
                 .expect("git runnable");
             let object = String::from_utf8_lossy(&object.stdout);
             assert!(
-                object.lines().any(|l| l.starts_with("gpgsig ")),
+                has_signature(&object),
                 "fixture commit is not signed:\n{object}"
             );
         }
+    }
+
+    /// Caller args the helper will not pass on: its own config, a directory
+    /// or a signing switch.
+    fn refused_arg(a: &str) -> bool {
+        a == "-c" || a == "-C" || a.starts_with("--config-env") || a.starts_with("--no-gpg")
+    }
+
+    /// Whether a commit object's text carries a signature header: a
+    /// `gpgsig` line before the blank line that ends the headers.
+    fn has_signature(object: &str) -> bool {
+        object
+            .lines()
+            .take_while(|l| !l.is_empty())
+            .any(|l| l.starts_with("gpgsig "))
     }
 
     fn write(path: &Path, content: &str) {
@@ -1573,11 +1588,11 @@ mod tests {
         );
     }
 
-    /// kos#158 review: the signature check runs on every commit the helper
-    /// makes, not only when the first argument is `commit`.
+    /// kos#158 review: a signing switch in the caller's args is refused
+    /// before git runs, so no unsigned commit is made to prove it.
     #[test]
-    #[should_panic(expected = "fixture commit is not signed")]
-    fn helper_checks_every_commit_it_makes() {
+    #[should_panic(expected = "refuses caller")]
+    fn helper_refuses_a_signing_switch() {
         let tmp = tempfile::tempdir().unwrap();
         let root = &fixture_repo(&tmp);
         git(
@@ -1592,5 +1607,25 @@ mod tests {
                 "x",
             ],
         );
+    }
+
+    /// The check the helper runs on every commit any ref reaches, after
+    /// every call, read on crafted commit text rather than on a real
+    /// unsigned commit.
+    #[test]
+    fn signature_check_reads_the_commit_object() {
+        let unsigned = "tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904\n\
+                        author t <t@example.com> 0 +0000\n\
+                        committer t <t@example.com> 0 +0000\n\nx\n";
+        let signed = "tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904\n\
+                      author t <t@example.com> 0 +0000\n\
+                      committer t <t@example.com> 0 +0000\n\
+                      gpgsig -----BEGIN SSH SIGNATURE-----\n \n -----END-----\n\nx\n";
+        let in_message = "tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904\n\
+                          committer t <t@example.com> 0 +0000\n\n\
+                          message\ngpgsig in the body is not a header\n";
+        assert!(!has_signature(unsigned));
+        assert!(has_signature(signed));
+        assert!(!has_signature(in_message));
     }
 }
