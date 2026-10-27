@@ -1439,14 +1439,13 @@ mod tests {
 
     // ── fixture commits are signed, never with the developer's key ─
 
-    /// A guard over this test module's own source: the one git helper signs
-    /// with the fixture's throwaway key and reads no host config, and no
-    /// other site makes git objects or writes a ref. The patterns are
-    /// bracketed so that they cannot match the lines that hold them.
-    #[test]
-    fn fixture_commits_go_through_the_signing_helper() {
-        let src = include_str!("reflect.rs");
-        let tests = &src[src.find("#[cfg(test)]\nmod tests").unwrap()..];
+    /// The guard's rules over a tests-module source: the one git helper
+    /// signs with the fixture's throwaway key and reads no host config, and
+    /// no other site makes git objects or writes a ref. Returns what breaks
+    /// them. The patterns are bracketed so that they cannot match the lines
+    /// that hold them.
+    fn guard_violations(tests: &str) -> Vec<String> {
+        let mut out = Vec::new();
         let helper_start = tests.find("    fn git(").expect("the git helper exists");
         let helper_len = tests[helper_start..].find("\n    }\n").unwrap();
         let helper = &tests[helper_start..helper_start + helper_len];
@@ -1458,8 +1457,9 @@ mod tests {
             r#""GIT_CONFIG_[G]LOBAL""#,
             r#""GIT_CONFIG_[N]OSYSTEM""#,
         ] {
-            let re = regex::Regex::new(want).unwrap();
-            assert!(re.is_match(helper), "the git helper lacks {want}");
+            if !regex::Regex::new(want).unwrap().is_match(helper) {
+                out.push(format!("the git helper lacks {want}"));
+            }
         }
         for banned in [
             r"gpgsign=[f]alse",
@@ -1470,14 +1470,94 @@ mod tests {
             r"update-[r]ef",
             r#"Command::new\("[g]it"\)"#,
         ] {
-            let re = regex::Regex::new(banned).unwrap();
-            assert!(!re.is_match(tests), "the test module holds {banned}");
+            if regex::Regex::new(banned).unwrap().is_match(tests) {
+                out.push(format!("the test module holds {banned}"));
+            }
         }
         let spawns = regex::Regex::new(r"gitenv::git_[i]n\(").unwrap();
         let outside = spawns.find_iter(tests).filter(|m| {
             let at = m.start();
             at < helper_start || at > helper_start + helper_len
         });
-        assert_eq!(outside.count(), 0, "a git spawn outside the helper");
+        if outside.count() > 0 {
+            out.push("a git spawn outside the helper".to_string());
+        }
+        out
+    }
+
+    fn tests_source() -> &'static str {
+        let src = include_str!("reflect.rs");
+        &src[src.find("#[cfg(test)]\nmod tests").unwrap()..]
+    }
+
+    #[test]
+    fn fixture_commits_go_through_the_signing_helper() {
+        assert_eq!(guard_violations(tests_source()), Vec::<String>::new());
+    }
+
+    /// kos#158 review: a signing override in any case or value is caught.
+    /// The mutant is built at run time so this file never holds it.
+    #[test]
+    fn guard_catches_a_signing_override_in_any_case() {
+        let mutant = format!(
+            "{}\n        let x = \"commit.gpg{}=no\";\n",
+            tests_source(),
+            "Sign"
+        );
+        assert!(!guard_violations(&mutant).is_empty());
+    }
+
+    /// kos#158 review: git run through a variable is caught.
+    #[test]
+    fn guard_catches_git_through_a_variable() {
+        let mutant = format!(
+            "{}\n        let prog = \"git\";\n        std::process::Command::{}(prog);\n",
+            tests_source(),
+            "new"
+        );
+        assert!(!guard_violations(&mutant).is_empty());
+    }
+
+    /// kos#158 review: a caller cannot hand the helper its own config.
+    #[test]
+    #[should_panic(expected = "refuses caller")]
+    fn helper_refuses_caller_config() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = &fixture_repo(&tmp);
+        git(
+            root,
+            &[
+                "-C",
+                ".",
+                "-c",
+                concat!("commit.gpg", "Sign=no"),
+                "commit",
+                "-q",
+                "--allow-empty",
+                "-m",
+                "x",
+            ],
+        );
+    }
+
+    /// kos#158 review: the signature check runs on every commit the helper
+    /// makes, not only when the first argument is `commit`.
+    #[test]
+    #[should_panic(expected = "fixture commit is not signed")]
+    fn helper_checks_every_commit_it_makes() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = &fixture_repo(&tmp);
+        git(
+            root,
+            &[
+                "--no-pager",
+                "commit",
+                concat!("--no-gpg", "-sign"),
+                "-q",
+                "--allow-empty",
+                "-m",
+                "x",
+            ],
+        );
     }
 }
