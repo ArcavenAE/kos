@@ -1230,27 +1230,66 @@ mod tests {
 
     // ── shared git fixture ───────────────────────────────────────
 
-    /// Run git in `dir` with an isolated identity and signing disabled, so
-    /// fixtures never touch the developer's global gitconfig or a signing key,
-    /// and with the repository-local variables dropped, so a GIT_DIR inherited
-    /// from a hook cannot turn `git init` and `git commit` here into commits on
-    /// the repository being pushed.
+    /// A fixture repo at `<tmp>/repo`, with a throwaway signing key beside it
+    /// at `<tmp>/signing-key`, outside the work tree so `add -A` never takes
+    /// it. The key dies with the temp dir.
+    fn fixture_repo(tmp: &tempfile::TempDir) -> std::path::PathBuf {
+        let key = tmp.path().join("signing-key");
+        let status = std::process::Command::new("ssh-keygen")
+            .args(["-q", "-t", "ed25519", "-N", "", "-C", "kos-test", "-f"])
+            .arg(&key)
+            .status()
+            .expect("ssh-keygen runnable");
+        assert!(status.success(), "ssh-keygen failed");
+        let root = tmp.path().join("repo");
+        fs::create_dir_all(&root).unwrap();
+        git(&root, &["init", "-q"]);
+        root
+    }
+
+    /// Run git in a fixture repo made by `fixture_repo`, with an isolated
+    /// identity and every commit signed by the fixture's throwaway key, so
+    /// fixtures never make an unsigned commit and never read the developer's
+    /// gitconfig or key, and with the repository-local variables dropped, so
+    /// a GIT_DIR inherited from a hook cannot turn `git init` and
+    /// `git commit` here into commits on the repository being pushed.
     fn git(dir: &Path, args: &[&str]) {
+        let key = dir.parent().unwrap().join("signing-key");
+        assert!(key.is_file(), "no fixture signing key beside {dir:?}");
         let status = crate::gitenv::git_in(dir)
+            .env("GIT_CONFIG_GLOBAL", "/dev/null")
+            .env("GIT_CONFIG_NOSYSTEM", "1")
             .args([
                 "-c",
                 "user.name=kos-test",
                 "-c",
                 "user.email=kos-test@example.com",
                 "-c",
-                "commit.gpgsign=false",
-                "-c",
                 "init.defaultBranch=main",
+                "-c",
+                "gpg.format=ssh",
+                "-c",
+                "gpg.ssh.program=ssh-keygen",
+                "-c",
+                "commit.gpgsign=true",
+                "-c",
             ])
+            .arg(format!("user.signingkey={}", key.display()))
             .args(args)
             .status()
             .expect("git runnable");
         assert!(status.success(), "git {args:?} failed");
+        if args.first() == Some(&"commit") {
+            let object = crate::gitenv::git_in(dir)
+                .args(["cat-file", "commit", "HEAD"])
+                .output()
+                .expect("git runnable");
+            let object = String::from_utf8_lossy(&object.stdout);
+            assert!(
+                object.lines().any(|l| l.starts_with("gpgsig ")),
+                "fixture commit is not signed:\n{object}"
+            );
+        }
     }
 
     fn write(path: &Path, content: &str) {
@@ -1270,8 +1309,7 @@ mod tests {
     #[test]
     fn resolve_since_finds_unscoped_harvest_commit() {
         let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path();
-        git(root, &["init", "-q"]);
+        let root = &fixture_repo(&tmp);
 
         write(&root.join("a.txt"), "one\n");
         git(root, &["add", "-A"]);
@@ -1302,9 +1340,8 @@ mod tests {
     #[test]
     fn build_reflection_lists_markdown_and_yaml_findings() {
         let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path();
+        let root = &fixture_repo(&tmp);
         let graph_root = root.join("_kos");
-        git(root, &["init", "-q"]);
 
         // Baseline commit so `since` has a parent to diff from.
         write(&root.join("README.md"), "seed\n");
@@ -1353,9 +1390,8 @@ mod tests {
         // yaml findings: a finding that links a probe whose brief predicted a
         // confidence must still show predicted + delta.
         let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path();
+        let root = &fixture_repo(&tmp);
         let graph_root = root.join("_kos");
-        git(root, &["init", "-q"]);
 
         // Brief with a predicted confidence lives on disk in probes/.
         write(
