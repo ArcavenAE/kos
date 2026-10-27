@@ -154,18 +154,17 @@ dissent — remain exactly where the SOUL put them.
 
 ---
 
-## Lifecycle fold (2026-10-25): proposed, awaiting the operator's ratification
+## Lifecycle fold (2026-10-25): ratified 2026-10-26
 
-> Proposed placement, not yet a roadmap decision. Two ideas are folded
-> here so they stop reading as open:
+> The operator ratified these placements as proposed on 2026-10-26. Two
+> ideas are folded here and closed:
 > `_kos/ideas/eight-lifecycle-problems-as-kos-roadmap.md` and
-> `_kos/ideas/kos-as-lifecycle-knowledge-layer.md`. Placing a problem under
-> a milestone is the operator's call; this table is a draft for that
-> decision, built from the v3 milestones and the v3.1 issues above. No v3
-> or v3.1 issue changes. "Unscheduled" means no current issue carries the
-> work, and the idea's own status line is kept as the reason.
+> `_kos/ideas/kos-as-lifecycle-knowledge-layer.md`. The table is built from
+> the v3 milestones and the v3.1 issues above. No v3 or v3.1 issue changes.
+> "Unscheduled" means no current issue carries the work, and the idea's own
+> status line is kept as the reason.
 
-| # | lifecycle problem (eight-lifecycle-problems) | proposed placement | why there |
+| # | lifecycle problem (eight-lifecycle-problems) | placement | why there |
 |---|---|---|---|
 | 1 | Lifecycle stops at "shipped" (kos as the feedback loop) | unscheduled | orient and drift exist; the bridge framework that extends them to other projects is idea-stage and has no issue |
 | 2 | Only works at one scale (fractal process ceremony) | unscheduled | question-stage (question-fractal-process-ceremony) |
@@ -178,5 +177,3 @@ dissent — remain exactly where the SOUL put them.
 | 7 | Process not composable (variants, overlays, chains) | unscheduled | the same idea as 3c, so one future issue would serve both |
 | 8 | Context doesn't fit (knowledge graph as retrieval) | MR | MR is this milestone: retrieval first (Issues 20 to 24) |
 | L | kos as the lifecycle's knowledge layer (kos-as-lifecycle-knowledge-layer) | M5, Issue 16 | whether kos grows toward lifecycle support or stays a knowledge substrate is the mission split Issue 16 decides |
-
-Once ratified, the two idea files carry a closed line pointing here.

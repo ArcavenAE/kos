@@ -1,6 +1,6 @@
 # The Eight Lifecycle Problems as kos's Roadmap
 
-Closed 2026-10-25: folded into docs/kos-roadmap-v3_1.md, Lifecycle fold
+Closed 2026-10-26, on the operator's ratification: folded into docs/kos-roadmap-v3_1.md, Lifecycle fold
 
 *Idea — pre-hypothesis brainstorming. Generative, uncommitted.*
 
