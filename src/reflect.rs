@@ -1230,27 +1230,98 @@ mod tests {
 
     // ── shared git fixture ───────────────────────────────────────
 
-    /// Run git in `dir` with an isolated identity and signing disabled, so
-    /// fixtures never touch the developer's global gitconfig or a signing key,
-    /// and with the repository-local variables dropped, so a GIT_DIR inherited
-    /// from a hook cannot turn `git init` and `git commit` here into commits on
-    /// the repository being pushed.
+    /// A fixture repo at `<tmp>/repo`, with a throwaway signing key beside it
+    /// at `<tmp>/signing-key`, outside the work tree so `add -A` never takes
+    /// it. The key dies with the temp dir.
+    fn fixture_repo(tmp: &tempfile::TempDir) -> std::path::PathBuf {
+        let key = tmp.path().join("signing-key");
+        let status = std::process::Command::new("ssh-keygen")
+            .args(["-q", "-t", "ed25519", "-N", "", "-C", "kos-test", "-f"])
+            .arg(&key)
+            .status()
+            .expect("ssh-keygen runnable");
+        assert!(status.success(), "ssh-keygen failed");
+        let root = tmp.path().join("repo");
+        fs::create_dir_all(&root).unwrap();
+        git(&root, &["init", "-q"]);
+        root
+    }
+
+    /// Run git in a fixture repo made by `fixture_repo`, with an isolated
+    /// identity and every commit signed by the fixture's throwaway key, so
+    /// fixtures never make an unsigned commit and never read the developer's
+    /// gitconfig or key, and with the repository-local variables dropped, so
+    /// a GIT_DIR inherited from a hook cannot turn `git init` and
+    /// `git commit` here into commits on the repository being pushed. A
+    /// caller cannot pass its own config or directory, and after every call
+    /// each commit any ref reaches must carry a signature.
     fn git(dir: &Path, args: &[&str]) {
-        let status = crate::gitenv::git_in(dir)
+        for a in args {
+            assert!(
+                !refused_arg(a),
+                "the git helper refuses caller config, directory or signing: {a}"
+            );
+        }
+        let key = dir.parent().unwrap().join("signing-key");
+        assert!(key.is_file(), "no fixture signing key beside {dir:?}");
+        let fixture_git = || {
+            let mut cmd = crate::gitenv::git_in(dir);
+            cmd.env("GIT_CONFIG_GLOBAL", "/dev/null")
+                .env("GIT_CONFIG_NOSYSTEM", "1");
+            cmd
+        };
+        let status = fixture_git()
             .args([
                 "-c",
                 "user.name=kos-test",
                 "-c",
                 "user.email=kos-test@example.com",
                 "-c",
-                "commit.gpgsign=false",
-                "-c",
                 "init.defaultBranch=main",
+                "-c",
+                "gpg.format=ssh",
+                "-c",
+                "gpg.ssh.program=ssh-keygen",
+                "-c",
+                "commit.gpgsign=true",
+                "-c",
             ])
+            .arg(format!("user.signingkey={}", key.display()))
             .args(args)
             .status()
             .expect("git runnable");
         assert!(status.success(), "git {args:?} failed");
+        let commits = fixture_git()
+            .args(["rev-list", "--all"])
+            .output()
+            .expect("git runnable");
+        assert!(commits.status.success(), "git rev-list --all failed");
+        for sha in String::from_utf8_lossy(&commits.stdout).lines() {
+            let object = fixture_git()
+                .args(["cat-file", "commit", sha])
+                .output()
+                .expect("git runnable");
+            let object = String::from_utf8_lossy(&object.stdout);
+            assert!(
+                has_signature(&object),
+                "fixture commit is not signed:\n{object}"
+            );
+        }
+    }
+
+    /// Caller args the helper will not pass on: its own config, a directory
+    /// or a signing switch.
+    fn refused_arg(a: &str) -> bool {
+        a == "-c" || a == "-C" || a.starts_with("--config-env") || a.starts_with("--no-gpg")
+    }
+
+    /// Whether a commit object's text carries a signature header: a
+    /// `gpgsig` line before the blank line that ends the headers.
+    fn has_signature(object: &str) -> bool {
+        object
+            .lines()
+            .take_while(|l| !l.is_empty())
+            .any(|l| l.starts_with("gpgsig "))
     }
 
     fn write(path: &Path, content: &str) {
@@ -1270,8 +1341,7 @@ mod tests {
     #[test]
     fn resolve_since_finds_unscoped_harvest_commit() {
         let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path();
-        git(root, &["init", "-q"]);
+        let root = &fixture_repo(&tmp);
 
         write(&root.join("a.txt"), "one\n");
         git(root, &["add", "-A"]);
@@ -1302,9 +1372,8 @@ mod tests {
     #[test]
     fn build_reflection_lists_markdown_and_yaml_findings() {
         let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path();
+        let root = &fixture_repo(&tmp);
         let graph_root = root.join("_kos");
-        git(root, &["init", "-q"]);
 
         // Baseline commit so `since` has a parent to diff from.
         write(&root.join("README.md"), "seed\n");
@@ -1353,9 +1422,8 @@ mod tests {
         // yaml findings: a finding that links a probe whose brief predicted a
         // confidence must still show predicted + delta.
         let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path();
+        let root = &fixture_repo(&tmp);
         let graph_root = root.join("_kos");
-        git(root, &["init", "-q"]);
 
         // Brief with a predicted confidence lives on disk in probes/.
         write(
@@ -1399,5 +1467,165 @@ mod tests {
             "graph_id: fixture\nscope: repo\nschema_version: '0.3'\n",
         );
         Workspace::from_explicit(root).unwrap()
+    }
+
+    // ── fixture commits are signed, never with the developer's key ─
+
+    /// The guard's rules over a tests-module source: the one git helper
+    /// signs with the fixture's throwaway key and reads no host config, and
+    /// no other site makes git objects or writes a ref. Returns what breaks
+    /// them. The patterns are bracketed so that they cannot match the lines
+    /// that hold them.
+    fn guard_violations(tests: &str) -> Vec<String> {
+        let mut out = Vec::new();
+        let helper_start = tests.find("    fn git(").expect("the git helper exists");
+        let helper_len = tests[helper_start..].find("\n    }\n").unwrap();
+        let helper = &tests[helper_start..helper_start + helper_len];
+        for want in [
+            r"commit\.gpg[s]ign=[t]rue",
+            r"gpg\.format=[s]sh",
+            r"user\.signingkey=",
+            r"gpg\.ssh\.program=[s]sh-keygen",
+            r#""GIT_CONFIG_[G]LOBAL""#,
+            r#""GIT_CONFIG_[N]OSYSTEM""#,
+        ] {
+            if !regex::Regex::new(want).unwrap().is_match(helper) {
+                out.push(format!("the git helper lacks {want}"));
+            }
+        }
+        for banned in [
+            r"--no-gpg-[s]ign",
+            r"commit-[t]ree",
+            r"fast-[i]mport",
+            r"\bmk[t]ag\b",
+            r"update-[r]ef",
+        ] {
+            if regex::Regex::new(banned).unwrap().is_match(tests) {
+                out.push(format!("the test module holds {banned}"));
+            }
+        }
+        // Signing is set in the helper only: any other mention, in any case
+        // and with any value, is a way to turn it off.
+        let rest = format!(
+            "{}{}",
+            &tests[..helper_start],
+            &tests[helper_start + helper_len..]
+        );
+        if regex::Regex::new(r"(?i)gpg[s]ign").unwrap().is_match(&rest) {
+            out.push("a signing setting outside the helper".to_string());
+        }
+        // The one program spawned directly is ssh-keygen, for the key; git
+        // only runs through the helper, by name or through a variable.
+        let spawn = regex::Regex::new(r"Command::ne[w]\(").unwrap();
+        for m in spawn.find_iter(tests) {
+            if !tests[m.end()..].starts_with("\"ssh-keygen\")") {
+                out.push("a program spawned outside the helper".to_string());
+            }
+        }
+        let spawns = regex::Regex::new(r"gitenv::git_[i]n\(").unwrap();
+        let outside = spawns.find_iter(tests).filter(|m| {
+            let at = m.start();
+            at < helper_start || at > helper_start + helper_len
+        });
+        if outside.count() > 0 {
+            out.push("a git spawn outside the helper".to_string());
+        }
+        out
+    }
+
+    fn tests_source() -> &'static str {
+        let src = include_str!("reflect.rs");
+        &src[src.find("#[cfg(test)]\nmod tests").unwrap()..]
+    }
+
+    #[test]
+    fn fixture_commits_go_through_the_signing_helper() {
+        assert_eq!(guard_violations(tests_source()), Vec::<String>::new());
+    }
+
+    /// kos#158 review: a signing override in any case or value is caught.
+    /// The mutant is built at run time so this file never holds it.
+    #[test]
+    fn guard_catches_a_signing_override_in_any_case() {
+        let mutant = format!(
+            "{}\n        let x = \"commit.gpg{}=no\";\n",
+            tests_source(),
+            "Sign"
+        );
+        assert!(!guard_violations(&mutant).is_empty());
+    }
+
+    /// kos#158 review: git run through a variable is caught.
+    #[test]
+    fn guard_catches_git_through_a_variable() {
+        let mutant = format!(
+            "{}\n        let prog = \"git\";\n        std::process::Command::{}(prog);\n",
+            tests_source(),
+            "new"
+        );
+        assert!(!guard_violations(&mutant).is_empty());
+    }
+
+    /// kos#158 review: a caller cannot hand the helper its own config.
+    #[test]
+    #[should_panic(expected = "refuses caller")]
+    fn helper_refuses_caller_config() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = &fixture_repo(&tmp);
+        git(
+            root,
+            &[
+                "-C",
+                ".",
+                "-c",
+                concat!("commit.gpg", "Sign=no"),
+                "commit",
+                "-q",
+                "--allow-empty",
+                "-m",
+                "x",
+            ],
+        );
+    }
+
+    /// kos#158 review: a signing switch in the caller's args is refused
+    /// before git runs, so no unsigned commit is made to prove it.
+    #[test]
+    #[should_panic(expected = "refuses caller")]
+    fn helper_refuses_a_signing_switch() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = &fixture_repo(&tmp);
+        git(
+            root,
+            &[
+                "--no-pager",
+                "commit",
+                concat!("--no-gpg", "-sign"),
+                "-q",
+                "--allow-empty",
+                "-m",
+                "x",
+            ],
+        );
+    }
+
+    /// The check the helper runs on every commit any ref reaches, after
+    /// every call, read on crafted commit text rather than on a real
+    /// unsigned commit.
+    #[test]
+    fn signature_check_reads_the_commit_object() {
+        let unsigned = "tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904\n\
+                        author t <t@example.com> 0 +0000\n\
+                        committer t <t@example.com> 0 +0000\n\nx\n";
+        let signed = "tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904\n\
+                      author t <t@example.com> 0 +0000\n\
+                      committer t <t@example.com> 0 +0000\n\
+                      gpgsig -----BEGIN SSH SIGNATURE-----\n \n -----END-----\n\nx\n";
+        let in_message = "tree 4b825dc642cb6eb9a060e54bf8d69288fbee4904\n\
+                          committer t <t@example.com> 0 +0000\n\n\
+                          message\ngpgsig in the body is not a header\n";
+        assert!(!has_signature(unsigned));
+        assert!(has_signature(signed));
+        assert!(!has_signature(in_message));
     }
 }
