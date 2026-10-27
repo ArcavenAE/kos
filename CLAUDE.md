@@ -43,6 +43,9 @@ One node per file. Filename = node id.
 ### Confidence Changes
 Moving a file between confidence directories IS the promotion.
 Always accompany a move with a commit message explaining the evidence.
+`kos promote <node-id> <tier>` makes an upward move (placeholder, frontier, bedrock): it
+rewrites `confidence:`, validates the moved node first, and prints the commit line.
+Demotions and moves out of the graveyard are still done by hand.
 
 ### Probe and Finding Files
 Exploration briefs live in _kos/probes/[brief-slug].yaml
