@@ -109,7 +109,7 @@ edges:
     note: "Retrieval counts are the frequency input ACT-R decay needs; that question is downstream of this instrument earning its keep."
   - target: finding-kos-guxt-kos-status-woz-one-day-trial
     type: supports
-    note: "a read instrument that went unused after one day: the kos status Wizard-of-Oz recorded four or five runs in one session and nothing after 2026-07-05, so its kill criterion was never evaluated; a new trial needs the verb wired into session start and telemetry read from every host (harvest 2026-11-01)"
+    note: "sibling instrument that went unused (its subject is val-tool-drives-operator-decides): the kos status Wizard-of-Oz recorded four or five runs in one session and nothing after 2026-07-05, so its kill criterion was never evaluated; a new trial needs the verb wired into session start and telemetry read from every host (harvest 2026-11-01)"
 provenance:
   created_by: agent
   session: "2026-08-16 read-path-first-steps"

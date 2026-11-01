@@ -52,6 +52,9 @@ edges:
   - target: val-uncertainty-structural
     type: supports
     note: "Uncertainty declared as structure requires the pawl — automation cannot pawl."
+  - target: finding-kos-guxt-kos-status-woz-one-day-trial
+    type: supports
+    note: "the kos status verb was tested against the R1 inversion (a free status verb gets consulted and its next verb followed). The trial ran one day, not three cycles, and its kill criterion was never evaluated, so the inversion is untested here: neither confirmed nor falsified. No confidence change (harvest 2026-11-01)"
 provenance:
   created_by: agent
   session: "2026-07-05 research-drop-harvest (aae-orc-9o95)"
