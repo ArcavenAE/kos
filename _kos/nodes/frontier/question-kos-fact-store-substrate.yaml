@@ -81,6 +81,20 @@ content: |
   The measurements do not choose a store, so this question stays open. The
   test named as the one that would separate the stores is growth with
   history: many commits, not two, for both layouts.
+  (Probe C below ran that test.)
+
+  ── Probe C, measured (2026-10-22, finding-kos-qttt; harvest 2026-11-01) ───
+
+  The test named as the one that would separate the stores ran: 200
+  first-parent commits of marvel history, three arms. Both candidate stores
+  pass every criterion at that depth. They separate on two ratios in opposite
+  directions: Dolt's store is 3.4 times smaller than the SQLite valid-time
+  store (12.0 MB against 40.6 MB), and SQLite traverses 4.5 times faster as of
+  a past commit (80.5 ms against 364.9 ms), with each engine as deployed in
+  the probe: Dolt answers each point lookup over a local sql-server connection,
+  while SQLite reads a file. History costs neither measurably on
+  the latest commit. The probe reports and does not choose, so this question
+  stays open.
 edges:
   - target: question-code-graph-correspondence
     type: derives
@@ -100,6 +114,9 @@ edges:
   - target: finding-kos-8bmj-fact-store-probes-dolt-sqlite
     type: supports
     note: "Probes A and B measured: both pass every criterion at two commits; no store chosen; sub-question D untested"
+  - target: finding-kos-qttt-fact-store-probe-c-history-growth
+    type: supports
+    note: "Probe C measured: both stores pass G0 to G5 at 200 commits of marvel history; Dolt is 3.4 times smaller, SQLite traverses 4.5 times faster as of a past commit; the probe does not choose a store"
 provenance:
   created_by: human
   session: "session-2026-10-20-code-graph-probe1"
@@ -109,6 +126,7 @@ provenance:
     - docs/kos-roadmap-v3.md
     - _kos/probes/code-graph-measurements-2026-10-20/fact-count.md
     - _kos/findings/finding-kos-8bmj-fact-store-probes-dolt-sqlite.md
+    - _kos/findings/finding-kos-qttt-fact-store-probe-c-history-growth.md
 notes: >
   Drafted by the arcaven research-supervisor from the 2026-10-20 code graph
   probe. The fact counts are in

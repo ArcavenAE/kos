@@ -3,6 +3,9 @@
 Status: DRAFT, written before any measurement. Lock it before the probe runs:
 it is locked when its kos PR merges after review, and nothing below changes
 after that without a dated note.
+Note 2026-11-01 (harvest): COMPLETE. The probe ran and its result is
+`_kos/findings/finding-kos-qttt-fact-store-probe-c-history-growth.md`. Nothing
+above changed.
 Date: 2026-10-21. Revised 2026-10-22 for review 5608546539 on kos#143, before
 the lock and before any measurement.
 Question node: question-kos-fact-store-substrate, sub-questions A to C
