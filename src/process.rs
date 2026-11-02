@@ -32,6 +32,16 @@ pub(crate) fn resolve_graph_root(workspace: &Workspace, cwd: &Path) -> Result<st
         });
     }
 
+    // A manifest that exists but did not load is not an absent one. Falling
+    // through would hand the parent graph's root to a creating command, which
+    // then writes there or mints an id with the parent's prefix (kos#168).
+    if let Some(problem) = workspace.nearest_manifest_problem(cwd) {
+        return Err(KosError::Manifest {
+            path: problem.path.display().to_string(),
+            message: problem.message.clone(),
+        });
+    }
+
     // Try nearest_graph first — handles orchestrator and subrepo graphs
     if let Some(graph) = workspace.nearest_graph(cwd) {
         return Ok(graph.path.clone());
