@@ -19,6 +19,11 @@ fn write(path: &Path, content: &str) {
 /// An orchestrator graph, a repo with a malformed manifest (`broken`), and a
 /// repo with a healthy one (`ok`).
 fn fixture(root: &Path) {
+    // The markers `Workspace::discover` reads as an orchestrator root. Without
+    // them it stops at the first `_kos/kos.yaml` it meets and never sees the
+    // parent graph.
+    write(&root.join("charter.md"), "# charter\n");
+    fs::create_dir_all(root.join("kos")).unwrap();
     write(
         &root.join("_kos/kos.yaml"),
         "graph_id: parentorc\nscope: orchestrator\nschema_version: '0.3'\nincludes:\n- path: ok/_kos\n- path: broken/_kos\n",
@@ -50,6 +55,10 @@ fn refused(out: &Output) {
     assert!(
         stderr.contains("broken/_kos/kos.yaml"),
         "stderr should name the unreadable manifest: {stderr}"
+    );
+    assert!(
+        stderr.contains("hint:"),
+        "stderr should say how to fix it: {stderr}"
     );
 }
 
@@ -93,6 +102,67 @@ fn finding_refuses_and_writes_nothing_to_the_parent() {
     ));
 
     assert_eq!(entries(&tmp.path().join("_kos/findings")), 0);
+}
+
+#[test]
+fn question_refuses_and_writes_nothing_to_the_parent() {
+    let tmp = tempfile::tempdir().unwrap();
+    fixture(tmp.path());
+
+    refused(&kos(
+        &tmp.path().join("broken"),
+        &["question", "a-slug", "a title"],
+    ));
+
+    assert!(!tmp.path().join("_kos/nodes").exists());
+}
+
+#[test]
+fn probe_refuses_and_writes_nothing_to_the_parent() {
+    let tmp = tempfile::tempdir().unwrap();
+    fixture(tmp.path());
+
+    refused(&kos(
+        &tmp.path().join("broken"),
+        &["probe", "a-slug", "a title"],
+    ));
+
+    assert!(!tmp.path().join("_kos/probes").exists());
+}
+
+#[test]
+fn promote_and_compact_refuse_too() {
+    let tmp = tempfile::tempdir().unwrap();
+    fixture(tmp.path());
+    write(
+        &tmp.path().join("_kos/nodes/frontier/question-a.yaml"),
+        "id: question-a\ntype: question\nconfidence: frontier\ntitle: \"a\"\ncontent: \"a long enough body of text\"\n",
+    );
+    fs::create_dir_all(tmp.path().join("_kos/nodes/bedrock")).unwrap();
+    let summary = tmp.path().join("summary.txt");
+    write(&summary, "short\n");
+
+    refused(&kos(
+        &tmp.path().join("broken"),
+        &["promote", "question-a", "bedrock"],
+    ));
+    refused(&kos(
+        &tmp.path().join("broken"),
+        &[
+            "compact",
+            "--node",
+            "question-a",
+            "--summary",
+            summary.to_str().unwrap(),
+        ],
+    ));
+
+    assert!(
+        tmp.path()
+            .join("_kos/nodes/frontier/question-a.yaml")
+            .is_file()
+    );
+    assert!(!tmp.path().join("_kos/snapshots").exists());
 }
 
 #[test]
