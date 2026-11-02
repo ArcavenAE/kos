@@ -158,6 +158,9 @@ fn run_nearest_refuses_bare_kos_directory() {
         validate::ScopedValidation::Validated(s) => {
             panic!("bare _kos/ silently validated a parent graph: {s:?}");
         }
+        validate::ScopedValidation::BadManifest(p) => {
+            panic!("a bare _kos/ has no manifest to be bad: {p}");
+        }
     }
 }
 
@@ -183,6 +186,9 @@ fn run_nearest_refuses_bare_kos_from_subdirectory() {
         validate::ScopedValidation::Validated(s) => {
             panic!("bare _kos/ misattributed from a subdirectory: {s:?}");
         }
+        validate::ScopedValidation::BadManifest(p) => {
+            panic!("a bare _kos/ has no manifest to be bad: {p}");
+        }
     }
 }
 
@@ -199,6 +205,9 @@ fn run_nearest_validates_real_graph() {
         }
         validate::ScopedValidation::BareKosDir(p) => {
             panic!("a real graph was refused as bare: {}", p.display());
+        }
+        validate::ScopedValidation::BadManifest(p) => {
+            panic!("a real graph was refused as a bad manifest: {p}");
         }
     }
 }

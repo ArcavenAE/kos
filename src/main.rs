@@ -402,6 +402,12 @@ fn main() -> anyhow::Result<()> {
                         }
                     }
                 }
+                // A manifest that exists but does not parse yields no graph,
+                // so the loop above never saw it (kos#164).
+                for problem in &workspace.manifest_errors {
+                    eprintln!("error: manifest {problem}");
+                    io_errors += 1;
+                }
                 // Also validate legacy layout if no _kos/ graphs found
                 if workspace.graphs.is_empty() {
                     combined.merge(&match only {
@@ -454,6 +460,13 @@ fn main() -> anyhow::Result<()> {
                     // and validate a parent graph, reporting its clean result
                     // as this repo's. Refuse loudly instead of a false pass
                     // (aae-orc-5z4p).
+                    kos::validate::ScopedValidation::BadManifest(problem) => {
+                        eprintln!("error: manifest {problem}");
+                        eprintln!(
+                            "kos.yaml exists but does not parse, so there is no graph to validate."
+                        );
+                        std::process::exit(1);
+                    }
                     kos::validate::ScopedValidation::BareKosDir(path) => {
                         eprintln!(
                             "error: {} exists but has no {} manifest.",

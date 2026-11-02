@@ -1,12 +1,28 @@
 use std::path::{Path, PathBuf};
 
 use crate::error::{KosError, Result};
-use crate::model::{GraphManifest, GraphScope, GraphSource};
+use crate::model::{GraphScope, GraphSource};
 
 /// The kos directory name convention: private-not-hidden.
 pub const KOS_DIR: &str = "_kos";
 /// The manifest filename inside a _kos/ directory.
 pub const MANIFEST_FILE: &str = "kos.yaml";
+
+/// A `kos.yaml` that exists but could not be read or parsed. Discovery keeps
+/// it rather than dropping the graph without a word (kos#164).
+#[derive(Debug, Clone)]
+pub struct ManifestProblem {
+    /// Absolute path to the `kos.yaml` file.
+    pub path: PathBuf,
+    /// What went wrong, as the reader reported it.
+    pub message: String,
+}
+
+impl std::fmt::Display for ManifestProblem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}: {}", self.path.display(), self.message)
+    }
+}
 
 /// The aae-orc workspace layout, discovered from the filesystem.
 #[derive(Debug)]
@@ -17,6 +33,9 @@ pub struct Workspace {
     pub kos_root: PathBuf,
     /// Discovered graph sources (_kos/ directories with kos.yaml manifests).
     pub graphs: Vec<GraphSource>,
+    /// Manifests that exist but do not read or parse, so no graph was found
+    /// for them. Absent manifests are not listed.
+    pub manifest_errors: Vec<ManifestProblem>,
 }
 
 impl Workspace {
@@ -61,11 +80,12 @@ impl Workspace {
             let standalone_kos = current.join(KOS_DIR);
             if standalone_kos.join(MANIFEST_FILE).exists() {
                 let root = current.to_path_buf();
-                let graphs = discover_graphs(&root);
+                let (graphs, manifest_errors) = discover_graphs(&root);
                 return Ok(Workspace {
                     root: root.clone(),
                     kos_root: root,
                     graphs,
+                    manifest_errors,
                 });
             }
 
@@ -78,12 +98,13 @@ impl Workspace {
             }
         };
 
-        let graphs = discover_graphs(&root);
+        let (graphs, manifest_errors) = discover_graphs(&root);
 
         Ok(Workspace {
             root,
             kos_root,
             graphs,
+            manifest_errors,
         })
     }
 
@@ -102,31 +123,34 @@ impl Workspace {
                 .parent()
                 .map(Path::to_path_buf)
                 .unwrap_or_else(|| kos_root.clone());
-            let graphs = discover_graphs(&orc_root);
+            let (graphs, manifest_errors) = discover_graphs(&orc_root);
             return Ok(Workspace {
                 root: orc_root,
                 kos_root,
                 graphs,
+                manifest_errors,
             });
         }
 
         // Is this the aae-orc root with a kos/ subdir?
         if path.join("kos").is_dir() {
-            let graphs = discover_graphs(&path);
+            let (graphs, manifest_errors) = discover_graphs(&path);
             return Ok(Workspace {
                 root: path.clone(),
                 kos_root: path.join("kos"),
                 graphs,
+                manifest_errors,
             });
         }
 
         // Is this a standalone repo with _kos/kos.yaml?
         if path.join(KOS_DIR).join(MANIFEST_FILE).exists() {
-            let graphs = discover_graphs(&path);
+            let (graphs, manifest_errors) = discover_graphs(&path);
             return Ok(Workspace {
                 root: path.clone(),
                 kos_root: path,
                 graphs,
+                manifest_errors,
             });
         }
 
@@ -182,6 +206,33 @@ impl Workspace {
             .collect()
     }
 
+    /// The unreadable manifest that governs `from`, if one does: the
+    /// deepest `_kos/kos.yaml` above `from` that failed to parse, unless a
+    /// healthy graph sits nearer. Without this, such a directory looks like
+    /// one with no graph and validation falls back silently (kos#164).
+    pub fn nearest_manifest_problem(&self, from: &Path) -> Option<&ManifestProblem> {
+        let canonical = std::fs::canonicalize(from).ok()?;
+        let depth = |p: &Path| p.components().count();
+        let repo_of = |p: &ManifestProblem| {
+            p.path
+                .parent()
+                .and_then(Path::parent)
+                .map(Path::to_path_buf)
+        };
+        let (problem, repo) = self
+            .manifest_errors
+            .iter()
+            .filter_map(|p| repo_of(p).map(|r| (p, r)))
+            .filter(|(_, r)| canonical.starts_with(r))
+            .max_by_key(|(_, r)| depth(r))?;
+        let healthy_nearer = self.graphs.iter().any(|g| {
+            g.path
+                .parent()
+                .is_some_and(|gp| canonical.starts_with(gp) && depth(gp) > depth(&repo))
+        });
+        (!healthy_nearer).then_some(problem)
+    }
+
     /// Find the graph source for the nearest _kos/ directory relative to a path.
     /// Returns the local graph if cwd has _kos/, otherwise the orchestrator graph.
     pub fn nearest_graph(&self, from: &Path) -> Option<&GraphSource> {
@@ -227,20 +278,21 @@ impl Workspace {
 /// 4. Check other subrepo dirs for _kos/kos.yaml
 ///
 /// Falls back to legacy layout if no _kos/ directories found.
-fn discover_graphs(root: &Path) -> Vec<GraphSource> {
+fn discover_graphs(root: &Path) -> (Vec<GraphSource>, Vec<ManifestProblem>) {
     let mut sources = Vec::new();
+    let mut problems = Vec::new();
     let mut seen_paths = std::collections::HashSet::new();
 
     // 1. Check orchestrator root for _kos/
     let orc_kos = root.join(KOS_DIR);
-    if let Some(source) = load_graph_source(&orc_kos) {
+    if let Some(source) = load_graph_source(&orc_kos, &mut problems) {
         seen_paths.insert(orc_kos.clone());
 
         // 2. Follow includes from orchestrator manifest
         for include in &source.manifest.includes {
             let include_path = root.join(&include.path);
             if !seen_paths.contains(&include_path) {
-                if let Some(included) = load_graph_source(&include_path) {
+                if let Some(included) = load_graph_source(&include_path, &mut problems) {
                     seen_paths.insert(include_path);
                     sources.push(included);
                 }
@@ -257,7 +309,7 @@ fn discover_graphs(root: &Path) -> Vec<GraphSource> {
             if path.is_dir() {
                 let sub_kos = path.join(KOS_DIR);
                 if !seen_paths.contains(&sub_kos) {
-                    if let Some(source) = load_graph_source(&sub_kos) {
+                    if let Some(source) = load_graph_source(&sub_kos, &mut problems) {
                         seen_paths.insert(sub_kos);
                         sources.push(source);
                     }
@@ -266,14 +318,30 @@ fn discover_graphs(root: &Path) -> Vec<GraphSource> {
         }
     }
 
-    sources
+    (sources, problems)
 }
 
 /// Load a graph source from a _kos/ directory if it has a valid kos.yaml.
-fn load_graph_source(kos_dir: &Path) -> Option<GraphSource> {
+/// A missing manifest is `None` and nothing more: discovery looks in every
+/// subdirectory. A manifest that exists but does not read or parse is also
+/// `None`, but is recorded in `problems` so the caller can say so (kos#164).
+fn load_graph_source(kos_dir: &Path, problems: &mut Vec<ManifestProblem>) -> Option<GraphSource> {
     let manifest_path = kos_dir.join(MANIFEST_FILE);
-    let content = std::fs::read_to_string(&manifest_path).ok()?;
-    let manifest: GraphManifest = crate::yaml::from_str(&content).ok()?;
+    let manifest = match crate::findings::read_manifest(kos_dir) {
+        Ok(Some(manifest)) => manifest,
+        Ok(None) => return None,
+        Err(e) => {
+            let message = match e {
+                KosError::Manifest { message, .. } => message,
+                other => other.to_string(),
+            };
+            problems.push(ManifestProblem {
+                path: manifest_path,
+                message,
+            });
+            return None;
+        }
+    };
 
     Some(GraphSource {
         graph_id: manifest.graph_id.clone(),
