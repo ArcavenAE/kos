@@ -38,7 +38,10 @@ pub(crate) fn resolve_graph_root(workspace: &Workspace, cwd: &Path) -> Result<st
     if let Some(problem) = workspace.nearest_manifest_problem(cwd) {
         return Err(KosError::Manifest {
             path: problem.path.display().to_string(),
-            message: problem.message.clone(),
+            message: format!(
+                "{}\n  hint: fix the YAML in that file, or remove it if this repo carries no graph; until it parses, this command would write into a parent graph and attribute the result to this repo",
+                problem.message
+            ),
         });
     }
 
