@@ -95,7 +95,7 @@ pub fn bare_kos_dir(dir: &Path) -> Option<PathBuf> {
 /// `kos validate` is run from a *subdirectory* of a bare-`_kos` repo, where a
 /// cwd-only check would miss the bare directory and misattribute a parent
 /// graph (aae-orc-5z4p).
-fn nearest_bare_kos(cwd: &Path, stop_at: &Path) -> Option<PathBuf> {
+pub fn nearest_bare_kos(cwd: &Path, stop_at: &Path) -> Option<PathBuf> {
     let stop = std::fs::canonicalize(stop_at).ok();
     let mut cur = std::fs::canonicalize(cwd).ok()?;
     loop {
