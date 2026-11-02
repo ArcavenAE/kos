@@ -101,6 +101,8 @@ fn findings_pass_errors_on_a_malformed_manifest() {
     let tmp = tempfile::tempdir().unwrap();
     let kos_root = tmp.path().join("_kos");
     write(&kos_root.join("kos.yaml"), MALFORMED);
+    // `run` returns before any pass when there is no nodes/ directory.
+    fs::create_dir_all(kos_root.join("nodes")).unwrap();
     fs::create_dir_all(kos_root.join("findings")).unwrap();
 
     let full = validate::run(&kos_root);

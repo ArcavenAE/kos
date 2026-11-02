@@ -66,6 +66,10 @@ pub enum ScopedValidation {
     /// silently attribute a parent graph's result to this location. Refused;
     /// carries the offending `_kos/` path for the caller's message.
     BareKosDir(PathBuf),
+    /// The nearest `kos.yaml` exists but does not read or parse, so there is
+    /// no graph to validate. A pass here would hide a broken manifest
+    /// (kos#164). Carries the path and the reader's message.
+    BadManifest(crate::workspace::ManifestProblem),
 }
 
 /// A `_kos/` directory at `dir` that exists but carries no `kos.yaml` manifest.
@@ -140,6 +144,9 @@ fn run_nearest_with(
     if let Some(bare) = nearest_bare_kos(cwd, &workspace.root) {
         return Ok(ScopedValidation::BareKosDir(bare));
     }
+    if let Some(problem) = workspace.nearest_manifest_problem(cwd) {
+        return Ok(ScopedValidation::BadManifest(problem.clone()));
+    }
 
     let summary = if let Some(graph) = workspace.nearest_graph(cwd) {
         eprintln!("Validating graph: {} ({})", graph.graph_id, graph.scope);
@@ -156,7 +163,7 @@ fn run_nearest_with(
 /// and no warnings, and the returned `Summary` carries only the findings
 /// counts, so `clean()` is false exactly when two files claim one number.
 pub fn run_duplicate_ids(kos_root: &Path) -> Result<Summary> {
-    let findings = validate_findings(kos_root, true);
+    let findings = validate_findings(kos_root, true)?;
     Ok(Summary {
         findings_total: findings.total,
         findings_failed: findings.failed,
@@ -226,7 +233,7 @@ pub fn run(kos_root: &Path) -> Result<Summary> {
     // Findings pass; a second section over _kos/findings/. Findings are not
     // under nodes/, so the node passes above never saw them; the collision
     // between two files claiming the same finding number went unnoticed.
-    let findings = validate_findings(kos_root, false);
+    let findings = validate_findings(kos_root, false)?;
 
     Ok(Summary {
         total,
@@ -253,17 +260,19 @@ struct FindingsReport {
 /// error; pure yaml, md+frontmatter, and legacy bare md are all valid. A
 /// duplicate id is structural well-formedness (may gate per ADR-007), not a
 /// health metric.
-fn validate_findings(kos_root: &Path, duplicates_only: bool) -> FindingsReport {
+fn validate_findings(kos_root: &Path, duplicates_only: bool) -> Result<FindingsReport> {
+    // A manifest that exists but does not parse stops the pass here, whether
+    // or not there is a findings/ directory (kos#164).
+    let manifest = findings::read_manifest(kos_root)?;
     let mut report = FindingsReport::default();
     let findings_dir = kos_root.join("findings");
     if !findings_dir.exists() {
-        return report;
+        return Ok(report);
     }
     let findings_dir = findings_dir.as_path();
 
     // The prefixes this graph knows, its owner, and where its numbered
     // sequence was closed (opaque-finding-ids design, 2.3 and 2.4).
-    let manifest = findings::load_manifest(kos_root);
     let owner = manifest.as_ref().map(|m| m.graph_id.to_lowercase());
     let numbered_through = manifest
         .as_ref()
@@ -296,7 +305,7 @@ fn validate_findings(kos_root: &Path, duplicates_only: bool) -> FindingsReport {
             println!();
             println!("=== findings ===");
             println!("  could not read findings/: {e}");
-            return report;
+            return Ok(report);
         }
     };
 
@@ -431,7 +440,7 @@ fn validate_findings(kos_root: &Path, duplicates_only: bool) -> FindingsReport {
         );
     }
 
-    report
+    Ok(report)
 }
 
 /// A loaded node: either successfully parsed or failed to parse.

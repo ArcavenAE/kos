@@ -218,10 +218,30 @@ fn split_segment(s: &str) -> (&str, Option<&str>) {
     }
 }
 
-/// Read a graph's kos.yaml. `None` when it is absent or does not parse.
+/// Read a graph's kos.yaml, telling an absent manifest from a damaged one.
+/// `Ok(None)` when there is no `kos.yaml`; an error naming the path when the
+/// file exists but cannot be read or does not parse (kos#164).
+pub fn read_manifest(kos_root: &Path) -> crate::error::Result<Option<GraphManifest>> {
+    let path = kos_root.join("kos.yaml");
+    let problem = |message: String| crate::error::KosError::Manifest {
+        path: path.display().to_string(),
+        message,
+    };
+    let text = match std::fs::read_to_string(&path) {
+        Ok(text) => text,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(e) => return Err(problem(format!("cannot be read: {e}"))),
+    };
+    crate::yaml::from_str(&text)
+        .map(Some)
+        .map_err(|e| problem(format!("does not parse: {e}")))
+}
+
+/// Read a graph's kos.yaml. `None` when it is absent or does not parse. For
+/// the callers that treat a damaged manifest as no manifest; validation uses
+/// [`read_manifest`], which does not.
 pub fn load_manifest(kos_root: &Path) -> Option<GraphManifest> {
-    let text = std::fs::read_to_string(kos_root.join("kos.yaml")).ok()?;
-    crate::yaml::from_str(&text).ok()
+    read_manifest(kos_root).ok().flatten()
 }
 
 /// The graph_ids a graph declares, as written: its own first, then (at an
@@ -659,6 +679,40 @@ mod tests {
         let mut got = known_prefixes(&orc);
         got.sort();
         assert_eq!(got, vec!["aae-orc".to_string(), "betterdials".to_string()]);
+    }
+
+    #[test]
+    fn read_manifest_tells_absent_from_damaged() {
+        let dir = tempfile::tempdir().unwrap();
+        let kos = dir.path().join("_kos");
+        fs::create_dir_all(&kos).unwrap();
+
+        assert!(
+            read_manifest(&kos).unwrap().is_none(),
+            "absent is not an error"
+        );
+
+        fs::write(
+            kos.join("kos.yaml"),
+            "graph_id: x\nscope: repo\nincludes: [\n",
+        )
+        .unwrap();
+        let err = read_manifest(&kos).unwrap_err().to_string();
+        assert!(
+            err.contains("kos.yaml") && err.contains("does not parse"),
+            "{err}"
+        );
+        assert!(
+            load_manifest(&kos).is_none(),
+            "load_manifest keeps its lenient reading"
+        );
+
+        fs::write(
+            kos.join("kos.yaml"),
+            "graph_id: x\nscope: repo\nschema_version: '0.3'\n",
+        )
+        .unwrap();
+        assert_eq!(read_manifest(&kos).unwrap().unwrap().graph_id, "x");
     }
 
     #[test]
