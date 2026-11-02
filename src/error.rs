@@ -37,6 +37,11 @@ pub enum KosError {
 
     #[error("promote: {message}")]
     Promote { message: String },
+
+    #[error(
+        "{path} exists but has no kos.yaml manifest\n  A bare _kos/ is not a graph, so this command would write into a parent graph and attribute the result to this repo.\n  hint: run `kos init` here to create the graph, or remove the empty {path} directory if this repo carries no graph"
+    )]
+    BareKos { path: String },
 }
 
 pub type Result<T> = std::result::Result<T, KosError>;

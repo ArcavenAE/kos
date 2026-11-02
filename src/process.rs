@@ -15,24 +15,36 @@ use crate::workspace::{KOS_DIR, MANIFEST_FILE, Workspace};
 /// relative to cwd — not the workspace's kos_root (which is for the
 /// kos subrepo's legacy layout).
 ///
+/// A bare `_kos/` (no manifest) at or above cwd is refused, as `kos validate`
+/// refuses it, so nothing is created under a parent graph (kos#163).
+///
 /// Resolution order:
 /// 1. nearest_graph() from cwd (handles orchestrator vs subrepo)
 /// 2. cwd/_kos/ if it has a manifest (standalone)
 /// 3. Fall back to workspace.node_root() (kos repo legacy layout)
-fn resolve_graph_root(workspace: &Workspace, cwd: &Path) -> std::path::PathBuf {
+fn resolve_graph_root(workspace: &Workspace, cwd: &Path) -> Result<std::path::PathBuf> {
+    // A `_kos/` with no manifest is not a graph. Walking past it would put the
+    // new file, or the minted id's prefix, under a parent graph (kos#163);
+    // `kos validate` refuses the same directory.
+    if let Some(bare) = crate::validate::nearest_bare_kos(cwd, &workspace.root) {
+        return Err(KosError::BareKos {
+            path: bare.display().to_string(),
+        });
+    }
+
     // Try nearest_graph first — handles orchestrator and subrepo graphs
     if let Some(graph) = workspace.nearest_graph(cwd) {
-        return graph.path.clone();
+        return Ok(graph.path.clone());
     }
 
     // Check for _kos/ in cwd directly (standalone not yet in graphs list)
     let local_kos = cwd.join(KOS_DIR);
     if local_kos.join(MANIFEST_FILE).exists() {
-        return local_kos;
+        return Ok(local_kos);
     }
 
     // Fall back to workspace node_root (kos repo legacy layout)
-    workspace.node_root()
+    Ok(workspace.node_root())
 }
 
 /// Create an idea file in _kos/ideas/{slug}.md.
@@ -40,7 +52,7 @@ fn resolve_graph_root(workspace: &Workspace, cwd: &Path) -> std::path::PathBuf {
 /// Ideas are pre-hypothesis brainstorming — generative, possibly
 /// contradictory, no commitment. Lowest ceremony level.
 pub fn idea(workspace: &Workspace, cwd: &Path, slug: &str, title: Option<&str>) -> Result<()> {
-    let graph_root = resolve_graph_root(workspace, cwd);
+    let graph_root = resolve_graph_root(workspace, cwd)?;
     let ideas_dir = graph_root.join("ideas");
     ensure_dir(&ideas_dir)?;
 
@@ -83,7 +95,7 @@ pub fn idea(workspace: &Workspace, cwd: &Path, slug: &str, title: Option<&str>) 
 /// Questions are the unit of work in kos — an open unknown that
 /// drives a probe. Schema-valid from creation.
 pub fn question(workspace: &Workspace, cwd: &Path, slug: &str, title: &str) -> Result<()> {
-    let graph_root = resolve_graph_root(workspace, cwd);
+    let graph_root = resolve_graph_root(workspace, cwd)?;
     let frontier_dir = graph_root.join("nodes").join("frontier");
     ensure_dir(&frontier_dir)?;
 
@@ -142,7 +154,7 @@ pub fn finding(
     title: &str,
     yaml: bool,
 ) -> Result<()> {
-    let graph_root = resolve_graph_root(workspace, cwd);
+    let graph_root = resolve_graph_root(workspace, cwd)?;
     let findings_dir = graph_root.join("findings");
     ensure_dir(&findings_dir)?;
 
@@ -219,7 +231,7 @@ edges: []
 /// Print a minted finding id and the filename it goes with, without writing a
 /// file, for an author who writes the finding by hand.
 pub fn id_finding(workspace: &Workspace, cwd: &Path, slug: &str, yaml: bool) -> Result<()> {
-    let graph_root = resolve_graph_root(workspace, cwd);
+    let graph_root = resolve_graph_root(workspace, cwd)?;
     let id = crate::id::mint_finding_id(&graph_root)?;
     println!("{id}");
     println!("{id}-{slug}.{}", if yaml { "yaml" } else { "md" });
@@ -237,7 +249,7 @@ fn yaml_quoted(text: &str) -> String {
 /// explicit success signals. Includes predicted_confidence for
 /// the predictor calibration instrument.
 pub fn probe(workspace: &Workspace, cwd: &Path, slug: &str, title: &str) -> Result<()> {
-    let graph_root = resolve_graph_root(workspace, cwd);
+    let graph_root = resolve_graph_root(workspace, cwd)?;
     let probes_dir = graph_root.join("probes");
     ensure_dir(&probes_dir)?;
 
