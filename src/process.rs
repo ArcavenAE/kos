@@ -22,7 +22,7 @@ use crate::workspace::{KOS_DIR, MANIFEST_FILE, Workspace};
 /// 1. nearest_graph() from cwd (handles orchestrator vs subrepo)
 /// 2. cwd/_kos/ if it has a manifest (standalone)
 /// 3. Fall back to workspace.node_root() (kos repo legacy layout)
-fn resolve_graph_root(workspace: &Workspace, cwd: &Path) -> Result<std::path::PathBuf> {
+pub(crate) fn resolve_graph_root(workspace: &Workspace, cwd: &Path) -> Result<std::path::PathBuf> {
     // A `_kos/` with no manifest is not a graph. Walking past it would put the
     // new file, or the minted id's prefix, under a parent graph (kos#163);
     // `kos validate` refuses the same directory.

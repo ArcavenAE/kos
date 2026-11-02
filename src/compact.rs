@@ -32,7 +32,7 @@ pub struct NodeSizeEntry {
 
 /// List all nodes by content size (largest first) for awareness.
 pub fn list_by_size(workspace: &Workspace, cwd: &Path) -> Result<Vec<NodeSizeEntry>> {
-    let graph_root = resolve_graph_root(workspace, cwd);
+    let graph_root = crate::process::resolve_graph_root(workspace, cwd)?;
     let nodes_dir = graph_root.join("nodes");
 
     if !nodes_dir.exists() {
@@ -88,7 +88,7 @@ pub fn apply_compaction(
     node_id: &str,
     summary: &str,
 ) -> Result<()> {
-    let graph_root = resolve_graph_root(workspace, cwd);
+    let graph_root = crate::process::resolve_graph_root(workspace, cwd)?;
 
     // Find the node file
     let node_path = find_node_file(&graph_root, node_id)?;
@@ -188,17 +188,6 @@ pub fn print_size_listing(entries: &[NodeSizeEntry]) {
 }
 
 // ── Helpers ───────────────────────────────────────────────────
-
-fn resolve_graph_root(workspace: &Workspace, cwd: &Path) -> PathBuf {
-    if let Some(graph) = workspace.nearest_graph(cwd) {
-        return graph.path.clone();
-    }
-    let local_kos = cwd.join(crate::workspace::KOS_DIR);
-    if local_kos.join(crate::workspace::MANIFEST_FILE).exists() {
-        return local_kos;
-    }
-    workspace.node_root()
-}
 
 fn find_node_file(graph_root: &Path, node_id: &str) -> Result<PathBuf> {
     let nodes_dir = graph_root.join("nodes");

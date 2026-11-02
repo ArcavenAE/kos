@@ -16,7 +16,7 @@ use std::path::{Path, PathBuf};
 use crate::error::{KosError, Result};
 use crate::model::Node;
 use crate::validate::validate_node;
-use crate::workspace::{KOS_DIR, MANIFEST_FILE, Workspace};
+use crate::workspace::Workspace;
 
 /// Every tier directory a node can sit in.
 const TIERS: [&str; 4] = ["placeholder", "frontier", "bedrock", "graveyard"];
@@ -38,19 +38,6 @@ fn rank(tier: &str) -> Option<u8> {
         "bedrock" => Some(2),
         _ => None,
     }
-}
-
-/// The graph root `kos promote` works in: the same resolution the other
-/// process commands use, so `--dir` means the same thing everywhere.
-fn graph_root(workspace: &Workspace, cwd: &Path) -> PathBuf {
-    if let Some(graph) = workspace.nearest_graph(cwd) {
-        return graph.path.clone();
-    }
-    let local = cwd.join(KOS_DIR);
-    if local.join(MANIFEST_FILE).exists() {
-        return local;
-    }
-    workspace.node_root()
 }
 
 /// Replace the value of the first top-level `confidence:` line, keeping the
@@ -103,7 +90,7 @@ pub fn promote(workspace: &Workspace, cwd: &Path, id: &str, to: &str) -> Result<
             "unknown tier '{to}' (expected one of: placeholder, frontier, bedrock)"
         ));
     }
-    let nodes_dir = graph_root(workspace, cwd).join("nodes");
+    let nodes_dir = crate::process::resolve_graph_root(workspace, cwd)?.join("nodes");
 
     let found: Vec<(&str, PathBuf)> = TIERS
         .iter()
