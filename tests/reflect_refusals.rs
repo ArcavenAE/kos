@@ -79,12 +79,67 @@ fn reflect_refuses_a_manifest_that_does_not_parse() {
     );
 }
 
+/// Run git in `dir` with an isolated identity, every commit signed by a
+/// throwaway ssh key beside `dir`, and the repository-local variables dropped
+/// so a GIT_DIR inherited from a hook cannot redirect the commit.
+fn git(dir: &Path, key: &Path, args: &[&str]) {
+    let status = Command::new("git")
+        .current_dir(dir)
+        .env_remove("GIT_DIR")
+        .env_remove("GIT_WORK_TREE")
+        .env_remove("GIT_INDEX_FILE")
+        .env("GIT_CONFIG_GLOBAL", "/dev/null")
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .args([
+            "-c",
+            "user.name=kos-test",
+            "-c",
+            "user.email=kos-test@example.com",
+            "-c",
+            "init.defaultBranch=main",
+            "-c",
+            "gpg.format=ssh",
+            "-c",
+            "gpg.ssh.program=ssh-keygen",
+            "-c",
+            "commit.gpgsign=true",
+            "-c",
+        ])
+        .arg(format!("user.signingkey={}", key.display()))
+        .args(args)
+        .status()
+        .expect("git runnable");
+    assert!(status.success(), "git {args:?} failed");
+}
+
 #[test]
-fn reflect_does_not_refuse_a_repo_with_a_healthy_manifest() {
+fn reflect_in_a_healthy_repo_reports_that_repos_own_graph() {
     let tmp = tempfile::tempdir().unwrap();
     fixture(tmp.path());
+    let ok = tmp.path().join("ok");
 
-    let out = kos(&tmp.path().join("ok"), &["reflect"]);
+    // A node only the parent graph has, and a node only `ok/` has, committed
+    // so the report has something to show for `ok/` and nothing for the parent.
+    write(
+        &tmp.path().join("_kos/nodes/frontier/question-parent.yaml"),
+        "id: question-parent\ntype: question\nconfidence: frontier\ntitle: \"parent node\"\ncontent: \"p\"\n",
+    );
+    write(
+        &ok.join("_kos/nodes/frontier/question-ok.yaml"),
+        "id: question-ok\ntype: question\nconfidence: frontier\ntitle: \"ok node\"\ncontent: \"o\"\n",
+    );
+    let key = tmp.path().join("signing-key");
+    let keygen = Command::new("ssh-keygen")
+        .args(["-q", "-t", "ed25519", "-N", "", "-C", "kos-test", "-f"])
+        .arg(&key)
+        .status()
+        .expect("ssh-keygen runnable");
+    assert!(keygen.success(), "ssh-keygen failed");
+    git(&ok, &key, &["init", "-q"]);
+    git(&ok, &key, &["add", "-A"]);
+    git(&ok, &key, &["commit", "-q", "-m", "chore: seed ok"]);
+
+    let out = kos(&ok, &["reflect"]);
 
     let err = stderr(&out);
     assert!(out.status.success(), "stderr: {err}");
@@ -92,6 +147,14 @@ fn reflect_does_not_refuse_a_repo_with_a_healthy_manifest() {
     assert!(
         stdout.contains("=== kos reflect ===") && stdout.contains("Range:"),
         "stdout: {stdout}"
+    );
+    assert!(
+        stdout.contains("question-ok"),
+        "the report should list ok/'s own node under Confidence changes: {stdout}"
+    );
+    assert!(
+        !stdout.contains("question-parent"),
+        "the report must not carry the parent graph's node: {stdout}"
     );
     assert!(!err.contains("has no kos.yaml manifest"), "stderr: {err}");
     assert!(!err.contains("manifest error"), "stderr: {err}");
