@@ -131,7 +131,7 @@ struct CalibrationEntry {
 // ── Entry point ──────────────────────────────────────────────
 
 pub fn run(workspace: &Workspace, cwd: &Path, since: Option<&str>, json: bool) -> Result<()> {
-    let graph_root = resolve_graph_root(workspace, cwd);
+    let graph_root = crate::process::resolve_graph_root(workspace, cwd)?;
     let repo_root = infer_repo_root(&graph_root, &workspace.root);
 
     let since_ref = resolve_since(&repo_root, since)?;
@@ -155,13 +155,6 @@ pub fn run(workspace: &Workspace, cwd: &Path, since: Option<&str>, json: bool) -
 }
 
 // ── Scope resolution ─────────────────────────────────────────
-
-fn resolve_graph_root(workspace: &Workspace, cwd: &Path) -> PathBuf {
-    if let Some(graph) = workspace.nearest_graph(cwd) {
-        return graph.path.clone();
-    }
-    workspace.node_root()
-}
 
 /// Infer the git repo root that contains this graph.
 /// For orc graphs, graph_root = <orc>/_kos, repo = <orc>.
