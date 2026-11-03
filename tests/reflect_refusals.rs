@@ -87,6 +87,12 @@ fn reflect_does_not_refuse_a_repo_with_a_healthy_manifest() {
     let out = kos(&tmp.path().join("ok"), &["reflect"]);
 
     let err = stderr(&out);
+    assert!(out.status.success(), "stderr: {err}");
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    assert!(
+        stdout.contains("=== kos reflect ===") && stdout.contains("Range:"),
+        "stdout: {stdout}"
+    );
     assert!(!err.contains("has no kos.yaml manifest"), "stderr: {err}");
     assert!(!err.contains("manifest error"), "stderr: {err}");
 }
