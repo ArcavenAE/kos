@@ -57,7 +57,9 @@ fn refused(out: &Output) {
         "stderr should name the unreadable manifest: {stderr}"
     );
     assert!(
-        stderr.contains("hint:") && stderr.contains("remove the _kos/ directory"),
+        stderr.contains("hint:")
+            && stderr.contains("remove the _kos/ directory")
+            && stderr.contains("while it is unreadable"),
         "stderr should say how to fix it: {stderr}"
     );
 }
