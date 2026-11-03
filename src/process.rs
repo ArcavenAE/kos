@@ -39,7 +39,7 @@ pub(crate) fn resolve_graph_root(workspace: &Workspace, cwd: &Path) -> Result<st
         return Err(KosError::Manifest {
             path: problem.path.display().to_string(),
             message: format!(
-                "{}\n  hint: fix the YAML in that file, or remove the _kos/ directory if this repo carries no graph; until it parses, this command would write into a parent graph and attribute the result to this repo",
+                "{}\n  hint: fix the YAML in that file, or remove the _kos/ directory if this repo carries no graph; while it is unreadable, this command would write into a parent graph and attribute the result to this repo",
                 problem.message
             ),
         });
