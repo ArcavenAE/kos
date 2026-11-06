@@ -734,7 +734,11 @@ pub(crate) fn validate_node(
         }
     }
 
-    // 3. Edge targets reference known node IDs (warn, don't fail)
+    // 3. Edge targets resolve. A plain target found nowhere only warns (it may be a
+    // finding or probe); a `graph::` target naming this graph or a workspace graph
+    // that resolves nowhere is an error; one naming a graph outside the workspace
+    // warns "not checked". A workspace graph whose nodes fail to load counts as
+    // empty, so its targets error rather than skip.
     for edge in node.all_edges() {
         if !known_ids.contains(&edge.target) {
             match citations.check(&edge.target, known_ids) {
@@ -883,6 +887,34 @@ mod tests {
         );
         let summary = run(&root).unwrap();
         assert_eq!(summary.warnings, 0, "every citation resolves to a finding");
+    }
+
+    #[test]
+    fn the_ambiguous_warning_names_the_count_and_every_candidate() {
+        let citations = Citations {
+            owner: None,
+            findings: findings::FindingIndex::from_stems(
+                ["finding-300-a", "finding-300-b"],
+                Vec::new(),
+                None,
+            ),
+            siblings: Siblings::default(),
+        };
+        let node: Node = crate::yaml::from_str(
+            "id: elem-c\ntype: element\nconfidence: bedrock\ntitle: c\ncontent: b\nedges:\n  - target: finding-300\n    type: derives\n",
+        )
+        .unwrap();
+        let result = validate_node(&node, "bedrock/elem-c.yaml", &HashSet::new(), &citations);
+        assert_eq!(result.warnings.len(), 1);
+        let w = &result.warnings[0];
+        assert!(
+            w.contains("is ambiguous") && w.contains("names 2 findings"),
+            "{w}"
+        );
+        assert!(
+            w.contains("finding-300-a") && w.contains("finding-300-b"),
+            "{w}"
+        );
     }
 
     #[test]
