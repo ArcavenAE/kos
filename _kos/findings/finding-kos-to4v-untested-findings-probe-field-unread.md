@@ -1,5 +1,4 @@
 ---
-id: finding-kos-to4v
 type: finding
 confidence: frontier
 title: "The graph has a probe field and never reads it, so a tested finding and a desk catalog look the same"

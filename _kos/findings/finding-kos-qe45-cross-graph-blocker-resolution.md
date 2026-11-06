@@ -1,5 +1,4 @@
 ---
-id: finding-kos-qe45
 type: finding
 confidence: frontier
 title: "Cross-graph blocking edges never resolve, and the docs promise a resolution order nothing implements"

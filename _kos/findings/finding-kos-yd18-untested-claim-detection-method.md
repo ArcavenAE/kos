@@ -1,5 +1,4 @@
 ---
-id: finding-kos-yd18
 type: finding
 confidence: frontier
 title: "Detecting mislabeled findings and claims with no named alternative: mechanical checks find the class, judgement finds the degenerate claim"
