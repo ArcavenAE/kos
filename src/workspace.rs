@@ -357,13 +357,23 @@ fn load_graph_source(kos_dir: &Path, problems: &mut Vec<ManifestProblem>) -> Opt
     })
 }
 
+/// True when the nearest `.git` at or above `path` is a directory, which is a
+/// primary checkout; in a linked worktree it is a file.
+fn is_primary_checkout(path: &Path) -> bool {
+    path.ancestors()
+        .map(|dir| dir.join(".git"))
+        .find(|git| git.exists())
+        .is_some_and(|git| git.is_dir())
+}
+
 /// Which graph answers for each graph id, and which ids more than one graph
 /// claims. Discovery lists graphs in directory order, which is not stable, so
 /// the answer comes from this rule and never from the listing (aae-orc-gtv04):
 ///
 /// 1. the root the orchestrator manifest's `includes` names;
-/// 2. the root at `<root>/<dir>/_kos` whose `.git` is a directory, which is the
-///    primary checkout and not a linked worktree;
+/// 2. a root in a primary checkout: the nearest `.git` found walking up from
+///    the root is a directory, where a linked worktree has a `.git` file. This
+///    covers the orchestrator's own `<root>/_kos` as well as `<root>/<dir>/_kos`;
 /// 3. the smallest canonical path.
 ///
 /// A shared id is reported once, as a `ManifestProblem` on the chosen root. It
@@ -383,14 +393,11 @@ pub(crate) fn resolve_graph_ids<'a>(
                 .map(|i| canon(&root.join(&i.path)))
         })
         .collect();
-    let canon_root = canon(root);
     let rank = |g: &GraphSource| {
         let path = canon(&g.path);
         let tier = if included.contains(&path) {
             0
-        } else if path.parent().is_some_and(|dir| {
-            dir.parent() == Some(canon_root.as_path()) && dir.join(".git").is_dir()
-        }) {
+        } else if is_primary_checkout(&path) {
             1
         } else {
             2
@@ -512,6 +519,23 @@ mod tests {
             source(r, "alpha", "x", Some(true)),
         ];
         assert_eq!(both_orders(r, graphs, "x"), "alpha");
+    }
+
+    #[test]
+    fn the_orchestrators_own_checkout_beats_a_same_id_worktree_in_either_order() {
+        let tmp = tempfile::tempdir().unwrap();
+        let r = tmp.path();
+        fs::create_dir_all(r.join(".git")).unwrap();
+        // "0-wt" sorts ahead of "_kos", so only the .git rule can pick the orc root.
+        let mut wt = source(r, "0-wt", "orc", Some(false));
+        wt.scope = GraphScope::Repo;
+        let graphs = vec![wt, orchestrator(r, &[])];
+        let (picked, _) = resolve_graph_ids(r, &graphs);
+        assert_eq!(picked[0].path, r.join(KOS_DIR));
+        let mut reversed = graphs;
+        reversed.reverse();
+        let (picked, _) = resolve_graph_ids(r, &reversed);
+        assert_eq!(picked[0].path, r.join(KOS_DIR));
     }
 
     #[test]

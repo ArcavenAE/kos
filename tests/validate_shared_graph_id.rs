@@ -94,3 +94,30 @@ fn with_no_shared_id_there_is_no_note() {
         "no note without a shared id; stderr: {err}"
     );
 }
+
+#[test]
+fn the_orchestrators_own_checkout_beats_a_same_id_worktree() {
+    let tmp = tempfile::tempdir().unwrap();
+    let r = tmp.path();
+    write(&r.join("charter.md"), "charter\n");
+    fs::create_dir_all(r.join("kos")).unwrap();
+    fs::create_dir_all(r.join(".git")).unwrap();
+    write(&r.join("_kos/kos.yaml"), ORC);
+    // "0-wt" sorts ahead of "_kos", so only the .git rule can pick the orc root.
+    write(&r.join("0-wt/_kos/kos.yaml"), ORC);
+    write(&r.join("0-wt/.git"), "gitdir: elsewhere\n");
+
+    let out = validate_merged(r);
+    let err = stderr(&out);
+    assert!(out.status.success(), "stderr: {err}");
+    let notes: Vec<&str> = err
+        .lines()
+        .filter(|l| l.starts_with("note: manifest "))
+        .collect();
+    assert_eq!(notes.len(), 1, "stderr: {err}");
+    assert!(
+        notes[0].contains("/_kos/kos.yaml") && !notes[0].contains("0-wt/_kos/kos.yaml: graph_id"),
+        "the orc root is the one used: {}",
+        notes[0]
+    );
+}
