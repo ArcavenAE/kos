@@ -392,7 +392,7 @@ fn main() -> anyhow::Result<()> {
                         Some(ValidateOnly::DuplicateIds) => {
                             kos::validate::run_duplicate_ids(&graph.path)
                         }
-                        None => kos::validate::run(&graph.path),
+                        None => kos::validate::run_in(&graph.path, &workspace),
                     };
                     match ran {
                         Ok(summary) => combined.merge(&summary),
