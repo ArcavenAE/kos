@@ -157,7 +157,10 @@ pub fn promote(workspace: &Workspace, cwd: &Path, id: &str, to: &str) -> Result<
         &node,
         &format!("{to}/{id}.yaml"),
         &known_ids(&nodes_dir),
-        &crate::findings::FindingIndex::load(nodes_dir.parent().unwrap_or(&nodes_dir)),
+        &crate::validate::Citations::load(
+            nodes_dir.parent().unwrap_or(&nodes_dir),
+            crate::validate::Siblings::default(),
+        ),
     );
     for w in &result.warnings {
         eprintln!("warning: {id}: {w}");

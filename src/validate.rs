@@ -1,5 +1,7 @@
+use std::cell::RefCell;
 use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::path::{Path, PathBuf};
+use std::rc::Rc;
 
 use crate::error::{KosError, Result};
 use crate::findings::{self, FindingClass, FindingLoad};
@@ -122,24 +124,148 @@ pub fn nearest_bare_kos(cwd: &Path, stop_at: &Path) -> Option<PathBuf> {
     None
 }
 
+/// The graphs a `graph::target` citation can be looked up in, by lowercased
+/// graph_id. Each graph is read once, on first use.
+#[derive(Debug, Default)]
+pub struct Siblings {
+    roots: BTreeMap<String, PathBuf>,
+    loaded: RefCell<BTreeMap<String, Rc<SiblingGraph>>>,
+}
+
+#[derive(Debug)]
+struct SiblingGraph {
+    node_ids: HashSet<String>,
+    findings: findings::FindingIndex,
+}
+
+impl Siblings {
+    /// Every graph the workspace discovered.
+    pub fn from_workspace(workspace: &Workspace) -> Self {
+        Self::from_roots(
+            workspace
+                .graphs
+                .iter()
+                .map(|g| (g.graph_id.clone(), g.path.clone())),
+        )
+    }
+
+    /// Graphs by id and root (the directory holding `nodes/` and `findings/`).
+    pub fn from_roots<I: IntoIterator<Item = (String, PathBuf)>>(roots: I) -> Self {
+        Self {
+            roots: roots
+                .into_iter()
+                .map(|(id, path)| (id.to_lowercase(), path))
+                .collect(),
+            loaded: RefCell::default(),
+        }
+    }
+
+    fn graph(&self, id: &str) -> Option<Rc<SiblingGraph>> {
+        let root = self.roots.get(id)?;
+        if let Some(done) = self.loaded.borrow().get(id) {
+            return Some(Rc::clone(done));
+        }
+        let node_ids = load_all_nodes(&root.join("nodes"))
+            .map(|(_, ids)| ids)
+            .unwrap_or_default();
+        let graph = Rc::new(SiblingGraph {
+            node_ids,
+            findings: findings::FindingIndex::load(root),
+        });
+        self.loaded
+            .borrow_mut()
+            .insert(id.to_string(), Rc::clone(&graph));
+        Some(graph)
+    }
+}
+
+/// What one graph's edge-target check reads: its own findings, its own id and
+/// the graphs a `graph::` citation may name.
+#[derive(Debug, Default)]
+pub struct Citations {
+    owner: Option<String>,
+    findings: findings::FindingIndex,
+    siblings: Siblings,
+}
+
+/// The verdict on one edge target.
+#[derive(Debug, PartialEq, Eq)]
+enum Cited {
+    Resolved,
+    /// Two or more findings answer to the target.
+    Ambiguous(Vec<String>),
+    /// A plain target found nowhere in this graph (it may be a probe).
+    NotFound,
+    /// A `graph::` target that should resolve and does not: an error.
+    Fails(String),
+    /// A `graph::` target naming a graph this run cannot read.
+    Unchecked(String),
+}
+
+impl Citations {
+    /// The graph at `kos_root`, with `siblings` as the other graphs.
+    pub fn load(kos_root: &Path, siblings: Siblings) -> Self {
+        Self {
+            owner: findings::load_manifest(kos_root).map(|m| m.graph_id.to_lowercase()),
+            findings: findings::FindingIndex::load(kos_root),
+            siblings,
+        }
+    }
+
+    fn check(&self, target: &str, known_ids: &HashSet<String>) -> Cited {
+        if known_ids.contains(target) {
+            return Cited::Resolved;
+        }
+        let from_findings =
+            |index: &findings::FindingIndex, rest: &str, whose: &str| match index.resolve(rest) {
+                findings::Citation::Resolved(_) => Cited::Resolved,
+                findings::Citation::Ambiguous(c) => Cited::Ambiguous(c),
+                _ => Cited::Fails(format!("'{rest}' is not a node or finding in {whose}")),
+            };
+        match target.split_once("::") {
+            Some((graph, rest)) if !graph.is_empty() && !rest.is_empty() => {
+                let graph = graph.to_lowercase();
+                if self.owner.as_deref() == Some(graph.as_str()) {
+                    if known_ids.contains(rest) {
+                        return Cited::Resolved;
+                    }
+                    return from_findings(&self.findings, rest, "this graph");
+                }
+                match self.siblings.graph(&graph) {
+                    Some(sibling) if sibling.node_ids.contains(rest) => Cited::Resolved,
+                    Some(sibling) => {
+                        from_findings(&sibling.findings, rest, &format!("graph '{graph}'"))
+                    }
+                    None => Cited::Unchecked(format!("graph '{graph}' is not in this workspace")),
+                }
+            }
+            _ => match self.findings.resolve(target) {
+                findings::Citation::Resolved(_) => Cited::Resolved,
+                findings::Citation::Ambiguous(c) => Cited::Ambiguous(c),
+                _ => Cited::NotFound,
+            },
+        }
+    }
+}
+
 /// Resolve the graph nearest `cwd` and validate it — but first refuse the
 /// aae-orc-5z4p misattribution. If a bare `_kos/` (a `_kos/` with no `kos.yaml`)
 /// sits at or above `cwd` up to the workspace root, return
 /// [`ScopedValidation::BareKosDir`] instead of validating a walked-up parent
 /// graph and reporting it as this repo's.
 pub fn run_nearest(workspace: &Workspace, cwd: &Path) -> Result<ScopedValidation> {
-    run_nearest_with(workspace, cwd, run)
+    run_nearest_with(workspace, cwd, run_with)
 }
 
 /// [`run_nearest`] for the duplicate-id section alone (`--only duplicate-ids`).
 pub fn run_nearest_duplicate_ids(workspace: &Workspace, cwd: &Path) -> Result<ScopedValidation> {
-    run_nearest_with(workspace, cwd, run_duplicate_ids)
+    run_nearest_with(workspace, cwd, |path, _| run_duplicate_ids(path))
 }
 
 fn run_nearest_with(
     workspace: &Workspace,
     cwd: &Path,
-    pass: fn(&Path) -> Result<Summary>,
+    pass: fn(&Path, Siblings) -> Result<Summary>,
 ) -> Result<ScopedValidation> {
     if let Some(bare) = nearest_bare_kos(cwd, &workspace.root) {
         return Ok(ScopedValidation::BareKosDir(bare));
@@ -150,9 +276,9 @@ fn run_nearest_with(
 
     let summary = if let Some(graph) = workspace.nearest_graph(cwd) {
         eprintln!("Validating graph: {} ({})", graph.graph_id, graph.scope);
-        pass(&graph.path)?
+        pass(&graph.path, Siblings::from_workspace(workspace))?
     } else {
-        pass(&workspace.node_root())?
+        pass(&workspace.node_root(), Siblings::default())?
     };
     Ok(ScopedValidation::Validated(summary))
 }
@@ -171,8 +297,21 @@ pub fn run_duplicate_ids(kos_root: &Path) -> Result<Summary> {
     })
 }
 
-/// Run the validate subcommand against all nodes in the kos root.
+/// Run the validate subcommand against all nodes in the kos root. A
+/// `graph::target` naming another graph is reported as unchecked; see
+/// [`run_in`].
 pub fn run(kos_root: &Path) -> Result<Summary> {
+    run_with(kos_root, Siblings::default())
+}
+
+/// [`run`], with the other graphs of `workspace` readable, so a `graph::target`
+/// that names one of them is resolved there and fails when it does not exist.
+pub fn run_in(kos_root: &Path, workspace: &Workspace) -> Result<Summary> {
+    run_with(kos_root, Siblings::from_workspace(workspace))
+}
+
+/// [`run`] against the given sibling graphs.
+pub fn run_with(kos_root: &Path, siblings: Siblings) -> Result<Summary> {
     let nodes_dir = kos_root.join("nodes");
     if !nodes_dir.exists() {
         println!("no nodes/ directory found at {}", kos_root.display());
@@ -181,7 +320,7 @@ pub fn run(kos_root: &Path) -> Result<Summary> {
 
     // First pass: load all nodes and collect IDs
     let (nodes, known_ids) = load_all_nodes(&nodes_dir)?;
-    let finding_index = findings::FindingIndex::load(kos_root);
+    let citations = Citations::load(kos_root, siblings);
 
     // Second pass: validate parsed nodes, skip parse errors
     let mut results: Vec<ValidationResult> = Vec::new();
@@ -190,7 +329,7 @@ pub fn run(kos_root: &Path) -> Result<Summary> {
     for loaded in &nodes {
         match loaded {
             LoadedNode::Parsed(node, rel_path) => {
-                results.push(validate_node(node, rel_path, &known_ids, &finding_index));
+                results.push(validate_node(node, rel_path, &known_ids, &citations));
             }
             LoadedNode::ParseError => {
                 parse_error_count += 1;
@@ -492,7 +631,7 @@ pub(crate) fn validate_node(
     node: &Node,
     rel_path: &str,
     known_ids: &HashSet<String>,
-    finding_index: &findings::FindingIndex,
+    citations: &Citations,
 ) -> ValidationResult {
     let mut errors = Vec::new();
     let mut warnings = Vec::new();
@@ -522,15 +661,23 @@ pub(crate) fn validate_node(
     // 3. Edge targets reference known node IDs (warn, don't fail)
     for edge in node.all_edges() {
         if !known_ids.contains(&edge.target) {
-            match finding_index.resolve(&edge.target) {
-                findings::Citation::Resolved(_) => {}
-                findings::Citation::Ambiguous(candidates) => warnings.push(format!(
+            match citations.check(&edge.target, known_ids) {
+                Cited::Resolved => {}
+                Cited::Ambiguous(candidates) => warnings.push(format!(
                     "edge target '{}' is ambiguous: it names {} findings ({})",
                     edge.target,
                     candidates.len(),
                     candidates.join(", ")
                 )),
-                _ => warnings.push(format!(
+                Cited::Fails(why) => errors.push(format!(
+                    "edge target '{}' does not resolve: {why}",
+                    edge.target
+                )),
+                Cited::Unchecked(why) => warnings.push(format!(
+                    "edge target '{}' was not checked: {why}",
+                    edge.target
+                )),
+                Cited::NotFound => warnings.push(format!(
                     "edge target '{}' not found in nodes/ (may be a finding or probe)",
                     edge.target
                 )),
@@ -674,6 +821,64 @@ mod tests {
         let (_g, root) = citing_graph(&["finding-300"], &["finding-300-a", "finding-300-b"]);
         let summary = run(&root).unwrap();
         assert_eq!(summary.warnings, 1);
+    }
+
+    #[test]
+    fn an_own_graph_target_that_resolves_nowhere_fails() {
+        let (_g, root) = citing_graph(&["aae-orc::elem-missing"], &[]);
+        let summary = run(&root).unwrap();
+        assert_eq!(summary.failed, 1, "a namespaced target must resolve");
+    }
+
+    /// `targets` cited from a graph that has `own_findings`, with a sibling
+    /// graph `b` that holds `b_findings` and the node `elem-anchor`.
+    fn run_beside_b(targets: &[&str], own_findings: &[&str], b_findings: &[&str]) -> Summary {
+        let (_g, root) = citing_graph(targets, own_findings);
+        let (_gb, b_root) = scaffold();
+        for f in b_findings {
+            write_finding(&b_root, &format!("{f}.md"), MD);
+        }
+        let siblings = Siblings::from_roots([("b".to_string(), b_root)]);
+        run_with(&root, siblings).unwrap()
+    }
+
+    #[test]
+    fn a_target_in_a_sibling_graph_resolves_there() {
+        let s = run_beside_b(
+            &["b::elem-anchor", "b::finding-7", "B::finding-007-x"],
+            &[],
+            &["finding-007-x"],
+        );
+        assert_eq!((s.failed, s.warnings), (0, 0));
+    }
+
+    #[test]
+    fn a_target_missing_from_a_sibling_graph_fails() {
+        let s = run_beside_b(&["b::elem-nope"], &[], &[]);
+        assert_eq!(s.failed, 1);
+    }
+
+    #[test]
+    fn a_graph_form_never_resolves_to_a_local_file_of_the_same_number() {
+        // The citing graph has finding-024; b does not. The citation means b's.
+        let s = run_beside_b(&["b::finding-024"], &["finding-024-local"], &[]);
+        assert_eq!(s.failed, 1);
+    }
+
+    #[test]
+    fn a_target_naming_a_graph_outside_the_workspace_warns_and_does_not_fail() {
+        let s = run_beside_b(&["elsewhere::elem-x"], &[], &[]);
+        assert_eq!((s.failed, s.warnings), (0, 1));
+    }
+
+    #[test]
+    fn an_own_graph_target_that_resolves_passes() {
+        let (_g, root) = citing_graph(
+            &["aae-orc::elem-anchor", "aae-orc::finding-173"],
+            &["finding-173-x"],
+        );
+        let s = run(&root).unwrap();
+        assert_eq!((s.failed, s.warnings), (0, 0));
     }
 
     #[test]
