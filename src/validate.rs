@@ -814,6 +814,34 @@ mod tests {
     }
 
     #[test]
+    fn the_ambiguous_warning_names_the_count_and_every_candidate() {
+        let citations = Citations {
+            owner: None,
+            findings: findings::FindingIndex::from_stems(
+                ["finding-300-a", "finding-300-b"],
+                Vec::new(),
+                None,
+            ),
+            siblings: Siblings::default(),
+        };
+        let node: Node = crate::yaml::from_str(
+            "id: elem-c\ntype: element\nconfidence: bedrock\ntitle: c\ncontent: b\nedges:\n  - target: finding-300\n    type: derives\n",
+        )
+        .unwrap();
+        let result = validate_node(&node, "bedrock/elem-c.yaml", &HashSet::new(), &citations);
+        assert_eq!(result.warnings.len(), 1);
+        let w = &result.warnings[0];
+        assert!(
+            w.contains("is ambiguous") && w.contains("names 2 findings"),
+            "{w}"
+        );
+        assert!(
+            w.contains("finding-300-a") && w.contains("finding-300-b"),
+            "{w}"
+        );
+    }
+
+    #[test]
     fn a_citation_that_resolves_nowhere_still_warns() {
         let (_g, root) = citing_graph(&["finding-999"], &["finding-173-bd-ids"]);
         let summary = run(&root).unwrap();
