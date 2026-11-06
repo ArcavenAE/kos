@@ -39,11 +39,19 @@ pub struct Summary {
     pub findings_failed: usize,
     /// Findings with an id/filename mismatch, or files that would not load.
     pub findings_warnings: usize,
+    /// Probe briefs and ideas examined.
+    pub slugs_total: usize,
+    /// Probe briefs or ideas that share a slug with another file in the same
+    /// directory; counted once per slug.
+    pub slugs_failed: usize,
 }
 
 impl Summary {
     pub fn clean(&self) -> bool {
-        self.failed == 0 && self.parse_errors == 0 && self.findings_failed == 0
+        self.failed == 0
+            && self.parse_errors == 0
+            && self.findings_failed == 0
+            && self.slugs_failed == 0
     }
 
     pub fn merge(&mut self, other: &Summary) {
@@ -55,6 +63,8 @@ impl Summary {
         self.findings_total += other.findings_total;
         self.findings_failed += other.findings_failed;
         self.findings_warnings += other.findings_warnings;
+        self.slugs_total += other.slugs_total;
+        self.slugs_failed += other.slugs_failed;
     }
 }
 
@@ -375,6 +385,13 @@ pub fn run_with(kos_root: &Path, siblings: Siblings) -> Result<Summary> {
     // between two files claiming the same finding number went unnoticed.
     let findings = validate_findings(kos_root, false)?;
 
+    // Probe briefs and ideas: no counter allocates them, so the failure is two
+    // files taking one slug (opaque-finding-ids design, 2.6).
+    let mut slugs = SlugReport::default();
+    for (dir, label) in [("probes", "probes"), ("ideas", "ideas")] {
+        validate_slugs(kos_root, dir, label, &mut slugs);
+    }
+
     Ok(Summary {
         total,
         passed: pass_count,
@@ -384,7 +401,66 @@ pub fn run_with(kos_root: &Path, siblings: Siblings) -> Result<Summary> {
         findings_total: findings.total,
         findings_failed: findings.failed,
         findings_warnings: findings.warnings,
+        slugs_total: slugs.total,
+        slugs_failed: slugs.failed,
     })
+}
+
+/// Counts from the probes and ideas passes, folded into the returned `Summary`.
+#[derive(Default)]
+struct SlugReport {
+    total: usize,
+    failed: usize,
+}
+
+/// The slug a probe or idea file answers to: its stem, lowercased, with a probe
+/// brief's leading `brief-` dropped. `.md`, `.yaml` and `.yml` all count, so
+/// `brief-a.md` and `brief-a.yaml` are one slug.
+fn artifact_slug(dir: &str, path: &Path) -> Option<String> {
+    let ext = path.extension()?.to_str()?;
+    if !matches!(ext, "md" | "yaml" | "yml") {
+        return None;
+    }
+    let stem = path.file_stem()?.to_str()?.to_lowercase();
+    match dir {
+        "probes" => Some(stem.strip_prefix("brief-").unwrap_or(&stem).to_string()),
+        _ => Some(stem),
+    }
+}
+
+/// Fail on two files in `_kos/<dir>/` that take one slug. Directories (a
+/// probe's work product) are not briefs and are skipped. Prints a section only
+/// when there is a collision to report.
+fn validate_slugs(kos_root: &Path, dir: &str, label: &str, report: &mut SlugReport) {
+    let Ok(read) = std::fs::read_dir(kos_root.join(dir)) else {
+        return;
+    };
+    let mut by_slug: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    for entry in read.flatten() {
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        let Some(slug) = artifact_slug(dir, &path) else {
+            continue;
+        };
+        let name = entry.file_name().to_string_lossy().into_owned();
+        by_slug.entry(slug).or_default().push(name);
+        report.total += 1;
+    }
+    for (slug, mut names) in by_slug {
+        if names.len() > 1 {
+            names.sort();
+            report.failed += 1;
+            println!();
+            println!("=== {label} ===");
+            println!(
+                "  FAIL  slug '{slug}' taken by {} files: {}",
+                names.len(),
+                names.join(", ")
+            );
+        }
+    }
 }
 
 /// Counts from the findings pass, folded into the returned `Summary`.
@@ -879,6 +955,47 @@ mod tests {
         );
         let s = run(&root).unwrap();
         assert_eq!((s.failed, s.warnings), (0, 0));
+    }
+
+    fn write_in(root: &Path, dir: &str, name: &str) {
+        let d = root.join(dir);
+        fs::create_dir_all(&d).unwrap();
+        fs::write(d.join(name), "slug: x\n").unwrap();
+    }
+
+    #[test]
+    fn two_probe_briefs_with_one_slug_fail() {
+        let (_g, root) = scaffold();
+        write_in(&root, "probes", "brief-alpha.md");
+        write_in(&root, "probes", "brief-alpha.yaml");
+        let summary = run(&root).unwrap();
+        assert!(!summary.clean(), "one slug in two files must fail");
+        assert_eq!(summary.slugs_total, 2);
+        assert_eq!(summary.slugs_failed, 1, "one collision counts once");
+    }
+
+    #[test]
+    fn two_ideas_with_one_slug_fail() {
+        let (_g, root) = scaffold();
+        write_in(&root, "ideas", "same-idea.md");
+        write_in(&root, "ideas", "Same-Idea.yaml");
+        let summary = run(&root).unwrap();
+        assert_eq!(summary.slugs_failed, 1);
+        assert!(!summary.clean());
+    }
+
+    #[test]
+    fn distinct_probe_and_idea_slugs_pass() {
+        let (_g, root) = scaffold();
+        write_in(&root, "probes", "brief-alpha.md");
+        write_in(&root, "probes", "brief-beta.yaml");
+        write_in(&root, "ideas", "alpha.md");
+        write_in(&root, "ideas", "gamma.md");
+        // a probe's work directory is not a brief
+        fs::create_dir_all(root.join("probes/brief-alpha-nodes")).unwrap();
+        let summary = run(&root).unwrap();
+        assert_eq!((summary.slugs_total, summary.slugs_failed), (4, 0));
+        assert!(summary.clean());
     }
 
     #[test]

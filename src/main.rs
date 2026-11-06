@@ -425,7 +425,7 @@ fn main() -> anyhow::Result<()> {
                     );
                 } else {
                     eprintln!(
-                        "all graphs: {} nodes, {} passed, {} warnings, {} failed, {} parse errors; {} findings, {} duplicate-id failures, {} findings warnings",
+                        "all graphs: {} nodes, {} passed, {} warnings, {} failed, {} parse errors; {} findings, {} duplicate-id failures, {} findings warnings; {} probes and ideas, {} slug collisions",
                         combined.total,
                         combined.passed,
                         combined.warnings,
@@ -433,7 +433,9 @@ fn main() -> anyhow::Result<()> {
                         combined.parse_errors,
                         combined.findings_total,
                         combined.findings_failed,
-                        combined.findings_warnings
+                        combined.findings_warnings,
+                        combined.slugs_total,
+                        combined.slugs_failed
                     );
                 }
                 if !combined.clean() || io_errors > 0 {
