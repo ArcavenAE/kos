@@ -750,6 +750,8 @@ mod tests {
         for (cite, want) in [
             ("finding-173-bd-ids", "finding-173-bd-ids"),
             ("finding-173", "finding-173-bd-ids"),
+            // a full stem whose number is shared still names its own file
+            ("finding-300-twin-a", "finding-300-twin-a"),
             ("Finding-173", "finding-173-bd-ids"),
             ("finding-19", "finding-019-padded"),
             ("finding-019", "finding-019-padded"),
