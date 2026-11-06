@@ -379,7 +379,7 @@ fn validate_findings(kos_root: &Path, duplicates_only: bool) -> Result<FindingsR
     // Duplicate finding numbers; the structural failure.
     for (key, members) in &by_key {
         if members.len() > 1 {
-            report.failed += members.len();
+            report.failed += 1;
             println!(
                 "  FAIL  duplicate finding number '{key}' across {} files:",
                 members.len()
@@ -600,7 +600,23 @@ mod tests {
             "a duplicate finding number must fail the graph"
         );
         assert_eq!(summary.findings_total, 2);
-        assert_eq!(summary.findings_failed, 2);
+        assert_eq!(summary.findings_failed, 1);
+    }
+
+    #[test]
+    fn a_number_shared_by_three_files_is_one_failure() {
+        let (_guard, root) = scaffold();
+        for slug in ["alpha", "beta", "gamma"] {
+            write_finding(
+                &root,
+                &format!("finding-310-{slug}.md"),
+                "# t\n\n**Date:** 2026-08-01\n\nbody\n",
+            );
+        }
+        let summary = run(&root).unwrap();
+        assert!(!summary.clean());
+        assert_eq!(summary.findings_total, 3);
+        assert_eq!(summary.findings_failed, 1, "one collision counts once");
     }
 
     #[test]
@@ -681,7 +697,7 @@ mod tests {
             !summary.clean(),
             "two files claiming one minted id must fail"
         );
-        assert_eq!(summary.findings_failed, 2);
+        assert_eq!(summary.findings_failed, 1);
     }
 
     #[test]
@@ -691,7 +707,7 @@ mod tests {
         write_finding(&root, "finding-19-b.md", MD);
         let summary = run(&root).unwrap();
         assert!(!summary.clean(), "019 and 19 are one finding number");
-        assert_eq!(summary.findings_failed, 2);
+        assert_eq!(summary.findings_failed, 1);
     }
 
     #[test]
