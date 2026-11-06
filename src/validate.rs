@@ -149,23 +149,30 @@ struct SiblingGraph {
 }
 
 impl Siblings {
-    /// Every graph the workspace discovered.
+    /// Every graph the workspace discovered. When two roots share a graph id,
+    /// the workspace's resolution rule picks one, never the listing order.
     pub fn from_workspace(workspace: &Workspace) -> Self {
-        Self::from_roots(
-            workspace
-                .graphs
-                .iter()
-                .map(|g| (g.graph_id.clone(), g.path.clone())),
-        )
+        let (graphs, _) = crate::workspace::resolve_graph_ids(&workspace.root, &workspace.graphs);
+        Self::from_roots(graphs.iter().map(|g| (g.graph_id.clone(), g.path.clone())))
     }
 
     /// Graphs by id and root (the directory holding `nodes/` and `findings/`).
+    /// Where a caller passes two roots with one id, the smaller canonical path
+    /// answers, so the input order never decides.
     pub fn from_roots<I: IntoIterator<Item = (String, PathBuf)>>(roots: I) -> Self {
+        let canon = |p: &Path| std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
+        let mut by_id: BTreeMap<String, PathBuf> = BTreeMap::new();
+        for (id, path) in roots {
+            let id = id.to_lowercase();
+            match by_id.get(&id) {
+                Some(kept) if canon(kept) <= canon(&path) => {}
+                _ => {
+                    by_id.insert(id, path);
+                }
+            }
+        }
         Self {
-            roots: roots
-                .into_iter()
-                .map(|(id, path)| (id.to_lowercase(), path))
-                .collect(),
+            roots: by_id,
             loaded: RefCell::default(),
         }
     }
@@ -948,6 +955,72 @@ mod tests {
         }
         let siblings = Siblings::from_roots([("b".to_string(), b_root)]);
         run_with(&root, siblings).unwrap()
+    }
+
+    /// Two roots that share one graph id, one holding `elem-left` and the
+    /// other `elem-right`; which answers must not depend on input order.
+    #[test]
+    fn two_roots_with_one_id_give_one_answer_in_both_orders() {
+        let (_ga, a_root) = scaffold();
+        let (_gb, b_root) = scaffold();
+        let which = |first: &PathBuf, second: &PathBuf| {
+            let s = Siblings::from_roots([
+                ("x".to_string(), first.clone()),
+                ("x".to_string(), second.clone()),
+            ]);
+            s.roots.get("x").cloned().unwrap()
+        };
+        assert_eq!(which(&a_root, &b_root), which(&b_root, &a_root));
+        let smaller = std::cmp::min(&a_root, &b_root).clone();
+        assert_eq!(
+            which(&a_root, &b_root),
+            smaller,
+            "rule 3: the smallest path"
+        );
+    }
+
+    #[test]
+    fn a_workspace_with_a_shared_id_gives_the_resolved_root_in_both_orders() {
+        use crate::model::{GraphInclude, GraphManifest, GraphScope, GraphSource};
+        let tmp = tempfile::tempdir().unwrap();
+        let r = tmp.path().to_path_buf();
+        let mk = |dir: &str, git_dir: bool| {
+            let repo = r.join(dir);
+            std::fs::create_dir_all(repo.join("_kos")).unwrap();
+            if git_dir {
+                std::fs::create_dir_all(repo.join(".git")).unwrap();
+            } else {
+                std::fs::write(repo.join(".git"), "gitdir: elsewhere\n").unwrap();
+            }
+            GraphSource {
+                graph_id: "x".into(),
+                path: repo.join("_kos"),
+                scope: GraphScope::Repo,
+                manifest: GraphManifest {
+                    graph_id: "x".into(),
+                    scope: GraphScope::Repo,
+                    description: None,
+                    schema_version: "0.3".into(),
+                    includes: Vec::<GraphInclude>::new(),
+                    findings: None,
+                },
+            }
+        };
+        let graphs = vec![mk("a-wt", false), mk("alpha", true)];
+        let want = r.join("alpha").join("_kos");
+        for order in [
+            graphs.clone(),
+            graphs.iter().rev().cloned().collect::<Vec<_>>(),
+        ] {
+            let ws = Workspace {
+                root: r.clone(),
+                kos_root: r.clone(),
+                graphs: order,
+                manifest_errors: Vec::new(),
+            };
+            let s = Siblings::from_workspace(&ws);
+            assert_eq!(s.roots.get("x"), Some(&want));
+        }
     }
 
     #[test]
