@@ -408,6 +408,11 @@ fn main() -> anyhow::Result<()> {
                     eprintln!("error: manifest {problem}");
                     io_errors += 1;
                 }
+                // Two roots that share a graph id: say so once. A report, not
+                // a failure (aae-orc-gtv04).
+                for shared in workspace.shared_graph_ids() {
+                    eprintln!("note: manifest {shared}");
+                }
                 // Also validate legacy layout if no _kos/ graphs found
                 if workspace.graphs.is_empty() {
                     combined.merge(&match only {

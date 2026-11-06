@@ -159,6 +159,12 @@ impl Workspace {
         })
     }
 
+    /// Graph ids that more than one discovered root claims, one report per
+    /// id. A report only: validation does not fail on it (aae-orc-gtv04).
+    pub fn shared_graph_ids(&self) -> Vec<ManifestProblem> {
+        resolve_graph_ids(&self.root, &self.graphs).1
+    }
+
     /// Returns `true` when the workspace is standalone — a repo with
     /// `_kos/kos.yaml` that is NOT under an aae-orc orchestrator.
     ///
@@ -349,4 +355,207 @@ fn load_graph_source(kos_dir: &Path, problems: &mut Vec<ManifestProblem>) -> Opt
         scope: manifest.scope.clone(),
         manifest,
     })
+}
+
+/// Which graph answers for each graph id, and which ids more than one graph
+/// claims. Discovery lists graphs in directory order, which is not stable, so
+/// the answer comes from this rule and never from the listing (aae-orc-gtv04):
+///
+/// 1. the root the orchestrator manifest's `includes` names;
+/// 2. the root at `<root>/<dir>/_kos` whose `.git` is a directory, which is the
+///    primary checkout and not a linked worktree;
+/// 3. the smallest canonical path.
+///
+/// A shared id is reported once, as a `ManifestProblem` on the chosen root. It
+/// is a report, not a failure.
+pub(crate) fn resolve_graph_ids<'a>(
+    root: &Path,
+    graphs: &'a [GraphSource],
+) -> (Vec<&'a GraphSource>, Vec<ManifestProblem>) {
+    let canon = |p: &Path| std::fs::canonicalize(p).unwrap_or_else(|_| p.to_path_buf());
+    let included: Vec<PathBuf> = graphs
+        .iter()
+        .filter(|g| g.scope == GraphScope::Orchestrator)
+        .flat_map(|g| {
+            g.manifest
+                .includes
+                .iter()
+                .map(|i| canon(&root.join(&i.path)))
+        })
+        .collect();
+    let canon_root = canon(root);
+    let rank = |g: &GraphSource| {
+        let path = canon(&g.path);
+        let tier = if included.contains(&path) {
+            0
+        } else if path.parent().is_some_and(|dir| {
+            dir.parent() == Some(canon_root.as_path()) && dir.join(".git").is_dir()
+        }) {
+            1
+        } else {
+            2
+        };
+        (tier, path)
+    };
+
+    let mut by_id: std::collections::BTreeMap<String, Vec<&GraphSource>> =
+        std::collections::BTreeMap::new();
+    for g in graphs {
+        by_id.entry(g.graph_id.to_lowercase()).or_default().push(g);
+    }
+    let mut chosen = Vec::new();
+    let mut problems = Vec::new();
+    for (id, mut group) in by_id {
+        group.sort_by_cached_key(|g| rank(g));
+        let first = group[0];
+        if group.len() > 1 {
+            let others: Vec<String> = group[1..]
+                .iter()
+                .map(|g| g.path.display().to_string())
+                .collect();
+            problems.push(ManifestProblem {
+                path: first.path.join(MANIFEST_FILE),
+                message: format!(
+                    "graph_id '{id}' is also claimed by {}; using this one",
+                    others.join(", ")
+                ),
+            });
+        }
+        chosen.push(first);
+    }
+    (chosen, problems)
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use super::*;
+    use crate::model::{GraphInclude, GraphManifest};
+
+    fn manifest(id: &str, scope: GraphScope, includes: &[&str]) -> GraphManifest {
+        GraphManifest {
+            graph_id: id.to_string(),
+            scope,
+            description: None,
+            schema_version: "0.3".to_string(),
+            includes: includes
+                .iter()
+                .map(|p| GraphInclude {
+                    path: (*p).to_string(),
+                })
+                .collect(),
+            findings: None,
+        }
+    }
+
+    fn source(root: &Path, dir: &str, id: &str, git: Option<bool>) -> GraphSource {
+        let repo = root.join(dir);
+        let kos = repo.join(KOS_DIR);
+        fs::create_dir_all(&kos).unwrap();
+        match git {
+            Some(true) => fs::create_dir_all(repo.join(".git")).unwrap(),
+            Some(false) => fs::write(repo.join(".git"), "gitdir: elsewhere\n").unwrap(),
+            None => {}
+        }
+        GraphSource {
+            graph_id: id.to_string(),
+            path: kos,
+            scope: GraphScope::Repo,
+            manifest: manifest(id, GraphScope::Repo, &[]),
+        }
+    }
+
+    fn orchestrator(root: &Path, includes: &[&str]) -> GraphSource {
+        let kos = root.join(KOS_DIR);
+        fs::create_dir_all(&kos).unwrap();
+        GraphSource {
+            graph_id: "orc".to_string(),
+            path: kos,
+            scope: GraphScope::Orchestrator,
+            manifest: manifest("orc", GraphScope::Orchestrator, includes),
+        }
+    }
+
+    /// The chosen root's directory name for `id`, with the input in `order`.
+    fn chosen(root: &Path, graphs: &[GraphSource], id: &str) -> String {
+        let (picked, _) = resolve_graph_ids(root, graphs);
+        let g = picked.iter().find(|g| g.graph_id == id).unwrap();
+        g.path
+            .parent()
+            .and_then(Path::file_name)
+            .unwrap()
+            .to_string_lossy()
+            .into_owned()
+    }
+
+    /// Both input orders must give the same answer; return it.
+    fn both_orders(root: &Path, graphs: Vec<GraphSource>, id: &str) -> String {
+        let forward = chosen(root, &graphs, id);
+        let mut reversed = graphs;
+        reversed.reverse();
+        assert_eq!(
+            forward,
+            chosen(root, &reversed, id),
+            "order changed the answer"
+        );
+        forward
+    }
+
+    #[test]
+    fn the_primary_checkout_beats_a_worktree_in_either_order() {
+        let tmp = tempfile::tempdir().unwrap();
+        let r = tmp.path();
+        // The worktree sorts first by path, so only rule 2 can pick the other.
+        let graphs = vec![
+            source(r, "a-wt", "x", Some(false)),
+            source(r, "alpha", "x", Some(true)),
+        ];
+        assert_eq!(both_orders(r, graphs, "x"), "alpha");
+    }
+
+    #[test]
+    fn the_root_the_manifest_includes_beats_the_primary_checkout() {
+        let tmp = tempfile::tempdir().unwrap();
+        let r = tmp.path();
+        let graphs = vec![
+            orchestrator(r, &["z-wt/_kos"]),
+            source(r, "alpha", "x", Some(true)),
+            source(r, "z-wt", "x", Some(false)),
+        ];
+        assert_eq!(both_orders(r, graphs, "x"), "z-wt");
+    }
+
+    #[test]
+    fn with_no_other_rule_the_smallest_path_wins_in_either_order() {
+        let tmp = tempfile::tempdir().unwrap();
+        let r = tmp.path();
+        let graphs = vec![source(r, "m2", "x", None), source(r, "m1", "x", None)];
+        assert_eq!(both_orders(r, graphs, "x"), "m1");
+    }
+
+    #[test]
+    fn a_shared_id_is_reported_once_and_a_unique_id_not_at_all() {
+        let tmp = tempfile::tempdir().unwrap();
+        let r = tmp.path();
+        let graphs = vec![
+            source(r, "alpha", "x", Some(true)),
+            source(r, "a-wt", "x", Some(false)),
+            source(r, "a-wt2", "x", Some(false)),
+            source(r, "solo", "y", Some(true)),
+        ];
+        let (_, problems) = resolve_graph_ids(r, &graphs);
+        assert_eq!(problems.len(), 1, "{problems:?}");
+        assert!(problems[0].message.contains("'x'"), "{}", problems[0]);
+        assert!(
+            problems[0].path.starts_with(r.join("alpha")),
+            "{}",
+            problems[0]
+        );
+
+        // Two claimants are enough to report; one is not.
+        let pair = vec![source(r, "p1", "z", None), source(r, "p2", "z", None)];
+        assert_eq!(resolve_graph_ids(r, &pair).1.len(), 1);
+        assert!(resolve_graph_ids(r, &pair[..1]).1.is_empty());
+    }
 }
