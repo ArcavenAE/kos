@@ -153,7 +153,12 @@ pub fn promote(workspace: &Workspace, cwd: &Path, id: &str, to: &str) -> Result<
     let node = crate::yaml::from_str::<Node>(&moved).map_err(|e| KosError::Promote {
         message: format!("{} would not parse after the move: {e}", source.display()),
     })?;
-    let result = validate_node(&node, &format!("{to}/{id}.yaml"), &known_ids(&nodes_dir));
+    let result = validate_node(
+        &node,
+        &format!("{to}/{id}.yaml"),
+        &known_ids(&nodes_dir),
+        &crate::findings::FindingIndex::load(nodes_dir.parent().unwrap_or(&nodes_dir)),
+    );
     for w in &result.warnings {
         eprintln!("warning: {id}: {w}");
     }

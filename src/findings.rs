@@ -209,6 +209,150 @@ pub fn finding_key(id: &str, known_prefixes: &[String]) -> String {
     classify_finding_id(id, known_prefixes).key
 }
 
+/// A finding id as the citation resolver sees it: the stem as written on disk,
+/// lowercased, with its classified key and slug.
+#[derive(Debug, Clone)]
+struct IndexedFinding {
+    stem: String,
+    key: String,
+    slug: Option<String>,
+}
+
+/// The findings of one graph, ready to resolve citations against. See
+/// [`FindingIndex::resolve`].
+#[derive(Debug, Clone, Default)]
+pub struct FindingIndex {
+    entries: Vec<IndexedFinding>,
+    prefixes: Vec<String>,
+    owner: Option<String>,
+}
+
+/// What a citation resolves to in one graph.
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum Citation {
+    /// One finding, by its stem.
+    Resolved(String),
+    /// Two or more findings answer to the citation; the stems are listed.
+    Ambiguous(Vec<String>),
+    /// A `graph::` citation naming a graph other than this one. This index
+    /// does not read sibling graphs, so it does not guess.
+    OtherGraph { graph: String, rest: String },
+    /// Nothing in this graph answers to it.
+    Unresolved,
+}
+
+impl FindingIndex {
+    /// Index the given finding stems. `prefixes` are the graph's known id
+    /// prefixes (see [`known_prefixes`]); `owner` is its own graph_id, which
+    /// a `graph::` citation may name.
+    pub fn from_stems<I, S>(stems: I, prefixes: Vec<String>, owner: Option<String>) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: AsRef<str>,
+    {
+        let entries = stems
+            .into_iter()
+            .map(|s| {
+                let stem = s.as_ref().to_lowercase();
+                let k = classify_finding_id(&stem, &prefixes);
+                IndexedFinding {
+                    key: k.key,
+                    slug: k.slug,
+                    stem,
+                }
+            })
+            .collect();
+        Self {
+            entries,
+            prefixes,
+            owner: owner.map(|o| o.to_lowercase()),
+        }
+    }
+
+    /// Index the finding files under `<kos_root>/findings/`, by file stem.
+    /// A graph with no findings directory gives an empty index.
+    pub fn load(kos_root: &Path) -> Self {
+        let mut stems: Vec<String> = Vec::new();
+        if let Ok(read) = std::fs::read_dir(kos_root.join("findings")) {
+            for entry in read.flatten() {
+                let path = entry.path();
+                let ext = path.extension().and_then(|e| e.to_str());
+                if matches!(ext, Some("md" | "yaml" | "yml")) {
+                    if let Some(stem) = path.file_stem().and_then(|s| s.to_str()) {
+                        stems.push(stem.to_string());
+                    }
+                }
+            }
+        }
+        let owner = load_manifest(kos_root).map(|m| m.graph_id);
+        Self::from_stems(stems, known_prefixes(kos_root), owner)
+    }
+
+    /// Resolve a citation in this graph. One function for every reader, so
+    /// the forms cannot drift apart. In order:
+    ///
+    /// 1. A `graph::` part naming this graph is dropped; one naming another
+    ///    graph is [`Citation::OtherGraph`].
+    /// 2. The full stem (`finding-173-some-slug`).
+    /// 3. The key (`finding-173`, `finding-19` for `finding-019`, or
+    ///    `finding-aae-orc-k3m9`), so a short citation reaches its file.
+    /// 4. A bare slug.
+    ///
+    /// Each step that matches two or more files is [`Citation::Ambiguous`],
+    /// listing every candidate. A bare number that is absent here stays
+    /// [`Citation::Unresolved`]; it never falls back to another graph.
+    pub fn resolve(&self, citation: &str) -> Citation {
+        let lower = citation.trim().to_lowercase();
+        let local = match lower.split_once("::") {
+            Some((graph, rest)) if graph.is_empty() || rest.is_empty() => {
+                return Citation::Unresolved;
+            }
+            Some((graph, rest)) if self.owner.as_deref() == Some(graph) => rest.to_string(),
+            Some((graph, rest)) => {
+                return Citation::OtherGraph {
+                    graph: graph.to_string(),
+                    rest: rest.to_string(),
+                };
+            }
+            None => lower,
+        };
+        if local.is_empty() {
+            return Citation::Unresolved;
+        }
+        let pick = |hits: Vec<&IndexedFinding>| match hits.as_slice() {
+            [] => None,
+            [one] => Some(Citation::Resolved(one.stem.clone())),
+            many => Some(Citation::Ambiguous(
+                many.iter().map(|f| f.stem.clone()).collect(),
+            )),
+        };
+        let by_stem: Vec<&IndexedFinding> =
+            self.entries.iter().filter(|f| f.stem == local).collect();
+        if let Some(found) = pick(by_stem) {
+            return found;
+        }
+        let cited = classify_finding_id(&local, &self.prefixes);
+        if !matches!(
+            cited.class,
+            FindingClass::NotAFinding | FindingClass::Unrecognised
+        ) {
+            let by_key: Vec<&IndexedFinding> =
+                self.entries.iter().filter(|f| f.key == cited.key).collect();
+            if let Some(found) = pick(by_key) {
+                return found;
+            }
+            return Citation::Unresolved;
+        }
+        let by_slug: Vec<&IndexedFinding> = self
+            .entries
+            .iter()
+            .filter(|f| f.slug.as_deref() == Some(local.as_str()))
+            .collect();
+        pick(by_slug).unwrap_or(Citation::Unresolved)
+    }
+}
+
 /// Split `a-b-c` into `a` and `Some("b-c")`; a lone segment has no rest.
 fn split_segment(s: &str) -> (&str, Option<&str>) {
     match s.split_once('-') {
@@ -578,6 +722,103 @@ fn loaded(node: Node, path: &Path) -> FindingLoad {
 
 #[cfg(test)]
 mod tests {
+
+    fn orc_index() -> FindingIndex {
+        FindingIndex::from_stems(
+            [
+                "finding-024-compaction-corpus",
+                "finding-173-bd-ids",
+                "finding-019-padded",
+                "finding-aae-orc-k3m9-minted-one",
+                "finding-aae-orc-p4q7-shared-slug",
+                "finding-aae-orc-r2s8-shared-slug",
+                "finding-300-twin-a",
+                "finding-300-twin-b",
+            ],
+            vec!["aae-orc".to_string(), "kos".to_string()],
+            Some("aae-orc".to_string()),
+        )
+    }
+
+    fn resolved(stem: &str) -> Citation {
+        Citation::Resolved(stem.to_string())
+    }
+
+    #[test]
+    fn a_citation_resolves_by_stem_key_or_unique_slug() {
+        let ix = orc_index();
+        for (cite, want) in [
+            ("finding-173-bd-ids", "finding-173-bd-ids"),
+            ("finding-173", "finding-173-bd-ids"),
+            ("Finding-173", "finding-173-bd-ids"),
+            ("finding-19", "finding-019-padded"),
+            ("finding-019", "finding-019-padded"),
+            ("finding-aae-orc-k3m9", "finding-aae-orc-k3m9-minted-one"),
+            ("minted-one", "finding-aae-orc-k3m9-minted-one"),
+            ("bd-ids", "finding-173-bd-ids"),
+        ] {
+            assert_eq!(ix.resolve(cite), resolved(want), "citation '{cite}'");
+        }
+    }
+
+    #[test]
+    fn the_graph_form_resolves_here_when_it_names_this_graph() {
+        let ix = orc_index();
+        assert_eq!(
+            ix.resolve("aae-orc::finding-173"),
+            resolved("finding-173-bd-ids")
+        );
+        assert_eq!(
+            ix.resolve("AAE-ORC::finding-aae-orc-k3m9"),
+            resolved("finding-aae-orc-k3m9-minted-one")
+        );
+    }
+
+    #[test]
+    fn the_graph_form_for_another_graph_is_not_guessed() {
+        let ix = orc_index();
+        // finding-024 exists here, and the citation means the other graph's.
+        assert_eq!(
+            ix.resolve("marvel::finding-024"),
+            Citation::OtherGraph {
+                graph: "marvel".to_string(),
+                rest: "finding-024".to_string()
+            }
+        );
+    }
+
+    #[test]
+    fn a_shared_number_or_slug_is_ambiguous_and_lists_every_file() {
+        let ix = orc_index();
+        assert_eq!(
+            ix.resolve("finding-300"),
+            Citation::Ambiguous(vec![
+                "finding-300-twin-a".to_string(),
+                "finding-300-twin-b".to_string()
+            ])
+        );
+        assert_eq!(
+            ix.resolve("shared-slug"),
+            Citation::Ambiguous(vec![
+                "finding-aae-orc-p4q7-shared-slug".to_string(),
+                "finding-aae-orc-r2s8-shared-slug".to_string()
+            ])
+        );
+    }
+
+    #[test]
+    fn a_bare_number_absent_here_stays_unresolved() {
+        let ix = orc_index();
+        for cite in [
+            "finding-999",
+            "finding-aae-orc-zzzz",
+            "no-such-slug",
+            "",
+            "::",
+        ] {
+            assert_eq!(ix.resolve(cite), Citation::Unresolved, "citation '{cite}'");
+        }
+    }
     use std::fs;
 
     use super::*;

@@ -181,6 +181,7 @@ pub fn run(kos_root: &Path) -> Result<Summary> {
 
     // First pass: load all nodes and collect IDs
     let (nodes, known_ids) = load_all_nodes(&nodes_dir)?;
+    let finding_index = findings::FindingIndex::load(kos_root);
 
     // Second pass: validate parsed nodes, skip parse errors
     let mut results: Vec<ValidationResult> = Vec::new();
@@ -189,7 +190,7 @@ pub fn run(kos_root: &Path) -> Result<Summary> {
     for loaded in &nodes {
         match loaded {
             LoadedNode::Parsed(node, rel_path) => {
-                results.push(validate_node(node, rel_path, &known_ids));
+                results.push(validate_node(node, rel_path, &known_ids, &finding_index));
             }
             LoadedNode::ParseError => {
                 parse_error_count += 1;
@@ -491,6 +492,7 @@ pub(crate) fn validate_node(
     node: &Node,
     rel_path: &str,
     known_ids: &HashSet<String>,
+    finding_index: &findings::FindingIndex,
 ) -> ValidationResult {
     let mut errors = Vec::new();
     let mut warnings = Vec::new();
@@ -520,10 +522,19 @@ pub(crate) fn validate_node(
     // 3. Edge targets reference known node IDs (warn, don't fail)
     for edge in node.all_edges() {
         if !known_ids.contains(&edge.target) {
-            warnings.push(format!(
-                "edge target '{}' not found in nodes/ (may be a finding or probe)",
-                edge.target
-            ));
+            match finding_index.resolve(&edge.target) {
+                findings::Citation::Resolved(_) => {}
+                findings::Citation::Ambiguous(candidates) => warnings.push(format!(
+                    "edge target '{}' is ambiguous: it names {} findings ({})",
+                    edge.target,
+                    candidates.len(),
+                    candidates.join(", ")
+                )),
+                _ => warnings.push(format!(
+                    "edge target '{}' not found in nodes/ (may be a finding or probe)",
+                    edge.target
+                )),
+            }
         }
 
         // 3b. Edge type is in the schema vocabulary. The loader is lenient so
@@ -617,6 +628,52 @@ mod tests {
         assert!(!summary.clean());
         assert_eq!(summary.findings_total, 3);
         assert_eq!(summary.findings_failed, 1, "one collision counts once");
+    }
+
+    /// A graph with one node, `elem-citer`, whose edges name `targets`.
+    fn citing_graph(targets: &[&str], findings: &[&str]) -> (tempfile::TempDir, PathBuf) {
+        let (guard, root) = scaffold();
+        manifest(&root, ORC);
+        let mut yaml = String::from(
+            "id: elem-citer\ntype: element\nconfidence: bedrock\ntitle: citer\ncontent: body\nedges:\n",
+        );
+        for t in targets {
+            yaml.push_str(&format!("  - target: {t}\n    type: derives\n"));
+        }
+        fs::write(root.join("nodes/bedrock/elem-citer.yaml"), yaml).unwrap();
+        for f in findings {
+            write_finding(&root, &format!("{f}.md"), MD);
+        }
+        (guard, root)
+    }
+
+    #[test]
+    fn a_short_citation_that_resolves_to_a_finding_does_not_warn() {
+        let (_g, root) = citing_graph(
+            &[
+                "finding-173",
+                "finding-aae-orc-k3m9",
+                "bd-ids",
+                "aae-orc::finding-173",
+            ],
+            &["finding-173-bd-ids", "finding-aae-orc-k3m9-minted"],
+        );
+        let summary = run(&root).unwrap();
+        assert_eq!(summary.warnings, 0, "every citation resolves to a finding");
+    }
+
+    #[test]
+    fn a_citation_that_resolves_nowhere_still_warns() {
+        let (_g, root) = citing_graph(&["finding-999"], &["finding-173-bd-ids"]);
+        let summary = run(&root).unwrap();
+        assert_eq!(summary.warnings, 1);
+    }
+
+    #[test]
+    fn an_ambiguous_citation_warns() {
+        let (_g, root) = citing_graph(&["finding-300"], &["finding-300-a", "finding-300-b"]);
+        let summary = run(&root).unwrap();
+        assert_eq!(summary.warnings, 1);
     }
 
     #[test]

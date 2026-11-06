@@ -120,7 +120,16 @@ pub fn run(
     let (graph_dir, label) = resolve_graph(workspace, cwd, target);
     let corpus = load_corpus(&graph_dir)?;
     let total = corpus.len();
-    let results = rank(&corpus, query, limit);
+    let finding_ids = corpus
+        .iter()
+        .filter(|n| n.node_type == NodeType::Finding)
+        .map(|n| n.id.as_str());
+    let findings = crate::findings::FindingIndex::from_stems(
+        finding_ids,
+        crate::findings::known_prefixes(&graph_dir),
+        crate::findings::load_manifest(&graph_dir).map(|m| m.graph_id),
+    );
+    let results = rank_with(&corpus, query, limit, &findings);
 
     if json {
         print_json(&results);
@@ -138,6 +147,25 @@ pub fn run(
 /// own; a tier and freshness weighting so bedrock outranks a ruled-out node at
 /// equal lexical strength and superseded items are penalized but still shown.
 pub fn rank(corpus: &[Node], query: &str, limit: usize) -> Vec<AskResult> {
+    let findings = crate::findings::FindingIndex::from_stems(
+        corpus
+            .iter()
+            .filter(|n| n.node_type == NodeType::Finding)
+            .map(|n| n.id.as_str()),
+        Vec::new(),
+        None,
+    );
+    rank_with(corpus, query, limit, &findings)
+}
+
+/// [`rank`] with a finding index, so an edge whose target is a short citation
+/// (a number, a key or a bare slug) joins the finding it names.
+pub fn rank_with(
+    corpus: &[Node],
+    query: &str,
+    limit: usize,
+    findings: &crate::findings::FindingIndex,
+) -> Vec<AskResult> {
     let terms = tokenize(query);
     if terms.is_empty() || corpus.is_empty() {
         return Vec::new();
@@ -169,7 +197,13 @@ pub fn rank(corpus: &[Node], query: &str, limit: usize) -> Vec<AskResult> {
         vec![std::collections::HashSet::new(); corpus.len()];
     for (i, node) in corpus.iter().enumerate() {
         for edge in node.all_edges() {
-            if let Some(&j) = index.get(edge.target.as_str()) {
+            let cited = index.get(edge.target.as_str()).copied().or_else(|| {
+                match findings.resolve(&edge.target) {
+                    crate::findings::Citation::Resolved(stem) => index.get(stem.as_str()).copied(),
+                    _ => None,
+                }
+            });
+            if let Some(j) = cited {
                 if j != i {
                     neighbors[i].insert(j);
                     neighbors[j].insert(i);
@@ -647,6 +681,35 @@ mod tests {
         ];
         let results = rank(&without_edge, "telemetry", 10);
         assert!(results.iter().all(|r| r.id != "elem-b"));
+    }
+
+    #[test]
+    fn a_short_citation_of_a_finding_counts_as_an_edge() {
+        let corpus = vec![
+            node(
+                "finding-173-telemetry-path",
+                Confidence::Frontier,
+                NodeType::Finding,
+                "telemetry read path",
+                "",
+                &[],
+            ),
+            node(
+                "elem-b",
+                Confidence::Frontier,
+                NodeType::Element,
+                "unrelated",
+                "nothing here",
+                &[("finding-173", EdgeType::Derives)],
+            ),
+        ];
+        let results = rank(&corpus, "telemetry", 10);
+        let b = results.iter().find(|r| r.id == "elem-b");
+        assert!(b.is_some(), "the short citation should reach its finding");
+        assert_eq!(
+            b.unwrap().via.as_deref(),
+            Some("finding-173-telemetry-path")
+        );
     }
 
     #[test]
