@@ -658,7 +658,11 @@ pub(crate) fn validate_node(
         }
     }
 
-    // 3. Edge targets reference known node IDs (warn, don't fail)
+    // 3. Edge targets resolve. A plain target found nowhere only warns (it may be a
+    // finding or probe); a `graph::` target naming this graph or a workspace graph
+    // that resolves nowhere is an error; one naming a graph outside the workspace
+    // warns "not checked". A workspace graph whose nodes fail to load counts as
+    // empty, so its targets error rather than skip.
     for edge in node.all_edges() {
         if !known_ids.contains(&edge.target) {
             match citations.check(&edge.target, known_ids) {
