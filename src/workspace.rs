@@ -539,6 +539,25 @@ mod tests {
     }
 
     #[test]
+    fn a_root_deeper_than_the_repo_dir_still_counts_as_primary() {
+        let tmp = tempfile::tempdir().unwrap();
+        let r = tmp.path();
+        fs::create_dir_all(r.join("deep/.git")).unwrap();
+        // The graph sits at deep/sub/_kos and only deep/ holds .git. "a-wt" sorts
+        // ahead of "deep", so only walking up past sub/ can pick the deep root.
+        let graphs = vec![
+            source(r, "a-wt", "x", Some(false)),
+            source(r, "deep/sub", "x", None),
+        ];
+        let (picked, _) = resolve_graph_ids(r, &graphs);
+        assert_eq!(picked[0].path, r.join("deep/sub").join(KOS_DIR));
+        let mut reversed = graphs;
+        reversed.reverse();
+        let (picked, _) = resolve_graph_ids(r, &reversed);
+        assert_eq!(picked[0].path, r.join("deep/sub").join(KOS_DIR));
+    }
+
+    #[test]
     fn the_root_the_manifest_includes_beats_the_primary_checkout() {
         let tmp = tempfile::tempdir().unwrap();
         let r = tmp.path();
