@@ -985,6 +985,33 @@ mod tests {
     }
 
     #[test]
+    fn a_probe_brief_and_a_bare_file_in_probes_share_a_slug() {
+        let (_g, root) = scaffold();
+        write_in(&root, "probes", "brief-alpha.md");
+        write_in(&root, "probes", "alpha.md");
+        let summary = run(&root).unwrap();
+        assert_eq!(summary.slugs_failed, 1, "brief- is not part of the slug");
+    }
+
+    #[test]
+    fn a_directory_named_like_a_brief_is_not_a_second_file() {
+        let (_g, root) = scaffold();
+        write_in(&root, "probes", "brief-alpha.yaml");
+        fs::create_dir_all(root.join("probes/brief-alpha.md")).unwrap();
+        let summary = run(&root).unwrap();
+        assert_eq!((summary.slugs_total, summary.slugs_failed), (1, 0));
+    }
+
+    #[test]
+    fn a_yml_file_takes_its_slug_like_any_other_extension() {
+        let (_g, root) = scaffold();
+        write_in(&root, "ideas", "shared.yml");
+        write_in(&root, "ideas", "shared.md");
+        let summary = run(&root).unwrap();
+        assert_eq!((summary.slugs_total, summary.slugs_failed), (2, 1));
+    }
+
+    #[test]
     fn distinct_probe_and_idea_slugs_pass() {
         let (_g, root) = scaffold();
         write_in(&root, "probes", "brief-alpha.md");
