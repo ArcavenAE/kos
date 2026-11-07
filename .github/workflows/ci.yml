@@ -1,6 +1,6 @@
 # CI + Release
 # Triggers: push to main (releases), pull requests (checks only)
-# Builds binaries for all platforms, signs/notarizes, creates pre-release, updates homebrew-tap
+# Builds binaries for all platforms, signs/notarizes, creates pre-release
 name: CI
 
 on:
@@ -471,70 +471,3 @@ jobs:
           cp "${{ steps.attest.outputs.bundle-path }}" attestations.sigstore.json
           gh release upload "${{ needs.build-release.outputs.tag }}" attestations.sigstore.json \
             --repo "${{ github.repository }}" --clobber
-
-  update-homebrew:
-    name: Update Homebrew Tap
-    needs: [build-release, sign-and-notarize, create-release]
-    if: needs.create-release.result == 'success' && needs.sign-and-notarize.result == 'success'
-    permissions:
-      contents: write
-    environment: release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Download signed darwin binaries
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          name: signed-binaries-darwin-arm64
-          path: dist/
-
-      # Homebrew's FormulaAudit/Desc enforces an 80-char max on desc. An
-      # over-long desc breaks `brew style` for EVERY formula in the tap
-      # (see kos#6), so fail here before anything is pushed.
-      - name: Validate formula desc length
-        run: |
-          set -euo pipefail
-          DESC=$(sed -n 's/^ *desc "\(.*\)"$/\1/p' Formula/kos.rb)
-          if [[ -z "$DESC" ]]; then
-            echo "::error::no desc found in Formula/kos.rb"
-            exit 1
-          fi
-          LEN=${#DESC}
-          if (( LEN > 80 )); then
-            echo "::error::Formula desc is ${LEN} chars (max 80): ${DESC}"
-            exit 1
-          fi
-          echo "desc OK (${LEN}/80 chars)"
-
-      - name: Update Homebrew formula
-        env:
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-        run: |
-          TAG="${{ needs.build-release.outputs.tag }}"
-          VERSION="${{ needs.build-release.outputs.version }}"
-
-          SHA256_ARM64=$(shasum -a 256 dist/kos-darwin-arm64 | cut -d' ' -f1)
-
-          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/arcavenae/homebrew-tap.git" homebrew-tap-repo
-          cd homebrew-tap-repo
-
-          mkdir -p Formula
-          cp ../Formula/kos.rb Formula/kos.rb
-
-          sed -i "s/VERSION_PLACEHOLDER/$TAG/g" Formula/kos.rb
-          sed -i "s/TAG_PLACEHOLDER/$TAG/g" Formula/kos.rb
-          sed -i "s/SHA256_ARM64_PLACEHOLDER/$SHA256_ARM64/g" Formula/kos.rb
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Formula/kos.rb
-          git diff --cached --quiet || git commit -m "Update kos to $TAG"
-          git push
