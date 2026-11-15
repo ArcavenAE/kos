@@ -46,6 +46,13 @@ Three principles resolved every design tradeoff in this session:
   (uncertainty to investigate), not work items. beads (bd) is the designated
   task tracker alongside kos. Probe findings create bd tasks; task completion
   creates kos findings. See grv-kos-as-task-tracker.
+- A mechanism for LLM session continuity. kos is knowledge infrastructure: a
+  knowledge accumulation and projection system for human-AI teams. Carrying a
+  model's context across sessions needs model-level mechanisms
+  (persistent-state inference, graph-native training), which kos tracks as an
+  external research dependency, not a kos property; kos is the substrate such
+  mechanisms would read. Ruled 2026-11-14 (kos#78). See
+  grv-continuity-via-infrastructure.
 - Solving the problem permanently (this is a moment in time, useful for a time)
 
 ---
