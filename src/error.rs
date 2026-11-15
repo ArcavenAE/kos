@@ -35,6 +35,23 @@ pub enum KosError {
     #[error("id error: {message}")]
     Id { message: String },
 
+    #[error("fact store: {0}")]
+    Sqlite(#[from] rusqlite::Error),
+
+    #[error(
+        "fact store: write at version {got} is behind the store's latest version {latest}\n  hint: versions only move forward; pass a version at or above {latest}"
+    )]
+    FactVersionOrder { got: i64, latest: i64 },
+
+    #[error(
+        "fact store: {path} has schema version {found}, this kos reads up to {supported}\n  hint: upgrade kos, or open a store written by this version"
+    )]
+    FactSchemaTooNew {
+        path: String,
+        found: i64,
+        supported: i64,
+    },
+
     #[error("promote: {message}")]
     Promote { message: String },
 

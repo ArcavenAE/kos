@@ -41,6 +41,9 @@ sha2 = "0.10"
 # Self-update (GitHub releases API)
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 
+# Fact store: SQLite in process, compiled in (aae-orc-xxe3n)
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+
 [build-dependencies]
 chrono = "0.4"
 
