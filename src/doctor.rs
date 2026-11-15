@@ -187,27 +187,26 @@ fn check_graph(graph: &GraphSource, workspace: &Workspace, fix: bool) -> Result<
     for node in &nodes {
         // Check filename matches id
         let expected_filename = format!("{}.yaml", node.id);
-        if let Some(actual_filename) = node.source_path.file_name().and_then(|n| n.to_str()) {
-            if actual_filename != expected_filename {
-                err(&format!(
-                    "node {} filename mismatch: expected {}, got {}",
-                    node.id, expected_filename, actual_filename
-                ));
-                id_mismatches += 1;
-            }
+        if let Some(actual_filename) = node.source_path.file_name().and_then(|n| n.to_str())
+            && actual_filename != expected_filename
+        {
+            err(&format!(
+                "node {} filename mismatch: expected {}, got {}",
+                node.id, expected_filename, actual_filename
+            ));
+            id_mismatches += 1;
         }
 
         // Check node is in correct confidence directory
-        if let Some(parent) = node.source_path.parent() {
-            if let Some(dir_name) = parent.file_name().and_then(|n| n.to_str()) {
-                if dir_name != node.confidence.directory() {
-                    err(&format!(
-                        "node {} in {dir_name}/ but confidence is {}",
-                        node.id, node.confidence
-                    ));
-                    dir_mismatches += 1;
-                }
-            }
+        if let Some(parent) = node.source_path.parent()
+            && let Some(dir_name) = parent.file_name().and_then(|n| n.to_str())
+            && dir_name != node.confidence.directory()
+        {
+            err(&format!(
+                "node {} in {dir_name}/ but confidence is {}",
+                node.id, node.confidence
+            ));
+            dir_mismatches += 1;
         }
 
         // Check edge targets resolve
@@ -306,13 +305,12 @@ fn check_graph(graph: &GraphSource, workspace: &Workspace, fix: bool) -> Result<
         if node.confidence != Confidence::Frontier {
             continue;
         }
-        if let Ok(raw) = std::fs::read_to_string(&node.source_path) {
-            if raw.to_lowercase().contains("[resolved]")
+        if let Ok(raw) = std::fs::read_to_string(&node.source_path)
+            && (raw.to_lowercase().contains("[resolved]")
                 || raw.contains("RESOLVED →")
-                || raw.contains("RESOLVED ->")
-            {
-                resolved_markers.push(node.id.as_str());
-            }
+                || raw.contains("RESOLVED ->"))
+        {
+            resolved_markers.push(node.id.as_str());
         }
     }
     if !resolved_markers.is_empty() {

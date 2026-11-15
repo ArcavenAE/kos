@@ -2,7 +2,7 @@
 name = "kos"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.89"
 license = "MIT"
 description = "Graph-based knowledge accumulation for designed systems"
 
@@ -42,7 +42,7 @@ sha2 = "0.10"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 
 # Fact store: SQLite in process, compiled in (aae-orc-xxe3n)
-rusqlite = { version = "0.40.2", features = ["bundled"] }
+rusqlite = { version = "0.43", features = ["bundled"] }
 
 [build-dependencies]
 chrono = "0.4"

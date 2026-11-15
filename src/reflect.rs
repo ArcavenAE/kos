@@ -538,10 +538,10 @@ fn confidence_from_path(path: &str) -> Option<String> {
     // _kos/nodes/<confidence>/<slug>.yaml
     let tokens: Vec<&str> = path.split('/').collect();
     for (i, tok) in tokens.iter().enumerate() {
-        if *tok == "nodes" {
-            if let Some(conf) = tokens.get(i + 1) {
-                return Some((*conf).to_string());
-            }
+        if *tok == "nodes"
+            && let Some(conf) = tokens.get(i + 1)
+        {
+            return Some((*conf).to_string());
         }
     }
     None

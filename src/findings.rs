@@ -278,10 +278,10 @@ impl FindingIndex {
             for entry in read.flatten() {
                 let path = entry.path();
                 let ext = path.extension().and_then(|e| e.to_str());
-                if matches!(ext, Some("md" | "yaml" | "yml")) {
-                    if let Some(stem) = path.file_stem().and_then(|s| s.to_str()) {
-                        stems.push(stem.to_string());
-                    }
+                if matches!(ext, Some("md" | "yaml" | "yml"))
+                    && let Some(stem) = path.file_stem().and_then(|s| s.to_str())
+                {
+                    stems.push(stem.to_string());
                 }
             }
         }

@@ -10,7 +10,7 @@ You don't need to use AI agents to contribute -- just follow this guide and subm
 
 ## Prerequisites
 
-- **Rust 1.85+** -- [install](https://rustup.rs/)
+- **Rust 1.89+** -- [install](https://rustup.rs/)
 - **just** -- [install](https://github.com/casey/just)
 - **nightly rustfmt** -- `rustup component add rustfmt --toolchain nightly`
 
