@@ -400,7 +400,9 @@ provenance.**
   matches. A production ingest needs a defined lexicon, not a window union.
 - **The MDE tests run at kos main 73a5568** (kos#192, which added export,
   import and harvest), from a separate checkout, against a copy of the scored
-  store file. Between the probe's base 071f1252 and 73a5568, the store's
-  schema and write code are unchanged: `SCHEMA_VERSION` is still 1, and
-  `src/facts/mod.rs` changes only one item's visibility. So the copy opens as
-  it is. The report records both shas and the copy's sha256.
+  store file. Between the probe's base 071f1252 and 73a5568,
+  `src/facts/mod.rs` makes `SCHEMA_VERSION` and `LATEST_KEY` `pub(crate)` and
+  adds the `exchange` module, a new export and import path. The `SCHEMA` text
+  and the existing write code are unchanged, and `SCHEMA_VERSION` is still 1,
+  so the copy opens as it is. The report records both shas and the copy's
+  sha256.
