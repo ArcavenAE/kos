@@ -34,6 +34,18 @@ pub struct Node {
     pub compaction: Option<CompactionMeta>,
     #[serde(default)]
     pub provenance: Option<Provenance>,
+    /// v0.4: how far the claim has been examined (RED STUB: never read).
+    #[serde(skip)]
+    pub examination: Option<Examination>,
+    /// v0.4: how much rests on the claim (RED STUB: never read).
+    #[serde(skip)]
+    pub commitment: Option<Commitment>,
+    /// v0.4: how a fact was produced; absent means authored (RED STUB).
+    #[serde(skip)]
+    pub source_grade: Option<SourceGrade>,
+    /// v0.4: premises this node's argument depends on (RED STUB).
+    #[serde(skip)]
+    pub conditional_on: Vec<NodeRef>,
     #[serde(default)]
     pub tags: Vec<String>,
     #[serde(default)]
@@ -340,7 +352,77 @@ pub struct Provenance {
     pub derived_from: Vec<String>,
     #[serde(default)]
     pub reviewed_by: Option<String>,
+    /// v0.4 (RED STUB: never read).
+    #[serde(skip)]
+    pub kind: Option<ProvenanceKind>,
+    /// v0.4 (RED STUB: never read).
+    #[serde(skip)]
+    pub promoted_from: Vec<NodeRef>,
+    /// v0.4 (RED STUB: never read).
+    #[serde(skip)]
+    pub falsifier: Option<String>,
 }
+
+/// A pointer to another node with an optional note: the shape of
+/// `promoted_from` and `conditional_on` entries in v0.4.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+pub struct NodeRef {
+    pub target: String,
+    // RED STUB: writes `note: null` for None.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+macro_rules! red_stub_enum {
+    ($name:ident { $($variant:ident),* }) => {
+        /// RED STUB: reads every value as `Unknown` and writes an empty string.
+        #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+        #[serde(from = "String")]
+        #[non_exhaustive]
+        pub enum $name {
+            $($variant,)*
+            /// A value outside the vocabulary, kept verbatim.
+            Unknown(String),
+        }
+
+        impl From<String> for $name {
+            fn from(raw: String) -> Self {
+                $name::Unknown(raw)
+            }
+        }
+
+        impl Serialize for $name {
+            fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+                s.serialize_str("")
+            }
+        }
+    };
+}
+
+red_stub_enum!(Examination {
+    UnExamined,
+    Questioned,
+    Answered,
+    RuledOut
+});
+red_stub_enum!(Commitment {
+    Floating,
+    LoadBearing,
+    Essential,
+    Abandoned
+});
+red_stub_enum!(ProvenanceKind {
+    Deliberated,
+    EmergentRatified,
+    Inherited,
+    PreQuestion
+});
+red_stub_enum!(SourceGrade {
+    Authored,
+    Compiler,
+    Heuristic,
+    Inferred
+});
 
 // ── Types used by orient (lighter, for findings/charter) ─────
 
