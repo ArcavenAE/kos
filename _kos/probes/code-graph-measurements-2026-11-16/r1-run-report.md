@@ -23,7 +23,7 @@ Status: DRAFT measured-facts file written by the runner. It states what was meas
 
 ## Run conditions
 
-- Every index, check, load and query ran under sandbox-exec with the brief's Probe C profile literally (<probe>/run.sb, sha256 a50acb5e4ffd490677efb3eda1264e52ede8f932a5296601b3ca1a25b45ffc63, 289 lines: the brief's rules, then a deny for each live localhost port on the run host at the time, then 47999 last), env -i, HOME and TMPDIR inside the probe directory, GOPROXY=off GOFLAGS=-mod=readonly GOTOOLCHAIN=local for Go, CARGO_NET_OFFLINE=true for Rust, CARGO_HOME the probe's copy of the crate registry.
+- Every index, check, load and query ran under sandbox-exec with the brief's Probe C profile literally (the profile that ran: 289 lines, sha256 a50acb5e4ffd490677efb3eda1264e52ede8f932a5296601b3ca1a25b45ffc63: the brief's rules, then a deny for each live localhost port on the run host at the time, then 47999 last; the committed run.sb is a summary of it), env -i, HOME and TMPDIR inside the probe directory, GOPROXY=off GOFLAGS=-mod=readonly GOTOOLCHAIN=local for Go, CARGO_NET_OFFLINE=true for Rust, CARGO_HOME the probe's copy of the crate registry.
 - Controls (repeated before each negative control): 192.0.2.1:80 refused with "Operation not permitted"; scratch listener 47999 started inside the sandbox refused inside with "Operation not permitted" and reachable from outside; scratch listener 47998 reachable inside; a write to a fixed path outside the probe directory refused and the file absent; a write inside the probe directory succeeded.
 - The fetches ran outside the sandbox and nothing else did.
 - Go list for the expected-documents lists ran in the sandbox; one write to the real Go module cache stat file was refused by the sandbox ("operation not permitted") and did not stop the list.
@@ -48,7 +48,7 @@ Status: DRAFT measured-facts file written by the runner. It states what was meas
 
 - Symbols: the indexed repo's own module or crate version is replaced by "." (note 3); document entities are prefixed with their repo ("kos:src/orient.rs"); local symbols are skipped for occurrences and for code/implements (the latter differs from the published extractor; code/implements dropped by it: 0 at every commit in both repos).
 - Documents whose path starts with "../" are skipped, as the published extractor does. Cause: the Go build cache sat beside the clone, so scip-go indexed the test mains it generated. kos: 0 dropped. marvel: 67 to 68 documents per commit, 6,516 (version 1) to 6,801 (version 50) facts per commit, 3,353 documents and 332,733 facts over the 50 commits (dropped_facts = distinct (role, symbol) pairs the dropped documents would have produced).
-- kos/ knowledge facts are read by kos's own parsers (kos::model::Node through kos::yaml, kos::findings::load_finding_file): refused by the parser at every one of the 100 commits: 0; read by the fallback: 0; lost: 0. kos 144 to 156 nodes and findings per commit, marvel 154 to 156.
+- kos/ knowledge facts are read by kos's own parsers (kos::model::Node through kos::yaml, kos::findings::load_finding_file): refused by the parser at every one of the 100 commits: 0; read by the fallback: 0; lost: 0. kos 144 to 152 nodes and findings read per commit, marvel 154 to 157 (corrected: an earlier draft of this line said 144 to 156 and 154 to 156, which was wrong; the per-commit tables prep-kos.tsv and prep-marvel.tsv, column read_by_kos_parser, give these ranges).
 - The names-dep vocabulary (crate or module names a node's text names): v2 = the dependencies declared at the commit being read; v3 = the union of dependency names across the 50-commit window (kos 18, marvel 29; <probe>/gt/deps-union-*.txt). v3's bias: a name that is a dependency only at another commit of the window still matches.
 
 ## Stores and binaries
@@ -61,7 +61,7 @@ Status: DRAFT measured-facts file written by the runner. It states what was meas
 ## C1, load time (v3)
 
 - 100 loads, 0 errors. Time from fact file to committed rows: max 1.56 s, p95 0.04 s; the bar is under 10 s per commit and repo: PASS.
-- Equality: for versions 1 to 50 the store's code/ and kos/ facts equal the union of the two repos' fact files and the diff between consecutive versions equals the files' set difference: 50 of 50 equal, 0 mismatches (<probe>/c1.log). Checker control: one fact line deleted from a copy of one marvel file (version 30) gives mismatches at versions 30 and 31 and exit 1 (<probe>/c1-mutant.log).
+- Equality: for versions 1 to 50 the store's code/ and kos/ facts equal the union of the two repos' fact files and the diff between consecutive versions equals the files' set difference: 50 of 50 equal, 0 mismatches (<probe>/c1.log). Checker control: one fact line (line 5) deleted from a copy of marvel's version-30 fact file, nothing else changed, gives mismatches at versions 30 (state and diff) and 31 (diff only) and exit 1 (c1-mutant.log).
 
 ## C2, provenance (v3)
 
@@ -98,11 +98,11 @@ Report path: <probe>/report/r1-run-report.md.
 (deny network-outbound (remote ip "localhost:4242"))
 (deny network-outbound (remote ip "localhost:7422"))
 (deny network-outbound (remote ip "localhost:7442"))
-(deny network-outbound (remote ip "localhost:<port>"))   one line per live localhost listener port on the host at the time, 276 lines
+(deny network-outbound (remote ip "localhost:<port>"))   one line per live localhost listener port on the host at the time, 275 lines
 (deny network-outbound (remote ip "localhost:47999"))
 ```
 
-The 289 lines are in <probe>/run.sb (sha256 a50acb5e4ffd490677efb3eda1264e52ede8f932a5296601b3ca1a25b45ffc63). The live-port denies were read from the host at the run; the control port 47999 is a scratch port, not a live service.
+The profile that ran had 289 lines (sha256 a50acb5e4ffd490677efb3eda1264e52ede8f932a5296601b3ca1a25b45ffc63). It is not committed, because its 275 unnamed deny lines list the host's live ports; the committed run.sb is a summary of it: the 8 rule lines, the five named denies, one comment line in place of the 275, and the control port last. The live-port denies were read from the host at the run; the control port 47999 is a scratch port, not a live service.
 
 ## Queries, quoted (plain reads through the store's API, no SQL)
 
@@ -134,7 +134,7 @@ The 289 lines are in <probe>/run.sb (sha256 a50acb5e4ffd490677efb3eda1264e52ede8
 ## MDE tests (run after note 5 was approved)
 
 Setup. kos at main 73a55684a1552107bbaa282bddc67f6d866b270b (kos#192), from a separate clone made with git clone --no-local from the host's local checkout and checked out detached; the probe's own code is one untracked file, src/bin/r1_mde.rs (a copy is beside this report; sha256 175e13f94a3a332f23a1582b4c3254bb99c1af55adbf049b4625ee8c7d105a5f), built with cargo build --locked --offline, outside the sandbox, with the probe's CARGO_HOME. Probe base for the scored store: kos 071f1252e5f9ccf23610427bbd492e39b6885d22. The store file is a copy of the scored v3 store: <probe>/store-v3-mde-copy.db sha256 c0207ac041b86b487bba4df4e65617bffc5bcdb6f97f804aad991bb88395ebb0, checked equal to the original before the run and after it (the original was never opened by these runs). MDE binary sha256 b527a3ce839e179f6d4fc1445d11032f9dd3004033a41cbbf75b7f563da3bf0a (an earlier build, which counted a fact's first-ever interval instead of the one live at the head, was replaced after the first round-trip run; its output was not used). The crate-name vocabulary is the scored v3 list, unchanged. The copy opened as it is: SCHEMA_VERSION is still 1.
-Run conditions: every test ran under the sandbox profile run.sb (sha256 a50acb5e4ffd490677efb3eda1264e52ede8f932a5296601b3ca1a25b45ffc63, network lines quoted above), env -i with HOME and TMPDIR in the probe directory, no MARVEL_ variables; five controls run first, in this order, results as expected: 192.0.2.1:80 refused inside with "Operation not permitted"; a fresh scratch listener on 47999, started for this run, refused inside with "Operation not permitted" and reachable from outside; a scratch listener on 47998 reachable inside; a write to a fixed path outside the probe directory refused ("Operation not permitted") and absent; a write inside the probe directory succeeded. No unix-socket allows were needed. Offline: the tests open local files only.
+Run conditions: every test ran under the sandbox profile that ran (sha256 a50acb5e4ffd490677efb3eda1264e52ede8f932a5296601b3ca1a25b45ffc63, network lines quoted above), env -i with HOME and TMPDIR in the probe directory, no MARVEL_ variables; five controls run first, in this order, results as expected: 192.0.2.1:80 refused inside with "Operation not permitted"; a fresh scratch listener on 47999, started for this run, refused inside with "Operation not permitted" and reachable from outside; a scratch listener on 47998 reachable inside; a write to a fixed path outside the probe directory refused ("Operation not permitted") and absent; a write inside the probe directory succeeded. No unix-socket allows were needed. Offline: the tests open local files only.
 
 ### Tool lock-in
 Criterion (brief): all facts, intervals and provenance export to JSONL and re-import into a fresh store whose per-commit fact counts and C1 pair differences equal the source's; export and import times measured.
@@ -156,3 +156,11 @@ Result: PASS, with the recorded changes.
 
 ## Files added beside this report for the MDE tests
 - r1_mde.rs, mde-lockin.log, mde-roundtrip-kos.log, mde-roundtrip-marvel.log, picks-kos.tsv, picks-marvel.tsv.
+
+## More files beside this report (second staging)
+- w7.log: the W7 run's output (recall, precision, rows, provenance line).
+- c1-mutant.log: the C1 checker control, the run with one fact line deleted at version 30.
+- run.sb: a summary of the profile that ran: the 8 rule lines, the denies for 3307, 4222, 4242, 7422 and 7442, the line "; 275 live listener ports denied, read from the host at run time" in place of those 275 lines, and the control port 47999 last. The profile that ran is sha256 a50acb5e4ffd490677efb3eda1264e52ede8f932a5296601b3ca1a25b45ffc63; the summary's own hash differs.
+- deny-advisories.log: the cargo deny advisories result ("advisories ok").
+- gt/w7-kos-fe1702a8.txt, gt/w7-marvel-5eb450df.txt: the W7 ground-truth file lists; gt/expect-docs-kos-fe1702a8.txt, gt/expect-docs-marvel-5eb450df.txt: the expected-documents lists for the indexer checks; gt/golist.err: the one line the Go listing wrote to stderr, with the module-cache path replaced by <gomodcache>.
+- Left out: the per-commit expected-documents directory (expect/, about 800 KB); the report is the only record of its totals.

@@ -1,0 +1,18 @@
+cmd/marvel/doctor_installed.go:245:	home, err := os.UserHomeDir()
+internal/api/account.go:114:	userHome, err := os.UserHomeDir()
+internal/api/account.go:98:	userHome, err := os.UserHomeDir()
+internal/api/handoff_path.go:28:		home, err := os.UserHomeDir()
+internal/api/trusted_folders.go:196:	home, _ := os.UserHomeDir()
+internal/config/config.go:1020:		if home, err := os.UserHomeDir(); err == nil {
+internal/daemon/watchdog.go:497:	home, _ := os.UserHomeDir()
+internal/daemon/watchdog.go:736:	home, _ := os.UserHomeDir()
+internal/daemonrpc/client.go:624:	home, err := os.UserHomeDir()
+internal/homeguard/homeguard.go:117:	// os.UserHomeDir is read here on purpose: it is what the code under test
+internal/homeguard/homeguard.go:119:	got, err := os.UserHomeDir()
+internal/homeguard/homeguard.go:153:// once before HOME is replaced. It is user.Current, not os.UserHomeDir, so the
+internal/paths/home.go:53:	if home, err := os.UserHomeDir(); err == nil && l.Home == filepath.Join(home, ".marvel") {
+internal/paths/paths.go:68:	home, err := os.UserHomeDir()
+internal/runtime/codex_trust.go:57:	home, _ := os.UserHomeDir()
+internal/runtime/codex.go:92:		if home, err := os.UserHomeDir(); err == nil {
+internal/session/projection.go:429:		home, err := os.UserHomeDir()
+internal/usage/accountant.go:157:	home, _ := os.UserHomeDir()

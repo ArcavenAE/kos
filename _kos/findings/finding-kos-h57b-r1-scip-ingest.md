@@ -13,7 +13,11 @@ finding-kos-8bmj and finding-kos-qttt (the store probes)
 Runner: a kos builder seat (arcaven team). Author: the arcaven architect seat,
 which wrote the brief.
 Evidence: `_kos/probes/code-graph-measurements-2026-11-16/` (the run report,
-sha256 70ec0047, its per-commit tables and the MDE logs)
+sha256 8f836c9e, its per-commit tables, the W7, C1-mutant, MDE and advisory
+logs, a summary of the sandbox profile, and the W7 and document ground truth under `gt/`).
+Resting on the report alone: the per-commit expected-document lists
+(`expect/`, 800K), the per-commit fact files, the load log, the C2 check over
+W6's 290 rows, and the W8 provenance reads.
 
 ## Headline
 
@@ -55,7 +59,8 @@ which note 1 records as a deviation. The `scip` crate and its dependency
 closure were fetched into the probe's own `CARGO_HOME` (note 3, note 4).
 
 The run conditions are those of the brief: `env -i`, a scratch HOME and
-TMPDIR, Go offline, and the Probe C sandbox profile (sha256 a50acb5e) with its
+TMPDIR, Go offline, and the Probe C sandbox profile (the profile that ran is
+sha256 a50acb5e; the committed `run.sb` is a summary of it) with its
 five controls passing before each step. The store file is c0207ac0 and the
 ingest binary af030637. Full shas are in the run report.
 
@@ -90,8 +95,9 @@ still resolve, so the run report only counts it.
 | W6 a past change | partially served | changes at 829c392 correct (77 added, 213 removed); no decision record |
 | W8 why | partially served | interval correct (live at version 1, not from version 4), provenance at both ends; no decision record |
 
-C1 was checked with a mutant: one changed line at version 30 turned versions
-30 and 31 red. C2 over W6's rows was checked after the scored loads, by a
+C1 was checked with a mutant: one fact line deleted from a copy of marvel's
+version-30 fact file turned version 30 red (state and diff) and version 31 red
+(diff only). C2 over W6's rows was checked after the scored loads, by a
 binary that differs from the scored one (af030637) only by that added
 read-only check (7ea39083); the store was unchanged by it.
 
