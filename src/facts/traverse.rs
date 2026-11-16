@@ -4,11 +4,10 @@
 //! an entity to the values of one attribute; a backward step maps a value to
 //! the entities that carry it. Each step is one indexed point lookup per
 //! element of the frontier, so no hop reads the whole log.
-//!
-//! RED STUB: every call returns no hops so the tests compile and fail on their
-//! assertions. The implementation follows.
 
 use std::collections::BTreeSet;
+
+use rusqlite::params;
 
 use super::{FactStore, Version};
 use crate::error::Result;
@@ -47,18 +46,49 @@ impl Step {
     }
 }
 
+fn first_column(row: &rusqlite::Row<'_>) -> rusqlite::Result<String> {
+    row.get(0)
+}
+
 impl FactStore {
     /// Apply `steps` to `seeds` as the facts hold at `version`. Returns one set
-    /// per step, in order: the elements reached by that hop.
+    /// per step, in order: the elements reached by that hop. Repeated seeds
+    /// count once. An attribute no fact carries gives an empty hop.
     ///
     /// # Errors
     /// Fails on a SQLite error.
     pub fn traverse(
         &self,
-        _version: Version,
-        _seeds: &[String],
-        _steps: &[Step],
+        version: Version,
+        seeds: &[String],
+        steps: &[Step],
     ) -> Result<Vec<BTreeSet<String>>> {
-        Ok(Vec::new())
+        let mut forward = self.conn.prepare_cached(concat!(
+            "SELECT v FROM facts WHERE e = ?1 AND a = ?2 AND ",
+            live_at!("3")
+        ))?;
+        let mut backward = self.conn.prepare_cached(concat!(
+            "SELECT e FROM facts WHERE a = ?1 AND v = ?2 AND ",
+            live_at!("3")
+        ))?;
+        let mut frontier: BTreeSet<String> = seeds.iter().cloned().collect();
+        let mut hops = Vec::with_capacity(steps.len());
+        for step in steps {
+            let mut reached = BTreeSet::new();
+            for element in &frontier {
+                let rows = match step.direction {
+                    Direction::Forward => forward
+                        .query_map(params![element, step.attribute, version.0], first_column)?,
+                    Direction::Backward => backward
+                        .query_map(params![step.attribute, element, version.0], first_column)?,
+                };
+                for row in rows {
+                    reached.insert(row?);
+                }
+            }
+            hops.push(reached.clone());
+            frontier = reached;
+        }
+        Ok(hops)
     }
 }

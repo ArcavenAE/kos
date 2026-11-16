@@ -57,6 +57,9 @@ pub enum KosError {
     )]
     FactImportNotEmpty,
 
+    #[error("kos facts: {message}")]
+    FactCommand { message: String },
+
     #[error("fact import: header: {message}")]
     FactImportHeader { message: String },
 
