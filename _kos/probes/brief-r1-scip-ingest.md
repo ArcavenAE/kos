@@ -81,7 +81,8 @@ this probe as written:
   at the main head when this brief merges (FILLED AT RUN), oldest first. Each
   commit list is written to a file and its sha256 recorded before any index is
   built. kos's window includes 829c392, the commit that replaced `serde_yaml`
-  with `serde-saphyr` (42 first-parent commits before kos main at 87743bb).
+  with `serde-saphyr` (the 42nd first-parent commit counting back from kos
+  main at 87743bb).
 - **Clones:** scratch clones made from the run host's existing local checkouts
   (`git clone --no-local`), never from the network.
 - **Indexers:** rust-analyzer `scip`, invoked by its absolute toolchain path,
@@ -89,7 +90,11 @@ this probe as written:
   `github.com/scip-code/scip-go`. Both already installed, versions recorded.
 - **Ground truth:** written to a file, with its sha256 recorded, before the
   ingest runs. It comes from `git grep` and `git log` at the pinned commits, as
-  each workload below states, never from the store.
+  each workload below states, never from the store. Pre-run premise check:
+  each workload's ground truth is non-empty in every repo it names. An empty
+  one stops the run before the ingest, and is reported with the command that
+  produced it, because a workload with nothing to find fails for a reason that
+  has nothing to do with the store.
 
 ## Silent degradation check, built into the ingest (finding-kos-ndz7)
 
@@ -128,13 +133,16 @@ Each workload is answered by one store query, written before the run and quoted
 in the finding. "Served" and "not served" use finding-kos-wre7's definitions.
 
 - **W7, one query across two repos.** "Where does each of kos and marvel
-  resolve the user's home directory?" The query asks for references to the
-  external symbols `dirs_next::home_dir` (kos) and `os.UserHomeDir` (marvel) at
-  each repo's pinned head. Ground truth: the non-test call sites from
-  `git grep` at the same commits. Served means one query returns sites in
-  both repos, with recall of at least 0.9 against the ground truth; precision
-  is reported. This replaces finding-kos-wre7's logging question, because
-  kos's `Cargo.toml` at 87743bb names no logging crate.
+  resolve a per-user directory?" The query asks for references to the external
+  symbols `dirs_next::data_dir` (kos) and `os.UserHomeDir` (marvel) at each
+  repo's pinned head. kos never reads the home directory itself: at 87743bb
+  its one per-user lookup is `dirs_next::data_dir` (src/orient.rs:1327), which
+  resolves under the home directory, so it stands in for home there. marvel at
+  627a51c5 has 18 non-test `os.UserHomeDir` calls. Ground truth: the non-test
+  call sites from `git grep` at the same commits. Served means one query
+  returns sites in both repos, with recall of at least 0.9 against the ground
+  truth; precision is reported. This replaces finding-kos-wre7's logging
+  question, because kos's `Cargo.toml` at 87743bb names no logging crate.
 - **W6, what did a past change touch and decide?** Fixed at the lock as the
   kos commit 829c392. The query returns the `code/` facts whose interval
   starts or ends at that commit, plus any `kos/` fact naming the commit or its
