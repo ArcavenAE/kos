@@ -316,3 +316,19 @@ and fell back to `--no-deps`.
   gives the count. If the run shows that an index with the warning lacks std
   symbols that an index without it has, the finding says so and names the
   warning as a candidate refusal condition for the production ingest.
+
+**Note 3, 2026-11-16: symbol identity across commits, and the crate fetch.**
+
+- The `scip` crate and its dependency closure were not in the run host's crate
+  cache. By the director's ruling they were fetched into the probe's own
+  `CARGO_HOME`, outside the sandbox for the fetch only, with `Cargo.lock` and
+  checksums recorded and `cargo deny check advisories` run before the build.
+  This is a deviation of the same kind as note 1's; the method above is
+  unchanged.
+- Symbol identity follows the published extractor that Probes A to C used
+  (`code-graph-measurements-2026-10-21/bin/facts.py`): the indexed repo's own
+  module or crate version inside a symbol is replaced by `.`. scip-go writes
+  the main module's version into every own symbol, and that version moves with
+  the commit. Without the replacement, every own fact would end and restart at
+  each commit, and C1 and W6 would measure version churn rather than code
+  change. The ground-truth fact files apply the same replacement.
