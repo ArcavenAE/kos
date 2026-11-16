@@ -271,6 +271,94 @@ enum Commands {
 
     /// Show version, commit, tag (release reference), build time, and channel
     Version,
+
+    /// Work with a fact store file (a SQLite valid-time store of facts)
+    Facts {
+        #[command(subcommand)]
+        action: FactsAction,
+    },
+}
+
+/// `kos facts <action>`. Every action names its store with a required --db;
+/// kos decides no default location.
+#[derive(clap::Subcommand)]
+enum FactsAction {
+    /// Assert the facts of a harvested-facts YAML file at version --at
+    Load {
+        /// The fact store file
+        #[arg(long)]
+        db: PathBuf,
+
+        /// The version to assert the facts at
+        #[arg(long)]
+        at: i64,
+
+        /// A harvested-facts YAML file (a .jsonl file goes to `kos facts import`)
+        file: PathBuf,
+    },
+
+    /// Replay a JSONL export into an empty fact store
+    Import {
+        /// The fact store file
+        #[arg(long)]
+        db: PathBuf,
+
+        /// A JSONL export (a .yaml file goes to `kos facts load`)
+        file: PathBuf,
+    },
+
+    /// Write the whole history as JSONL, to stdout or to a new file
+    Export {
+        /// The fact store file
+        #[arg(long)]
+        db: PathBuf,
+
+        /// Write to this file instead of stdout; an existing file is refused
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+
+    /// Print the facts that hold at version --at
+    AsOf {
+        /// The fact store file
+        #[arg(long)]
+        db: PathBuf,
+
+        /// The version to read
+        #[arg(long)]
+        at: i64,
+
+        /// Only facts of this entity
+        #[arg(long)]
+        entity: Option<String>,
+
+        /// Only facts of this attribute
+        #[arg(long)]
+        attribute: Option<String>,
+
+        /// Output JSONL, one {e,a,v} per line
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Print what changed from version --from to version --to
+    Diff {
+        /// The fact store file
+        #[arg(long)]
+        db: PathBuf,
+
+        /// The earlier version
+        #[arg(long)]
+        from: i64,
+
+        /// The later version
+        #[arg(long)]
+        to: i64,
+
+        /// Output JSONL, one {op,e,a,v} per line
+        #[arg(long)]
+        json: bool,
+    },
 }
 
 /// A section of `kos validate` that can run alone, with its own exit status.
@@ -752,6 +840,22 @@ fn main() -> anyhow::Result<()> {
                 }
             }
         }
+
+        Commands::Facts { action } => match action {
+            FactsAction::Load { db, at, file } => kos::facts::cli::load(&db, at, &file)?,
+            FactsAction::Import { db, file } => kos::facts::cli::import(&db, &file)?,
+            FactsAction::Export { db, out } => kos::facts::cli::export(&db, out.as_deref())?,
+            FactsAction::AsOf {
+                db,
+                at,
+                entity,
+                attribute,
+                json,
+            } => kos::facts::cli::as_of(&db, at, entity.as_deref(), attribute.as_deref(), json)?,
+            FactsAction::Diff { db, from, to, json } => {
+                kos::facts::cli::diff(&db, from, to, json)?;
+            }
+        },
 
         Commands::Version => {
             println!("kos {}", env!("KOS_LONG_VERSION"));

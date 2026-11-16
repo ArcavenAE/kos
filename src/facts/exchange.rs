@@ -63,8 +63,7 @@ impl Scalar {
 #[derive(Deserialize)]
 struct RawHarvest {
     kind: Option<String>,
-    #[serde(default)]
-    source: BTreeMap<String, Scalar>,
+    source: Option<BTreeMap<String, Scalar>>,
     #[serde(default)]
     facts: Vec<RawFact>,
 }
@@ -100,8 +99,9 @@ impl Harvest {
     /// Parse a harvested-facts YAML file.
     ///
     /// # Errors
-    /// Fails when the text is not YAML, has no `kind: harvested-facts`, or has
-    /// a fact without all of `e`, `a` and `v`.
+    /// Fails when the text is not YAML, has no `kind: harvested-facts`, has no
+    /// `source` or a `source` without `repo` and `commit`, or has a fact
+    /// without all of `e`, `a` and `v`.
     pub fn parse(yaml: &str) -> Result<Self> {
         let raw: RawHarvest =
             crate::yaml::from_str(yaml).map_err(|e| format_error(e.to_string()))?;
@@ -118,12 +118,18 @@ impl Harvest {
                 )));
             }
         }
+        let Some(raw_source) = raw.source else {
+            return Err(format_error(
+                "no source; a harvest file needs source.repo and source.commit",
+            ));
+        };
+        let source: BTreeMap<String, String> = raw_source
+            .into_iter()
+            .map(|(k, v)| (k, v.into_text()))
+            .collect();
+        require_provenance(&source)?;
         Ok(Self {
-            source: raw
-                .source
-                .into_iter()
-                .map(|(k, v)| (k, v.into_text()))
-                .collect(),
+            source,
             facts: raw
                 .facts
                 .into_iter()
@@ -131,6 +137,17 @@ impl Harvest {
                 .collect(),
         })
     }
+}
+
+/// A harvest's source is its provenance: it must name the repo and the
+/// commit. The writer and the reader hold the same rule.
+fn require_provenance(source: &BTreeMap<String, String>) -> Result<()> {
+    for key in ["repo", "commit"] {
+        if source.get(key).is_none_or(|v| v.trim().is_empty()) {
+            return Err(format_error(format!("source needs a non-empty {key}")));
+        }
+    }
+    Ok(())
 }
 
 impl FactStore {
@@ -217,11 +234,7 @@ impl FactStore {
         picks: &[Fact],
         source: &BTreeMap<String, String>,
     ) -> Result<String> {
-        for key in ["repo", "commit"] {
-            if source.get(key).is_none_or(|v| v.trim().is_empty()) {
-                return Err(format_error(format!("source needs a non-empty {key}")));
-            }
-        }
+        require_provenance(source)?;
         let mut facts: Vec<&Fact> = picks.iter().collect();
         facts.sort();
         facts.dedup();
