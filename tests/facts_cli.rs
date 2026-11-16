@@ -412,3 +412,303 @@ fn at_is_the_version_flag_and_version_is_not_a_facts_flag_and_db_is_required() {
     );
     assert!(no_db.stderr.contains("--db"), "{:?}", no_db.stderr);
 }
+
+// ---- review round 1 on kos#194: every refusal carries a hint line, and a
+// refused import leaves no store behind ----
+
+/// True when some stderr line, trimmed, starts with `hint:`.
+fn has_hint(stderr: &str) -> bool {
+    stderr.lines().any(|l| l.trim_start().starts_with("hint:"))
+}
+
+fn export_text(db: &Path) -> Vec<u8> {
+    let mut text = Vec::new();
+    FactStore::open(db)
+        .unwrap()
+        .export_jsonl(&mut text)
+        .unwrap();
+    text
+}
+
+#[test]
+fn every_refusal_the_commands_can_return_prints_a_hint_line() {
+    let dir = tempfile::tempdir().unwrap();
+    let d = dir.path();
+    let good_db = changing_store(d);
+    let good_export = d.join("good.jsonl");
+    fs::write(&good_export, export_text(&good_db)).unwrap();
+    let no_source = harvest_file(d, "nosource.yaml", false);
+    let good_yaml = harvest_file(d, "good.yaml", true);
+    let not_json = d.join("notjson.jsonl");
+    fs::write(&not_json, "this is not json\n").unwrap();
+    let bad_line = d.join("badline.jsonl");
+    let header = good_export_header(&good_export);
+    fs::write(&bad_line, format!("{header}\n{{\"e\":1}}\n")).unwrap();
+    let garbage_db = d.join("garbage.db");
+    fs::write(
+        &garbage_db,
+        "this is not a sqlite file, just text\n".repeat(200),
+    )
+    .unwrap();
+    let missing = d.join("missing");
+    let taken = d.join("taken.jsonl");
+    fs::write(&taken, "keep\n").unwrap();
+    let ahead_db = d.join("ahead.db");
+    {
+        let mut s = FactStore::open(&ahead_db).unwrap();
+        s.assert_facts(v(9), &[f("e", "a", "v")]).unwrap();
+    }
+    let nested = d.join("no-such-dir").join("out.jsonl");
+
+    // (label, args) for every refusal path a command has.
+    let cases: Vec<(&str, Vec<String>)> = vec![
+        (
+            "import: header is not JSON",
+            vec![
+                "import".into(),
+                "--db".into(),
+                s(&d.join("n1.db")),
+                s(&not_json),
+            ],
+        ),
+        (
+            "import: a bad line",
+            vec![
+                "import".into(),
+                "--db".into(),
+                s(&d.join("n2.db")),
+                s(&bad_line),
+            ],
+        ),
+        (
+            "import: file missing",
+            vec![
+                "import".into(),
+                "--db".into(),
+                s(&d.join("n3.db")),
+                s(&missing.with_extension("jsonl")),
+            ],
+        ),
+        (
+            "import: store not empty",
+            vec![
+                "import".into(),
+                "--db".into(),
+                s(&ahead_db),
+                s(&good_export),
+            ],
+        ),
+        (
+            "import: yaml file",
+            vec![
+                "import".into(),
+                "--db".into(),
+                s(&d.join("n4.db")),
+                s(&good_yaml),
+            ],
+        ),
+        (
+            "import: db is not a SQLite file",
+            vec![
+                "import".into(),
+                "--db".into(),
+                s(&garbage_db),
+                s(&good_export),
+            ],
+        ),
+        (
+            "load: file missing",
+            vec![
+                "load".into(),
+                "--db".into(),
+                s(&d.join("n5.db")),
+                "--at".into(),
+                "1".into(),
+                s(&missing.with_extension("yaml")),
+            ],
+        ),
+        (
+            "load: no source",
+            vec![
+                "load".into(),
+                "--db".into(),
+                s(&d.join("n6.db")),
+                "--at".into(),
+                "1".into(),
+                s(&no_source),
+            ],
+        ),
+        (
+            "load: jsonl file",
+            vec![
+                "load".into(),
+                "--db".into(),
+                s(&d.join("n7.db")),
+                "--at".into(),
+                "1".into(),
+                s(&good_export),
+            ],
+        ),
+        (
+            "load: version behind the store",
+            vec![
+                "load".into(),
+                "--db".into(),
+                s(&ahead_db),
+                "--at".into(),
+                "3".into(),
+                s(&good_yaml),
+            ],
+        ),
+        (
+            "load: db is not a SQLite file",
+            vec![
+                "load".into(),
+                "--db".into(),
+                s(&garbage_db),
+                "--at".into(),
+                "1".into(),
+                s(&good_yaml),
+            ],
+        ),
+        (
+            "export: store missing",
+            vec!["export".into(), "--db".into(), s(&d.join("absent.db"))],
+        ),
+        (
+            "export: out exists",
+            vec![
+                "export".into(),
+                "--db".into(),
+                s(&good_db),
+                "--out".into(),
+                s(&taken),
+            ],
+        ),
+        (
+            "export: out cannot be created",
+            vec![
+                "export".into(),
+                "--db".into(),
+                s(&good_db),
+                "--out".into(),
+                s(&nested),
+            ],
+        ),
+        (
+            "export: db is not a SQLite file",
+            vec!["export".into(), "--db".into(), s(&garbage_db)],
+        ),
+        (
+            "as-of: store missing",
+            vec![
+                "as-of".into(),
+                "--db".into(),
+                s(&d.join("absent.db")),
+                "--at".into(),
+                "1".into(),
+            ],
+        ),
+        (
+            "as-of: db is not a SQLite file",
+            vec![
+                "as-of".into(),
+                "--db".into(),
+                s(&garbage_db),
+                "--at".into(),
+                "1".into(),
+            ],
+        ),
+        (
+            "diff: store missing",
+            vec![
+                "diff".into(),
+                "--db".into(),
+                s(&d.join("absent.db")),
+                "--from".into(),
+                "1".into(),
+                "--to".into(),
+                "2".into(),
+            ],
+        ),
+        (
+            "diff: db is not a SQLite file",
+            vec![
+                "diff".into(),
+                "--db".into(),
+                s(&garbage_db),
+                "--from".into(),
+                "1".into(),
+                "--to".into(),
+                "2".into(),
+            ],
+        ),
+    ];
+    let mut missing_hint = Vec::new();
+    for (label, rest) in &cases {
+        let mut args = vec!["facts".to_string()];
+        args.extend(rest.iter().cloned());
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        let out = kos(&refs);
+        assert_eq!(out.code, 1, "{label}: exit 1, stderr {:?}", out.stderr);
+        assert_eq!(out.stdout, "", "{label}: nothing on stdout");
+        if !has_hint(&out.stderr) {
+            missing_hint.push(format!("{label}: {:?}", out.stderr));
+        }
+    }
+    assert!(
+        missing_hint.is_empty(),
+        "refusals with no hint line:\n{}",
+        missing_hint.join("\n")
+    );
+}
+
+fn good_export_header(export: &Path) -> String {
+    fs::read_to_string(export)
+        .unwrap()
+        .lines()
+        .next()
+        .unwrap()
+        .to_string()
+}
+
+#[test]
+fn a_refused_import_leaves_no_store_behind() {
+    let dir = tempfile::tempdir().unwrap();
+    let d = dir.path();
+    let source = changing_store(d);
+    let good_header = {
+        let text = String::from_utf8(export_text(&source)).unwrap();
+        text.lines().next().unwrap().to_string()
+    };
+    let cases = [
+        ("header is not JSON", "not json at all\n".to_string()),
+        ("header names no format", "{\"hello\":1}\n".to_string()),
+        ("a bad second line", format!("{good_header}\n{{\"e\":1}}\n")),
+        ("an empty file", String::new()),
+    ];
+    for (label, body) in cases {
+        let file = d.join("bad.jsonl");
+        fs::write(&file, body).unwrap();
+        let db = d.join("fresh.db");
+        let out = kos(&["facts", "import", "--db", &s(&db), &s(&file)]);
+        assert_eq!(out.code, 1, "{label}: refused, stderr {:?}", out.stderr);
+        assert!(
+            !db.exists(),
+            "{label}: a refused import must not create the store"
+        );
+    }
+    // A store that already exists is left byte for byte as it was.
+    let existing = d.join("empty.db");
+    drop(FactStore::open(&existing).unwrap());
+    let before = fs::read(&existing).unwrap();
+    let file = d.join("bad2.jsonl");
+    fs::write(&file, "not json\n").unwrap();
+    let out = kos(&["facts", "import", "--db", &s(&existing), &s(&file)]);
+    assert_eq!(out.code, 1);
+    assert_eq!(
+        fs::read(&existing).unwrap(),
+        before,
+        "an existing store is untouched"
+    );
+}
