@@ -1,0 +1,59 @@
+id: grv-continuity-via-infrastructure
+type: graveyard
+confidence: graveyard
+title: "Continuity via infrastructure: kos as the mechanism of LLM session continuity (ruled out)"
+content: |
+  RULED OUT 2026-11-14 by the operator (Desk card kdec-17, option 1), closing
+  the mission split of roadmap Issue 16 (kos#78). The ruling, verbatim:
+
+    "Accept kos#78. kos's mission is knowledge infrastructure.
+    Continuity-via-infrastructure goes to the graveyard with kos#78's
+    reopener. The cost: features that only serve continuity need another
+    home."
+
+  kos had been carrying two missions at once: knowledge infrastructure (a graph
+  of what a project knows, with confidence and provenance), and continuity for
+  LLM sessions (kos as the thing that lets a model carry context from one
+  session to the next). Work that served one was routinely counted as serving
+  both, without anyone saying which. The ruling keeps the first and rules out
+  the second as a kos property.
+
+  What this does not rule out: kos as the knowledge a continuity mechanism
+  reads. That is the reopener below, unchanged from Issue 16. Nor does it close
+  question-collaboration-continuity, which asks how context moves between
+  sessions in practice. That question stays open; any answer that is a feature
+  serving only continuity belongs outside kos, per the ruling's stated cost.
+graveyard:
+  approach: |
+    Treat session continuity for LLM agents as something kos provides: build
+    kos features whose purpose is to restore a model's context across sessions.
+  context: |
+    The human carries continuity and the model carries inference within one
+    session (question-collaboration-continuity), so a persistent knowledge
+    graph looked like the natural carrier. Roadmap v1 Issue 16 named the
+    conflation; v3 (M5) kept the issue as written.
+  finding: |
+    LLM continuity requires model-level mechanisms (persistent-state
+    inference, graph-native training), which kos does not supply and cannot
+    supply as infrastructure (roadmap v1 Issue 16). Counting continuity as a
+    kos property let the two missions borrow against each other.
+  ruling: |
+    kos's mission is knowledge infrastructure. Features that serve only
+    continuity are not kos features and need another home (operator,
+    2026-11-14, Desk kdec-17).
+  reopener: |
+    When such mechanisms exist, KOS is the substrate they operate on (roadmap
+    v1 Issue 16, deliverable a, verbatim). Concretely: a model-level mechanism
+    for carrying state across sessions (persistent-state inference or
+    graph-native training) that reads a knowledge graph as its input.
+edges:
+  - target: question-collaboration-continuity
+    type: partially_resolves
+    note: "rules continuity out as a kos property; how context moves between sessions stays open, and continuity-only answers belong outside kos"
+provenance:
+  created_by: human
+  session: "desk-kdec-17-2026-11-14"
+  created_at: "2026-11-15"
+  evidence:
+    - docs/kos-roadmap.md
+    - docs/kos-roadmap-v3.md
