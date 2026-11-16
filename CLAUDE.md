@@ -15,7 +15,7 @@ See docs/product-brief.md for the CLI tool overview.
 
 ## Build / Run / Test
 
-Requires: Rust 1.85+ (Edition 2024), `just`, nightly rustfmt.
+Requires: Rust 1.89+ (Edition 2024), `just`, nightly rustfmt.
 
 ```sh
 just build          # cargo build

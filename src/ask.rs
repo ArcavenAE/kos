@@ -203,11 +203,11 @@ pub fn rank_with(
                     _ => None,
                 }
             });
-            if let Some(j) = cited {
-                if j != i {
-                    neighbors[i].insert(j);
-                    neighbors[j].insert(i);
-                }
+            if let Some(j) = cited
+                && j != i
+            {
+                neighbors[i].insert(j);
+                neighbors[j].insert(i);
             }
         }
     }
@@ -423,10 +423,10 @@ pub fn load_corpus(graph_dir: &Path) -> Result<Vec<Node>> {
 /// `--target` naming a discovered graph wins; otherwise mirror the resolution
 /// `orient` uses for where it logs a read.
 fn resolve_graph(workspace: &Workspace, cwd: &Path, target: Option<&str>) -> (PathBuf, String) {
-    if let Some(t) = target {
-        if let Some(graph) = workspace.graphs.iter().find(|g| g.graph_id == t) {
-            return (graph.path.clone(), graph.graph_id.clone());
-        }
+    if let Some(t) = target
+        && let Some(graph) = workspace.graphs.iter().find(|g| g.graph_id == t)
+    {
+        return (graph.path.clone(), graph.graph_id.clone());
     }
 
     let (dir, default_label) = if workspace.is_standalone() {

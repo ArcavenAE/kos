@@ -243,7 +243,7 @@ xattr -d com.apple.quarantine "$(mise which kos)"
 
 ## Quick start
 
-Requires Rust 1.85+.
+Requires Rust 1.89+.
 
 ```sh
 cargo build                    # build the CLI

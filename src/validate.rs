@@ -562,13 +562,13 @@ fn validate_findings(kos_root: &Path, duplicates_only: bool) -> Result<FindingsR
                         }
                     }
                     FindingClass::Numbered(number) => {
-                        if let Some(through) = numbered_through {
-                            if number.is_none_or(|n| n > through) {
-                                id_warnings.push(format!(
+                        if let Some(through) = numbered_through
+                            && number.is_none_or(|n| n > through)
+                        {
+                            id_warnings.push(format!(
                                     "numbered finding '{}' is above findings.numbered_through ({through}); new findings take minted ids",
                                     l.node.id
                                 ));
-                            }
                         }
                     }
                     _ => {}
@@ -721,24 +721,24 @@ pub(crate) fn validate_node(
 
     // 1. Filename matches id
     let expected_filename = format!("{}.yaml", node.id);
-    if let Some(actual_filename) = Path::new(rel_path).file_name().and_then(|f| f.to_str()) {
-        if actual_filename != expected_filename {
-            errors.push(format!(
-                "filename '{actual_filename}' does not match id '{}'",
-                node.id
-            ));
-        }
+    if let Some(actual_filename) = Path::new(rel_path).file_name().and_then(|f| f.to_str())
+        && actual_filename != expected_filename
+    {
+        errors.push(format!(
+            "filename '{actual_filename}' does not match id '{}'",
+            node.id
+        ));
     }
 
     // 2. File is in correct confidence directory
     let expected_dir = node.confidence.directory();
-    if let Some(parent) = Path::new(rel_path).parent().and_then(|p| p.to_str()) {
-        if parent != expected_dir {
-            errors.push(format!(
-                "in directory '{parent}' but confidence is '{}' (expected '{expected_dir}/')",
-                node.confidence
-            ));
-        }
+    if let Some(parent) = Path::new(rel_path).parent().and_then(|p| p.to_str())
+        && parent != expected_dir
+    {
+        errors.push(format!(
+            "in directory '{parent}' but confidence is '{}' (expected '{expected_dir}/')",
+            node.confidence
+        ));
     }
 
     // 3. Edge targets resolve. A plain target found nowhere only warns (it may be a

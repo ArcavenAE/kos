@@ -7,6 +7,7 @@ pub mod compact;
 pub mod doctor;
 pub mod drift;
 pub mod error;
+pub mod facts;
 pub mod findings;
 mod gitenv;
 pub mod graph;

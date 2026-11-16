@@ -232,12 +232,12 @@ fn scan_subrepo_graphs(root: &Path) -> Vec<GraphInclude> {
             let path = entry.path();
             if path.is_dir() {
                 let sub_kos = path.join(KOS_DIR).join(MANIFEST_FILE);
-                if sub_kos.exists() {
-                    if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
-                        includes.push(GraphInclude {
-                            path: format!("{name}/{KOS_DIR}"),
-                        });
-                    }
+                if sub_kos.exists()
+                    && let Some(name) = path.file_name().and_then(|n| n.to_str())
+                {
+                    includes.push(GraphInclude {
+                        path: format!("{name}/{KOS_DIR}"),
+                    });
                 }
             }
         }

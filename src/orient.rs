@@ -77,10 +77,8 @@ pub fn run(workspace: &Workspace, target: &str, json: bool, log: bool, ready: bo
         print_human(&orientation);
     }
 
-    if log {
-        if let Err(e) = append_usage_log(&orientation, duration, json) {
-            eprintln!("warning: could not write usage log: {e}");
-        }
+    if log && let Err(e) = append_usage_log(&orientation, duration, json) {
+        eprintln!("warning: could not write usage log: {e}");
     }
 
     Ok(())

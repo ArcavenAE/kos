@@ -70,10 +70,11 @@ impl Workspace {
             }
 
             // Are we in a sibling subrepo? Check if parent is aae-orc
-            if let Some(parent) = current.parent() {
-                if parent.join("charter.md").exists() && parent.join("kos").is_dir() {
-                    break (parent.to_path_buf(), parent.join("kos"));
-                }
+            if let Some(parent) = current.parent()
+                && parent.join("charter.md").exists()
+                && parent.join("kos").is_dir()
+            {
+                break (parent.to_path_buf(), parent.join("kos"));
             }
 
             // Standalone repo with _kos/kos.yaml?
@@ -246,12 +247,11 @@ impl Workspace {
 
         // Check if we're inside a subrepo that has its own graph
         for graph in &self.graphs {
-            if graph.scope == GraphScope::Repo {
-                if let Some(graph_parent) = graph.path.parent() {
-                    if canonical.starts_with(graph_parent) {
-                        return Some(graph);
-                    }
-                }
+            if graph.scope == GraphScope::Repo
+                && let Some(graph_parent) = graph.path.parent()
+                && canonical.starts_with(graph_parent)
+            {
+                return Some(graph);
             }
         }
 
@@ -297,11 +297,11 @@ fn discover_graphs(root: &Path) -> (Vec<GraphSource>, Vec<ManifestProblem>) {
         // 2. Follow includes from orchestrator manifest
         for include in &source.manifest.includes {
             let include_path = root.join(&include.path);
-            if !seen_paths.contains(&include_path) {
-                if let Some(included) = load_graph_source(&include_path, &mut problems) {
-                    seen_paths.insert(include_path);
-                    sources.push(included);
-                }
+            if !seen_paths.contains(&include_path)
+                && let Some(included) = load_graph_source(&include_path, &mut problems)
+            {
+                seen_paths.insert(include_path);
+                sources.push(included);
             }
         }
 
@@ -314,11 +314,11 @@ fn discover_graphs(root: &Path) -> (Vec<GraphSource>, Vec<ManifestProblem>) {
             let path = entry.path();
             if path.is_dir() {
                 let sub_kos = path.join(KOS_DIR);
-                if !seen_paths.contains(&sub_kos) {
-                    if let Some(source) = load_graph_source(&sub_kos, &mut problems) {
-                        seen_paths.insert(sub_kos);
-                        sources.push(source);
-                    }
+                if !seen_paths.contains(&sub_kos)
+                    && let Some(source) = load_graph_source(&sub_kos, &mut problems)
+                {
+                    seen_paths.insert(sub_kos);
+                    sources.push(source);
                 }
             }
         }
