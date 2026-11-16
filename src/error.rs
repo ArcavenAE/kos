@@ -57,13 +57,22 @@ pub enum KosError {
     )]
     FactImportNotEmpty,
 
-    #[error("fact import: header: {message}")]
+    #[error("kos facts: {message}")]
+    FactCommand { message: String },
+
+    #[error(
+        "fact import: header: {message}\n  hint: line 1 must be the header that `kos facts export` writes; regenerate the file with that command"
+    )]
     FactImportHeader { message: String },
 
-    #[error("fact import: line {line}: {message}")]
+    #[error(
+        "fact import: line {line}: {message}\n  hint: each line after the header is one fact interval as `kos facts export` writes it; fix the line or regenerate the file"
+    )]
     FactImportLine { line: usize, message: String },
 
-    #[error("fact harvest: {e} {a} {v} does not hold at version {version}")]
+    #[error(
+        "fact harvest: {e} {a} {v} does not hold at version {version}\n  hint: a retraction must name a fact that holds at that version; check the version and the fact"
+    )]
     FactHarvestNotLive {
         e: String,
         a: String,
@@ -71,7 +80,9 @@ pub enum KosError {
         version: i64,
     },
 
-    #[error("fact harvest file: {message}")]
+    #[error(
+        "fact harvest file: {message}\n  hint: a harvest file is YAML with `kind: harvested-facts`, a `source` naming `repo` and `commit`, and a `facts` list of e, a, v"
+    )]
     FactHarvestFormat { message: String },
 
     #[error("promote: {message}")]

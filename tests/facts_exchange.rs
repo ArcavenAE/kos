@@ -464,3 +464,48 @@ fn unknown_extra_keys_in_a_harvested_facts_file_are_ignored() {
     assert_eq!(store.apply_harvest(v(3), text).unwrap(), 1);
     assert_eq!(store.facts_as_of(v(3)).unwrap(), vec![f("a", "r", "b")]);
 }
+
+/// The reader binds as the writer does: a harvest's source is its provenance,
+/// and a file without repo and commit is refused by `parse` and by `apply`.
+fn assert_source_refused(text: &str, what: &str) {
+    let parsed = Harvest::parse(text);
+    assert!(
+        matches!(parsed, Err(KosError::FactHarvestFormat { .. })),
+        "parse must refuse {what}, got {parsed:?}"
+    );
+    let mut store = FactStore::open_in_memory().unwrap();
+    let applied = store.apply_harvest(v(1), text);
+    assert!(
+        matches!(applied, Err(KosError::FactHarvestFormat { .. })),
+        "apply must refuse {what}, got {applied:?}"
+    );
+    assert_eq!(
+        store.latest_version().unwrap(),
+        None,
+        "{what}: store stays empty"
+    );
+}
+
+#[test]
+fn a_harvest_file_with_no_source_is_refused() {
+    assert_source_refused(
+        "kind: harvested-facts\nfacts:\n- e: a\n  a: r\n  v: b\n",
+        "a file with no source",
+    );
+}
+
+#[test]
+fn a_harvest_file_whose_source_has_no_repo_is_refused() {
+    assert_source_refused(
+        "kind: harvested-facts\nsource:\n  commit: abc1234\nfacts:\n- e: a\n  a: r\n  v: b\n",
+        "a source with no repo",
+    );
+}
+
+#[test]
+fn a_harvest_file_whose_source_has_no_commit_is_refused() {
+    assert_source_refused(
+        "kind: harvested-facts\nsource:\n  repo: demo/repo\nfacts:\n- e: a\n  a: r\n  v: b\n",
+        "a source with no commit",
+    );
+}
