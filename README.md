@@ -10,6 +10,13 @@ KOS is an attempt to fix this. It treats **accumulated understanding as the
 primary product** — not code, not documents — the knowledge graph underneath
 both.
 
+Its mission is knowledge infrastructure: a system that accumulates what a
+project knows and projects it for human-AI teams. KOS is not a mechanism for
+carrying an AI model's context from one session to the next. That needs
+model-level mechanisms, which are an external research dependency; KOS would
+be the knowledge they read (ruled 2026-11-14, see
+`_kos/nodes/graveyard/grv-continuity-via-infrastructure.yaml`).
+
 ## What it does
 
 KOS represents everything a project knows as a graph of typed nodes with
