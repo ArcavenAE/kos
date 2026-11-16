@@ -12,7 +12,7 @@
 #   0.3 — session-002: added signal classification on edges,
 #          based on twelve-project probe (findings 001-013).
 #          See finding-014-twelve-project-synthesis for rationale.
-#   0.4 — aae-orc-kv2rv: added the examination x commitment coordinate,
+#   0.4 - aae-orc-kv2rv: added the examination x commitment coordinate,
 #          provenance kind, promoted_from and falsifier, source_grade and
 #          conditional_on. Every new field is optional, so every v0.3 node
 #          parses unchanged. Design: docs/design/schema-v0.4.md.
