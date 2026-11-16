@@ -1,0 +1,2 @@
+roundtrip repo=marvel picks=100 source_missing=0 yaml_files=4 facts_equal_after_yaml=100 start_equal_after_apply=100 end_equal_after_apply=100 picks_with_end_in_source=0 picks_with_an_earlier_closed_interval=0 earlier_closed_intervals_total=0
+roundtrip yaml_source_keys={"commit", "repo", "version"} provenance_values_not_in_yaml={"grade", "index-sha256", "indexer", "indexer-version"}
