@@ -218,25 +218,28 @@ fn graph(root: &Path) {
     write(&root.join("summary.txt"), "short summary\n");
 }
 
-/// The lines that carry the v0.4 fields, as they are written in `V04`.
-fn v04_lines() -> Vec<&'static str> {
+/// The v0.4 field lines of `V04`, from `examination:` to the end, in order.
+fn field_block() -> Vec<&'static str> {
     V04.lines()
-        .filter(|l| {
-            [
-                "examination:",
-                "commitment:",
-                "source_grade:",
-                "conditional_on:",
-                "kind:",
-                "falsifier:",
-                "promoted_from:",
-                "target:",
-                "note:",
-            ]
-            .iter()
-            .any(|k| l.trim_start().trim_start_matches("- ").starts_with(k))
-        })
+        .skip_while(|l| !l.starts_with("examination:"))
         .collect()
+}
+
+/// The field block appears in `text` whole: contiguous and in order, with no
+/// line between or reordered.
+fn assert_block_intact(text: &str) {
+    let lines: Vec<&str> = text.lines().collect();
+    let block = field_block();
+    let start = lines
+        .iter()
+        .position(|l| *l == block[0])
+        .unwrap_or_else(|| panic!("no examination line in:\n{text}"));
+    let found = lines.get(start..start + block.len());
+    assert_eq!(
+        found,
+        Some(block.as_slice()),
+        "the v0.4 field lines stay contiguous and in order:\n{text}"
+    );
 }
 
 #[test]
@@ -257,9 +260,7 @@ fn promote_leaves_the_v04_fields_byte_identical_and_the_node_still_reads_them() 
         V04.replacen("confidence: frontier\n", "confidence: bedrock\n", 1),
         "only the confidence line changes"
     );
-    for line in v04_lines() {
-        assert!(moved.lines().any(|l| l == line), "kept line {line:?}");
-    }
+    assert_block_intact(&moved);
     let n = parse(&moved);
     assert_eq!(n.commitment, Some(Commitment::LoadBearing));
     assert_eq!(n.conditional_on.len(), 2);
@@ -289,12 +290,7 @@ fn compact_leaves_the_v04_fields_byte_identical_and_the_node_still_reads_them() 
     let after =
         fs::read_to_string(tmp.path().join("_kos/nodes/frontier/question-new.yaml")).unwrap();
     assert!(after.contains("[COMPACTED]"), "compaction ran:\n{after}");
-    for line in v04_lines() {
-        assert!(
-            after.lines().any(|l| l == line),
-            "kept line {line:?}\n{after}"
-        );
-    }
+    assert_block_intact(&after);
     let n = parse(&after);
     assert_eq!(n.examination, Some(Examination::Questioned));
     assert_eq!(n.provenance.unwrap().promoted_from.len(), 2);
@@ -306,10 +302,7 @@ fn the_schema_file_declares_v04_and_documents_each_new_field() {
         fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("schema/node.schema.yaml"))
             .unwrap();
     assert!(text.contains("# Version: 0.4"), "version line");
-    assert!(
-        text.contains("0.4 —") || text.contains("0.4 -"),
-        "history entry"
-    );
+    assert!(text.contains("0.4 - aae-orc-kv2rv:"), "history entry");
     for field in [
         "examination:",
         "commitment:",
@@ -343,5 +336,28 @@ fn the_schema_file_declares_v04_and_documents_each_new_field() {
         "inferred",
     ] {
         assert!(text.contains(word), "schema lists the value {word}");
+    }
+}
+
+#[test]
+fn the_v04_history_entry_has_no_em_dash() {
+    let text =
+        fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("schema/node.schema.yaml"))
+            .unwrap();
+    let lines: Vec<&str> = text.lines().collect();
+    let start = lines
+        .iter()
+        .position(|l| l.contains("aae-orc-kv2rv:"))
+        .expect("the 0.4 history entry names its ticket");
+    // The entry is the line that names the ticket and its comment continuation.
+    for line in lines[start..]
+        .iter()
+        .take_while(|l| l.starts_with('#'))
+        .take(4)
+    {
+        assert!(
+            !line.contains('\u{2014}'),
+            "no em dash in the 0.4 entry: {line:?}"
+        );
     }
 }
