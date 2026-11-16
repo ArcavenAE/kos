@@ -245,3 +245,74 @@ If W6 and W8 come back partially served for that reason, the finding should
 say so plainly. The missing piece is then the link from a commit to a
 decision, which is knowledge kos does not yet record, and is not a gap in the
 code graph.
+
+## Dated notes
+
+Each note is written after the lock and before the step it governs. The text
+above is unchanged.
+
+**Note 1, 2026-11-16: the FILLED AT RUN slots.** Runner: a kos builder seat
+(arcaven team), on mokuzai, by the director's host ruling.
+
+- Store: the probe branch is based on kos main at 071f1252. That commit
+  contains xxe3n PR 1 (kos#188, merged as 5d87f18f), and
+  `git diff --stat 5d87f18f 071f1252 -- src/facts tests/facts_store.rs Cargo.toml`
+  is empty, so the store is PR 1's.
+- kos pin: fe1702a8, the main head when this brief merged (kos#185,
+  2026-11-16T00:32:29Z). 829c392 is the 47th first-parent commit counting back
+  from it, inside the 50.
+- marvel pin: 5eb450df, the main head at the same moment (committed 00:26:49Z;
+  the next first-parent commit is at 00:38:06Z). W7 scores against it, and
+  its non-test `os.UserHomeDir` count is 18, the same as at 627a51c5.
+- Deviation: "both already installed" did not hold on this host. rust-analyzer
+  and rust-src were added to the `stable` toolchain that kos's
+  `rust-toolchain.toml` resolves to (rustc 1.96.0), and scip-go v0.2.7 was
+  installed from `github.com/scip-code/scip-go`. That is a pinned fetch under
+  the director's ruling, run outside the sandbox, and each version string is
+  recorded in the report.
+
+**Note 2, 2026-11-16: the negative Rust control is replaced.** The run
+stopped as the brief requires, because `RUST_SRC_PATH` set to an empty
+scratch directory did not reproduce the trap:
+
+- With rust-src installed on the active toolchain, rust-analyzer 1.96.0 loaded
+  std from the toolchain's own `lib/rustlib/src`.
+- The index was byte for byte the positive control's (sha256 ff546670...e43d,
+  1,552,519 bytes).
+- There was no "can't load standard library" line, and std symbols were
+  present.
+
+The replacement reproduces the mechanism that finding-kos-ndz7 observed: the
+toolchain in use has no rust-src.
+
+- **Method A.** Run the same rust-analyzer binary (stable's, by absolute path)
+  on the same commit with `RUSTUP_TOOLCHAIN` set to an installed numbered
+  toolchain that has no rust-src. Before the run, record
+  `rustup component list --installed --toolchain <that toolchain>` showing no
+  rust-src, and record the toolchain's rustc version.
+  - Nothing is installed, removed or written outside the probe directory, and
+    the real toolchains are only read.
+  - The control passes as the brief states: the log line is present, the exit
+    status is 0, and the ingest then refuses the index with a nonzero exit and
+    loads no rows.
+- **Method B, only if A does not reproduce the trap.** Use a copy of the
+  stable toolchain inside the probe directory with its `lib/rustlib/src`
+  removed, selected through `RUSTUP_TOOLCHAIN` as a path, under the same pass
+  condition.
+- If neither reproduces it, the run stops again and reports. The brief's
+  check then has no working negative control on this host, and per the brief
+  it does not count.
+
+**Note 2, continued: the offline std metadata warning.** Both control logs
+carry a warning that `cargo metadata` for the std workspace failed offline
+("no matching package named `dlmalloc` found ... required by package `std`")
+and fell back to `--no-deps`.
+
+- This is not a refusal condition. It concerns std's own dependencies, not
+  whether kos's references into std resolve. Those do: the positive control
+  names std symbols and has no "can't load standard library" line, which is
+  what the silent-degradation check tests.
+- The ingest records, per index, whether this warning appeared, and the report
+  gives the count. If the run shows that an index with the warning lacks std
+  symbols that an index without it has, the finding says so and names the
+  warning as a candidate refusal condition for the production ingest.
