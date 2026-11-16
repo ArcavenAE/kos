@@ -1,6 +1,7 @@
 # Finding: probe R1, SCIP facts in the kos fact store (aae-orc-6fy1)
 
-Status: draft, revision 1. The MDE section waits for its run (brief note 5).
+Status: draft, revision 1. The MDE section waits for its run (brief note 5),
+and C2 waits for its check over W6's rows.
 Date: 2026-11-16
 Host: mokuzai (Apple silicon, macOS), by the director's host ruling
 bd: aae-orc-6fy1
@@ -17,7 +18,8 @@ Evidence: `_kos/probes/code-graph-measurements-2026-11-16/` (the run report)
 ## Headline
 
 Compiler facts in the kos fact store answer the cross-repo question that live
-LSP could not answer at all, and they carry provenance on every row. W7 is
+LSP could not answer at all, and every row checked so far carries its
+provenance. W7 is
 served in one query, with document-level recall and precision of 1.000 in both
 repos. The store tracks change exactly: at all 50 versions it equals the fact
 files, and every consecutive difference equals the set difference.
@@ -29,7 +31,8 @@ kos record names the decision. That is the outcome the brief predicted, and
 the gap it names is in what kos records, not in the code graph: nothing links
 a commit to the decision behind it.
 
-By the brief's rule this recommends a production ingest ticket: C0 to C2 pass,
+By the brief's rule this recommends a production ingest ticket if C2 holds
+over W6's rows as it does over W7's and W8's: C0 and C1 pass,
 W7 is served, and both W6 and W8 are at least partially served. The probe
 recommends; the operator rules.
 
@@ -76,7 +79,7 @@ still resolve, so the run report only counts it.
 |---|---|---|
 | C0 coverage | PASS | kos 50 of 50, marvel 50 of 50 |
 | C1 freshness | PASS | 50 of 50 versions equal the fact files; consecutive diffs equal the set differences; load p95 0.04 s, max 1.56 s |
-| C2 provenance | PASS | every W7 row and both W8 ends resolve to a complete load entity |
+| C2 provenance | pending | every W7 row (18) and both W8 ends resolve to a complete load entity; W6's 290 rows are not yet checked |
 | W7 one query, two repos | served | recall and precision 1.000: kos 1 of 1 file, marvel 14 of 14 files |
 | W6 a past change | partially served | changes at 829c392 correct (77 added, 213 removed); no decision record |
 | W8 why | partially served | interval correct (live at version 1, not from version 4), provenance at both ends; no decision record |
@@ -124,11 +127,14 @@ Each change is a dated note in the brief, written before the step it governs:
 Two filters follow `facts.py`, and one departs from it:
 - Documents outside the repo root are skipped, as `facts.py` skips them. In
   marvel these were generated test mains in a Go build cache beside the clone.
-  They were 6,516 of 85,959 facts at version 1, and they made about 1,000
-  spurious changes per commit before the filter.
+  They were 67 to 68 documents and 6,516 to 6,801 facts per commit (332,733
+  over the 50 commits, counted as the distinct pairs those documents would
+  have produced), and they made about 1,000 spurious changes per commit
+  before the filter. kos had none.
 - Local symbols are skipped in occurrences, as in `facts.py`.
 - The ingest also skips local symbols in implementation relationships, where
-  `facts.py` does not. The run report gives that count.
+  `facts.py` does not. It dropped 0 facts at every commit in both repos, so
+  the difference changed nothing here.
 
 Crate names in kos facts come from one list for the whole window: 18 names for
 kos and 29 for marvel. A load that used each commit's own manifest dropped the
@@ -149,7 +155,7 @@ the scored store (note 5), once note 5 is approved.
 | 0.8 W7 served | held |
 | 0.6 W6 partially served, no record naming 829c392 or #135 | held. One node names 829c392 as a measurement commit, not as a decision. |
 | 0.5 W8 partially served | held |
-| 0.7 C0 to C2 all pass | held |
+| 0.7 C0 to C2 all pass | C0 and C1 held; C2 pending |
 
 ## For a production ingest
 
