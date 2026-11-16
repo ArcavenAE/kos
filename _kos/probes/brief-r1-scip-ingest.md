@@ -349,3 +349,38 @@ provenance.**
   resolves to a load entity with all six values. The store has no tier field,
   so "no `code/` fact carries a tier" holds by construction, and the finding
   says so rather than counting zero rows.
+
+**Note 4, 2026-11-16: three exact readings of note 3.**
+
+- **The crate fetch** was run under the director's ruling 01M7GZ5TZD, which
+  set five conditions:
+  - the fetch runs outside the sandbox, and only the fetch;
+  - the `Cargo.lock` and checksums are recorded;
+  - `cargo deny check advisories` runs before the build, and any advisory
+    stops it;
+  - nothing is written to the real `~/.cargo`;
+  - nothing is vendored into kos.
+
+  The run report names the advisory database's commit and its age at the
+  check.
+- **Own-version replacement, per repo**, applied to symbols both in the store
+  and in the fact files:
+  - marvel: `^(scip-go gomod github\.com/arcavenae/marvel) \S+ ` becomes
+    `\1 . `, as in `facts.py`;
+  - kos: `^(rust-analyzer cargo kos) \S+ ` becomes `\1 . `.
+
+  No other package's version is touched. A dependency or toolchain version
+  change shows as a fact change, and the finding reports it as one.
+- **C1's comparison.** The fact files that C1 compares against are written by
+  the ingest's extraction step with the same repo prefix on document entities
+  (`kos:`, `marvel:`) and the same version replacement as the store. C1
+  compares `facts_as_of(n)` with the union of both repos' fact files at
+  version n, as exact `(e, a, v)` sets, with no prefix stripped. The W6 and C1
+  set differences are taken the same way, per repo, between consecutive fact
+  files.
+- **W7 is scored per document, not per call site.** A `code/references` fact
+  is `(document, symbol)`, one per distinct pair, as in `facts.py`, and it
+  carries no line. So W7's ground truth is the set of non-test files that
+  `git grep` finds calling the symbol, and recall and precision are counted
+  over files. The call-site counts (18 in marvel at 5eb450df) are reported
+  beside the file counts, not scored.
