@@ -378,3 +378,9 @@ provenance.**
   version n, as exact `(e, a, v)` sets, with no prefix stripped. The W6 and C1
   set differences are taken the same way, per repo, between consecutive fact
   files.
+- **W7 is scored per document, not per call site.** A `code/references` fact
+  is `(document, symbol)`, one per distinct pair, as in `facts.py`, and it
+  carries no line. So W7's ground truth is the set of non-test files that
+  `git grep` finds calling the symbol, and recall and precision are counted
+  over files. The call-site counts (18 in marvel at 5eb450df) are reported
+  beside the file counts, not scored.
