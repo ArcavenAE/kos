@@ -124,11 +124,16 @@ fn long_log() -> FactStore {
 fn export_then_import_reproduces_every_version_and_every_diff() {
     let source_store = long_log();
     let text = export(&source_store);
+    let lines = text.lines().count();
+    assert!(
+        lines > 1,
+        "the export holds a header and rows, got {lines} lines"
+    );
     let mut copy = FactStore::open_in_memory().unwrap();
     let rows = copy.import_jsonl(text.as_bytes()).unwrap();
     assert_eq!(
         rows,
-        text.lines().count() - 1,
+        lines - 1,
         "rows read equal lines written, less the header"
     );
     assert_eq!(copy.latest_version().unwrap(), Some(v(30)));
