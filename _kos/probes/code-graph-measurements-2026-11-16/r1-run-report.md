@@ -48,7 +48,7 @@ Status: DRAFT measured-facts file written by the runner. It states what was meas
 
 - Symbols: the indexed repo's own module or crate version is replaced by "." (note 3); document entities are prefixed with their repo ("kos:src/orient.rs"); local symbols are skipped for occurrences and for code/implements (the latter differs from the published extractor; code/implements dropped by it: 0 at every commit in both repos).
 - Documents whose path starts with "../" are skipped, as the published extractor does. Cause: the Go build cache sat beside the clone, so scip-go indexed the test mains it generated. kos: 0 dropped. marvel: 67 to 68 documents per commit, 6,516 (version 1) to 6,801 (version 50) facts per commit, 3,353 documents and 332,733 facts over the 50 commits (dropped_facts = distinct (role, symbol) pairs the dropped documents would have produced).
-- kos/ knowledge facts are read by kos's own parsers (kos::model::Node through kos::yaml, kos::findings::load_finding_file): refused by the parser at every one of the 100 commits: 0; read by the fallback: 0; lost: 0. kos 144 to 156 nodes and findings per commit, marvel 154 to 156.
+- kos/ knowledge facts are read by kos's own parsers (kos::model::Node through kos::yaml, kos::findings::load_finding_file): refused by the parser at every one of the 100 commits: 0; read by the fallback: 0; lost: 0. kos 144 to 152 nodes and findings read per commit, marvel 154 to 157 (corrected: an earlier draft of this line said 144 to 156 and 154 to 156, which was wrong; the per-commit tables prep-kos.tsv and prep-marvel.tsv, column read_by_kos_parser, give these ranges).
 - The names-dep vocabulary (crate or module names a node's text names): v2 = the dependencies declared at the commit being read; v3 = the union of dependency names across the 50-commit window (kos 18, marvel 29; <probe>/gt/deps-union-*.txt). v3's bias: a name that is a dependency only at another commit of the window still matches.
 
 ## Stores and binaries
@@ -61,7 +61,7 @@ Status: DRAFT measured-facts file written by the runner. It states what was meas
 ## C1, load time (v3)
 
 - 100 loads, 0 errors. Time from fact file to committed rows: max 1.56 s, p95 0.04 s; the bar is under 10 s per commit and repo: PASS.
-- Equality: for versions 1 to 50 the store's code/ and kos/ facts equal the union of the two repos' fact files and the diff between consecutive versions equals the files' set difference: 50 of 50 equal, 0 mismatches (<probe>/c1.log). Checker control: one fact line deleted from a copy of one marvel file (version 30) gives mismatches at versions 30 and 31 and exit 1 (<probe>/c1-mutant.log).
+- Equality: for versions 1 to 50 the store's code/ and kos/ facts equal the union of the two repos' fact files and the diff between consecutive versions equals the files' set difference: 50 of 50 equal, 0 mismatches (<probe>/c1.log). Checker control: one fact line (line 5) deleted from a copy of marvel's version-30 fact file, nothing else changed, gives mismatches at versions 30 (state and diff) and 31 (diff only) and exit 1 (c1-mutant.log).
 
 ## C2, provenance (v3)
 
@@ -156,3 +156,11 @@ Result: PASS, with the recorded changes.
 
 ## Files added beside this report for the MDE tests
 - r1_mde.rs, mde-lockin.log, mde-roundtrip-kos.log, mde-roundtrip-marvel.log, picks-kos.tsv, picks-marvel.tsv.
+
+## More files beside this report (second staging)
+- w7.log: the W7 run's output (recall, precision, rows, provenance line).
+- c1-mutant.log: the C1 checker control, the run with one fact line deleted at version 30.
+- run.sb: the sandbox profile the report quotes (276 deny lines for the live localhost ports of the run host, then the rules; sha256 a50acb5e4ffd490677efb3eda1264e52ede8f932a5296601b3ca1a25b45ffc63).
+- deny-advisories.log: the cargo deny advisories result ("advisories ok").
+- gt/w7-kos-fe1702a8.txt, gt/w7-marvel-5eb450df.txt: the W7 ground-truth file lists; gt/expect-docs-kos-fe1702a8.txt, gt/expect-docs-marvel-5eb450df.txt: the expected-documents lists for the indexer checks; gt/golist.err: the one line the Go listing wrote to stderr, with the module-cache path replaced by <gomodcache>.
+- Left out: the per-commit expected-documents directory (expect/, about 800 KB); the report is the only record of its totals.

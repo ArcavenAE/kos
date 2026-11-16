@@ -1,0 +1,4 @@
+w7 repo=kos found_documents=1 ground_truth_documents=1 recall=1.000 precision=1.000 missed=[] extra=[]
+w7 repo=marvel found_documents=14 ground_truth_documents=14 recall=1.000 precision=1.000 missed=[] extra=[]
+w7 rows_returned=18 one_read_both_repos=true
+w7 c2_every_row_has_provenance=true
