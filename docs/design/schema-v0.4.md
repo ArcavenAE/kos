@@ -113,10 +113,10 @@ parent is undermined now (confidence graveyard or placeholder, examination
 ruled-out, or commitment abandoned) gets one warning naming the parent and the
 reason. A questioned or frontier parent is the normal case and does not warn.
 It does not change the dependent or fail the run. The warning reads the
-parent's state in the graph being checked: a parent that is a finding, or a
-node in a sibling graph, is resolved for existence only. Real change detection
-(a comparison with the base commit, or a stamp on the dependent) is later
-work, and is left to its own ticket. The e689 line "Default: substrate-conditional unless proven
+parent's state in the graph being checked: a parent that is a finding,
+an unreadable node, or a node in a sibling graph is resolved for existence
+only. Real change detection (a comparison with the base commit, or a stamp on
+the dependent) is later work, and is left to its own ticket. The e689 line "Default: substrate-conditional unless proven
 substrate-independent" is read as guidance for authors, not as a value kos
 fills in: v0.4 writes nothing that an author did not.
 

@@ -392,13 +392,40 @@ fn a_parent_the_graph_does_not_hold_gives_no_dependent_warning() {
     );
     let text = stdout(&validate(tmp.path()));
     assert!(text.contains("PASS  elem-dep"), "{text}");
-    assert!(!text.contains("is undermined"), "{text}");
-    // The far target still reports its own check-3 result, which is what makes
-    // this a statement about the dependent warning and not about silence.
-    assert!(
-        text.contains("conditional_on target 'elsewhere::elem-x' was not checked"),
-        "{text}"
+    // Behaviour, not wording: the far node carries exactly one warning, its own
+    // check-3 line, whatever a dependent line would say. A second line of any
+    // wording fails this.
+    let far = warning_lines(&text, "elem-far");
+    assert_eq!(
+        far.len(),
+        1,
+        "elem-far carries one warning: {far:?}\n{text}"
     );
+    assert!(
+        far[0].contains("conditional_on target 'elsewhere::elem-x' was not checked"),
+        "and it is the check-3 line: {far:?}"
+    );
+    // No line anywhere names the far parent as a conditional_on parent.
+    assert!(
+        !text.contains("conditional_on parent"),
+        "no dependent line at all: {text}"
+    );
+}
+
+/// The warning lines printed under `WARN  <id>` in `kos validate` output: the
+/// indented lines that follow it, up to the next status line.
+fn warning_lines(text: &str, id: &str) -> Vec<String> {
+    let header = format!("  WARN  {id}");
+    let mut lines = text.lines().skip_while(|l| *l != header).skip(1);
+    let mut found = Vec::new();
+    for l in lines.by_ref() {
+        if l.starts_with("        ") {
+            found.push(l.trim().to_string());
+        } else {
+            break;
+        }
+    }
+    found
 }
 
 #[test]
@@ -441,5 +468,9 @@ fn the_design_says_validate_warns_on_the_parents_state_and_names_its_limit() {
     assert!(
         text.contains("sibling graph"),
         "names the limit: a parent outside the checked graph is resolved for existence only"
+    );
+    assert!(
+        text.contains("an unreadable node"),
+        "the existence-only list names an unreadable node"
     );
 }
