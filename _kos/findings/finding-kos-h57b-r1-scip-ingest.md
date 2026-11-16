@@ -1,7 +1,6 @@
 # Finding: probe R1, SCIP facts in the kos fact store (aae-orc-6fy1)
 
-Status: draft, revision 1. The MDE section waits for its run (brief note 5),
-and C2 waits for its check over W6's rows.
+Status: draft, revision 2. The MDE section waits for its run (brief note 5).
 Date: 2026-11-16
 Host: mokuzai (Apple silicon, macOS), by the director's host ruling
 bd: aae-orc-6fy1
@@ -13,12 +12,13 @@ Follows: finding-kos-wre7 (live LSP), finding-kos-ndz7 (indexing cost),
 finding-kos-8bmj and finding-kos-qttt (the store probes)
 Runner: a kos builder seat (arcaven team). Author: the arcaven architect seat,
 which wrote the brief.
-Evidence: `_kos/probes/code-graph-measurements-2026-11-16/` (the run report)
+Evidence: `_kos/probes/code-graph-measurements-2026-11-16/` (the run report,
+sha256 872b572e, and its per-commit tables)
 
 ## Headline
 
 Compiler facts in the kos fact store answer the cross-repo question that live
-LSP could not answer at all, and every row checked so far carries its
+LSP could not answer at all, and every row they return carries its
 provenance. W7 is
 served in one query, with document-level recall and precision of 1.000 in both
 repos. The store tracks change exactly: at all 50 versions it equals the fact
@@ -31,8 +31,7 @@ kos record names the decision. That is the outcome the brief predicted, and
 the gap it names is in what kos records, not in the code graph: nothing links
 a commit to the decision behind it.
 
-By the brief's rule this recommends a production ingest ticket if C2 holds
-over W6's rows as it does over W7's and W8's: C0 and C1 pass,
+By the brief's rule this recommends a production ingest ticket: C0 to C2 pass,
 W7 is served, and both W6 and W8 are at least partially served. The probe
 recommends; the operator rules.
 
@@ -79,13 +78,15 @@ still resolve, so the run report only counts it.
 |---|---|---|
 | C0 coverage | PASS | kos 50 of 50, marvel 50 of 50 |
 | C1 freshness | PASS | 50 of 50 versions equal the fact files; consecutive diffs equal the set differences; load p95 0.04 s, max 1.56 s |
-| C2 provenance | pending | every W7 row (18) and both W8 ends resolve to a complete load entity; W6's 290 rows are not yet checked |
+| C2 provenance | PASS | every returned row resolves to a complete load entity: W6 290 of 290, W7 18 of 18, both W8 ends |
 | W7 one query, two repos | served | recall and precision 1.000: kos 1 of 1 file, marvel 14 of 14 files |
 | W6 a past change | partially served | changes at 829c392 correct (77 added, 213 removed); no decision record |
 | W8 why | partially served | interval correct (live at version 1, not from version 4), provenance at both ends; no decision record |
 
 C1 was checked with a mutant: one changed line at version 30 turned versions
-30 and 31 red.
+30 and 31 red. C2 over W6's rows was checked after the scored loads, by a
+binary that differs from the scored one (af030637) only by that added
+read-only check (7ea39083); the store was unchanged by it.
 
 C2's "no code fact carries a tier" holds by construction: the store has no
 tier field. That says the store cannot mislabel a compiler fact as bedrock. It
@@ -155,7 +156,7 @@ the scored store (note 5), once note 5 is approved.
 | 0.8 W7 served | held |
 | 0.6 W6 partially served, no record naming 829c392 or #135 | held. One node names 829c392 as a measurement commit, not as a decision. |
 | 0.5 W8 partially served | held |
-| 0.7 C0 to C2 all pass | C0 and C1 held; C2 pending |
+| 0.7 C0 to C2 all pass | held |
 
 ## For a production ingest
 
