@@ -712,3 +712,49 @@ fn a_refused_import_leaves_no_store_behind() {
         "an existing store is untouched"
     );
 }
+
+#[test]
+fn a_refused_import_into_a_store_that_holds_facts_changes_nothing() {
+    let dir = tempfile::tempdir().unwrap();
+    let d = dir.path();
+    let source = changing_store(d);
+    let export = d.join("in.jsonl");
+    fs::write(&export, export_text(&source)).unwrap();
+    // A store that already holds facts, and a listing of the directory.
+    let full = awkward_store(d);
+    let names = |dir: &Path| {
+        let mut v: Vec<_> = fs::read_dir(dir)
+            .unwrap()
+            .map(|e| e.unwrap().file_name())
+            .collect();
+        v.sort();
+        v
+    };
+    let bytes_before = fs::read(&full).unwrap();
+    let listing_before = names(d);
+    let out = kos(&["facts", "import", "--db", &s(&full), &s(&export)]);
+    assert_eq!(out.code, 1, "refused, stderr: {:?}", out.stderr);
+    assert_eq!(out.stdout, "", "no count line on a refusal");
+    assert!(
+        out.stderr.contains("import needs an empty store"),
+        "the refusal is the empty-store one: {:?}",
+        out.stderr
+    );
+    assert!(
+        out.stderr
+            .lines()
+            .any(|l| l.trim_start().starts_with("hint:")),
+        "and it carries a hint line: {:?}",
+        out.stderr
+    );
+    assert_eq!(
+        fs::read(&full).unwrap(),
+        bytes_before,
+        "the store file is byte for byte as it was"
+    );
+    assert_eq!(names(d), listing_before, "no journal or other file appears");
+    // The facts are still the ones it held.
+    let store = FactStore::open(&full).unwrap();
+    assert_eq!(store.facts_as_of(v(1)).unwrap().len(), 2);
+    assert_eq!(store.latest_version().unwrap(), Some(v(1)));
+}
