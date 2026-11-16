@@ -52,6 +52,28 @@ pub enum KosError {
         supported: i64,
     },
 
+    #[error(
+        "fact store: import needs an empty store\n  hint: import into a new file, or open an empty store"
+    )]
+    FactImportNotEmpty,
+
+    #[error("fact import: header: {message}")]
+    FactImportHeader { message: String },
+
+    #[error("fact import: line {line}: {message}")]
+    FactImportLine { line: usize, message: String },
+
+    #[error("fact harvest: {e} {a} {v} does not hold at version {version}")]
+    FactHarvestNotLive {
+        e: String,
+        a: String,
+        v: String,
+        version: i64,
+    },
+
+    #[error("fact harvest file: {message}")]
+    FactHarvestFormat { message: String },
+
     #[error("promote: {message}")]
     Promote { message: String },
 

@@ -16,6 +16,9 @@
 
 use std::path::Path;
 
+mod exchange;
+
+pub use exchange::Harvest;
 use rusqlite::{Connection, OptionalExtension, Transaction, params};
 
 use crate::error::{KosError, Result};
