@@ -328,8 +328,8 @@ fn import_replays_a_jsonl_export_into_a_new_store_and_prints_one_line() {
         out.stdout
     );
     assert!(
-        out.stdout.contains('6'),
-        "the row count 6 is named: {:?}",
+        out.stdout.contains('5'),
+        "the row count 5 is named (keep, x and y from version 1, then z and w): {:?}",
         out.stdout
     );
     assert_eq!(out.stderr, "");
