@@ -16,15 +16,12 @@
 
 use std::path::Path;
 
-mod exchange;
-
-pub use exchange::Harvest;
 use rusqlite::{Connection, OptionalExtension, Transaction, params};
 
 use crate::error::{KosError, Result};
 
 /// Schema version written to `PRAGMA user_version`.
-const SCHEMA_VERSION: i64 = 1;
+pub(crate) const SCHEMA_VERSION: i64 = 1;
 
 const SCHEMA: &str = "
 CREATE TABLE IF NOT EXISTS facts (
@@ -46,7 +43,7 @@ CREATE TABLE IF NOT EXISTS meta (
 ) WITHOUT ROWID;
 ";
 
-const LATEST_KEY: &str = "latest_version";
+pub(crate) const LATEST_KEY: &str = "latest_version";
 
 /// SQL predicate: the fact row holds at the version bound to `?N`.
 macro_rules! live_at {
@@ -60,6 +57,10 @@ macro_rules! live_at {
         )
     };
 }
+
+mod exchange;
+
+pub use exchange::Harvest;
 
 /// A version of the fact set. Opaque to the store: it only compares them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
