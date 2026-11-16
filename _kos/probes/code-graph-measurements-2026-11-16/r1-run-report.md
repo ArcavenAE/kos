@@ -76,7 +76,7 @@ Status: DRAFT measured-facts file written by the runner. It states what was meas
 
 ## Not run
 
-- The three MDE tests (lock-in export and import, round-trip of 100 code/ facts, skill asymmetry): held for the architect's note 5; to run at kos 73a5568 against a copy of the v3 store.
+- The MDE tests now ran; see "MDE tests" below.
 - A counterfactual for the rust-analyzer dlmalloc WARN.
 - The brief's timebox and the registered predictions are not scored here.
 
@@ -130,3 +130,29 @@ The 289 lines are in <probe>/run.sb (sha256 a50acb5e4ffd490677efb3eda1264e52ede8
 - c1.log: C1 equality per version 1 to 50 (v3).
 - deps-union-kos.txt, deps-union-marvel.txt: the v3 window-wide dependency vocabulary.
 - loads.log stays in the probe directory (per-load timings, 100 lines).
+
+## MDE tests (run after note 5 was approved)
+
+Setup. kos at main 73a55684a1552107bbaa282bddc67f6d866b270b (kos#192), from a separate clone made with git clone --no-local from the host's local checkout and checked out detached; the probe's own code is one untracked file, src/bin/r1_mde.rs (a copy is beside this report; sha256 175e13f94a3a332f23a1582b4c3254bb99c1af55adbf049b4625ee8c7d105a5f), built with cargo build --locked --offline, outside the sandbox, with the probe's CARGO_HOME. Probe base for the scored store: kos 071f1252e5f9ccf23610427bbd492e39b6885d22. The store file is a copy of the scored v3 store: <probe>/store-v3-mde-copy.db sha256 c0207ac041b86b487bba4df4e65617bffc5bcdb6f97f804aad991bb88395ebb0, checked equal to the original before the run and after it (the original was never opened by these runs). MDE binary sha256 b527a3ce839e179f6d4fc1445d11032f9dd3004033a41cbbf75b7f563da3bf0a (an earlier build, which counted a fact's first-ever interval instead of the one live at the head, was replaced after the first round-trip run; its output was not used). The crate-name vocabulary is the scored v3 list, unchanged. The copy opened as it is: SCHEMA_VERSION is still 1.
+Run conditions: every test ran under the sandbox profile run.sb (sha256 a50acb5e4ffd490677efb3eda1264e52ede8f932a5296601b3ca1a25b45ffc63, network lines quoted above), env -i with HOME and TMPDIR in the probe directory, no MARVEL_ variables; five controls run first, in this order, results as expected: 192.0.2.1:80 refused inside with "Operation not permitted"; a fresh scratch listener on 47999, started for this run, refused inside with "Operation not permitted" and reachable from outside; a scratch listener on 47998 reachable inside; a write to a fixed path outside the probe directory refused ("Operation not permitted") and absent; a write inside the probe directory succeeded. No unix-socket allows were needed. Offline: the tests open local files only.
+
+### Tool lock-in
+Criterion (brief): all facts, intervals and provenance export to JSONL and re-import into a fresh store whose per-commit fact counts and C1 pair differences equal the source's; export and import times measured.
+Measured: export of the whole history: a header line plus 88,997 rows (88,998 lines, 17,467,708 bytes, sha256 a9b5cd7b3f108f8b1ac5df53dad77f1daa243893768f6e1c36430b6fc7304e5f); import into a fresh store: 88,997 rows, latest version 50 in both. For versions 1 to 50, facts_as_of equals the source's as a set at every version (state mismatches 0), the diff between consecutive versions equals the source's, added and removed (diff mismatches 0), and the per-version counts equal (count mismatches 0); this compares all attributes, which includes the load/<repo>@<n> provenance facts (the six prov/ attributes), not only code/ and kos/. Intervals: the rows carry valid_from and valid_to; the state and diff equalities at every version hold only if the intervals are equal. Export 6.54 s, import 2.53 s on this host (one run each). Log: mde-lockin.log. Result against the criterion: PASS.
+
+### Round-trip breakage
+Criterion (brief): 100 code/ facts drawn as of each repo's head (Python random.Random(20261115).sample over the facts sorted by entity, attribute and value) go to YAML and back with the same facts, intervals and provenance. Any loss is a FAIL.
+Drawn: version 50, code/ facts of the repo by entity prefix; kos 3,875 facts, marvel 81,412; sample files picks-kos.tsv and picks-marvel.tsv beside this report. Each pick went through FactStore::harvest at the start version of the interval it holds at the head (13 harvest files for kos, 4 for marvel, grouped by start version; the source map carried repo, commit and version), then Harvest::parse, then apply_harvest into a fresh in-memory store at the same start version.
+Measured: facts equal after the YAML round trip: 100 of 100 for kos, 100 of 100 for marvel. Start version of the interval after apply equal to the source's: 100 of 100 and 100 of 100; end (open) equal: 100 and 100. What the YAML file carries of the six provenance values: repo and commit (and the version, given as source, which the format treats as provenance only); not in the file: indexer, indexer-version, index-sha256, grade (four of six). The harvest format carries no interval: the start version above was supplied to apply_harvest by the caller from the grouping, not read from the file. Earlier closed intervals: 6 of the 100 kos picks (none of marvel's) were live earlier, absent between, and live again; the harvest carries the current interval only, so those 6 earlier intervals do not come back.
+Result against the criterion, read literally ("Any loss is a FAIL"): FAIL for the YAML path as it is, because of that loss: four of the six provenance values, the interval itself (carried by the caller, not the file) and six earlier closed intervals. The JSONL path carries all of them (lock-in above). Whether the harvest format is meant to be the exchange path for provenance and history is the architect's reading; the facts themselves round trip exactly. Logs: mde-roundtrip-kos.log, mde-roundtrip-marvel.log.
+
+### Skill asymmetry
+Criterion (brief): every query is plain SQL through the store's API; any query rewritten for speed after its first run is recorded with both forms.
+Measured: the probe's queries are calls to the store's Rust API (facts_as_of, diff, values_of, entities_with, latest_version, and the exchange functions above), not SQL text; no SQL was written by the probe. None was rewritten for speed. Queries changed after their first run, for other reasons, recorded here: (a) W6, before and after: the first form compared the store's whole version-4 diff, which holds both repos' changes, with kos's file difference; the second form keeps only kos's code/ facts by entity prefix (kos, kos:..., rust-analyzer ...). (b) W6's naming query gained a version argument so the check could be read at version 4 and at version 50; the query is the same call. (c) W8's names-dep vocabulary: v2 (dependencies at the commit read) replaced by v3 (window-wide union), by the architect's rulings. (d) The C2 every-row check over W6 was added after the scored runs. No query was changed after seeing its result in order to change the result's bar.
+Result: PASS, with the recorded changes.
+
+### Not run
+- A counterfactual for the rust-analyzer dlmalloc WARN.
+
+## Files added beside this report for the MDE tests
+- r1_mde.rs, mde-lockin.log, mde-roundtrip-kos.log, mde-roundtrip-marvel.log, picks-kos.tsv, picks-marvel.tsv.

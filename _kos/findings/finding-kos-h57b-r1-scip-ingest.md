@@ -1,6 +1,6 @@
 # Finding: probe R1, SCIP facts in the kos fact store (aae-orc-6fy1)
 
-Status: draft, revision 2. The MDE section waits for its run (brief note 5).
+Status: draft, revision 3, with the MDE tests run (brief note 5).
 Date: 2026-11-16
 Host: mokuzai (Apple silicon, macOS), by the director's host ruling
 bd: aae-orc-6fy1
@@ -13,7 +13,7 @@ finding-kos-8bmj and finding-kos-qttt (the store probes)
 Runner: a kos builder seat (arcaven team). Author: the arcaven architect seat,
 which wrote the brief.
 Evidence: `_kos/probes/code-graph-measurements-2026-11-16/` (the run report,
-sha256 872b572e, and its per-commit tables)
+sha256 70ec0047, its per-commit tables and the MDE logs)
 
 ## Headline
 
@@ -34,6 +34,13 @@ a commit to the decision behind it.
 By the brief's rule this recommends a production ingest ticket: C0 to C2 pass,
 W7 is served, and both W6 and W8 are at least partially served. The probe
 recommends; the operator rules.
+
+Of the three MDE tests, tool lock-in and skill asymmetry pass. Round-trip
+breakage fails as the brief wrote it: kos's YAML harvest format carries the
+facts exactly but drops four of six provenance values and every interval. The
+JSONL export carries all of them. The brief's recommendation rule does not
+include the MDE tests, so the failure does not change the recommendation, and
+it is reported here rather than set aside.
 
 ## Run
 
@@ -145,8 +152,57 @@ commit in the window still matches.
 
 ## MDE killers (kos roadmap v3, M4)
 
-Pending. These run at kos 73a5568, from a separate checkout, against a copy of
-the scored store (note 5), once note 5 is approved.
+They ran at kos 73a55684 (#192), from a separate clone, against a copy of the
+scored store (note 5). The copy's sha256 equals the scored store's (c0207ac0)
+before and after the run, and the scored store itself was never opened. The
+run conditions and the five controls are those above.
+
+| test | result | number |
+|---|---|---|
+| Tool lock-in | PASS | 88,997 interval rows export (6.54 s) and import (2.53 s); state, diff and count equal at all 50 versions, 0 mismatches, provenance facts included |
+| Round-trip breakage | FAIL, as written | facts 100 of 100 equal in each repo; the YAML carries 2 of 6 provenance values and no interval |
+| Skill asymmetry | PASS | no query rewritten for speed; four changes made for other reasons, recorded |
+
+**Round-trip breakage.** The brief's criterion, as written: "100 `code/` facts
+drawn as of each repo's head ... go to YAML and back with the same facts,
+intervals and provenance. Any loss is a FAIL." The picks went through
+`FactStore::harvest`, `Harvest::parse` and `apply_harvest` into a fresh
+store. What came back:
+- All 100 facts in each repo are equal after the trip.
+- The YAML carries repo and commit. It does not carry indexer,
+  indexer version, index sha256 or grade, so four of the six provenance values
+  are lost.
+- The YAML carries no interval. The start version matched only because the
+  test supplied it to `apply_harvest` from its own grouping.
+- 6 of the 100 kos picks had an earlier closed interval (live, then absent,
+  then live again). A harvest at the head does not carry it. None of marvel's
+  picks had one.
+
+So the test fails, and the FAIL stands. The criterion was also mis-specified,
+and that was the brief's error, not the run's. It asked the YAML harvest
+format to carry intervals and provenance. kos#192 designed that format to
+carry "a chosen set of facts, as they hold at one version", with a source map
+the caller supplies (`src/facts/exchange.rs:11-12` at 73a55684), not history. The test that answers "can the store's
+whole record leave and come back" is lock-in, over JSONL, and it passes. What
+the FAIL shows is real: a fact projected through YAML loses its provenance.
+Anything that treats harvest YAML as an exchange path for code facts inherits
+that loss.
+
+**Skill asymmetry.** The criterion says every query is plain SQL through the
+store's API. The store's API exposes no SQL: every query was a call to its Rust
+functions (`facts_as_of`, `diff`, `values_of`, `entities_with`), and the probe
+wrote no SQL. The part of the criterion that can be checked holds: no query was
+rewritten for speed. Four changed after their first run, and the run report
+records both forms of each:
+- W6 was narrowed to kos's facts.
+- W6's naming query gained a version argument.
+- The crate-name list moved from v2 to v3 (note 5).
+- The C2 check over W6 was added.
+
+One of those changes moved a number. Under v2, W8 found 0 kos facts naming
+`serde_yaml`, and under v3 it found 3. The change was ruled after the v2 load,
+for the reason note 5 gives. W8 scores partially served under either list,
+because none of the three records the decision.
 
 ## Prediction against result
 
