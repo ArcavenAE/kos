@@ -384,3 +384,25 @@ provenance.**
   `git grep` finds calling the symbol, and recall and precision are counted
   over files. The call-site counts (18 in marvel at 5eb450df) are reported
   beside the file counts, not scored.
+
+**Note 5, 2026-11-16: the crate-name vocabulary, and where the MDE tests run.**
+
+- **Crate names in `kos/` facts.** A node's text "names" a crate when it
+  contains a name from one fixed list for the whole run: the union of the
+  dependency names declared in the repo's manifests across the 50-commit
+  window (18 names for kos, 29 for marvel). An earlier load used each
+  commit's own manifest, and that made a knowledge fact vanish when the code
+  dependency left. A node that discusses `serde_yaml` after 829c392 still
+  names it, and that is what W8 asks about. So the knowledge side does not
+  follow the code side. The scored load uses the fixed list. The report gives
+  both loads and their counts, and says the fixed list has a known bias: a
+  name that is a dependency only at another commit in the window still
+  matches. A production ingest needs a defined lexicon, not a window union.
+- **The MDE tests run at kos main 73a5568** (kos#192, which added export,
+  import and harvest), from a separate checkout, against a copy of the scored
+  store file. Between the probe's base 071f1252 and 73a5568,
+  `src/facts/mod.rs` makes `SCHEMA_VERSION` and `LATEST_KEY` `pub(crate)` and
+  adds the `exchange` module, a new export and import path. The `SCHEMA` text
+  and the existing write code are unchanged, and `SCHEMA_VERSION` is still 1,
+  so the copy opens as it is. The report records both shas and the copy's
+  sha256.
