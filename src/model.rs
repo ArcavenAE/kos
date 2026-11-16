@@ -34,17 +34,20 @@ pub struct Node {
     pub compaction: Option<CompactionMeta>,
     #[serde(default)]
     pub provenance: Option<Provenance>,
-    /// v0.4: how far the claim has been examined (RED STUB: never read).
-    #[serde(skip)]
+    /// v0.4: how far the claim has been examined.
+    #[serde(default)]
     pub examination: Option<Examination>,
-    /// v0.4: how much rests on the claim (RED STUB: never read).
-    #[serde(skip)]
+    /// v0.4: how much rests on the claim.
+    #[serde(default)]
     pub commitment: Option<Commitment>,
-    /// v0.4: how a fact was produced; absent means authored (RED STUB).
-    #[serde(skip)]
+    /// v0.4: how a fact was produced. Absent means authored; kos writes no
+    /// default. No value sets or implies `confidence`, `examination` or
+    /// `commitment`.
+    #[serde(default)]
     pub source_grade: Option<SourceGrade>,
-    /// v0.4: premises this node's argument depends on (RED STUB).
-    #[serde(skip)]
+    /// v0.4: premises this node's argument depends on. A node field and not a
+    /// ninth edge type (design section 4, aae-orc-gq1c).
+    #[serde(default)]
     pub conditional_on: Vec<NodeRef>,
     #[serde(default)]
     pub tags: Vec<String>,
@@ -352,14 +355,14 @@ pub struct Provenance {
     pub derived_from: Vec<String>,
     #[serde(default)]
     pub reviewed_by: Option<String>,
-    /// v0.4 (RED STUB: never read).
-    #[serde(skip)]
+    /// v0.4: how the claim came to be held.
+    #[serde(default)]
     pub kind: Option<ProvenanceKind>,
-    /// v0.4 (RED STUB: never read).
-    #[serde(skip)]
+    /// v0.4: the ADR, finding, convention or question the claim was promoted from.
+    #[serde(default)]
     pub promoted_from: Vec<NodeRef>,
-    /// v0.4 (RED STUB: never read).
-    #[serde(skip)]
+    /// v0.4: a condition someone can check that would unmake the claim.
+    #[serde(default)]
     pub falsifier: Option<String>,
 }
 
@@ -368,14 +371,17 @@ pub struct Provenance {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct NodeRef {
     pub target: String,
-    // RED STUB: writes `note: null` for None.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub note: Option<String>,
 }
 
-macro_rules! red_stub_enum {
-    ($name:ident { $($variant:ident),* }) => {
-        /// RED STUB: reads every value as `Unknown` and writes an empty string.
+/// Declares a v0.4 vocabulary enum. Reading never fails: a value outside the
+/// vocabulary becomes `Unknown(raw)` and keeps its text, the way `EdgeType`
+/// does (tolerant reader, strict validate; the legality check is aae-orc-blj1w).
+/// Writing gives the vocabulary word, or the raw text for `Unknown`.
+macro_rules! vocab_enum {
+    ($(#[$meta:meta])* $name:ident { $($variant:ident => $word:literal),* $(,)? }) => {
+        $(#[$meta])*
         #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
         #[serde(from = "String")]
         #[non_exhaustive]
@@ -385,44 +391,91 @@ macro_rules! red_stub_enum {
             Unknown(String),
         }
 
+        impl $name {
+            /// The legal vocabulary, in schema order.
+            pub const LEGAL: &'static [&'static str] = &[$($word),*];
+
+            /// The word as written in a node file.
+            #[must_use]
+            pub fn as_str(&self) -> &str {
+                match self {
+                    $($name::$variant => $word,)*
+                    $name::Unknown(raw) => raw,
+                }
+            }
+
+            /// The raw string if the value is outside the vocabulary.
+            #[must_use]
+            pub fn unknown_value(&self) -> Option<&str> {
+                match self {
+                    $name::Unknown(raw) => Some(raw),
+                    _ => None,
+                }
+            }
+        }
+
         impl From<String> for $name {
             fn from(raw: String) -> Self {
-                $name::Unknown(raw)
+                match raw.as_str() {
+                    $($word => $name::$variant,)*
+                    _ => $name::Unknown(raw),
+                }
             }
         }
 
         impl Serialize for $name {
             fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
-                s.serialize_str("")
+                s.serialize_str(self.as_str())
+            }
+        }
+
+        impl std::fmt::Display for $name {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.write_str(self.as_str())
             }
         }
     };
 }
 
-red_stub_enum!(Examination {
-    UnExamined,
-    Questioned,
-    Answered,
-    RuledOut
-});
-red_stub_enum!(Commitment {
-    Floating,
-    LoadBearing,
-    Essential,
-    Abandoned
-});
-red_stub_enum!(ProvenanceKind {
-    Deliberated,
-    EmergentRatified,
-    Inherited,
-    PreQuestion
-});
-red_stub_enum!(SourceGrade {
-    Authored,
-    Compiler,
-    Heuristic,
-    Inferred
-});
+vocab_enum! {
+    /// How far a claim has been examined (v0.4 matrix, first axis).
+    Examination {
+        UnExamined => "un-examined",
+        Questioned => "questioned",
+        Answered => "answered",
+        RuledOut => "ruled-out",
+    }
+}
+
+vocab_enum! {
+    /// How much rests on a claim (v0.4 matrix, second axis).
+    Commitment {
+        Floating => "floating",
+        LoadBearing => "load-bearing",
+        Essential => "essential",
+        Abandoned => "abandoned",
+    }
+}
+
+vocab_enum! {
+    /// How a claim came to be held (`provenance.kind`).
+    ProvenanceKind {
+        Deliberated => "deliberated",
+        EmergentRatified => "emergent-ratified",
+        Inherited => "inherited",
+        PreQuestion => "pre-question",
+    }
+}
+
+vocab_enum! {
+    /// How a fact was produced (`source_grade`).
+    SourceGrade {
+        Authored => "authored",
+        Compiler => "compiler",
+        Heuristic => "heuristic",
+        Inferred => "inferred",
+    }
+}
 
 // ── Types used by orient (lighter, for findings/charter) ─────
 

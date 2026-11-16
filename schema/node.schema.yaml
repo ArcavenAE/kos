@@ -1,5 +1,5 @@
 # KOS Node Schema
-# Version: 0.3
+# Version: 0.4
 # Status: FRONTIER
 # Purpose: Minimum viable spec node — human-writable, agent-parseable,
 #          no tooling required. Validate under real use, then revise.
@@ -12,6 +12,10 @@
 #   0.3 — session-002: added signal classification on edges,
 #          based on twelve-project probe (findings 001-013).
 #          See finding-014-twelve-project-synthesis for rationale.
+#   0.4 — aae-orc-kv2rv: added the examination x commitment coordinate,
+#          provenance kind, promoted_from and falsifier, source_grade and
+#          conditional_on. Every new field is optional, so every v0.3 node
+#          parses unchanged. Design: docs/design/schema-v0.4.md.
 
 # ─────────────────────────────────────────────
 # REQUIRED FIELDS (every node)
@@ -77,6 +81,60 @@ content:
     For finding nodes: what the probe revealed, not what was hoped.
     For question nodes: the question precisely stated — vague
     questions produce vague probes.
+
+# ─────────────────────────────────────────────
+# v0.4 FIELDS (all optional)
+# ─────────────────────────────────────────────
+#
+# `confidence` stays required, with its v0.3 values. The coordinate below
+# records the real cell of the examination x commitment matrix. The rule that a
+# node on a named cell agrees with its `confidence` belongs to the validator
+# (aae-orc-8j6cc), not to this schema. A value outside a vocabulary below is
+# read as written and reported by `kos validate` (aae-orc-blj1w); it never
+# fails the parse.
+
+examination:
+  type: enum
+  required: false
+  values:
+    un-examined:  "Nobody has questioned the claim."
+    questioned:   "The claim is under question."
+    answered:     "The question was answered."
+    ruled-out:    "The claim was examined and ruled out."
+  notes: "bedrock is answered x essential; frontier is questioned x load-bearing; graveyard is ruled-out x abandoned."
+
+commitment:
+  type: enum
+  required: false
+  values:
+    floating:     "Nothing rests on the claim."
+    load-bearing: "Work rests on the claim."
+    essential:    "Much rests on the claim."
+    abandoned:    "The claim was given up."
+
+source_grade:
+  type: enum
+  required: false
+  values:
+    authored:     "Written by a person or an agent as a judgement. The meaning of an absent field."
+    compiler:     "Produced by a compiler or an index."
+    heuristic:    "Produced by a heuristic."
+    inferred:     "Inferred by a model."
+  notes: >
+    No value of source_grade sets or implies confidence, examination or
+    commitment. A compiler fact is current until it drifts, not bedrock.
+    Absence from a code index is staleness, never ruled-out.
+
+conditional_on:
+  type: list
+  required: false
+  format:
+    - target: node-id
+      note: "Optional. One-line reason."
+  description: >
+    The premises this node's argument depends on. A node field, not a ninth
+    edge type (aae-orc-gq1c: the eight edge types stand). When a premise
+    moves, kos validate warns about its dependents; it never changes them.
 
 # ─────────────────────────────────────────────
 # EDGE FIELDS
@@ -238,6 +296,26 @@ provenance:
   reviewed_by:
     type: string or null
     description: "Human reviewer id, or null if not yet reviewed."
+  kind:
+    type: enum
+    required: false
+    values:
+      deliberated:        "Weighed and decided."
+      emergent-ratified:  "Emerged from work, then ratified."
+      inherited:          "Taken over from an earlier source."
+      pre-question:       "Held before it was ever questioned."
+    notes: "There is no substrate value: that is the matrix cell un-examined x load-bearing."
+  promoted_from:
+    type: list
+    required: false
+    format:
+      - target: node-id
+        note: "Optional."
+    description: "The ADR, finding, convention or question node the claim was promoted from."
+  falsifier:
+    type: string
+    required: false
+    description: "A condition someone can check that would unmake the claim."
 
 # ─────────────────────────────────────────────
 # TYPE-SPECIFIC FIELDS
