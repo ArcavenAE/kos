@@ -25,7 +25,7 @@ from tier (aae-orc-pwnh). This note says what v0.4 adds, and in what order.
 | No v0.4 work has landed | `schema/node.schema.yaml` on kos main 87743bb | its version history ends at v0.3; no examination, commitment, kind, promoted_from, falsifier or conditional_on |
 | No v0.4 work is in flight | `gh pr list --repo ArcavenAE/kos --state open`, `git ls-remote` | no PR and no branch for it |
 | Old binaries keep unknown fields | `src/model.rs` | `Node` has no `deny_unknown_fields`, so a field the binary does not know is ignored |
-| Old binaries refuse unknown edge types | `src/model.rs` | `EdgeType` is a closed enum and `LEGAL_EDGE_TYPES` has 8 entries, so an edge with a ninth type fails the parse of the whole node |
+| How binaries treat an unknown edge type | `src/model.rs`, `git log 3495ed1` | since 3495ed1 (#89), an unknown type loads as `EdgeType::Unknown(raw)` and kos validate fails the node; a binary from before #89 dropped the whole node. `LEGAL_EDGE_TYPES` has 8 entries |
 | How validate treats an edge target | `src/validate.rs` check 3 | a plain target found nowhere warns; a `graph::target` that does not exist fails (#177) |
 
 ## 2. The matrix
@@ -95,11 +95,16 @@ type, and it is a list of `{target, note}`.
 
 The reason is a ruling already on record. aae-orc-gq1c was ratified on
 2026-08-09: "the eight edge types stand. No ninth type." It gave the version
-skew as the measured reason, and section 1 confirms it. An older kos binary
-keeps a node with an unknown field, but drops a node with an unknown edge
-type. gq1c used the same field shape for `out_of_scope`. This note applies
-that ruling to `conditional_on`. If the operator wants an edge here instead,
-it needs a ruling that reopens gq1c.
+skew as the measured reason. Section 1 updates that reason without
+changing the conclusion. A binary from before #89 drops a node with an
+unknown edge type, and a current binary loads it as `Unknown` and kos
+validate fails it. So a ninth type would make every graph that uses it fail
+validation under any kos release that predates the type. An unknown field,
+by contrast, is ignored: `Node` has never carried `deny_unknown_fields`
+(`git log -S deny_unknown_fields -- src/model.rs` is empty), and kos
+validate does not flag one. gq1c used the same field shape for
+`out_of_scope`. This note applies that ruling to `conditional_on`. If the
+operator wants an edge here instead, it needs a ruling that reopens gq1c.
 
 The flag is a warning, never a gate and never an automatic move (SOUL section
 8, ADR-007). When a target's confidence or coordinate changes, kos validate
