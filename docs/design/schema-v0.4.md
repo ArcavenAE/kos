@@ -121,8 +121,13 @@ same rule applies to `promoted_from`.
 
 1. **aae-orc-kv2rv (PR 1).** `schema/node.schema.yaml` documents v0.4, and
    `src/model.rs` parses every field above. All the new fields are optional,
-   so every v0.3 graph parses unchanged. Tests: a v0.3 node and a v0.4 node
-   each round-trip through parse and write, and a node carrying a field the
+   so every v0.3 graph parses unchanged. Tests: kos has no Node writer
+   (promote and compact edit the text in place), so there is no node-level
+   write to round trip. A v0.3 node parses with every new field absent, a v0.4
+   node parses with every new field present, promote and compact leave a v0.4
+   node's new fields byte-identical, each new enum and the `{target, note}`
+   struct serialize and re-parse to equal values, a value outside a
+   vocabulary parses as `Unknown(raw)`, and a node carrying a field the
    binary does not know still parses. No directory changes. Size M.
 2. **aae-orc-blj1w (PR 2).** kos validate resolves `promoted_from` and
    `conditional_on` targets by the section 4 rule and prints the dependent
