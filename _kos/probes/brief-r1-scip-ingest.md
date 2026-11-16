@@ -317,7 +317,8 @@ and fell back to `--no-deps`.
   symbols that an index without it has, the finding says so and names the
   warning as a candidate refusal condition for the production ingest.
 
-**Note 3, 2026-11-16: symbol identity across commits, and the crate fetch.**
+**Note 3, 2026-11-16: the crate fetch, symbol identity, store layout and
+provenance.**
 
 - The `scip` crate and its dependency closure were not in the run host's crate
   cache. By the director's ruling they were fetched into the probe's own
@@ -332,3 +333,19 @@ and fell back to `--no-deps`.
   the commit. Without the replacement, every own fact would end and restart at
   each commit, and C1 and W6 would measure version churn rather than code
   change. The ground-truth fact files apply the same replacement.
+- One store file holds both repos, so W7 stays one query. Version n loads
+  kos's n-th and marvel's n-th commit of their windows together. Each repo's
+  load asserts and retracts only that repo's facts, against its own previous
+  load. Every document entity is prefixed with its repo (`kos:` or `marvel:`),
+  so a path that exists in both repos stays two entities.
+- Provenance is reached through a row's version. The store's rows are
+  `(e, a, v)` intervals with no provenance column, and putting provenance in
+  `v` would change every fact's identity at every commit. So each load writes
+  a load entity per repo and version (`load/<repo>@<n>`), carrying repo,
+  commit, indexer, indexer version, index sha256 and source grade. These
+  facts are asserted at that version and never retracted. A `code/` row's
+  provenance is its repo's load entity at the row's start version, and at its
+  end version for an ended row. C2's 100 percent means every returned row
+  resolves to a load entity with all six values. The store has no tier field,
+  so "no `code/` fact carries a tier" holds by construction, and the finding
+  says so rather than counting zero rows.
