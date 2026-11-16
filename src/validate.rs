@@ -1,11 +1,14 @@
 use std::cell::RefCell;
-use std::collections::{BTreeMap, BTreeSet, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 
 use crate::error::{KosError, Result};
 use crate::findings::{self, FindingClass, FindingLoad};
-use crate::model::{LEGAL_EDGE_TYPES, Node, NodeType};
+use crate::model::{
+    Commitment, Confidence, Examination, LEGAL_EDGE_TYPES, Node, NodeType, ProvenanceKind,
+    SourceGrade,
+};
 use crate::workspace::{KOS_DIR, MANIFEST_FILE, Workspace};
 
 #[derive(Debug)]
@@ -343,10 +346,22 @@ pub fn run_with(kos_root: &Path, siblings: Siblings) -> Result<Summary> {
     let mut results: Vec<ValidationResult> = Vec::new();
     let mut parse_error_count = 0;
 
+    let parents: HashMap<&str, &Node> = nodes
+        .iter()
+        .filter_map(|n| match n {
+            LoadedNode::Parsed(node, _) => Some((node.id.as_str(), &**node)),
+            LoadedNode::ParseError => None,
+        })
+        .collect();
+
     for loaded in &nodes {
         match loaded {
             LoadedNode::Parsed(node, rel_path) => {
-                results.push(validate_node(node, rel_path, &known_ids, &citations));
+                let mut result = validate_node(node, rel_path, &known_ids, &citations);
+                result
+                    .warnings
+                    .extend(undermined_parent_warnings(node, &parents));
+                results.push(result);
             }
             LoadedNode::ParseError => {
                 parse_error_count += 1;
@@ -710,6 +725,83 @@ fn load_all_nodes(nodes_dir: &Path) -> Result<(Vec<LoadedNode>, HashSet<String>)
     Ok((nodes, known_ids))
 }
 
+/// One target of an edge, `conditional_on` or `promoted_from`. A plain target
+/// found nowhere only warns (it may be a finding or probe); a `graph::` target
+/// naming this graph or a workspace graph that resolves nowhere is an error;
+/// one naming a graph outside the workspace warns "not checked". `label` names
+/// the kind of target in the message.
+fn check_target(
+    label: &str,
+    target: &str,
+    known_ids: &HashSet<String>,
+    citations: &Citations,
+    errors: &mut Vec<String>,
+    warnings: &mut Vec<String>,
+) {
+    if known_ids.contains(target) {
+        return;
+    }
+    match citations.check(target, known_ids) {
+        Cited::Resolved => {}
+        Cited::Ambiguous(candidates) => warnings.push(format!(
+            "{label} '{target}' is ambiguous: it names {} findings ({})",
+            candidates.len(),
+            candidates.join(", ")
+        )),
+        Cited::Fails(why) => errors.push(format!("{label} '{target}' does not resolve: {why}")),
+        Cited::Unchecked(why) => {
+            warnings.push(format!("{label} '{target}' was not checked: {why}"));
+        }
+        Cited::NotFound => warnings.push(format!(
+            "{label} '{target}' not found in nodes/ (may be a finding or probe)"
+        )),
+    }
+}
+
+/// Why a `conditional_on` parent no longer supports the nodes that depend on
+/// it: the states design section 4 names. A `questioned` or `frontier` parent
+/// is the normal case and is not listed; neither is a value outside a
+/// vocabulary, which fails the parent on its own.
+fn undermined_reasons(parent: &Node) -> Vec<String> {
+    let mut reasons = Vec::new();
+    match parent.confidence {
+        Confidence::Graveyard => reasons.push("confidence is graveyard".to_string()),
+        Confidence::Placeholder => reasons.push("confidence is placeholder".to_string()),
+        _ => {}
+    }
+    if parent.examination == Some(Examination::RuledOut) {
+        reasons.push("examination is ruled-out".to_string());
+    }
+    if parent.commitment == Some(Commitment::Abandoned) {
+        reasons.push("commitment is abandoned".to_string());
+    }
+    reasons
+}
+
+/// The warnings for one node whose `conditional_on` parents, read from the
+/// graph being checked, are undermined now. validate keeps no record of an
+/// earlier run, so it cannot see a parent change; it warns on the state. A
+/// parent that is a finding, unreadable, or in another graph is resolved for
+/// existence only (check 3c) and gives no warning here. A warning only, never a
+/// failure and never a move (SOUL section 8, ADR-007).
+fn undermined_parent_warnings(node: &Node, parents: &HashMap<&str, &Node>) -> Vec<String> {
+    node.conditional_on
+        .iter()
+        .filter_map(|r| {
+            let parent = parents.get(r.target.as_str())?;
+            let reasons = undermined_reasons(parent);
+            if reasons.is_empty() {
+                return None;
+            }
+            Some(format!(
+                "conditional_on parent '{}' is undermined ({}): this node's argument depends on it, so review it",
+                r.target,
+                reasons.join(" and ")
+            ))
+        })
+        .collect()
+}
+
 pub(crate) fn validate_node(
     node: &Node,
     rel_path: &str,
@@ -747,29 +839,14 @@ pub(crate) fn validate_node(
     // warns "not checked". A workspace graph whose nodes fail to load counts as
     // empty, so its targets error rather than skip.
     for edge in node.all_edges() {
-        if !known_ids.contains(&edge.target) {
-            match citations.check(&edge.target, known_ids) {
-                Cited::Resolved => {}
-                Cited::Ambiguous(candidates) => warnings.push(format!(
-                    "edge target '{}' is ambiguous: it names {} findings ({})",
-                    edge.target,
-                    candidates.len(),
-                    candidates.join(", ")
-                )),
-                Cited::Fails(why) => errors.push(format!(
-                    "edge target '{}' does not resolve: {why}",
-                    edge.target
-                )),
-                Cited::Unchecked(why) => warnings.push(format!(
-                    "edge target '{}' was not checked: {why}",
-                    edge.target
-                )),
-                Cited::NotFound => warnings.push(format!(
-                    "edge target '{}' not found in nodes/ (may be a finding or probe)",
-                    edge.target
-                )),
-            }
-        }
+        check_target(
+            "edge target",
+            &edge.target,
+            known_ids,
+            citations,
+            &mut errors,
+            &mut warnings,
+        );
 
         // 3b. Edge type is in the schema vocabulary. The loader is lenient so
         // one bad edge never hides a node from readers; the gate lives here,
@@ -782,6 +859,69 @@ pub(crate) fn validate_node(
             ));
         }
     }
+
+    // 3c. v0.4: `conditional_on` and `promoted_from` targets resolve as edge
+    // targets do (design section 4).
+    for r in &node.conditional_on {
+        check_target(
+            "conditional_on target",
+            &r.target,
+            known_ids,
+            citations,
+            &mut errors,
+            &mut warnings,
+        );
+    }
+    if let Some(p) = &node.provenance {
+        for r in &p.promoted_from {
+            check_target(
+                "promoted_from target",
+                &r.target,
+                known_ids,
+                citations,
+                &mut errors,
+                &mut warnings,
+            );
+        }
+    }
+
+    // 3d. v0.4: a value outside a vocabulary. The loader keeps the raw text so
+    // the node still reads; the gate lives here, at authorship.
+    let mut illegal = |field: &str, raw: Option<&str>, legal: &[&str]| {
+        if let Some(raw) = raw {
+            errors.push(format!(
+                "{field} '{raw}' is not legal (expected one of: {})",
+                legal.join(", ")
+            ));
+        }
+    };
+    illegal(
+        "examination",
+        node.examination
+            .as_ref()
+            .and_then(Examination::unknown_value),
+        Examination::LEGAL,
+    );
+    illegal(
+        "commitment",
+        node.commitment.as_ref().and_then(Commitment::unknown_value),
+        Commitment::LEGAL,
+    );
+    illegal(
+        "source_grade",
+        node.source_grade
+            .as_ref()
+            .and_then(SourceGrade::unknown_value),
+        SourceGrade::LEGAL,
+    );
+    illegal(
+        "provenance.kind",
+        node.provenance
+            .as_ref()
+            .and_then(|p| p.kind.as_ref())
+            .and_then(ProvenanceKind::unknown_value),
+        ProvenanceKind::LEGAL,
+    );
 
     // 4. Graveyard type-specific: should have graveyard section
     if node.node_type == NodeType::Graveyard && node.graveyard.is_none() {

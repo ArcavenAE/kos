@@ -107,9 +107,16 @@ validate does not flag one. gq1c used the same field shape for
 operator wants an edge here instead, it needs a ruling that reopens gq1c.
 
 The flag is a warning, never a gate and never an automatic move (SOUL section
-8, ADR-007). When a target's confidence or coordinate changes, kos validate
-names each dependent in a warning. It does not change the dependent or fail
-the run. The e689 line "Default: substrate-conditional unless proven
+8, ADR-007). kos validate keeps no record of an earlier run, so it cannot see a
+parent change; it warns on the parent's state. A node whose `conditional_on`
+parent is undermined now (confidence graveyard or placeholder, examination
+ruled-out, or commitment abandoned) gets one warning naming the parent and the
+reason. A questioned or frontier parent is the normal case and does not warn.
+It does not change the dependent or fail the run. The warning reads the
+parent's state in the graph being checked: a parent that is a finding, or a
+node in a sibling graph, is resolved for existence only. Real change detection
+(a comparison with the base commit, or a stamp on the dependent) is later
+work, and is left to its own ticket. The e689 line "Default: substrate-conditional unless proven
 substrate-independent" is read as guidance for authors, not as a value kos
 fills in: v0.4 writes nothing that an author did not.
 
@@ -121,8 +128,13 @@ same rule applies to `promoted_from`.
 
 1. **aae-orc-kv2rv (PR 1).** `schema/node.schema.yaml` documents v0.4, and
    `src/model.rs` parses every field above. All the new fields are optional,
-   so every v0.3 graph parses unchanged. Tests: a v0.3 node and a v0.4 node
-   each round-trip through parse and write, and a node carrying a field the
+   so every v0.3 graph parses unchanged. Tests: kos has no Node writer
+   (promote and compact edit the text in place), so there is no node-level
+   write to round trip. A v0.3 node parses with every new field absent, a v0.4
+   node parses with every new field present, promote and compact leave a v0.4
+   node's new fields byte-identical, each new enum and the `{target, note}`
+   struct serialize and re-parse to equal values, a value outside a
+   vocabulary parses as `Unknown(raw)`, and a node carrying a field the
    binary does not know still parses. No directory changes. Size M.
 2. **aae-orc-blj1w (PR 2).** kos validate resolves `promoted_from` and
    `conditional_on` targets by the section 4 rule and prints the dependent

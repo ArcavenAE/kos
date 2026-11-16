@@ -58,9 +58,12 @@ macro_rules! live_at {
     };
 }
 
+pub mod cli;
 mod exchange;
+mod traverse;
 
 pub use exchange::Harvest;
+pub use traverse::{Direction, Step};
 
 /// A version of the fact set. Opaque to the store: it only compares them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

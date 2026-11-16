@@ -691,6 +691,9 @@ fn finding_node(
         created_at: Some(c),
         derived_from: Vec::new(),
         reviewed_by: None,
+        kind: None,
+        promoted_from: Vec::new(),
+        falsifier: None,
     });
     Node {
         id,
@@ -705,6 +708,10 @@ fn finding_node(
         finding: None,
         compaction: None,
         provenance,
+        examination: None,
+        commitment: None,
+        source_grade: None,
+        conditional_on: Vec::new(),
         tags: Vec::new(),
         notes: None,
         source_path: PathBuf::new(),
