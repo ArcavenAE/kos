@@ -128,6 +128,16 @@ content: |
      leave a forwarding record?
   4. What is the smallest change that ends the fan-out case this month,
      independent of the full scheme?
+
+  Harvest 2026-11-17 (I-532), finding-kos-qe45-cross-graph-blocker-resolution
+  (measured at kos 12cd440, 2026-11-06). The accepted `graph::slug` reference
+  is read by no resolver yet: `kos orient --ready` treats a blocking edge as
+  satisfied only for a local bedrock or graveyard node or a local finding id,
+  so a cross-graph target stays blocked, and `schema/manifest.schema.yaml`
+  promises a resolution order that no read path implements. That bears on
+  sub-questions 3 and 4 (the resolver is implementation, not part of the ruling).
+  The finding's recommendation is input to a ruling the operator is asked for;
+  this node does not take it. No confidence change.
 edges:
   - target: question-subrepo-kos-workflow
     type: derives
@@ -135,10 +145,13 @@ edges:
   - target: question-projection-seam
     type: supports
     note: "A collision-free canonical id is a precondition for projecting nodes across graphs without ambiguity"
+  - target: finding-kos-qe45-cross-graph-blocker-resolution
+    type: supports
+    note: "measured that a graph::slug blocking edge never resolves in kos orient --ready and that the documented resolution order is unimplemented; bears on sub-questions 3 and 4"
 provenance:
   created_by: agent
   session: research-supervisor dispatch 2026-09-16 (operator commission via the director seat)
-  source: "finding-131 (observation and the three shapes), finding-131 addenda 2026-08-15 and 2026-08-16, finding-068, bd aae-orc-ul2h notes (fan-out instance 4), bd aae-orc-vxaa, orc PR #339 (finding-170 to 172 renumber)"
+  source: "finding-kos-qe45 (cross-graph blocking edges, 2026-11-06), finding-131 (observation and the three shapes), finding-131 addenda 2026-08-15 and 2026-08-16, finding-068, bd aae-orc-ul2h notes (fan-out instance 4), bd aae-orc-vxaa, orc PR #339 (finding-170 to 172 renumber)"
 notes: |
   Filed here by the subject test: kos assigns and resolves ids, so the
   question lives in kos's graph even though every specimen is an orc or

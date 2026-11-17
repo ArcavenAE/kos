@@ -82,3 +82,8 @@ brief:
     If decomposition fails: redirects (code structure insufficient for
     graph seeding without documents).
   timebox: "Session-003, first probe cycle"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Ran as finding-016-code-only-bootstrap, whose probe field names this brief (result: partial).

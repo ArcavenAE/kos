@@ -113,3 +113,8 @@ brief:
     If 30-50%: partial (signal exists but noise is a real problem).
     If < 30%: disconfirms (graph generates more noise than signal).
   timebox: "Session-004, third probe cycle"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Ran as finding-023-signal-to-noise-four-projects (result: partial); findings 024, 025 and 026 also name it as their probe.

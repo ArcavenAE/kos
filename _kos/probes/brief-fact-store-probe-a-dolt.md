@@ -8,6 +8,9 @@ one commit to the next. Criterion 2's numbers depend on it; the finding gives
 the counts without it.
 Date: 2026-10-20
 Question node: question-kos-fact-store-substrate, sub-questions A, C and D
+Note 2026-11-17 (harvest, I-532): COMPLETE. The probe ran and its result is
+`_kos/findings/finding-kos-8bmj-fact-store-probes-dolt-sqlite.md`. Nothing above
+changed.
 
 ## Question
 

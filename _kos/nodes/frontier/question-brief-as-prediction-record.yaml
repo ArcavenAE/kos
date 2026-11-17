@@ -26,9 +26,29 @@ content: |
   Test: add predicted_confidence to the next three briefs before probes run.
   Measure deviation at harvest. See if the delta carries signal.
 
+  Harvest 2026-11-17 (I-532), revised by finding-kos-to4v: the schema addition
+  is not needed. `schema/node.schema.yaml` already carries `predicted_confidence`
+  on briefs (`:356`) and `surprise_magnitude` on findings (`:399`), and three
+  briefs already record a predicted confidence (brief-seed-scan,
+  brief-lenient-edge-loading, brief-kos-status-woz). The gap finding-kos-to4v
+  measured is on the reading side: kos never checks `finding.probe`,
+  `finding.result` or the brief's success signals, and validate ignores them.
+  The test above (add the field to the next three briefs) is partly met on the
+  writing side; the deviation at harvest is still unmeasured. finding-kos-yd18
+  piloted a 14-step method on six findings and recommends that only the field
+  and reference checks gate in `kos validate`; that is input to the operator,
+  not a ruling. No confidence change.
+
 depends_on:
   - question-predictor-layer
   - elem-spec-cycle
+edges:
+  - target: finding-kos-to4v-untested-findings-probe-field-unread
+    type: supports
+    note: "the schema already has predicted_confidence and surprise_magnitude; the gap is that kos never reads finding.probe, finding.result or the success signals"
+  - target: finding-kos-yd18-untested-claim-detection-method
+    type: supports
+    note: "follows to4v: a 14-step method piloted on six findings; only the field and reference checks may gate in kos validate"
 provenance:
   created_by: human
   session: session-013

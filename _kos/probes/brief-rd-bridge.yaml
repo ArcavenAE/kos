@@ -64,3 +64,8 @@ brief:
        findings that don't exist in kos's own findings/
     4. The unified index is < 1 file, queryable with grep/jq
   timebox: "Session-008 (one session)"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Built and reported as finding-032-rd-bridge-probe (48 of 48 findings extracted from 2 briefs).

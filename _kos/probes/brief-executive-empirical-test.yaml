@@ -99,3 +99,8 @@ brief:
     See success criteria above. The bar is 5/5 for confirms,
     3-4 for partial, <3 for disconfirms.
   timebox: "Session-004, second probe cycle"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Ran as finding-021-executive-empirical-three-projects and finding-022-executive-twelve-project-synthesis, whose probe fields name this brief (result: confirms in both).

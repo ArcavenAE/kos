@@ -91,3 +91,8 @@ brief:
   success_signal: "Produce an artifact catalog covering 10+ systems with enough detail to (1) identify 15+ universal patterns worth building in, (2) write bridge profiles for at least 3 systems, and (3) design a profile format that handles version ranges and artifact-to-node mapping."
   timebox: "2-3 sessions of research"
   predicted_confidence: 0.6
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Ran as finding-042-sdd-system-survey and finding-043-beads-deep-dive, whose probe fields name this brief (result: partial in both).

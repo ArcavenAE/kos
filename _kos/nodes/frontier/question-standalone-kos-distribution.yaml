@@ -36,6 +36,16 @@ content: |
   `kos install` self-install command? Does the Workspace abstraction
   need to formally distinguish orchestrator-workspace from
   standalone-graph, or is the current "root == kos_root" hack adequate?
+
+  Harvest 2026-11-17 (I-532), revised by finding-038-distribution-pipeline: the
+  premise above, that no installed binary exists, no longer holds. kos is now
+  installable outside aae-orc with `brew install arcavenae/tap/kos` or
+  `kos update` (finding-038 states this and calls the question "partially
+  resolved"). The Workspace half stays open: finding-038 says the abstraction
+  still needs cleanup for standalone repos (the root == kos_root workaround).
+  Commit aeef578 (2026-04-05, standalone support in orient) touched
+  src/workspace.rs; whether it settles that half is not checked here.
+  No confidence change.
 edges:
   - target: question-subrepo-kos-workflow
     type: derives

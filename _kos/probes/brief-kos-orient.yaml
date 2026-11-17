@@ -95,3 +95,8 @@ brief:
     6. At least one instance where the tool surfaces knowledge that
        would have been missed by reading only the subrepo's CLAUDE.md
   timebox: "Session-006 (one session)"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Built and reported as finding-029-kos-orient-probe (the brief's signals met; result: confirms).

@@ -128,3 +128,8 @@ brief:
     a very different sequence: redirects (the priority function is
     wrong or the input channels are wrong).
   timebox: "Session-004, first probe cycle"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Ran as finding-020-executive-mechanism, whose probe field names this brief (result: confirms).

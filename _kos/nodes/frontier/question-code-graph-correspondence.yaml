@@ -64,6 +64,13 @@ content: |
      provenance) workloads that live LSP failed is a separate probe, still open.
      msqx measured what indexing costs, not whether its output closes the gap
      5lbu found.
+     HARVEST 2026-11-17 (I-532): the decision-forcing half ran as
+     finding-kos-h57b-r1-scip-ingest (the finding landed in kos#202; its brief was
+     locked at kos#185; the finding is still marked draft, revision 3). W7 is served in one query, with document-level recall
+     and precision of 1.000 in both repos. W6 and W8 are partially served: the
+     code side is right, but no kos record names the decision behind a commit.
+     The finding recommends a production ingest ticket; the operator rules.
+     No confidence change.
 
   C. What substrate holds the facts? (aae-orc-isie)
      OPEN. Ungated by the mission-split (per isie). A per-commit, per-repo,
@@ -143,7 +150,8 @@ content: |
   This question closes when the arc is decided (kos as sink or not, substrate
   chosen, mission split resolved), not when the two cost probes finished. A and
   B are answered, and E is answered by decision (2026-10-16 harvest); C, D, F
-  and G are open; the decision-forcing half of B is the nearest open probe.
+  and G are open; the decision-forcing half of B has run, see
+  finding-kos-h57b-r1-scip-ingest, and the operator rules on its recommendation.
 edges:
   - target: elem-correspondence-layer
     type: derives
@@ -166,6 +174,9 @@ edges:
   - target: aae-orc::question-kos-multi-writer-concurrency
     type: supports
     note: "shared substrate and multi-writer concern feeding sub-question C"
+  - target: finding-kos-h57b-r1-scip-ingest
+    type: supports
+    note: "the decision-forcing half of sub-question B ran: W7 served in one query, W6 and W8 partially served; recommends a production ingest ticket, the operator rules; the finding is still draft, revision 3"
 provenance:
   created_by: human
   session: "session-2026-08-16-code-graph-harvest"
@@ -174,6 +185,7 @@ provenance:
     - _kos/ideas/code-graph-as-second-lens.md
     - _kos/findings/finding-kos-wre7-serena-live-lsp-baseline.md
     - _kos/findings/finding-kos-ndz7-scip-indexing-cost.md
+    - _kos/findings/finding-kos-h57b-r1-scip-ingest.md
     - docs/research/2026-08-08-code-graph-briefing.md
     - docs/decisions/adr-009-read-surface-single-query-engine.md
 notes: >

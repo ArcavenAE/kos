@@ -84,3 +84,8 @@ brief:
     If decisions decompose cleanly: redirects (the hypothesis was wrong,
     everything CAN be a node, or we tested the wrong decisions).
   timebox: "Session-003, second probe cycle"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Ran as finding-017-what-cant-be-a-node and finding-019-undeclared-structure, whose probe fields name this brief (result: confirms in both).

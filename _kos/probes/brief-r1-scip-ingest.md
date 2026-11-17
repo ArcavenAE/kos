@@ -11,6 +11,9 @@ Follows: finding-kos-wre7 (live LSP did not serve W6, W7 or W8),
 finding-kos-ndz7 (indexing cost, and the silent-degradation trap),
 finding-kos-8bmj and finding-kos-qttt (the store probes), and Desk kdec-7
 (ruled 2026-11-14: the fact store is SQLite valid-time, built in aae-orc-xxe3n).
+Note 2026-11-17 (harvest, I-532): COMPLETE as a probe. It ran and its result is
+`_kos/findings/finding-kos-h57b-r1-scip-ingest.md`, which is itself still marked
+draft, revision 3; its status is not changed here. Nothing above changed.
 
 ## Question
 
