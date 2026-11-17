@@ -42,6 +42,16 @@ content: |
   spec-to-spec relationships; the new three cover knowledge-graph-level
   relationships (components supporting platforms, code instantiating
   principles, findings partially resolving questions). Total: 7 edge types.
+
+  Harvest 2026-11-17 (I-532), revised by finding-044-edge-vocabulary-adjudicated
+  (2026-08-08 and 2026-08-09): the count above is out of date. That finding
+  states "The eight types stand. No new edge types", and the scope-exclusion
+  semantic landed as a node field (`out_of_scope`), not an edge. The sibling node
+  question-edge-vocabulary-gap already cites it. No confidence change.
+edges:
+  - target: finding-044-edge-vocabulary-adjudicated
+    type: supports
+    note: "the eight types stand and no new edge types were added; the total above (7) predates it"
 depends_on:
   - question-mvg-bootstrap
   - elem-correspondence-layer

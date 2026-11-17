@@ -137,3 +137,8 @@ brief:
       orientation (LLM reads charter directly). Record which produced
       better orientation and why.
   timebox: "Session-013 (this session for implementation, testing may span)"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Done by merged work and not by a finding: commit aeef578 (2026-04-05, feat(orient): standalone repo support), an ancestor of main. No finding names this brief in a probe field.

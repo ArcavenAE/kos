@@ -184,3 +184,8 @@ brief:
     6. YAML-in-git substrate holds (read/write <100ms, validate <1s)
   timebox: "2-3 sessions (this is a large probe — layer 1-2 in session-011,
     layers 3-6 across sessions 012-013)"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Reported as finding-035-threedoors-bootstrap-complete (every threshold in the hypothesis met). Finding-034-threedoors-bootstrap-layers-1-3 is the earlier layer report; neither carries a probe field naming this brief.

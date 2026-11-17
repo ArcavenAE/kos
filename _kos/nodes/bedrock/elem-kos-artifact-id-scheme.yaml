@@ -41,6 +41,9 @@ edges:
   - target: question-artifact-id-allocation
     type: partially_resolves
     note: "Answers the allocation question; implementation and relocation consequences stay open there"
+  - target: finding-kos-qe45-cross-graph-blocker-resolution
+    type: supports
+    note: "cross-checks this ruling against the code: graph::slug is accepted as the canonical reference but no read path resolves it in orient --ready; implementation stays open on question-artifact-id-allocation (harvest 2026-11-17, no confidence change)"
 provenance:
   created_by: human
   session: operator ruling 2026-09-16, harvested by the research-supervisor seat

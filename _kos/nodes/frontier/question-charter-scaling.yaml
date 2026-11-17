@@ -25,10 +25,21 @@ content: |
   settled questions during sessions focused on one frontier item. The
   graph has the data but not the narrative. The charter has the narrative
   but not the selectivity.
+
+  Harvest 2026-11-17 (I-532), reframed by finding-041-charter-inflation-as-graph-gap
+  (result: redirects). That finding measured KOS-charter.md at 884 lines and
+  50,785 bytes after 13 sessions and concludes that the growth is the signal:
+  compressing the charter treats the symptom and leaves the root cause, a graph
+  that does not give cold-start orientation, untouched. The split-or-trim choice
+  above is therefore not the open question; what the graph must provide instead
+  is. No confidence change.
 edges:
   - target: question-knowledge-layer-requirements
     type: derives
     note: "Charter scaling is a knowledge surfacing problem"
+  - target: finding-041-charter-inflation-as-graph-gap
+    type: supports
+    note: "redirects: the charter's growth is the signal of what the graph does not provide, so compressing it treats the symptom"
 provenance:
   created_by: human
   session: session-012

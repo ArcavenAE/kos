@@ -70,3 +70,8 @@ brief:
     3. Edge coverage report shows how many nodes are reachable vs isolated
     4. The snapshot file is small, human-readable, and diffable
   timebox: "Session-010 (one session)"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Built in session-010 and reported as finding-033-drift-probe (result: works at current scale).

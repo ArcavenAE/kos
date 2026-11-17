@@ -67,3 +67,8 @@ brief:
     5. The graph reveals at least one structural insight not visible from
        reading individual YAML files
   timebox: "Session-007 (one session)"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Built and reported as finding-030-schema-tooling-probe (all 5 success signals met; result: confirms).

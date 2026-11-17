@@ -91,3 +91,8 @@ brief:
     If mechanism can't handle cross-lens: redirects (need different
     architecture for multi-lens graphs).
   timebox: "Session-003, third probe cycle"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Ran as finding-018-ripple-engine-design, whose probe field names this brief (result: confirms).

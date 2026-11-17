@@ -46,3 +46,8 @@ brief:
     If decomposition itself breaks the schema: redirects (schema needs revision
     before the checksum property can be tested).
   timebox: "One session (session-002)"
+  status: complete
+  outcome: |
+    Marked complete in the 2026-11-17 harvest (I-532), from the evidence below; closing
+    stays a human act.
+    Ran as finding-001-mvg-bootstrap (result: partial) and is synthesised in finding-014-twelve-project-synthesis (result: confirms).
