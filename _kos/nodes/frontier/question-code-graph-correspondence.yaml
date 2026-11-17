@@ -65,8 +65,8 @@ content: |
      msqx measured what indexing costs, not whether its output closes the gap
      5lbu found.
      HARVEST 2026-11-17 (I-532): the decision-forcing half ran as
-     finding-kos-h57b-r1-scip-ingest (kos#185; the finding is still marked
-     draft, revision 3). W7 is served in one query, with document-level recall
+     finding-kos-h57b-r1-scip-ingest (the finding landed in kos#202; its brief was
+     locked at kos#185; the finding is still marked draft, revision 3). W7 is served in one query, with document-level recall
      and precision of 1.000 in both repos. W6 and W8 are partially served: the
      code side is right, but no kos record names the decision behind a commit.
      The finding recommends a production ingest ticket; the operator rules.
