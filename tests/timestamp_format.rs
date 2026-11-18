@@ -136,7 +136,6 @@ fn kos_version_prints_the_build_time_in_the_chrono_shape() {
     let value = line
         .trim_start()
         .trim_start_matches("built:")
-        .trim()
         .split_whitespace()
         .next()
         .unwrap();
