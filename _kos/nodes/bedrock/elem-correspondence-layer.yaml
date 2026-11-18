@@ -23,7 +23,9 @@ content: |
   entries that explain its shape, and back again.
 depends_on:
   - val-typed-traversable
-  - elem-storage-model
+conditional_on:
+  - target: elem-storage-model
+    note: "rests on the layering (git substrate, fact store, semantic graph), which did not move; elem-storage-model went to frontier 2026-11-18 (kos#207) because the substrate question is open"
 provenance:
   created_by: human
   session: session-001
