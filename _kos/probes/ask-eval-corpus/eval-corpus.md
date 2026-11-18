@@ -155,11 +155,13 @@ just grep's flat list.
 ### Q6. What was ruled out about pack management?
 - **Kind:** ruled-out (this is a literal `kos ask` test query the build session used)
 - **Ground truth:** `grv-skillshare-for-packs` (orc, **graveyard**), charter G1.
-  Positive counterpart for contrast: `elem-packs-in-marvel` (orc, bedrock).
+  Positive counterpart for contrast: `elem-packs-in-marvel` (orc; bedrock on
+  2026-08-16, graveyard since 2026-11-18).
 - **grep:** `rg -il 'pack management' _kos` -> 8 files. The graveyard node is
   present but sits beside `elem-packs-in-marvel` (the opposite, positive
-  decision) and four sideshow idea files. **grep gives no signal that the
-  graveyard node is the ruled-out answer**; the reader infers it from the path.
+  decision then; graveyard since 2026-11-18) and four sideshow idea files.
+  **grep gives no signal that the graveyard node is the ruled-out answer**;
+  the reader infers it from the path.
 - **orient:** the orc graveyard section is only 7 items, so orient's tier
   grouping lets the reader jump straight to graveyard and find
   `grv-skillshare-for-packs` fast. **This is where orient beats grep**, and it
@@ -193,15 +195,18 @@ just grep's flat list.
 - **Kind:** ruled-out
 - **Ground truth:** `grv-git-as-sufficient-substrate` (kos, graveyard),
   `grv-git-semantic-layer` (kos, graveyard). Positive contrast:
-  `elem-storage-model` (kos, bedrock, "immutable fact store over git").
+  `elem-storage-model` (kos; bedrock on 2026-08-16, frontier since 2026-11-18,
+  "immutable fact store over git").
 - **grep:** `rg -il 'git.{0,12}substrate|sufficient substrate' kos/_kos` -> 11
   files. The graveyard node is present but buried among substrate-hypothesis
-  findings (finding-036, finding-040) and the bedrock storage model, which is
-  the near-opposite conclusion. **The reader risks reading the positive node as
-  the answer.** Freshness/polarity matters and grep gives none.
-- **orient:** graveyard section (10 items) holds both ruled-out nodes; bedrock
-  section holds the storage model. Tier grouping separates ruled-out from
-  adopted, which is exactly the distinction grep loses.
+  findings (finding-036, finding-040) and the storage model (bedrock then,
+  frontier since 2026-11-18), which is the near-opposite conclusion. **The
+  reader risks reading the positive node as the answer.** Freshness/polarity
+  matters and grep gives none.
+- **orient:** graveyard section (10 items) holds both ruled-out nodes; the
+  bedrock section held the storage model then (frontier since 2026-11-18).
+  Tier grouping separates ruled-out from adopted, which is exactly the
+  distinction grep loses.
 
 ### Q10. Did we rule out flat-file context loading, and what was the measured ceiling?
 - **Kind:** ruled-out (with a specific fact: the ceiling)
