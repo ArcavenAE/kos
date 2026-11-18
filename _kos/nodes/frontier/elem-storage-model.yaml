@@ -1,6 +1,6 @@
 id: elem-storage-model
 type: element
-confidence: bedrock
+confidence: frontier
 title: "Immutable fact store over Git substrate"
 content: |
   Storage is layered:
@@ -24,6 +24,15 @@ content: |
   Fact store resolves temporal conflicts.
   Graph resolves semantic conflicts.
   Humans resolve intent conflicts.
+
+  Moved from bedrock to frontier 2026-11-18 (I-532 harvest; operator ruling
+  d1117b-1, option 1, 2026-11-17). The text above names git as the substrate
+  ("GIT SUBSTRATE", and the title "over Git substrate"), but the substrate is
+  an open question: question-kos-fact-store-substrate says "this question stays
+  open" (lines 81 and 97-98 at kos main 307cd12), after a probe measured Dolt
+  and SQLite as candidate stores (finding-kos-qttt). The text above is left as
+  written and records the 2026-03-15 position. The layering it describes (git
+  substrate, fact store, semantic graph) is not what moved.
 depends_on:
   - val-typed-traversable
 provenance:
