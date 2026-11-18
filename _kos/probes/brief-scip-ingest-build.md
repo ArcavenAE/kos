@@ -5,9 +5,11 @@ after review; after that it changes only by dated note.
 Date: 2026-11-18.
 Ruling: the operator, Desk card r1-ingest, option 1, 2026-11-17 about 21:57Z,
 relayed by director: "build the SCIP ingest in kos as its own ticket and
-brief, with the probe's lessons as requirements." Option 1 as carded also
-files a separate flat ticket for the commit-to-decision link (see "Out of
-scope").
+brief, with the probe's lessons as requirements." The card's own wording of
+option 1 is "Build the ingest as its own ticket and brief, with the probe's
+lessons as requirements", followed by "File a separate flat ticket for the
+knowledge-side gap: a way for kos to link a commit or PR to a decision node"
+(see "Out of scope").
 Author: the arcaven architect seat. Builder: as the supervisor routes it.
 Question node: `question-code-graph-correspondence`, sub-question B.
 Follows: `finding-kos-h57b-r1-scip-ingest.md` (probe R1, brief
@@ -98,7 +100,7 @@ versions, loaded at versions 1 and 2, gives an empty `diff`.
   same path in two repos stays two entities (note 3).
 - Documents whose path leaves the repo root (`../`) are skipped. In the probe
   these came from a Go build cache beside the clone: 67 to 68 documents and
-  about 6,500 facts per marvel commit (h57b).
+  6,516 to 6,801 facts per marvel commit (h57b).
 - Local symbols are skipped for occurrences and for `code/implements`.
 - The load reports how many documents and facts each filter dropped, so a
   filter that starts dropping a lot is visible.
@@ -142,8 +144,8 @@ unless all of these hold.
 - Rust: the indexer log has no `can't load standard library` line; the index
   names at least one external symbol from `std`; and it has a document for
   every tracked `.rs` file under the crate's `src/`.
-- Go: the index has a document for every tracked non-test `.go` file in a
-  package the module builds.
+- Go: scip-go exited 0, and the index has a document for every tracked
+  non-test `.go` file in a package the module builds.
 
 A refusal exits nonzero, loads nothing for that commit, and records the
 commit as a GAP with the reason. So the ingest's inputs are the index, the
@@ -153,6 +155,7 @@ Red tests (negative controls, kept in the suite):
   line, from the probe's working method (note 2: a toolchain with no rust-src;
   an empty `RUST_SRC_PATH` did not reproduce the trap);
 - `go_index_missing_a_document_is_refused`;
+- `go_index_with_nonzero_exit_is_refused`;
 - `refusal_loads_nothing`: after a refusal, the store version count and rows
   are unchanged.
 
@@ -217,9 +220,10 @@ changes scope, a ruling.
 
 ## Tickets
 
-- **This build.** One flat ticket, labels `aae-orc,kos`, pointing at this brief.
-- **The commit-to-decision link.** One flat ticket, labels `aae-orc,kos`, with
-  no edge to the build.
+- **This build.** aae-orc-yto7v, flat, labels `aae-orc,kos`, pointing at this
+  brief.
+- **The commit-to-decision link.** aae-orc-0aypm, flat, labels `aae-orc,kos`,
+  with no edge to the build.
 
 Neither has a parent.
 
