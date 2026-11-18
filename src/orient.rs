@@ -1317,6 +1317,25 @@ fn print_jsonl(o: &Orientation) {
 
 // ── Usage logging (opt-in via --log) ─────────────────────────
 
+/// The current time as RFC 3339 in UTC with a numeric `+00:00` offset and 3, 6 or
+/// 9 fractional digits only when the clock has them: the shape
+/// `chrono::Utc::now().to_rfc3339()` wrote (tests/timestamp_format.rs pins it).
+/// Taken from a `jiff::Timestamp`, which is UTC, never from a zoned local time.
+fn utc_now_rfc3339() -> String {
+    let now = jiff::Timestamp::now();
+    let nanos = now.subsec_nanosecond();
+    let frac = if nanos == 0 {
+        String::new()
+    } else if nanos % 1_000_000 == 0 {
+        format!(".{:03}", nanos / 1_000_000)
+    } else if nanos % 1_000 == 0 {
+        format!(".{:06}", nanos / 1_000)
+    } else {
+        format!(".{nanos:09}")
+    };
+    format!("{}{frac}+00:00", now.strftime("%Y-%m-%dT%H:%M:%S"))
+}
+
 /// Append a single JSONL line to the local usage log.
 /// No content or file paths; just the shape of what was surfaced.
 fn append_usage_log(
@@ -1333,7 +1352,7 @@ fn append_usage_log(
     let log_path = log_dir.join("orient.jsonl");
 
     let entry = serde_json::json!({
-        "timestamp": chrono::Utc::now().to_rfc3339(),
+        "timestamp": utc_now_rfc3339(),
         "target": o.target,
         "standalone": o.is_standalone,
         "charter_items": o.charter_items.len(),
