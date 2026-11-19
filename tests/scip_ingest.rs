@@ -1087,12 +1087,65 @@ fn crate_names_come_from_the_list() {
     let co = w.rust_checkout(
         "kos",
         &[
-            (".kos/crate-names.txt", "serde-saphyr\n"),
+            (".kos/crate-names.txt", "# crates kos names\nserde-saphyr\n"),
             (
                 "_kos/nodes/frontier/q-storage.yaml",
                 "id: q-storage\ntext: parsing moved to serde-saphyr and away from rand\n",
             ),
+            (
+                "_kos/nodes/bedrock/elem-other.yaml",
+                "id: elem-other\ntext: the serde-saphyr-extras crate is not on the list\n",
+            ),
         ],
+    );
+    let load = |commit: &str, at: i64| {
+        accepted(&w.ingest(
+            "kos",
+            commit,
+            at,
+            &rust_index("kos", "0.1.0", true, true),
+            HEALTHY_RUST_LOG,
+            &co,
+        ));
+    };
+    let names_at = |at: i64| -> BTreeSet<Triple> {
+        w.facts_at(&w.db(), at)
+            .into_iter()
+            .filter(|(_, a, _)| a == "kos/names-dep")
+            .collect()
+    };
+    let want = BTreeSet::from([t("kos:q-storage", "kos/names-dep", "serde-saphyr")]);
+
+    load("c1", 1);
+    load("c2", 2);
+    for at in [1, 2] {
+        assert_eq!(
+            names_at(at),
+            want,
+            "at version {at}: a listed name that a node's text names makes a fact; an unlisted name, and a listed name inside a longer one, make none"
+        );
+    }
+
+    // The list is the source: with the name gone from it, the fact ends.
+    fs::write(co.join(".kos/crate-names.txt"), "# no crates yet\n").unwrap();
+    load("c3", 3);
+    assert_eq!(names_at(2), want, "version 2 keeps its fact");
+    assert!(
+        names_at(3).is_empty(),
+        "a name that left the list ends its fact; got {:?}",
+        names_at(3)
+    );
+}
+
+#[test]
+fn no_crate_list_means_no_names_facts() {
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[(
+            "_kos/nodes/frontier/q-storage.yaml",
+            "id: q-storage\ntext: parsing moved to serde-saphyr\n",
+        )],
     );
     accepted(&w.ingest(
         "kos",
@@ -1102,24 +1155,10 @@ fn crate_names_come_from_the_list() {
         HEALTHY_RUST_LOG,
         &co,
     ));
-    accepted(&w.ingest(
-        "kos",
-        "c2",
-        2,
-        &rust_index("kos", "0.1.0", true, true),
-        HEALTHY_RUST_LOG,
-        &co,
-    ));
-    for at in [1, 2] {
-        let names: BTreeSet<Triple> = w
-            .facts_at(&w.db(), at)
-            .into_iter()
-            .filter(|(_, a, _)| a == "kos/names-dep")
-            .collect();
-        assert_eq!(
-            names,
-            BTreeSet::from([t("q-storage", "kos/names-dep", "serde-saphyr")]),
-            "at version {at}: the listed name makes a fact and the unlisted one does not"
-        );
-    }
+    let names: BTreeSet<Triple> = w
+        .facts_at(&w.db(), 1)
+        .into_iter()
+        .filter(|(_, a, _)| a == "kos/names-dep")
+        .collect();
+    assert!(names.is_empty(), "no list, no names facts; got {names:?}");
 }
