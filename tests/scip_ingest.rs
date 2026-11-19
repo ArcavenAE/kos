@@ -906,6 +906,100 @@ fn healthy_rust_index_is_accepted() {
 }
 
 #[test]
+fn a_nested_non_member_crate_is_not_required() {
+    let w = World::new();
+    // kos tracks probe crates like this one, and rust-analyzer loads only the
+    // root workspace, so a healthy index has no document for it.
+    let co = w.rust_checkout(
+        "kos",
+        &[
+            (
+                "_kos/probes/m/trav/Cargo.toml",
+                "[package]\nname = \"trav\"\n",
+            ),
+            ("_kos/probes/m/trav/src/main.rs", "fn main() {}\n"),
+        ],
+    );
+    let out = w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    );
+    accepted(&out);
+    assert!(!out.stderr.contains("GAP"), "stderr: {}", out.stderr);
+}
+
+#[test]
+fn std_symbols_are_required_even_when_the_log_is_healthy() {
+    let w = World::new();
+    let co = w.rust_checkout("kos", &[]);
+    let out = w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", false, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    );
+    refused(&out, "std");
+}
+
+#[test]
+fn a_tracked_root_source_without_a_document_is_refused() {
+    let w = World::new();
+    let co = w.rust_checkout("kos", &[("src/c.rs", "pub struct C;\n")]);
+    let out = w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    );
+    refused(&out, "src/c.rs");
+}
+
+#[test]
+fn a_workspace_members_sources_are_required() {
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[
+            (
+                "Cargo.toml",
+                "[workspace]\nmembers = [\n    \"crates/a\",\n    \"tools/*\",\n]\n",
+            ),
+            ("crates/a/src/lib.rs", "pub struct A;\n"),
+            ("tools/t1/src/main.rs", "fn main() {}\n"),
+            ("crates/other/src/lib.rs", "pub struct O;\n"),
+        ],
+    );
+    let out = w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    );
+    // crates/a and tools/t1 are members; crates/other is not.
+    assert_ne!(out.code, 0, "members without documents are refused");
+    assert!(
+        out.stderr.contains("crates/a/src/lib.rs") && out.stderr.contains("tools/t1/src/main.rs"),
+        "both members are named; stderr: {}",
+        out.stderr
+    );
+    assert!(
+        !out.stderr.contains("crates/other"),
+        "a crate that is not a member is not required; stderr: {}",
+        out.stderr
+    );
+}
+
+#[test]
 fn rust_index_without_std_is_refused() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -1282,6 +1376,49 @@ fn crate_names_come_from_the_list() {
         "a name that left the list ends its fact; got {:?}",
         names_at(3)
     );
+}
+
+#[test]
+fn an_unreadable_node_file_is_refused_not_skipped() {
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[
+            (".kos/crate-names.txt", "serde-saphyr\n"),
+            (
+                "_kos/nodes/frontier/q-ok.yaml",
+                "id: q-ok\ntext: parsing moved to serde-saphyr\n",
+            ),
+        ],
+    );
+    let load = |commit: &str, at: i64| {
+        w.ingest(
+            "kos",
+            commit,
+            at,
+            &rust_index("kos", "0.1.0", true, true),
+            HEALTHY_RUST_LOG,
+            &co,
+        )
+    };
+    accepted(&load("c1", 1));
+    let before = w.export(&w.db());
+
+    // One node file that is not UTF-8: skipping it would end its names facts
+    // in history on a load that exits 0.
+    fs::write(
+        co.join("_kos/nodes/frontier/q-bad.yaml"),
+        [0xff_u8, 0xfe, 0x00, 0x41],
+    )
+    .unwrap();
+    let out = load("c2", 2);
+    assert_ne!(out.code, 0, "an unreadable node file is refused");
+    assert!(
+        out.stderr.contains("q-bad.yaml"),
+        "the refusal names the file; stderr: {}",
+        out.stderr
+    );
+    assert_eq!(w.export(&w.db()), before, "a refused load changes nothing");
 }
 
 #[test]

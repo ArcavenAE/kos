@@ -44,7 +44,9 @@
 //!
 //! - Rust: the log has no `can't load standard library` line, the index names
 //!   at least one external symbol from `std`, and it has a document for every
-//!   tracked `.rs` file under a `src/` directory.
+//!   tracked `.rs` file under the root crate's `src/` and under the `src/` of each
+//!   workspace member the root `Cargo.toml` lists. A project tracked inside the
+//!   repo that is not a member is not the crate the index covers.
 //! - Go: the log's last line is `exit: 0` (scip-go's exit status, which the
 //!   indexing recipe appends to the log), and the index has a document for
 //!   every tracked non-test `.go` file outside `testdata`, `vendor` and
@@ -341,19 +343,26 @@ fn names_dep_facts(repo: &str, checkout: &Path) -> Result<BTreeSet<Fact>> {
         return Ok(facts);
     }
     let nodes = checkout.join("_kos/nodes");
-    let Ok(tiers) = fs::read_dir(&nodes) else {
-        return Ok(facts);
+    let unreadable =
+        |path: &Path, e: std::io::Error| refuse(format!("cannot read {}: {e}", path.display()));
+    let tiers = match fs::read_dir(&nodes) {
+        Ok(tiers) => tiers,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(facts),
+        Err(e) => return Err(unreadable(&nodes, e)),
     };
-    for tier in tiers.flatten().filter(|t| t.path().is_dir()) {
-        for entry in fs::read_dir(tier.path())?.flatten() {
-            let path = entry.path();
+    for tier in tiers {
+        let tier = tier.map_err(|e| unreadable(&nodes, e))?;
+        if !tier.path().is_dir() {
+            continue;
+        }
+        let entries = fs::read_dir(tier.path()).map_err(|e| unreadable(&tier.path(), e))?;
+        for entry in entries {
+            let path = entry.map_err(|e| unreadable(&tier.path(), e))?.path();
             if path.extension().and_then(|e| e.to_str()) != Some("yaml") {
                 continue;
             }
-            let (Some(id), Ok(text)) = (
-                path.file_stem().and_then(|s| s.to_str()),
-                fs::read_to_string(&path),
-            ) else {
+            let text = fs::read_to_string(&path).map_err(|e| unreadable(&path, e))?;
+            let Some(id) = path.file_stem().and_then(|s| s.to_str()) else {
                 continue;
             };
             for name in names.iter().filter(|n| names_whole_word(&text, n)) {
@@ -446,8 +455,67 @@ fn go_list_files(path: &Path) -> std::result::Result<BTreeSet<String>, String> {
     Ok(files)
 }
 
-fn is_rust_source(path: &str) -> bool {
-    path.ends_with(".rs") && (path.starts_with("src/") || path.contains("/src/"))
+/// The member patterns of the root `Cargo.toml`'s `[workspace]` table: the
+/// quoted strings of its `members` array. This is a line reader, not a TOML
+/// parser, so a `members` written some other way reads as no members, and the
+/// check then covers the root crate alone. `exclude` is not read.
+fn workspace_members(manifest: &str) -> Vec<String> {
+    let mut in_workspace = false;
+    let mut in_members = false;
+    let mut members = Vec::new();
+    for line in manifest.lines() {
+        let line = line.split('#').next().unwrap_or("").trim();
+        if line.starts_with('[') {
+            in_workspace = line == "[workspace]";
+            in_members = false;
+            continue;
+        }
+        if !in_workspace {
+            continue;
+        }
+        let mut rest = line;
+        if !in_members {
+            let Some(after) = line
+                .strip_prefix("members")
+                .map(str::trim_start)
+                .and_then(|r| r.strip_prefix('='))
+            else {
+                continue;
+            };
+            rest = after.trim_start();
+            if !rest.starts_with('[') {
+                continue;
+            }
+            in_members = true;
+        }
+        let mut quoted = rest.split('"');
+        quoted.next();
+        members.extend(quoted.step_by(2).map(str::to_string));
+        if rest.contains(']') {
+            in_members = false;
+        }
+    }
+    members
+}
+
+/// Whether `path` is a source file of the root crate or of a workspace member.
+/// A member is a plain directory, or `dir/*` for each directory under `dir`.
+fn is_rust_source(path: &str, members: &[String]) -> bool {
+    if !path.ends_with(".rs") {
+        return false;
+    }
+    path.starts_with("src/")
+        || members.iter().any(|m| match m.strip_suffix("/*") {
+            Some(dir) => path
+                .strip_prefix(dir)
+                .and_then(|p| p.strip_prefix('/'))
+                .and_then(|p| p.split_once('/'))
+                .is_some_and(|(_, rest)| rest.starts_with("src/")),
+            None => path
+                .strip_prefix(m.trim_end_matches('/'))
+                .and_then(|p| p.strip_prefix("/src/"))
+                .is_some(),
+        })
 }
 
 /// The reasons `index` is degraded, empty when it is healthy.
@@ -456,13 +524,14 @@ fn degraded_reasons(
     log: &str,
     tracked: &[String],
     go_files: Option<&BTreeSet<String>>,
+    members: &[String],
 ) -> std::result::Result<Vec<String>, String> {
     let documents: BTreeSet<&str> = index
         .documents
         .iter()
         .map(|d| d.relative_path.as_str())
         .collect();
-    let missing = |wanted: fn(&str) -> bool| -> Vec<&str> {
+    let missing = |wanted: &dyn Fn(&str) -> bool| -> Vec<&str> {
         tracked
             .iter()
             .map(String::as_str)
@@ -481,7 +550,7 @@ fn degraded_reasons(
             if !names_std(index) {
                 reasons.push("the index names no external symbol from std".to_string());
             }
-            for path in missing(is_rust_source) {
+            for path in missing(&|p| is_rust_source(p, members)) {
                 reasons.push(format!("the index has no document for tracked file {path}"));
             }
         }
@@ -503,7 +572,7 @@ fn degraded_reasons(
                     ));
                 }
             } else {
-                for path in missing(is_go_source) {
+                for path in missing(&is_go_source) {
                     reasons.push(format!("the index has no document for tracked file {path}"));
                 }
             }
@@ -538,7 +607,14 @@ fn check_healthy(request: &Request<'_>, index: &Index) -> Result<()> {
         Some(path) => Some(go_list_files(path).map_err(|e| gap(&e))?),
         None => None,
     };
-    match degraded_reasons(index, &log, &tracked, go_files.as_ref()) {
+    let manifest = fs::read_to_string(request.checkout.join("Cargo.toml")).unwrap_or_default();
+    match degraded_reasons(
+        index,
+        &log,
+        &tracked,
+        go_files.as_ref(),
+        &workspace_members(&manifest),
+    ) {
         Ok(reasons) if reasons.is_empty() => Ok(()),
         Ok(reasons) => Err(gap(&reasons.join("; "))),
         Err(reason) => Err(gap(&reason)),
