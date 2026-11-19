@@ -108,6 +108,15 @@ pub struct FactDiff {
     pub removed: Vec<Fact>,
 }
 
+/// What `FactStore::apply` changed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct Applied {
+    /// Facts that were live and whose interval ended.
+    pub retracted: usize,
+    /// Facts newly asserted.
+    pub asserted: usize,
+}
+
 pub struct FactStore {
     conn: Connection,
 }
@@ -185,6 +194,26 @@ impl FactStore {
                 params![fact.e, fact.a, fact.v, version.0],
             )?;
             Ok(closed)
+        })
+    }
+
+    /// Retract `retract`, then assert `assert`, both at `version`. Written as
+    /// two separate transactions for now; the next commit makes it one.
+    ///
+    /// # Errors
+    /// Fails when `version` is behind the latest version written, or on a
+    /// SQLite error.
+    pub fn apply(
+        &mut self,
+        version: Version,
+        retract: &[Fact],
+        assert: &[Fact],
+    ) -> Result<Applied> {
+        let retracted = self.retract_facts(version, retract)?;
+        let asserted = self.assert_facts(version, assert)?;
+        Ok(Applied {
+            retracted,
+            asserted,
         })
     }
 
