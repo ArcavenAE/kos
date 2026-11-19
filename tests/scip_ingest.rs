@@ -459,7 +459,6 @@ fn refused(out: &Out, reason_word: &str) {
 // ------------------------------------------------------------------------ SI-1
 
 #[test]
-#[ignore = "red until SI-1 lands in G1 (aae-orc-yto7v); run with --ignored"]
 fn ingest_reads_a_fixture_index() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -494,7 +493,6 @@ fn ingest_reads_a_fixture_index() {
 // ------------------------------------------------------------------------ SI-2
 
 #[test]
-#[ignore = "red until SI-2 lands in G1 (aae-orc-yto7v); run with --ignored"]
 fn ingest_emits_the_four_shapes() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -512,7 +510,6 @@ fn ingest_emits_the_four_shapes() {
 // ------------------------------------------------------------------------ SI-3
 
 #[test]
-#[ignore = "red until SI-3 lands in G1 (aae-orc-yto7v); run with --ignored"]
 fn own_version_bump_changes_no_fact() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -542,7 +539,6 @@ fn own_version_bump_changes_no_fact() {
 // ------------------------------------------------------------------------ SI-4
 
 #[test]
-#[ignore = "red until SI-4 lands in G1 (aae-orc-yto7v); run with --ignored"]
 fn out_of_root_documents_are_skipped_and_counted() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -568,7 +564,6 @@ fn out_of_root_documents_are_skipped_and_counted() {
 }
 
 #[test]
-#[ignore = "red until SI-4 lands in G1 (aae-orc-yto7v); run with --ignored"]
 fn same_path_in_two_repos_is_two_entities() {
     let w = World::new();
     let kos_co = w.rust_checkout("kos", &[]);
@@ -606,7 +601,6 @@ fn same_path_in_two_repos_is_two_entities() {
 }
 
 #[test]
-#[ignore = "red until SI-4 lands in G1 (aae-orc-yto7v); run with --ignored"]
 fn local_symbols_are_skipped() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);

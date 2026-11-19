@@ -95,6 +95,37 @@ fn load_inner(db: &Path, at: i64, file: &Path) -> Result<()> {
     Ok(())
 }
 
+/// What `kos facts ingest-scip` was given. The indexer log and the checkout
+/// are inputs of the degraded-index check, which a later change adds.
+pub struct IngestScip<'a> {
+    pub db: &'a Path,
+    pub at: i64,
+    pub repo: &'a str,
+    pub commit: &'a str,
+    pub index: &'a Path,
+    pub log: &'a Path,
+    pub checkout: &'a Path,
+}
+
+/// Load the facts of a SCIP index for one repo at version `at`.
+///
+/// # Errors
+/// Fails on an unreadable index or a store error.
+pub fn ingest_scip(args: &IngestScip<'_>) -> Result<()> {
+    let report = with_hint(super::scip_ingest::ingest(
+        args.db, args.at, args.repo, args.index,
+    ))?;
+    println!(
+        "loaded {} facts for {}@{} at version {}",
+        report.added, args.repo, args.commit, args.at
+    );
+    println!(
+        "filtered: out_of_root_documents={} local_symbols={}",
+        report.out_of_root_documents, report.local_symbols
+    );
+    Ok(())
+}
+
 /// Replay a JSONL export into an empty store.
 ///
 /// # Errors
