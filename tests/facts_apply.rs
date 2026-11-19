@@ -75,7 +75,6 @@ fn apply_behind_the_latest_version_is_refused_and_changes_nothing() {
 }
 
 #[test]
-#[ignore = "red until apply runs in one transaction (aae-orc-yto7v); run with --ignored"]
 fn a_failed_apply_leaves_the_store_unchanged() {
     let dir = TempDir::new().unwrap();
     let db = seeded(&dir);

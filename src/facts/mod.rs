@@ -162,14 +162,7 @@ impl FactStore {
     /// # Errors
     /// Fails when `version` is behind the latest version written.
     pub fn assert_facts(&mut self, version: Version, facts: &[Fact]) -> Result<usize> {
-        self.write(version, facts, |tx, fact| {
-            let changed = tx.execute(
-                "INSERT INTO facts (e, a, v, valid_from) VALUES (?1, ?2, ?3, ?4)
-                 ON CONFLICT (e, a, v) WHERE valid_to IS NULL DO NOTHING",
-                params![fact.e, fact.a, fact.v, version.0],
-            )?;
-            Ok(changed)
-        })
+        self.write(version, facts, assert_one)
     }
 
     /// Retract facts at `version`; returns how many were live and closed.
@@ -177,28 +170,13 @@ impl FactStore {
     /// # Errors
     /// Fails when `version` is behind the latest version written.
     pub fn retract_facts(&mut self, version: Version, facts: &[Fact]) -> Result<usize> {
-        self.write(version, facts, |tx, fact| {
-            // Asserted in this same version: the interval would be empty, so
-            // the row goes.
-            let removed = tx.execute(
-                "DELETE FROM facts
-                 WHERE e = ?1 AND a = ?2 AND v = ?3 AND valid_to IS NULL AND valid_from = ?4",
-                params![fact.e, fact.a, fact.v, version.0],
-            )?;
-            if removed > 0 {
-                return Ok(removed);
-            }
-            let closed = tx.execute(
-                "UPDATE facts SET valid_to = ?4
-                 WHERE e = ?1 AND a = ?2 AND v = ?3 AND valid_to IS NULL",
-                params![fact.e, fact.a, fact.v, version.0],
-            )?;
-            Ok(closed)
-        })
+        self.write(version, facts, retract_one)
     }
 
-    /// Retract `retract`, then assert `assert`, both at `version`. Written as
-    /// two separate transactions for now; the next commit makes it one.
+    /// Retract `retract`, then assert `assert`, both at `version`, in one
+    /// transaction: when any write fails, none of them is kept and the latest
+    /// version does not move. A fact in both lists is retracted and then
+    /// asserted again.
     ///
     /// # Errors
     /// Fails when `version` is behind the latest version written, or on a
@@ -209,42 +187,40 @@ impl FactStore {
         retract: &[Fact],
         assert: &[Fact],
     ) -> Result<Applied> {
-        let retracted = self.retract_facts(version, retract)?;
-        let asserted = self.assert_facts(version, assert)?;
-        Ok(Applied {
-            retracted,
-            asserted,
-        })
+        if retract.is_empty() && assert.is_empty() {
+            return Ok(Applied::default());
+        }
+        let tx = self.conn.transaction()?;
+        check_version(&tx, version)?;
+        let mut done = Applied::default();
+        for fact in retract {
+            done.retracted += retract_one(&tx, version, fact)?;
+        }
+        for fact in assert {
+            done.asserted += assert_one(&tx, version, fact)?;
+        }
+        set_latest(&tx, version)?;
+        tx.commit()?;
+        Ok(done)
     }
 
-    /// Run `apply` for each fact in one transaction, after the version check.
+    /// Run `change` for each fact in one transaction, after the version check.
     fn write(
         &mut self,
         version: Version,
         facts: &[Fact],
-        apply: impl Fn(&Transaction<'_>, &Fact) -> Result<usize>,
+        change: impl Fn(&Transaction<'_>, Version, &Fact) -> Result<usize>,
     ) -> Result<usize> {
         if facts.is_empty() {
             return Ok(0);
         }
         let tx = self.conn.transaction()?;
-        if let Some(latest) = latest_in(&tx)?
-            && version < latest
-        {
-            return Err(KosError::FactVersionOrder {
-                got: version.0,
-                latest: latest.0,
-            });
-        }
+        check_version(&tx, version)?;
         let mut changed = 0;
         for fact in facts {
-            changed += apply(&tx, fact)?;
+            changed += change(&tx, version, fact)?;
         }
-        tx.execute(
-            "INSERT INTO meta (key, value) VALUES (?1, ?2)
-             ON CONFLICT (key) DO UPDATE SET value = excluded.value",
-            params![LATEST_KEY, version.0],
-        )?;
+        set_latest(&tx, version)?;
         tx.commit()?;
         Ok(changed)
     }
@@ -339,6 +315,55 @@ impl FactStore {
         let rows = stmt.query_map(args, |row| row.get(0))?;
         Ok(rows.collect::<std::result::Result<Vec<_>, _>>()?)
     }
+}
+
+/// Refuse a write behind the latest version.
+fn check_version(tx: &Transaction<'_>, version: Version) -> Result<()> {
+    if let Some(latest) = latest_in(tx)?
+        && version < latest
+    {
+        return Err(KosError::FactVersionOrder {
+            got: version.0,
+            latest: latest.0,
+        });
+    }
+    Ok(())
+}
+
+fn set_latest(tx: &Transaction<'_>, version: Version) -> Result<()> {
+    tx.execute(
+        "INSERT INTO meta (key, value) VALUES (?1, ?2)
+         ON CONFLICT (key) DO UPDATE SET value = excluded.value",
+        params![LATEST_KEY, version.0],
+    )?;
+    Ok(())
+}
+
+/// Assert one fact; a fact already live is left alone and counts 0.
+fn assert_one(tx: &Transaction<'_>, version: Version, fact: &Fact) -> Result<usize> {
+    Ok(tx.execute(
+        "INSERT INTO facts (e, a, v, valid_from) VALUES (?1, ?2, ?3, ?4)
+         ON CONFLICT (e, a, v) WHERE valid_to IS NULL DO NOTHING",
+        params![fact.e, fact.a, fact.v, version.0],
+    )?)
+}
+
+/// Retract one fact. A fact asserted in this same version would get an empty
+/// interval, so its row goes; otherwise the live row's interval ends.
+fn retract_one(tx: &Transaction<'_>, version: Version, fact: &Fact) -> Result<usize> {
+    let removed = tx.execute(
+        "DELETE FROM facts
+         WHERE e = ?1 AND a = ?2 AND v = ?3 AND valid_to IS NULL AND valid_from = ?4",
+        params![fact.e, fact.a, fact.v, version.0],
+    )?;
+    if removed > 0 {
+        return Ok(removed);
+    }
+    Ok(tx.execute(
+        "UPDATE facts SET valid_to = ?4
+         WHERE e = ?1 AND a = ?2 AND v = ?3 AND valid_to IS NULL",
+        params![fact.e, fact.a, fact.v, version.0],
+    )?)
 }
 
 fn latest_in(conn: &Connection) -> Result<Option<Version>> {
