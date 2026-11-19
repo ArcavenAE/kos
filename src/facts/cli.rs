@@ -112,12 +112,16 @@ pub struct IngestScip<'a> {
 /// # Errors
 /// Fails on an unreadable index or a store error.
 pub fn ingest_scip(args: &IngestScip<'_>) -> Result<()> {
-    let report = with_hint(super::scip_ingest::ingest(
-        args.db, args.at, args.repo, args.index,
-    ))?;
+    let report = with_hint(super::scip_ingest::ingest(&super::scip_ingest::Request {
+        db: args.db,
+        at: args.at,
+        repo: args.repo,
+        commit: args.commit,
+        index: args.index,
+    }))?;
     println!(
-        "loaded {} facts for {}@{} at version {}",
-        report.added, args.repo, args.commit, args.at
+        "loaded {} facts and ended {} for {}@{} at version {}",
+        report.added, report.ended, args.repo, args.commit, args.at
     );
     println!(
         "filtered: out_of_root_documents={} local_symbols={}",

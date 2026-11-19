@@ -629,7 +629,6 @@ fn local_symbols_are_skipped() {
 // ------------------------------------------------------------------------ SI-6
 
 #[test]
-#[ignore = "red until SI-6 lands in G2 (aae-orc-yto7v); run with --ignored"]
 fn every_code_row_resolves_to_a_complete_load_entity() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -692,7 +691,6 @@ fn every_code_row_resolves_to_a_complete_load_entity() {
 // ------------------------------------------------------------------------ SI-7
 
 #[test]
-#[ignore = "red until SI-7 lands in G2 (aae-orc-yto7v); run with --ignored"]
 fn missing_fact_ends_its_interval() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -746,40 +744,46 @@ fn missing_fact_ends_its_interval() {
 }
 
 #[test]
-#[ignore = "red until SI-7 lands in G2 (aae-orc-yto7v); run with --ignored"]
 fn deleted_line_mutant_is_caught() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
-    // The mutant: one fact line (the definition of bar) is deleted from the fixture.
+    // The mutant: one fact line (the definition of bar) is deleted from the
+    // second load's index. Ending an interval is the only way the store can
+    // show the deletion, so a store that never ends one does not catch it.
     let mut mutant = rust_index("kos", "0.1.0", true, true);
     let bar = rs("kos", "0.1.0", "b/bar().");
     mutant.documents[1].occurrences.retain(|o| o.symbol != bar);
-    accepted(&w.ingest("kos", "c1", 1, &mutant, HEALTHY_RUST_LOG, &co));
     accepted(&w.ingest(
         "kos",
-        "c2",
-        2,
+        "c1",
+        1,
         &rust_index("kos", "0.1.0", true, true),
         HEALTHY_RUST_LOG,
         &co,
     ));
+    accepted(&w.ingest("kos", "c2", 2, &mutant, HEALTHY_RUST_LOG, &co));
 
     let expected = rust_expected("kos", true, true);
-    assert_ne!(
-        w.code_facts_at(1),
-        expected,
-        "the state check fails at the mutated version"
-    );
     assert_eq!(
-        w.code_facts_at(2),
+        w.code_facts_at(1),
         expected,
         "the state check passes at the intact version"
     );
-    let expected_diff: BTreeSet<(String, Triple)> = BTreeSet::new();
     assert_ne!(
-        w.code_diff(1, 2),
-        expected_diff,
-        "the diff check fails at the next version"
+        w.code_facts_at(2),
+        expected,
+        "the state check fails at the mutated version"
+    );
+    let no_change: BTreeSet<(String, Triple)> = BTreeSet::new();
+    let diff = w.code_diff(1, 2);
+    assert_ne!(diff, no_change, "the diff check fails at the next version");
+    assert_eq!(
+        diff,
+        BTreeSet::from([(
+            "removed".to_string(),
+            t("kos:src/b.rs", "code/defines", &rs("kos", ".", "b/bar()."))
+        )]),
+        "the diff names exactly the deleted line"
     );
 }
 
@@ -877,7 +881,6 @@ fn refusal_loads_nothing() {
 // ------------------------------------------------------------------------ SI-9
 
 #[test]
-#[ignore = "red until SI-9 lands in G2 (aae-orc-yto7v); run with --ignored"]
 fn loading_repo_a_never_retracts_repo_b() {
     let w = World::new();
     let kos_co = w.rust_checkout("kos", &[]);
@@ -908,13 +911,14 @@ fn loading_repo_a_never_retracts_repo_b() {
         &kos_co,
     ));
 
-    let at3 = w.code_facts_at(3);
-    for fact in rust_expected("marvel", true, true) {
-        assert!(
-            at3.contains(&fact),
-            "marvel's fact {fact:?} was lost when kos loaded again"
-        );
-    }
+    // kos's dropped facts end, and marvel's stay exactly as loaded.
+    let mut expected = rust_expected("kos", true, false);
+    expected.extend(rust_expected("marvel", true, true));
+    assert_eq!(
+        w.code_facts_at(3),
+        expected,
+        "kos's load ended its own dropped facts and left marvel's alone"
+    );
     let removed_marvel: Vec<_> = w
         .code_diff(2, 3)
         .into_iter()
