@@ -340,19 +340,26 @@ fn names_dep_facts(repo: &str, checkout: &Path) -> Result<BTreeSet<Fact>> {
         return Ok(facts);
     }
     let nodes = checkout.join("_kos/nodes");
-    let Ok(tiers) = fs::read_dir(&nodes) else {
-        return Ok(facts);
+    let unreadable =
+        |path: &Path, e: std::io::Error| refuse(format!("cannot read {}: {e}", path.display()));
+    let tiers = match fs::read_dir(&nodes) {
+        Ok(tiers) => tiers,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(facts),
+        Err(e) => return Err(unreadable(&nodes, e)),
     };
-    for tier in tiers.flatten().filter(|t| t.path().is_dir()) {
-        for entry in fs::read_dir(tier.path())?.flatten() {
-            let path = entry.path();
+    for tier in tiers {
+        let tier = tier.map_err(|e| unreadable(&nodes, e))?;
+        if !tier.path().is_dir() {
+            continue;
+        }
+        let entries = fs::read_dir(tier.path()).map_err(|e| unreadable(&tier.path(), e))?;
+        for entry in entries {
+            let path = entry.map_err(|e| unreadable(&tier.path(), e))?.path();
             if path.extension().and_then(|e| e.to_str()) != Some("yaml") {
                 continue;
             }
-            let (Some(id), Ok(text)) = (
-                path.file_stem().and_then(|s| s.to_str()),
-                fs::read_to_string(&path),
-            ) else {
+            let text = fs::read_to_string(&path).map_err(|e| unreadable(&path, e))?;
+            let Some(id) = path.file_stem().and_then(|s| s.to_str()) else {
                 continue;
             };
             for name in names.iter().filter(|n| names_whole_word(&text, n)) {

@@ -1275,7 +1275,6 @@ fn crate_names_come_from_the_list() {
 }
 
 #[test]
-#[ignore = "red until an unreadable node file is refused (aae-orc-yto7v); run with --ignored"]
 fn an_unreadable_node_file_is_refused_not_skipped() {
     let w = World::new();
     let co = w.rust_checkout(
