@@ -748,14 +748,56 @@ fn missing_fact_ends_its_interval() {
 #[test]
 #[ignore = "red until SI-7 lands in G2 (aae-orc-yto7v); run with --ignored"]
 fn deleted_line_mutant_is_caught() {
+    // Intact at version 1, mutant at version 2. Only an ended interval shows
+    // the deletion, so a store that only adds facts does not catch it.
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
-    // The mutant: one fact line (the definition of bar) is deleted from the fixture.
-    let mut mutant = rust_index("kos", "0.1.0", true, true);
     let bar = rs("kos", "0.1.0", "b/bar().");
+    let mut mutant = rust_index("kos", "0.1.0", true, true);
     mutant.documents[1].occurrences.retain(|o| o.symbol != bar);
-    accepted(&w.ingest("kos", "c1", 1, &mutant, HEALTHY_RUST_LOG, &co));
     accepted(&w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    ));
+    accepted(&w.ingest("kos", "c2", 2, &mutant, HEALTHY_RUST_LOG, &co));
+
+    let expected = rust_expected("kos", true, true);
+    let bar_facts: BTreeSet<Triple> = expected
+        .iter()
+        .filter(|(e, _, v)| e.contains("b/bar().") || v.contains("b/bar()."))
+        .cloned()
+        .collect();
+    assert!(!bar_facts.is_empty(), "the fixture has facts naming bar");
+    let without_bar: BTreeSet<Triple> = expected.difference(&bar_facts).cloned().collect();
+    assert_eq!(
+        w.code_facts_at(1),
+        expected,
+        "the state check passes at the intact version"
+    );
+    assert_eq!(
+        w.code_facts_at(2),
+        without_bar,
+        "the state check at the mutated version lacks exactly bar's facts"
+    );
+    let removed: BTreeSet<(String, Triple)> = bar_facts
+        .iter()
+        .map(|f| ("removed".to_string(), f.clone()))
+        .collect();
+    assert_eq!(
+        w.code_diff(1, 2),
+        removed,
+        "the diff is exactly the removal of bar's facts"
+    );
+
+    // The other direction: mutant at version 1, intact at version 2.
+    let back = World::new();
+    let co = back.rust_checkout("kos", &[]);
+    accepted(&back.ingest("kos", "c1", 1, &mutant, HEALTHY_RUST_LOG, &co));
+    accepted(&back.ingest(
         "kos",
         "c2",
         2,
@@ -763,23 +805,16 @@ fn deleted_line_mutant_is_caught() {
         HEALTHY_RUST_LOG,
         &co,
     ));
-
-    let expected = rust_expected("kos", true, true);
-    assert_ne!(
-        w.code_facts_at(1),
-        expected,
-        "the state check fails at the mutated version"
-    );
+    assert_eq!(back.code_facts_at(1), without_bar);
+    assert_eq!(back.code_facts_at(2), expected);
+    let added: BTreeSet<(String, Triple)> = bar_facts
+        .iter()
+        .map(|f| ("added".to_string(), f.clone()))
+        .collect();
     assert_eq!(
-        w.code_facts_at(2),
-        expected,
-        "the state check passes at the intact version"
-    );
-    let expected_diff: BTreeSet<(String, Triple)> = BTreeSet::new();
-    assert_ne!(
-        w.code_diff(1, 2),
-        expected_diff,
-        "the diff check fails at the next version"
+        back.code_diff(1, 2),
+        added,
+        "the diff is exactly bar's facts added"
     );
 }
 
@@ -898,7 +933,8 @@ fn loading_repo_a_never_retracts_repo_b() {
         HEALTHY_RUST_LOG,
         &marvel_co,
     ));
-    // kos loads again and drops a fact; marvel's facts must be untouched.
+    // kos loads again and drops the serde facts; marvel's facts must be
+    // untouched, and kos's dropped facts must really end (the positive control).
     accepted(&w.ingest(
         "kos",
         "c2",
@@ -915,14 +951,25 @@ fn loading_repo_a_never_retracts_repo_b() {
             "marvel's fact {fact:?} was lost when kos loaded again"
         );
     }
-    let removed_marvel: Vec<_> = w
-        .code_diff(2, 3)
-        .into_iter()
-        .filter(|(_, (e, _, v))| e.starts_with("marvel") || v.contains(" marvel "))
+    let dropped: BTreeSet<Triple> = rust_expected("kos", true, true)
+        .difference(&rust_expected("kos", true, false))
+        .cloned()
         .collect();
-    assert!(
-        removed_marvel.is_empty(),
-        "kos's load changed marvel's facts: {removed_marvel:?}"
+    assert!(!dropped.is_empty(), "the second kos load drops facts");
+    for fact in &dropped {
+        assert!(
+            !at3.contains(fact),
+            "kos's dropped fact {fact:?} still holds at version 3"
+        );
+    }
+    let removals: BTreeSet<(String, Triple)> = dropped
+        .iter()
+        .map(|f| ("removed".to_string(), f.clone()))
+        .collect();
+    assert_eq!(
+        w.code_diff(2, 3),
+        removals,
+        "the only change from 2 to 3 is the removal of kos's dropped facts"
     );
 }
 
