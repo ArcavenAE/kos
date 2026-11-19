@@ -1275,6 +1275,50 @@ fn crate_names_come_from_the_list() {
 }
 
 #[test]
+#[ignore = "red until an unreadable node file is refused (aae-orc-yto7v); run with --ignored"]
+fn an_unreadable_node_file_is_refused_not_skipped() {
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[
+            (".kos/crate-names.txt", "serde-saphyr\n"),
+            (
+                "_kos/nodes/frontier/q-ok.yaml",
+                "id: q-ok\ntext: parsing moved to serde-saphyr\n",
+            ),
+        ],
+    );
+    let load = |commit: &str, at: i64| {
+        w.ingest(
+            "kos",
+            commit,
+            at,
+            &rust_index("kos", "0.1.0", true, true),
+            HEALTHY_RUST_LOG,
+            &co,
+        )
+    };
+    accepted(&load("c1", 1));
+    let before = w.export(&w.db());
+
+    // One node file that is not UTF-8: skipping it would end its names facts
+    // in history on a load that exits 0.
+    fs::write(
+        co.join("_kos/nodes/frontier/q-bad.yaml"),
+        [0xff_u8, 0xfe, 0x00, 0x41],
+    )
+    .unwrap();
+    let out = load("c2", 2);
+    assert_ne!(out.code, 0, "an unreadable node file is refused");
+    assert!(
+        out.stderr.contains("q-bad.yaml"),
+        "the refusal names the file; stderr: {}",
+        out.stderr
+    );
+    assert_eq!(w.export(&w.db()), before, "a refused load changes nothing");
+}
+
+#[test]
 fn no_crate_list_means_no_names_facts() {
     let w = World::new();
     let co = w.rust_checkout(
