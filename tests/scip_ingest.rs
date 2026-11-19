@@ -691,6 +691,50 @@ fn every_code_row_resolves_to_a_complete_load_entity() {
 // ------------------------------------------------------------------------ SI-7
 
 #[test]
+fn a_failing_write_leaves_the_store_unchanged() {
+    let w = World::new();
+    let co = w.rust_checkout("kos", &[]);
+    accepted(&w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    ));
+    let before = w.export(&w.db());
+
+    // Make the second load's last write, its load entity, fail after the
+    // facts it ends and asserts have been written.
+    let conn = rusqlite::Connection::open(w.db()).unwrap();
+    conn.execute_batch(
+        "CREATE TRIGGER fail_on_load BEFORE INSERT ON facts WHEN NEW.e = 'load/kos@2'
+         BEGIN SELECT RAISE(ABORT, 'forced failure'); END;",
+    )
+    .unwrap();
+    drop(conn);
+
+    let out = w.ingest(
+        "kos",
+        "c2",
+        2,
+        &rust_index("kos", "0.1.0", true, false),
+        HEALTHY_RUST_LOG,
+        &co,
+    );
+    assert_ne!(
+        out.code, 0,
+        "the forced failure surfaces; stdout: {}",
+        out.stdout
+    );
+    assert_eq!(
+        w.export(&w.db()),
+        before,
+        "the facts the load ended were not kept when its last write failed"
+    );
+}
+
+#[test]
 fn missing_fact_ends_its_interval() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -1175,18 +1219,149 @@ fn jsonl_round_trip_keeps_code_facts_intervals_and_load_entities() {
 // ----------------------------------------------------------------------- SI-11
 
 #[test]
-#[ignore = "red until SI-11 lands in G5 (aae-orc-yto7v); run with --ignored"]
 fn crate_names_come_from_the_list() {
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[
+            (".kos/crate-names.txt", "# crates kos names\nserde-saphyr\n"),
+            (
+                "_kos/nodes/frontier/q-storage.yaml",
+                "id: q-storage\ntext: parsing moved to serde-saphyr and away from rand\n",
+            ),
+            (
+                "_kos/nodes/bedrock/elem-other.yaml",
+                "id: elem-other\ntext: the serde-saphyr-extras crate is not on the list\n",
+            ),
+        ],
+    );
+    let load = |commit: &str, at: i64| {
+        accepted(&w.ingest(
+            "kos",
+            commit,
+            at,
+            &rust_index("kos", "0.1.0", true, true),
+            HEALTHY_RUST_LOG,
+            &co,
+        ));
+    };
+    let names_at = |at: i64| -> BTreeSet<Triple> {
+        w.facts_at(&w.db(), at)
+            .into_iter()
+            .filter(|(_, a, _)| a == "kos/names-dep")
+            .collect()
+    };
+    let want = BTreeSet::from([t("kos:q-storage", "kos/names-dep", "serde-saphyr")]);
+
+    load("c1", 1);
+    load("c2", 2);
+    for at in [1, 2] {
+        assert_eq!(
+            names_at(at),
+            want,
+            "at version {at}: a listed name that a node's text names makes a fact; an unlisted name, and a listed name inside a longer one, make none"
+        );
+    }
+
+    // The list is the source: with the name gone from it, the fact ends.
+    fs::write(co.join(".kos/crate-names.txt"), "# no crates yet\n").unwrap();
+    load("c3", 3);
+    assert_eq!(names_at(2), want, "version 2 keeps its fact");
+    assert!(
+        names_at(3).is_empty(),
+        "a name that left the list ends its fact; got {:?}",
+        names_at(3)
+    );
+}
+
+#[test]
+fn an_unreadable_node_file_is_refused_not_skipped() {
     let w = World::new();
     let co = w.rust_checkout(
         "kos",
         &[
             (".kos/crate-names.txt", "serde-saphyr\n"),
             (
-                "_kos/nodes/frontier/q-storage.yaml",
-                "id: q-storage\ntext: parsing moved to serde-saphyr and away from rand\n",
+                "_kos/nodes/frontier/q-ok.yaml",
+                "id: q-ok\ntext: parsing moved to serde-saphyr\n",
             ),
         ],
+    );
+    let load = |commit: &str, at: i64| {
+        w.ingest(
+            "kos",
+            commit,
+            at,
+            &rust_index("kos", "0.1.0", true, true),
+            HEALTHY_RUST_LOG,
+            &co,
+        )
+    };
+    accepted(&load("c1", 1));
+    let before = w.export(&w.db());
+
+    // One node file that is not UTF-8: skipping it would end its names facts
+    // in history on a load that exits 0.
+    fs::write(
+        co.join("_kos/nodes/frontier/q-bad.yaml"),
+        [0xff_u8, 0xfe, 0x00, 0x41],
+    )
+    .unwrap();
+    let out = load("c2", 2);
+    assert_ne!(out.code, 0, "an unreadable node file is refused");
+    assert!(
+        out.stderr.contains("q-bad.yaml"),
+        "the refusal names the file; stderr: {}",
+        out.stderr
+    );
+    assert_eq!(w.export(&w.db()), before, "a refused load changes nothing");
+}
+
+#[test]
+fn an_unreadable_node_tier_directory_is_refused_not_skipped() {
+    use std::os::unix::fs::PermissionsExt;
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[
+            (".kos/crate-names.txt", "serde-saphyr\n"),
+            (
+                "_kos/nodes/frontier/q-ok.yaml",
+                "id: q-ok\ntext: parsing moved to serde-saphyr\n",
+            ),
+        ],
+    );
+    let tier = co.join("_kos/nodes/frontier");
+    fs::set_permissions(&tier, fs::Permissions::from_mode(0o000)).unwrap();
+    let out = w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    );
+    // Put the mode back first, so the temp directory can be cleaned up even
+    // when an assertion below fails.
+    fs::set_permissions(&tier, fs::Permissions::from_mode(0o755)).unwrap();
+    assert_ne!(out.code, 0, "an unreadable tier directory is refused");
+    assert!(
+        out.stderr.contains("frontier"),
+        "the refusal names the directory; stderr: {}",
+        out.stderr
+    );
+    assert!(!w.db().exists(), "a refusal creates no store");
+}
+
+#[test]
+fn no_crate_list_means_no_names_facts() {
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[(
+            "_kos/nodes/frontier/q-storage.yaml",
+            "id: q-storage\ntext: parsing moved to serde-saphyr\n",
+        )],
     );
     accepted(&w.ingest(
         "kos",
@@ -1196,24 +1371,10 @@ fn crate_names_come_from_the_list() {
         HEALTHY_RUST_LOG,
         &co,
     ));
-    accepted(&w.ingest(
-        "kos",
-        "c2",
-        2,
-        &rust_index("kos", "0.1.0", true, true),
-        HEALTHY_RUST_LOG,
-        &co,
-    ));
-    for at in [1, 2] {
-        let names: BTreeSet<Triple> = w
-            .facts_at(&w.db(), at)
-            .into_iter()
-            .filter(|(_, a, _)| a == "kos/names-dep")
-            .collect();
-        assert_eq!(
-            names,
-            BTreeSet::from([t("q-storage", "kos/names-dep", "serde-saphyr")]),
-            "at version {at}: the listed name makes a fact and the unlisted one does not"
-        );
-    }
+    let names: BTreeSet<Triple> = w
+        .facts_at(&w.db(), 1)
+        .into_iter()
+        .filter(|(_, a, _)| a == "kos/names-dep")
+        .collect();
+    assert!(names.is_empty(), "no list, no names facts; got {names:?}");
 }
