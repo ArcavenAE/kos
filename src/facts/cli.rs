@@ -96,7 +96,7 @@ fn load_inner(db: &Path, at: i64, file: &Path) -> Result<()> {
 }
 
 /// What `kos facts ingest-scip` was given. The indexer log and the checkout
-/// are inputs of the degraded-index check, which a later change adds.
+/// are inputs of the degraded-index check.
 pub struct IngestScip<'a> {
     pub db: &'a Path,
     pub at: i64,
@@ -118,6 +118,8 @@ pub fn ingest_scip(args: &IngestScip<'_>) -> Result<()> {
         repo: args.repo,
         commit: args.commit,
         index: args.index,
+        log: args.log,
+        checkout: args.checkout,
     }))?;
     println!(
         "loaded {} facts and ended {} for {}@{} at version {}",

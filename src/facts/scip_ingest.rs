@@ -1,5 +1,5 @@
 //! Reading a SCIP index into the fact store (aae-orc-yto7v, brief
-//! `_kos/probes/brief-scip-ingest-build.md`, SI-1 to SI-4, SI-6, SI-7, SI-9).
+//! `_kos/probes/brief-scip-ingest-build.md`, SI-1 to SI-4, SI-6 to SI-9).
 //!
 //! The ingest decodes an index file an indexer already wrote and writes only
 //! through `FactStore`. Four fact shapes come out of it:
@@ -29,10 +29,25 @@
 //!   confidence tier, and the source grade is `compiler` for all of them.
 //! - A load asserts and ends only its own repo's facts, so one store holds
 //!   several repos.
+//!
+//! An index that the indexer degraded is refused before anything is written
+//! (SI-8). A refusal is an error whose message starts `GAP <repo>@<commit>:`
+//! and names every check that failed, and it never opens the store:
+//!
+//! - Rust: the log has no `can't load standard library` line, the index names
+//!   at least one external symbol from `std`, and it has a document for every
+//!   tracked `.rs` file under the root crate's `src/` and under the `src/` of each
+//!   workspace member the root `Cargo.toml` lists. A project tracked inside the
+//!   repo that is not a member is not the crate the index covers.
+//! - Go: the log's last line is `exit: 0` (scip-go's exit status, which the
+//!   indexing recipe appends to the log), and the index has a document for
+//!   every tracked non-test `.go` file outside `testdata`, `vendor` and
+//!   directories whose name starts with `_` or `.`.
 
 use std::collections::BTreeSet;
 use std::fs;
 use std::path::Path;
+use std::process::Command;
 
 use protobuf::Message;
 use scip::symbol::is_local_symbol;
@@ -225,6 +240,8 @@ pub struct Request<'a> {
     pub repo: &'a str,
     pub commit: &'a str,
     pub index: &'a Path,
+    pub log: &'a Path,
+    pub checkout: &'a Path,
 }
 
 /// The provenance of one load, as the six values of `load/<repo>@<at>`.
@@ -276,6 +293,195 @@ fn defined_packages<'a>(
         .collect()
 }
 
+/// The paths of the files git tracks in `checkout`.
+fn tracked_files(checkout: &Path) -> Result<Vec<String>> {
+    let out = Command::new("git")
+        .arg("-C")
+        .arg(checkout)
+        .args(["ls-files", "-z"])
+        .output()
+        .map_err(|e| refuse(format!("cannot run git in {}: {e}", checkout.display())))?;
+    if !out.status.success() {
+        return Err(refuse(format!(
+            "{} is not a git checkout: {}",
+            checkout.display(),
+            String::from_utf8_lossy(&out.stderr).trim()
+        )));
+    }
+    Ok(String::from_utf8_lossy(&out.stdout)
+        .split('\0')
+        .filter(|p| !p.is_empty())
+        .map(str::to_string)
+        .collect())
+}
+
+/// Whether the index names an external symbol from the standard library.
+fn names_std(index: &Index) -> bool {
+    let named = |symbol: &str| split_symbol(symbol).is_some_and(|p| p.package == "std");
+    index.documents.iter().any(|d| {
+        d.occurrences.iter().any(|o| named(&o.symbol))
+            || d.symbols
+                .iter()
+                .any(|s| named(&s.symbol) || s.relationships.iter().any(|r| named(&r.symbol)))
+    })
+}
+
+fn is_go_source(path: &str) -> bool {
+    let ignored_dir = path
+        .split('/')
+        .rev()
+        .skip(1)
+        .any(|d| d == "testdata" || d == "vendor" || d.starts_with('_') || d.starts_with('.'));
+    path.ends_with(".go") && !path.ends_with("_test.go") && !ignored_dir
+}
+
+/// The member patterns of the root `Cargo.toml`'s `[workspace]` table: the
+/// quoted strings of its `members` array. This is a line reader, not a TOML
+/// parser, so a `members` written some other way reads as no members, and the
+/// check then covers the root crate alone. `exclude` is not read.
+fn workspace_members(manifest: &str) -> Vec<String> {
+    let mut in_workspace = false;
+    let mut in_members = false;
+    let mut members = Vec::new();
+    for line in manifest.lines() {
+        let line = line.split('#').next().unwrap_or("").trim();
+        if line.starts_with('[') {
+            in_workspace = line == "[workspace]";
+            in_members = false;
+            continue;
+        }
+        if !in_workspace {
+            continue;
+        }
+        let mut rest = line;
+        if !in_members {
+            let Some(after) = line
+                .strip_prefix("members")
+                .map(str::trim_start)
+                .and_then(|r| r.strip_prefix('='))
+            else {
+                continue;
+            };
+            rest = after.trim_start();
+            if !rest.starts_with('[') {
+                continue;
+            }
+            in_members = true;
+        }
+        let mut quoted = rest.split('"');
+        quoted.next();
+        members.extend(quoted.step_by(2).map(str::to_string));
+        if rest.contains(']') {
+            in_members = false;
+        }
+    }
+    members
+}
+
+/// Whether `path` is a source file of the root crate or of a workspace member.
+/// A member is a plain directory, or `dir/*` for each directory under `dir`.
+fn is_rust_source(path: &str, members: &[String]) -> bool {
+    if !path.ends_with(".rs") {
+        return false;
+    }
+    path.starts_with("src/")
+        || members.iter().any(|m| match m.strip_suffix("/*") {
+            Some(dir) => path
+                .strip_prefix(dir)
+                .and_then(|p| p.strip_prefix('/'))
+                .and_then(|p| p.split_once('/'))
+                .is_some_and(|(_, rest)| rest.starts_with("src/")),
+            None => path
+                .strip_prefix(m.trim_end_matches('/'))
+                .and_then(|p| p.strip_prefix("/src/"))
+                .is_some(),
+        })
+}
+
+/// The reasons `index` is degraded, empty when it is healthy.
+fn degraded_reasons(
+    index: &Index,
+    log: &str,
+    tracked: &[String],
+    members: &[String],
+) -> std::result::Result<Vec<String>, String> {
+    let documents: BTreeSet<&str> = index
+        .documents
+        .iter()
+        .map(|d| d.relative_path.as_str())
+        .collect();
+    let missing = |wanted: &dyn Fn(&str) -> bool| -> Vec<&str> {
+        tracked
+            .iter()
+            .map(String::as_str)
+            .filter(|p| wanted(p) && !documents.contains(p))
+            .collect()
+    };
+    let mut reasons = Vec::new();
+    match index.metadata.tool_info.name.as_str() {
+        "rust-analyzer" => {
+            if log
+                .lines()
+                .any(|l| l.contains("can't load standard library"))
+            {
+                reasons.push("the indexer log has `can't load standard library`".to_string());
+            }
+            if !names_std(index) {
+                reasons.push("the index names no external symbol from std".to_string());
+            }
+            for path in missing(&|p| is_rust_source(p, members)) {
+                reasons.push(format!("the index has no document for tracked file {path}"));
+            }
+        }
+        "scip-go" => {
+            match log.lines().rev().find(|l| !l.trim().is_empty()) {
+                Some(last) if last.trim() == "exit: 0" => {}
+                Some(last) if last.trim().starts_with("exit: ") => reasons.push(format!(
+                    "scip-go's exit status is not 0 (the log ends `{}`)",
+                    last.trim()
+                )),
+                _ => {
+                    reasons.push("the log does not end with scip-go's `exit: <n>` line".to_string())
+                }
+            }
+            for path in missing(&is_go_source) {
+                reasons.push(format!("the index has no document for tracked file {path}"));
+            }
+        }
+        other => {
+            return Err(format!(
+                "there is no health check for the indexer `{other}`"
+            ));
+        }
+    }
+    Ok(reasons)
+}
+
+/// Refuse a degraded index (SI-8). Nothing is written, and the store is not
+/// opened.
+fn check_healthy(request: &Request<'_>, index: &Index) -> Result<()> {
+    let gap = |reasons: &str| {
+        refuse(format!(
+            "GAP {}@{}: {reasons}\n  hint: nothing was loaded; fix the indexing and run it again",
+            request.repo, request.commit
+        ))
+    };
+    let log = fs::read(request.log).map_err(|e| {
+        refuse(format!(
+            "cannot read the indexer log {}: {e}",
+            request.log.display()
+        ))
+    })?;
+    let log = String::from_utf8_lossy(&log);
+    let tracked = tracked_files(request.checkout)?;
+    let manifest = fs::read_to_string(request.checkout.join("Cargo.toml")).unwrap_or_default();
+    match degraded_reasons(index, &log, &tracked, &workspace_members(&manifest)) {
+        Ok(reasons) if reasons.is_empty() => Ok(()),
+        Ok(reasons) => Err(gap(&reasons.join("; "))),
+        Err(reason) => Err(gap(&reason)),
+    }
+}
+
 /// Read the index and load it for the repo at version `at`: assert its facts,
 /// end this repo's facts that it no longer holds, and write the load entity.
 ///
@@ -284,6 +490,7 @@ fn defined_packages<'a>(
 /// store is opened, so a refused file creates no store.
 pub fn ingest(request: &Request<'_>) -> Result<Report> {
     let (index, sha256) = read_index_bytes(request.index)?;
+    check_healthy(request, &index)?;
     let (facts, mut report) = facts_from_index(request.repo, &index);
     let version = Version::new(request.at);
     let mut store = FactStore::open(request.db)?;
