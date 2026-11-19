@@ -111,7 +111,8 @@ pub struct FactDiff {
 /// What `FactStore::apply` changed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Applied {
-    /// Facts that were live and whose interval ended.
+    /// Facts whose interval ended, plus facts asserted at this same version
+    /// that were retracted again: those leave no row, and they count here.
     pub retracted: usize,
     /// Facts newly asserted.
     pub asserted: usize,

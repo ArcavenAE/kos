@@ -31,8 +31,14 @@ For a Go repo, also write the file set the module builds, from the same
 checkout and with the same `GOCACHE`:
 
 ```sh
-GOCACHE="$SCRATCH/gocache" go list -json ./... > "$SCRATCH/golist.json"
+GOCACHE="$SCRATCH/gocache" go list -json ./... > "$SCRATCH/golist.json" 2> "$SCRATCH/golist.err"
+echo "exit: $?" >> "$SCRATCH/golist.json"
 ```
+
+The last line of the list is `exit: <n>`, written by the recipe, the way the
+scip-go log's is. The ingest refuses a list that does not end with `exit: 0`, so
+a `go list` that stopped part way is not trusted. `--golist` is for a Go index
+only; the ingest refuses it with an index from any other indexer.
 
 The ingest requires an index document for every file in that output (`GoFiles`
 and `CgoFiles`, relative to `Module.Dir`). Without it, a path rule stands in:

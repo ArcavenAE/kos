@@ -22,7 +22,8 @@
 //!   `prov/index_sha256`, `prov/grade`.
 //! - A refusal exits nonzero, loads nothing and prints
 //!   `GAP <repo>@<commit>: <reason>` on stderr.
-//! - A load prints `filtered: out_of_root_documents=<n> local_symbols=<n>`.
+//! - A load prints `filtered: out_of_root_documents=<n> out_of_root_facts=<n>
+//!   local_symbols=<n> local_facts=<n>`.
 //! - The indexer log's last line is `exit: <n>` for scip-go (the exit status
 //!   is an input of SI-8).
 //! - Crate names come from `.kos/crate-names.txt` in the checkout and are
@@ -588,7 +589,6 @@ fn out_of_root_documents_are_skipped_and_counted() {
 }
 
 #[test]
-#[ignore = "red until the review follow-ups land (aae-orc-yto7v); run with --ignored"]
 fn the_filter_line_counts_facts_as_well_as_documents() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -613,7 +613,6 @@ fn the_filter_line_counts_facts_as_well_as_documents() {
 }
 
 #[test]
-#[ignore = "red until the review follow-ups land (aae-orc-yto7v); run with --ignored"]
 fn a_dotdot_segment_leaves_the_root() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -642,7 +641,6 @@ fn a_dotdot_segment_leaves_the_root() {
 }
 
 #[test]
-#[ignore = "red until the review follow-ups land (aae-orc-yto7v); run with --ignored"]
 fn a_repo_name_with_a_delimiter_is_refused() {
     for bad in ["a:b", "a@b"] {
         let w = World::new();
@@ -666,7 +664,6 @@ fn a_repo_name_with_a_delimiter_is_refused() {
 }
 
 #[test]
-#[ignore = "red until the review follow-ups land (aae-orc-yto7v); run with --ignored"]
 fn an_empty_indexer_version_is_refused() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -682,11 +679,10 @@ fn an_empty_indexer_version_is_refused() {
 }
 
 #[test]
-#[ignore = "red until the review follow-ups land (aae-orc-yto7v); run with --ignored"]
 fn a_go_list_file_with_a_rust_index_is_refused() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
-    let listed = format!("{}exit: 0\n", go_list(&[("", &["main.go"])]));
+    let listed = go_list_file(&[("", &["main.go"])]);
     let out = w.ingest_with(
         "kos",
         "c1",
@@ -700,7 +696,6 @@ fn a_go_list_file_with_a_rust_index_is_refused() {
 }
 
 #[test]
-#[ignore = "red until the review follow-ups land (aae-orc-yto7v); run with --ignored"]
 fn a_go_list_file_without_its_exit_line_is_refused() {
     let w = World::new();
     let co = w.go_checkout("kos");
@@ -718,7 +713,6 @@ fn a_go_list_file_without_its_exit_line_is_refused() {
 }
 
 #[test]
-#[ignore = "red until the review follow-ups land (aae-orc-yto7v); run with --ignored"]
 fn a_go_list_that_exited_nonzero_is_refused() {
     let w = World::new();
     let co = w.go_checkout("kos");
@@ -1188,6 +1182,11 @@ fn go_list(packages: &[(&str, &[&str])]) -> String {
         .collect()
 }
 
+/// `go_list(..)` followed by the `exit: 0` line the recipe appends.
+fn go_list_file(packages: &[(&str, &[&str])]) -> String {
+    format!("{}exit: 0\n", go_list(packages))
+}
+
 fn go_checkout_with_ignored_file(w: &World) -> PathBuf {
     w.checkout(
         "kos",
@@ -1212,7 +1211,7 @@ fn go_file_set_comes_from_go_list() {
     refused(&out, "tools.go");
 
     // With go list's own file set, tools.go is not a file the module builds.
-    let listed = go_list(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
+    let listed = go_list_file(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
     let out = w.ingest_with("kos", "c1", 1, &idx, GO_LOG_OK, &co, Some(&listed));
     accepted(&out);
     assert!(!out.stderr.contains("GAP"), "stderr: {}", out.stderr);
@@ -1223,7 +1222,7 @@ fn a_file_go_list_names_must_have_a_document() {
     let w = World::new();
     let co = go_checkout_with_ignored_file(&w);
     // The list names pkg/a.go, and the index has no document for it.
-    let listed = go_list(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
+    let listed = go_list_file(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
     let out = w.ingest_with(
         "kos",
         "c1",
