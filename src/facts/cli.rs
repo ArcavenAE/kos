@@ -128,8 +128,11 @@ pub fn ingest_scip(args: &IngestScip<'_>) -> Result<()> {
         report.added, report.ended, args.repo, args.commit, args.at
     );
     println!(
-        "filtered: out_of_root_documents={} local_symbols={}",
-        report.out_of_root_documents, report.local_symbols
+        "filtered: out_of_root_documents={} out_of_root_facts={} local_symbols={} local_facts={}",
+        report.out_of_root_documents,
+        report.out_of_root_facts,
+        report.local_symbols,
+        report.local_facts
     );
     Ok(())
 }

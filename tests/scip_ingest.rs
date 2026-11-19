@@ -22,7 +22,8 @@
 //!   `prov/index_sha256`, `prov/grade`.
 //! - A refusal exits nonzero, loads nothing and prints
 //!   `GAP <repo>@<commit>: <reason>` on stderr.
-//! - A load prints `filtered: out_of_root_documents=<n> local_symbols=<n>`.
+//! - A load prints `filtered: out_of_root_documents=<n> out_of_root_facts=<n>
+//!   local_symbols=<n> local_facts=<n>`.
 //! - The indexer log's last line is `exit: <n>` for scip-go (the exit status
 //!   is an input of SI-8).
 //! - Crate names come from `.kos/crate-names.txt` in the checkout and are
@@ -588,6 +589,150 @@ fn out_of_root_documents_are_skipped_and_counted() {
 }
 
 #[test]
+fn the_filter_line_counts_facts_as_well_as_documents() {
+    let w = World::new();
+    let co = w.rust_checkout("kos", &[]);
+    let mut idx = rust_index("kos", "0.1.0", true, true);
+    idx.documents.push(
+        index(
+            "rust-analyzer",
+            "1.97.1",
+            vec![doc("../cache/z.rs").def(&rs("kos", "0.1.0", "cache/Z#"))],
+        )
+        .documents[0]
+            .clone(),
+    );
+    let out = w.ingest("kos", "c1", 1, &idx, HEALTHY_RUST_LOG, &co);
+    accepted(&out);
+    assert!(
+        out.stdout
+            .contains("out_of_root_documents=1 out_of_root_facts=1 local_symbols=3 local_facts=3"),
+        "the line counts the facts each filter dropped; stdout: {}",
+        out.stdout
+    );
+}
+
+#[test]
+fn a_dotdot_segment_leaves_the_root() {
+    let w = World::new();
+    let co = w.rust_checkout("kos", &[]);
+    let mut idx = rust_index("kos", "0.1.0", true, true);
+    idx.documents.push(
+        index(
+            "rust-analyzer",
+            "1.97.1",
+            vec![doc("src/../../cache/z.rs").def(&rs("kos", "0.1.0", "cache/Z#"))],
+        )
+        .documents[0]
+            .clone(),
+    );
+    let out = w.ingest("kos", "c1", 1, &idx, HEALTHY_RUST_LOG, &co);
+    accepted(&out);
+    assert_eq!(
+        w.code_facts_at(1),
+        rust_expected("kos", true, true),
+        "a path with a .. segment adds no fact"
+    );
+    assert!(
+        out.stdout.contains("out_of_root_documents=1"),
+        "stdout: {}",
+        out.stdout
+    );
+}
+
+#[test]
+fn a_repo_name_with_a_delimiter_is_refused() {
+    for bad in ["a:b", "a@b"] {
+        let w = World::new();
+        let co = w.rust_checkout("kos", &[]);
+        let out = w.ingest(
+            bad,
+            "c1",
+            1,
+            &rust_index("kos", "0.1.0", true, true),
+            HEALTHY_RUST_LOG,
+            &co,
+        );
+        assert_ne!(out.code, 0, "{bad:?} is refused");
+        assert!(
+            out.stderr.contains("--repo") && out.stderr.contains(bad),
+            "the refusal names the flag and the value; stderr: {}",
+            out.stderr
+        );
+        assert!(!w.db().exists(), "a refused repo name creates no store");
+    }
+}
+
+#[test]
+fn an_empty_indexer_version_is_refused() {
+    let w = World::new();
+    let co = w.rust_checkout("kos", &[]);
+    let mut idx = rust_index("kos", "0.1.0", true, true);
+    idx.metadata
+        .mut_or_insert_default()
+        .tool_info
+        .mut_or_insert_default()
+        .version = String::new();
+    let out = w.ingest("kos", "c1", 1, &idx, HEALTHY_RUST_LOG, &co);
+    refused(&out, "version");
+    assert!(!w.db().exists(), "a refusal creates no store");
+}
+
+#[test]
+fn a_go_list_file_with_a_rust_index_is_refused() {
+    let w = World::new();
+    let co = w.rust_checkout("kos", &[]);
+    let listed = go_list_file(&[("", &["main.go"])]);
+    let out = w.ingest_with(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+        Some(&listed),
+    );
+    refused(&out, "--golist");
+}
+
+#[test]
+fn a_go_list_file_without_its_exit_line_is_refused() {
+    let w = World::new();
+    let co = w.go_checkout("kos");
+    let listed = go_list(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
+    let out = w.ingest_with(
+        "kos",
+        "c1",
+        1,
+        &go_index("kos", true),
+        GO_LOG_OK,
+        &co,
+        Some(&listed),
+    );
+    refused(&out, "exit");
+}
+
+#[test]
+fn a_go_list_that_exited_nonzero_is_refused() {
+    let w = World::new();
+    let co = w.go_checkout("kos");
+    let listed = format!(
+        "{}exit: 1\n",
+        go_list(&[("", &["main.go"]), ("/pkg", &["a.go"])])
+    );
+    let out = w.ingest_with(
+        "kos",
+        "c1",
+        1,
+        &go_index("kos", true),
+        GO_LOG_OK,
+        &co,
+        Some(&listed),
+    );
+    refused(&out, "exit: 1");
+}
+
+#[test]
 fn same_path_in_two_repos_is_two_entities() {
     let w = World::new();
     let kos_co = w.rust_checkout("kos", &[]);
@@ -1037,6 +1182,11 @@ fn go_list(packages: &[(&str, &[&str])]) -> String {
         .collect()
 }
 
+/// `go_list(..)` followed by the `exit: 0` line the recipe appends.
+fn go_list_file(packages: &[(&str, &[&str])]) -> String {
+    format!("{}exit: 0\n", go_list(packages))
+}
+
 fn go_checkout_with_ignored_file(w: &World) -> PathBuf {
     w.checkout(
         "kos",
@@ -1061,7 +1211,7 @@ fn go_file_set_comes_from_go_list() {
     refused(&out, "tools.go");
 
     // With go list's own file set, tools.go is not a file the module builds.
-    let listed = go_list(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
+    let listed = go_list_file(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
     let out = w.ingest_with("kos", "c1", 1, &idx, GO_LOG_OK, &co, Some(&listed));
     accepted(&out);
     assert!(!out.stderr.contains("GAP"), "stderr: {}", out.stderr);
@@ -1072,7 +1222,7 @@ fn a_file_go_list_names_must_have_a_document() {
     let w = World::new();
     let co = go_checkout_with_ignored_file(&w);
     // The list names pkg/a.go, and the index has no document for it.
-    let listed = go_list(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
+    let listed = go_list_file(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
     let out = w.ingest_with(
         "kos",
         "c1",

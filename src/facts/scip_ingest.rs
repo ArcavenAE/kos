@@ -28,7 +28,11 @@
 //!   has its interval ended. It is stale, not graveyard: no `code/` fact has a
 //!   confidence tier, and the source grade is `compiler` for all of them.
 //! - A load asserts and ends only its own repo's facts, so one store holds
-//!   several repos.
+//!   several repos. A store holds one repo per package: `code/implements`
+//!   facts belong to the repo that defines their subject symbol's package, so
+//!   two repos that define the same package would end each other's. The repo
+//!   name may not contain `:` or `@`, the delimiters of an entity and of a
+//!   load entity.
 //!
 //! A repo may name crates in its knowledge nodes. The names that count come
 //! from one checked-in list per repo, `.kos/crate-names.txt` in the checkout
@@ -36,7 +40,10 @@
 //! commits or from a commit's manifest, which moved a probe's answer from 3
 //! facts to 0 when a dependency left. For each listed name that the text of a
 //! node under `_kos/nodes/*/<id>.yaml` names as a whole word, the load asserts
-//! `kos/names-dep (<repo>:<id>, <name>)`.
+//! `kos/names-dep (<repo>:<id>, <name>)`. A name is matched as written: a Rust
+//! path spells a crate with an underscore (`serde_saphyr::`) where the list may
+//! hold the hyphenated name (`serde-saphyr`), and the underscore form does not
+//! match the hyphenated one, so the list holds each spelling the text uses.
 //!
 //! An input the ingest cannot read is refused before anything is written, and
 //! so is an index it cannot parse. Only the index health check below refuses
@@ -49,6 +56,8 @@
 //!   parse;
 //! - `cannot read <path>: <error>` for the crate-name list and for a node file
 //!   or a node directory;
+//! - `--repo "<name>" must be non-empty and hold no ':' or '@', ...` for a repo
+//!   name that holds a delimiter;
 //! - `cannot run git in <checkout>: <error>` when `git` cannot start, and
 //!   `<checkout> is not a git checkout: <git's message>` when `git ls-files`
 //!   fails, since the tracked files are how the health check knows what the
@@ -95,8 +104,12 @@ pub struct Report {
     pub ended: usize,
     /// Documents skipped because their path leaves the repo root.
     pub out_of_root_documents: usize,
+    /// Distinct facts those documents would have made.
+    pub out_of_root_facts: usize,
     /// Local occurrences and local relationships skipped.
     pub local_symbols: usize,
+    /// Distinct facts the skipped local items would have made.
+    pub local_facts: usize,
 }
 
 fn refuse(message: impl Into<String>) -> KosError {
@@ -174,8 +187,17 @@ fn own_packages(index: &Index) -> BTreeSet<(String, String)> {
     own
 }
 
+/// The attribute an occurrence's roles give it.
+fn occurrence_attribute(roles: i32) -> &'static str {
+    if roles & DEFINITION_ROLE == 0 {
+        "code/references"
+    } else {
+        "code/defines"
+    }
+}
+
 fn leaves_root(path: &str) -> bool {
-    path.starts_with('/') || path == ".." || path.starts_with("../")
+    path.starts_with('/') || path.split('/').any(|segment| segment == "..")
 }
 
 /// The symbol with its own package's version replaced by `.`.
@@ -208,6 +230,8 @@ pub fn facts_from_index(repo: &str, index: &Index) -> (BTreeSet<Fact>, Report) {
     let mut facts = BTreeSet::new();
     let mut report = Report::default();
     let mut packages = BTreeSet::new();
+    let mut out_of_root = BTreeSet::new();
+    let mut local = BTreeSet::new();
     let mut note_package = |symbol: &str| {
         if let Some(package) = external_package(symbol, &own) {
             packages.insert(package);
@@ -216,19 +240,41 @@ pub fn facts_from_index(repo: &str, index: &Index) -> (BTreeSet<Fact>, Report) {
     for document in &index.documents {
         if leaves_root(&document.relative_path) {
             report.out_of_root_documents += 1;
+            let entity = format!("{repo}:{}", document.relative_path);
+            for occurrence in document
+                .occurrences
+                .iter()
+                .filter(|o| !is_local_symbol(&o.symbol))
+            {
+                out_of_root.insert(Fact::new(
+                    &entity,
+                    occurrence_attribute(occurrence.symbol_roles),
+                    &occurrence.symbol,
+                ));
+            }
+            for info in &document.symbols {
+                for relationship in info.relationships.iter().filter(|r| r.is_implementation) {
+                    out_of_root.insert(Fact::new(
+                        &info.symbol,
+                        "code/implements",
+                        &relationship.symbol,
+                    ));
+                }
+            }
             continue;
         }
         let entity = format!("{repo}:{}", document.relative_path);
         for occurrence in &document.occurrences {
             if is_local_symbol(&occurrence.symbol) {
                 report.local_symbols += 1;
+                local.insert(Fact::new(
+                    &entity,
+                    occurrence_attribute(occurrence.symbol_roles),
+                    &occurrence.symbol,
+                ));
                 continue;
             }
-            let attribute = if occurrence.symbol_roles & DEFINITION_ROLE == 0 {
-                "code/references"
-            } else {
-                "code/defines"
-            };
+            let attribute = occurrence_attribute(occurrence.symbol_roles);
             note_package(&occurrence.symbol);
             facts.insert(Fact::new(
                 &entity,
@@ -240,6 +286,11 @@ pub fn facts_from_index(repo: &str, index: &Index) -> (BTreeSet<Fact>, Report) {
             for relationship in info.relationships.iter().filter(|r| r.is_implementation) {
                 if is_local_symbol(&info.symbol) || is_local_symbol(&relationship.symbol) {
                     report.local_symbols += 1;
+                    local.insert(Fact::new(
+                        &info.symbol,
+                        "code/implements",
+                        &relationship.symbol,
+                    ));
                     continue;
                 }
                 note_package(&info.symbol);
@@ -255,6 +306,8 @@ pub fn facts_from_index(repo: &str, index: &Index) -> (BTreeSet<Fact>, Report) {
     for package in packages {
         facts.insert(Fact::new(repo, "code/depends_on", package));
     }
+    report.out_of_root_facts = out_of_root.len();
+    report.local_facts = local.len();
     (facts, report)
 }
 
@@ -438,9 +491,24 @@ fn go_list_files(path: &Path) -> std::result::Result<BTreeSet<String>, String> {
     let text = fs::read_to_string(path)
         .map_err(|e| format!("cannot read the go list output {}: {e}", path.display()))?;
     let bad = |why: &str| format!("the go list output {} is not usable: {why}", path.display());
+    // The recipe appends `exit: <n>` after go list's output, the way it does
+    // for scip-go's log, so a partial list is not trusted.
+    let trimmed = text.trim_end();
+    let (json, last) = trimmed.rsplit_once('\n').unwrap_or(("", trimmed));
+    match last.trim() {
+        "exit: 0" => {}
+        other if other.starts_with("exit: ") => {
+            return Err(format!("go list did not succeed (the list ends `{other}`)"));
+        }
+        _ => {
+            return Err(bad(
+                "it does not end with go list's `exit: <n>` line, which the recipe appends",
+            ));
+        }
+    }
     let mut files = BTreeSet::new();
     let mut packages = 0;
-    for value in serde_json::Deserializer::from_str(&text).into_iter::<serde_json::Value>() {
+    for value in serde_json::Deserializer::from_str(json).into_iter::<serde_json::Value>() {
         let value = value.map_err(|e| bad(&e.to_string()))?;
         let text_of =
             |v: Option<&serde_json::Value>| v.and_then(|v| v.as_str()).map(str::to_string);
@@ -556,6 +624,9 @@ fn degraded_reasons(
             .collect()
     };
     let mut reasons = Vec::new();
+    if index.metadata.tool_info.version.trim().is_empty() {
+        reasons.push("the index names no indexer version".to_string());
+    }
     match index.metadata.tool_info.name.as_str() {
         "rust-analyzer" => {
             if log
@@ -621,6 +692,12 @@ fn check_healthy(request: &Request<'_>, index: &Index) -> Result<()> {
     let log = String::from_utf8_lossy(&log);
     let tracked = tracked_files(request.checkout)?;
     let go_files = match request.go_list {
+        Some(_) if index.metadata.tool_info.name != "scip-go" => {
+            return Err(gap(&format!(
+                "--golist is for an index scip-go wrote, and this one was written by `{}`",
+                index.metadata.tool_info.name
+            )));
+        }
         Some(path) => Some(go_list_files(path).map_err(|e| gap(&e))?),
         None => None,
     };
@@ -645,6 +722,12 @@ fn check_healthy(request: &Request<'_>, index: &Index) -> Result<()> {
 /// Fails on an unreadable index or a store error. The index is read before the
 /// store is opened, so a refused file creates no store.
 pub fn ingest(request: &Request<'_>) -> Result<Report> {
+    if request.repo.is_empty() || request.repo.contains([':', '@']) {
+        return Err(refuse(format!(
+            "--repo {:?} must be non-empty and hold no ':' or '@', which delimit an entity and a load entity",
+            request.repo
+        )));
+    }
     let (index, sha256) = read_index_bytes(request.index)?;
     check_healthy(request, &index)?;
     let (mut facts, mut report) = facts_from_index(request.repo, &index);
