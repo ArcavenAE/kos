@@ -39,8 +39,9 @@
 //! (one name per line, `#` starts a comment line), and not from any window of
 //! commits or from a commit's manifest, which moved a probe's answer from 3
 //! facts to 0 when a dependency left. For each listed name that the text of a
-//! node under `_kos/nodes/*/<id>.yaml` names as a whole word, the load asserts
-//! `kos/names-dep (<repo>:<id>, <name>)`. A name is matched as written: a Rust
+//! node under `_kos/nodes/*/<id>.yaml`, or a finding under
+//! `_kos/findings/<id>.yaml` or `<id>.md`, names as a whole word, the load
+//! asserts `kos/names-dep (<repo>:<id>, <name>)`. A name is matched as written: a Rust
 //! path spells a crate with an underscore (`serde_saphyr::`) where the list may
 //! hold the hyphenated name (`serde-saphyr`), and the underscore form does not
 //! match the hyphenated one, so the list holds each spelling the text uses.
@@ -393,23 +394,23 @@ fn names_dep_facts(repo: &str, checkout: &Path) -> Result<BTreeSet<Fact>> {
     if names.is_empty() {
         return Ok(facts);
     }
-    let nodes = checkout.join("_kos/nodes");
     let unreadable =
         |path: &Path, e: std::io::Error| refuse(format!("cannot read {}: {e}", path.display()));
-    let tiers = match fs::read_dir(&nodes) {
-        Ok(tiers) => tiers,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(facts),
-        Err(e) => return Err(unreadable(&nodes, e)),
-    };
-    for tier in tiers {
-        let tier = tier.map_err(|e| unreadable(&nodes, e))?;
-        if !tier.path().is_dir() {
-            continue;
-        }
-        let entries = fs::read_dir(tier.path()).map_err(|e| unreadable(&tier.path(), e))?;
+    // Every file of one directory: the text is read whole, and a file that
+    // cannot be read is a refusal.
+    let mut scan = |dir: &Path, extensions: &[&str]| -> Result<()> {
+        let entries = match fs::read_dir(dir) {
+            Ok(entries) => entries,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+            Err(e) => return Err(unreadable(dir, e)),
+        };
         for entry in entries {
-            let path = entry.map_err(|e| unreadable(&tier.path(), e))?.path();
-            if path.extension().and_then(|e| e.to_str()) != Some("yaml") {
+            let path = entry.map_err(|e| unreadable(dir, e))?.path();
+            let wanted = path
+                .extension()
+                .and_then(|e| e.to_str())
+                .is_some_and(|e| extensions.contains(&e));
+            if !wanted || path.is_dir() {
                 continue;
             }
             let text = fs::read_to_string(&path).map_err(|e| unreadable(&path, e))?;
@@ -420,7 +421,24 @@ fn names_dep_facts(repo: &str, checkout: &Path) -> Result<BTreeSet<Fact>> {
                 facts.insert(Fact::new(format!("{repo}:{id}"), "kos/names-dep", name));
             }
         }
+        Ok(())
+    };
+    // Nodes live one directory down, by confidence tier.
+    let nodes = checkout.join("_kos/nodes");
+    match fs::read_dir(&nodes) {
+        Ok(tiers) => {
+            for tier in tiers {
+                let tier = tier.map_err(|e| unreadable(&nodes, e))?.path();
+                if tier.is_dir() {
+                    scan(&tier, &["yaml"])?;
+                }
+            }
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+        Err(e) => return Err(unreadable(&nodes, e)),
     }
+    // Findings are YAML or markdown files in one directory.
+    scan(&checkout.join("_kos/findings"), &["yaml", "md"])?;
     Ok(facts)
 }
 

@@ -1572,7 +1572,6 @@ fn an_unreadable_node_file_is_refused_not_skipped() {
 }
 
 #[test]
-#[ignore = "red until names-dep reads findings (aae-orc-yto7v); run with --ignored"]
 fn findings_in_yaml_and_markdown_name_crates_too() {
     let w = World::new();
     let co = w.rust_checkout(
@@ -1626,7 +1625,6 @@ fn findings_in_yaml_and_markdown_name_crates_too() {
 }
 
 #[test]
-#[ignore = "red until names-dep reads findings (aae-orc-yto7v); run with --ignored"]
 fn an_unreadable_finding_is_refused_not_skipped() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[(".kos/crate-names.txt", "serde_yaml\n")]);
