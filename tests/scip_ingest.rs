@@ -691,6 +691,51 @@ fn every_code_row_resolves_to_a_complete_load_entity() {
 // ------------------------------------------------------------------------ SI-7
 
 #[test]
+#[ignore = "red until the load runs through FactStore::apply (aae-orc-yto7v); run with --ignored"]
+fn a_failing_write_leaves_the_store_unchanged() {
+    let w = World::new();
+    let co = w.rust_checkout("kos", &[]);
+    accepted(&w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    ));
+    let before = w.export(&w.db());
+
+    // Make the second load's last write, its load entity, fail after the
+    // facts it ends and asserts have been written.
+    let conn = rusqlite::Connection::open(w.db()).unwrap();
+    conn.execute_batch(
+        "CREATE TRIGGER fail_on_load BEFORE INSERT ON facts WHEN NEW.e = 'load/kos@2'
+         BEGIN SELECT RAISE(ABORT, 'forced failure'); END;",
+    )
+    .unwrap();
+    drop(conn);
+
+    let out = w.ingest(
+        "kos",
+        "c2",
+        2,
+        &rust_index("kos", "0.1.0", true, false),
+        HEALTHY_RUST_LOG,
+        &co,
+    );
+    assert_ne!(
+        out.code, 0,
+        "the forced failure surfaces; stdout: {}",
+        out.stdout
+    );
+    assert_eq!(
+        w.export(&w.db()),
+        before,
+        "the facts the load ended were not kept when its last write failed"
+    );
+}
+
+#[test]
 fn missing_fact_ends_its_interval() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
