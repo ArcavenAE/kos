@@ -60,6 +60,7 @@ macro_rules! live_at {
 
 pub mod cli;
 mod exchange;
+pub mod scip_ingest;
 mod traverse;
 
 pub use exchange::Harvest;

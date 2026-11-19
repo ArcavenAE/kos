@@ -815,6 +815,7 @@ dependencies = [
  "insta",
  "jiff",
  "petgraph",
+ "protobuf",
  "regex",
  "reqwest",
  "rusqlite",

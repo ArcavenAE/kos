@@ -297,6 +297,37 @@ enum FactsAction {
         file: PathBuf,
     },
 
+    /// Load the facts of a SCIP index (one repo at one commit) at version --at
+    IngestScip {
+        /// The fact store file
+        #[arg(long)]
+        db: PathBuf,
+
+        /// The version to assert the facts at
+        #[arg(long)]
+        at: i64,
+
+        /// The repo's name; every document entity is prefixed with it
+        #[arg(long)]
+        repo: String,
+
+        /// The commit the index was built at
+        #[arg(long)]
+        commit: String,
+
+        /// The SCIP index file rust-analyzer or scip-go wrote
+        #[arg(long)]
+        index: PathBuf,
+
+        /// The indexer's log
+        #[arg(long)]
+        log: PathBuf,
+
+        /// The repo checkout at that commit
+        #[arg(long)]
+        checkout: PathBuf,
+    },
+
     /// Replay a JSONL export into an empty fact store
     Import {
         /// The fact store file
@@ -843,6 +874,23 @@ fn main() -> anyhow::Result<()> {
 
         Commands::Facts { action } => match action {
             FactsAction::Load { db, at, file } => kos::facts::cli::load(&db, at, &file)?,
+            FactsAction::IngestScip {
+                db,
+                at,
+                repo,
+                commit,
+                index,
+                log,
+                checkout,
+            } => kos::facts::cli::ingest_scip(&kos::facts::cli::IngestScip {
+                db: &db,
+                at,
+                repo: &repo,
+                commit: &commit,
+                index: &index,
+                log: &log,
+                checkout: &checkout,
+            })?,
             FactsAction::Import { db, file } => kos::facts::cli::import(&db, &file)?,
             FactsAction::Export { db, out } => kos::facts::cli::export(&db, out.as_deref())?,
             FactsAction::AsOf {
