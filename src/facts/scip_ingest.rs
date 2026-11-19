@@ -1,5 +1,5 @@
 //! Reading a SCIP index into the fact store (aae-orc-yto7v, brief
-//! `_kos/probes/brief-scip-ingest-build.md`, SI-1 to SI-4, SI-6 to SI-9).
+//! `_kos/probes/brief-scip-ingest-build.md`, SI-1 to SI-4, SI-6 to SI-9, SI-11).
 //!
 //! The ingest decodes an index file an indexer already wrote and writes only
 //! through `FactStore`. Four fact shapes come out of it:
@@ -29,6 +29,14 @@
 //!   confidence tier, and the source grade is `compiler` for all of them.
 //! - A load asserts and ends only its own repo's facts, so one store holds
 //!   several repos.
+//!
+//! A repo may name crates in its knowledge nodes. The names that count come
+//! from one checked-in list per repo, `.kos/crate-names.txt` in the checkout
+//! (one name per line, `#` starts a comment line), and not from any window of
+//! commits or from a commit's manifest, which moved a probe's answer from 3
+//! facts to 0 when a dependency left. For each listed name that the text of a
+//! node under `_kos/nodes/*/<id>.yaml` names as a whole word, the load asserts
+//! `kos/names-dep (<repo>:<id>, <name>)`.
 //!
 //! An index that the indexer degraded is refused before anything is written
 //! (SI-8). A refusal is an error whose message starts `GAP <repo>@<commit>:`
@@ -268,6 +276,10 @@ fn belongs_to(fact: &Fact, repo: &str, packages: &BTreeSet<(String, String)>) ->
             .strip_prefix(repo)
             .is_some_and(|rest| rest.starts_with(':')),
         "code/depends_on" => fact.e == repo,
+        "kos/names-dep" => fact
+            .e
+            .strip_prefix(repo)
+            .is_some_and(|rest| rest.starts_with(':')),
         "code/implements" => split_symbol(&fact.e)
             .is_some_and(|p| packages.contains(&(p.manager.to_string(), p.package.to_string()))),
         _ => false,
@@ -289,6 +301,63 @@ fn defined_packages<'a>(
         .filter_map(|f| split_symbol(&f.v))
         .map(|p| (p.manager.to_string(), p.package.to_string()))
         .collect()
+}
+
+/// The crate names the repo lists, one per line.
+fn crate_names(checkout: &Path) -> Result<Vec<String>> {
+    let path = checkout.join(".kos/crate-names.txt");
+    match fs::read_to_string(&path) {
+        Ok(text) => Ok(text
+            .lines()
+            .map(str::trim)
+            .filter(|l| !l.is_empty() && !l.starts_with('#'))
+            .map(str::to_string)
+            .collect()),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(Vec::new()),
+        Err(e) => Err(refuse(format!("cannot read {}: {e}", path.display()))),
+    }
+}
+
+/// Whether `text` holds `name` bounded by characters that cannot be part of a
+/// crate name, so `serde-saphyr` is not found inside `serde-saphyr-extras`.
+fn names_whole_word(text: &str, name: &str) -> bool {
+    let part_of_name = |c: char| c.is_ascii_alphanumeric() || c == '-' || c == '_';
+    text.match_indices(name).any(|(start, _)| {
+        let before = text[..start].chars().next_back();
+        let after = text[start + name.len()..].chars().next();
+        !before.is_some_and(part_of_name) && !after.is_some_and(part_of_name)
+    })
+}
+
+/// `kos/names-dep` facts: each listed crate name that a node's text names.
+fn names_dep_facts(repo: &str, checkout: &Path) -> Result<BTreeSet<Fact>> {
+    let names = crate_names(checkout)?;
+    let mut facts = BTreeSet::new();
+    if names.is_empty() {
+        return Ok(facts);
+    }
+    let nodes = checkout.join("_kos/nodes");
+    let Ok(tiers) = fs::read_dir(&nodes) else {
+        return Ok(facts);
+    };
+    for tier in tiers.flatten().filter(|t| t.path().is_dir()) {
+        for entry in fs::read_dir(tier.path())?.flatten() {
+            let path = entry.path();
+            if path.extension().and_then(|e| e.to_str()) != Some("yaml") {
+                continue;
+            }
+            let (Some(id), Ok(text)) = (
+                path.file_stem().and_then(|s| s.to_str()),
+                fs::read_to_string(&path),
+            ) else {
+                continue;
+            };
+            for name in names.iter().filter(|n| names_whole_word(&text, n)) {
+                facts.insert(Fact::new(format!("{repo}:{id}"), "kos/names-dep", name));
+            }
+        }
+    }
+    Ok(facts)
 }
 
 /// The paths of the files git tracks in `checkout`.
@@ -428,7 +497,8 @@ fn check_healthy(request: &Request<'_>, index: &Index) -> Result<()> {
 pub fn ingest(request: &Request<'_>) -> Result<Report> {
     let (index, sha256) = read_index_bytes(request.index)?;
     check_healthy(request, &index)?;
-    let (facts, mut report) = facts_from_index(request.repo, &index);
+    let (mut facts, mut report) = facts_from_index(request.repo, &index);
+    facts.extend(names_dep_facts(request.repo, request.checkout)?);
     let version = Version::new(request.at);
     let mut store = FactStore::open(request.db)?;
 

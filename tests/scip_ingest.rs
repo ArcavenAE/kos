@@ -1081,7 +1081,6 @@ fn jsonl_round_trip_keeps_code_facts_intervals_and_load_entities() {
 // ----------------------------------------------------------------------- SI-11
 
 #[test]
-#[ignore = "red until SI-11 lands in G5 (aae-orc-yto7v); run with --ignored"]
 fn crate_names_come_from_the_list() {
     let w = World::new();
     let co = w.rust_checkout(
