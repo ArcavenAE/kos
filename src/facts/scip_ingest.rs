@@ -48,11 +48,21 @@
 //! An input the ingest cannot read is refused before anything is written, and
 //! so is an index it cannot parse. Only the index health check below refuses
 //! with a message that starts `GAP <repo>@<commit>:` and names every check
-//! that failed. The other refusals are plain errors: `cannot read <what> <path>:
-//! <error>` for the index, the indexer log, the crate-name list and a node
-//! file or directory, and `<path> is not a SCIP index` for a file that does not
-//! parse. All of them return before the store is opened, so a refused load
-//! creates no store file.
+//! that failed. The other refusals are plain errors, each in this form:
+//!
+//! - `cannot read the index <path>: <error>` and `cannot read the indexer log
+//!   <path>: <error>`;
+//! - `<path> is not a SCIP index: <error>` for an index file that does not
+//!   parse;
+//! - `cannot read <path>: <error>` for the crate-name list and for a node file
+//!   or a node directory;
+//! - `cannot run git in <checkout>: <error>` when `git` cannot start, and
+//!   `<checkout> is not a git checkout: <git's message>` when `git ls-files`
+//!   fails, since the tracked files are how the health check knows what the
+//!   index must cover.
+//!
+//! All of them return before the store is opened, so a refused load creates no
+//! store file.
 //!
 //! An index that the indexer degraded is refused (SI-8):
 //!
