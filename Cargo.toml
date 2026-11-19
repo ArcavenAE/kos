@@ -56,10 +56,6 @@ jiff = "1"
 insta = { version = "1", features = ["yaml", "json"] }
 tempfile = "3"
 
-# SCIP fixtures for the ingest tests (aae-orc-yto7v). The ingest itself adds
-# the crate to [dependencies] when it lands.
-scip = "0.10"
-
 [lints.clippy]
 cloned_instead_of_copied = "warn"
 needless_pass_by_value = "warn"
