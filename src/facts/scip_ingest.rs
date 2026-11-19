@@ -1,5 +1,5 @@
 //! Reading a SCIP index into the fact store (aae-orc-yto7v, brief
-//! `_kos/probes/brief-scip-ingest-build.md`, SI-1 to SI-4).
+//! `_kos/probes/brief-scip-ingest-build.md`, SI-1 to SI-4, SI-6, SI-7, SI-9).
 //!
 //! The ingest decodes an index file an indexer already wrote and writes only
 //! through `FactStore`. Four fact shapes come out of it:
@@ -14,6 +14,21 @@
 //! entities. A repo's own version inside a symbol is replaced by `.`, so a
 //! version bump does not end and restart every own fact. Documents whose path
 //! leaves the repo root, and local symbols, are skipped and counted.
+//!
+//! A load also writes provenance and ends what the index no longer holds:
+//!
+//! - The entity `load/<repo>@<at>` carries six values (`prov/repo`,
+//!   `prov/commit`, `prov/indexer`, `prov/indexer_version`,
+//!   `prov/index_sha256`, `prov/grade`). It is asserted at the load's version
+//!   and never retracted, so a `code/` row's provenance is its repo's load
+//!   entity at the row's start version, and at its end version for an ended
+//!   row. The store has no provenance column, and putting provenance in a
+//!   fact's value would change every fact's identity at every commit.
+//! - A fact this repo's earlier load asserted, and this index does not hold,
+//!   has its interval ended. It is stale, not graveyard: no `code/` fact has a
+//!   confidence tier, and the source grade is `compiler` for all of them.
+//! - A load asserts and ends only its own repo's facts, so one store holds
+//!   several repos.
 
 use std::collections::BTreeSet;
 use std::fs;
@@ -22,6 +37,7 @@ use std::path::Path;
 use protobuf::Message;
 use scip::symbol::is_local_symbol;
 use scip::types::Index;
+use sha2::{Digest, Sha256};
 
 use super::{Fact, FactStore, Version};
 use crate::error::{KosError, Result};
@@ -34,6 +50,8 @@ const DEFINITION_ROLE: i32 = 1;
 pub struct Report {
     /// Facts newly asserted (a fact already live is not counted).
     pub added: usize,
+    /// Facts of this repo that the index no longer holds, whose interval ended.
+    pub ended: usize,
     /// Documents skipped because their path leaves the repo root.
     pub out_of_root_documents: usize,
     /// Local occurrences and local relationships skipped.
@@ -51,14 +69,20 @@ fn refuse(message: impl Into<String>) -> KosError {
 /// # Errors
 /// Fails when the file cannot be read or is not a SCIP index.
 pub fn read_index(path: &Path) -> Result<Index> {
+    read_index_bytes(path).map(|(index, _)| index)
+}
+
+/// The index at `path` and the sha256 of its bytes, as lowercase hex.
+fn read_index_bytes(path: &Path) -> Result<(Index, String)> {
     let bytes = fs::read(path)
         .map_err(|e| refuse(format!("cannot read the index {}: {e}", path.display())))?;
-    Index::parse_from_bytes(&bytes).map_err(|e| {
+    let index = Index::parse_from_bytes(&bytes).map_err(|e| {
         refuse(format!(
             "{} is not a SCIP index: {e}\n  hint: pass the index file rust-analyzer or scip-go wrote",
             path.display()
         ))
-    })
+    })?;
+    Ok((index, format!("{:x}", Sha256::digest(&bytes))))
 }
 
 /// The parts of a global SCIP symbol that a fact keeps; the symbol is five
@@ -193,16 +217,90 @@ pub fn facts_from_index(repo: &str, index: &Index) -> (BTreeSet<Fact>, Report) {
     (facts, report)
 }
 
-/// Read the index at `index_path` and assert its facts for `repo` at `at`.
+/// What one ingest needs: the store, the version, which repo and commit the
+/// index describes, and the index file.
+pub struct Request<'a> {
+    pub db: &'a Path,
+    pub at: i64,
+    pub repo: &'a str,
+    pub commit: &'a str,
+    pub index: &'a Path,
+}
+
+/// The provenance of one load, as the six values of `load/<repo>@<at>`.
+fn load_facts(request: &Request<'_>, index: &Index, sha256: &str) -> Vec<Fact> {
+    let entity = format!("load/{}@{}", request.repo, request.at);
+    let tool = &index.metadata.tool_info;
+    [
+        ("prov/repo", request.repo),
+        ("prov/commit", request.commit),
+        ("prov/indexer", tool.name.as_str()),
+        ("prov/indexer_version", tool.version.as_str()),
+        ("prov/index_sha256", sha256),
+        ("prov/grade", "compiler"),
+    ]
+    .into_iter()
+    .map(|(attribute, value)| Fact::new(&entity, attribute, value))
+    .collect()
+}
+
+/// Whether `fact` belongs to `repo`: its documents and dependencies by name,
+/// and its implementation facts by the packages the repo defines.
+fn belongs_to(fact: &Fact, repo: &str, packages: &BTreeSet<(String, String)>) -> bool {
+    match fact.a.as_str() {
+        "code/defines" | "code/references" => fact
+            .e
+            .strip_prefix(repo)
+            .is_some_and(|rest| rest.starts_with(':')),
+        "code/depends_on" => fact.e == repo,
+        "code/implements" => split_symbol(&fact.e)
+            .is_some_and(|p| packages.contains(&(p.manager.to_string(), p.package.to_string()))),
+        _ => false,
+    }
+}
+
+/// The packages `repo` defines, from the definitions in `facts`.
+fn defined_packages<'a>(
+    repo: &str,
+    facts: impl Iterator<Item = &'a Fact>,
+) -> BTreeSet<(String, String)> {
+    facts
+        .filter(|f| {
+            f.a == "code/defines"
+                && f.e
+                    .strip_prefix(repo)
+                    .is_some_and(|rest| rest.starts_with(':'))
+        })
+        .filter_map(|f| split_symbol(&f.v))
+        .map(|p| (p.manager.to_string(), p.package.to_string()))
+        .collect()
+}
+
+/// Read the index and load it for the repo at version `at`: assert its facts,
+/// end this repo's facts that it no longer holds, and write the load entity.
 ///
 /// # Errors
 /// Fails on an unreadable index or a store error. The index is read before the
 /// store is opened, so a refused file creates no store.
-pub fn ingest(db: &Path, at: i64, repo: &str, index_path: &Path) -> Result<Report> {
-    let index = read_index(index_path)?;
-    let (facts, mut report) = facts_from_index(repo, &index);
+pub fn ingest(request: &Request<'_>) -> Result<Report> {
+    let (index, sha256) = read_index_bytes(request.index)?;
+    let (facts, mut report) = facts_from_index(request.repo, &index);
+    let version = Version::new(request.at);
+    let mut store = FactStore::open(request.db)?;
+
+    let earlier = match store.latest_version()? {
+        Some(latest) => store.facts_as_of(latest)?,
+        None => Vec::new(),
+    };
+    let packages = defined_packages(request.repo, earlier.iter().chain(facts.iter()));
+    let stale: Vec<Fact> = earlier
+        .into_iter()
+        .filter(|f| belongs_to(f, request.repo, &packages) && !facts.contains(f))
+        .collect();
+
+    report.ended = store.retract_facts(version, &stale)?;
     let facts: Vec<Fact> = facts.into_iter().collect();
-    let mut store = FactStore::open(db)?;
-    report.added = store.assert_facts(Version::new(at), &facts)?;
+    report.added = store.assert_facts(version, &facts)?;
+    store.assert_facts(version, &load_facts(request, &index, &sha256))?;
     Ok(report)
 }

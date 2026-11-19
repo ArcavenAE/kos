@@ -629,7 +629,6 @@ fn local_symbols_are_skipped() {
 // ------------------------------------------------------------------------ SI-6
 
 #[test]
-#[ignore = "red until SI-6 lands in G2 (aae-orc-yto7v); run with --ignored"]
 fn every_code_row_resolves_to_a_complete_load_entity() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -692,7 +691,6 @@ fn every_code_row_resolves_to_a_complete_load_entity() {
 // ------------------------------------------------------------------------ SI-7
 
 #[test]
-#[ignore = "red until SI-7 lands in G2 (aae-orc-yto7v); run with --ignored"]
 fn missing_fact_ends_its_interval() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -746,7 +744,6 @@ fn missing_fact_ends_its_interval() {
 }
 
 #[test]
-#[ignore = "red until SI-7 lands in G2 (aae-orc-yto7v); run with --ignored"]
 fn deleted_line_mutant_is_caught() {
     // Intact at version 1, mutant at version 2. Only an ended interval shows
     // the deletion, so a store that only adds facts does not catch it.
@@ -912,7 +909,6 @@ fn refusal_loads_nothing() {
 // ------------------------------------------------------------------------ SI-9
 
 #[test]
-#[ignore = "red until SI-9 lands in G2 (aae-orc-yto7v); run with --ignored"]
 fn loading_repo_a_never_retracts_repo_b() {
     let w = World::new();
     let kos_co = w.rust_checkout("kos", &[]);
