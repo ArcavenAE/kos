@@ -45,9 +45,16 @@
 //! hold the hyphenated name (`serde-saphyr`), and the underscore form does not
 //! match the hyphenated one, so the list holds each spelling the text uses.
 //!
-//! An index that the indexer degraded is refused before anything is written
-//! (SI-8). A refusal is an error whose message starts `GAP <repo>@<commit>:`
-//! and names every check that failed, and it never opens the store:
+//! An input the ingest cannot read is refused before anything is written, and
+//! so is an index it cannot parse. Only the index health check below refuses
+//! with a message that starts `GAP <repo>@<commit>:` and names every check
+//! that failed. The other refusals are plain errors: `cannot read <what> <path>:
+//! <error>` for the index, the indexer log, the crate-name list and a node
+//! file or directory, and `<path> is not a SCIP index` for a file that does not
+//! parse. All of them return before the store is opened, so a refused load
+//! creates no store file.
+//!
+//! An index that the indexer degraded is refused (SI-8):
 //!
 //! - Rust: the log has no `can't load standard library` line, the index names
 //!   at least one external symbol from `std`, and it has a document for every
