@@ -818,7 +818,6 @@ fn deleted_line_mutant_is_caught() {
 // ------------------------------------------------------------------------ SI-8
 
 #[test]
-#[ignore = "red until SI-8 lands in G3 (aae-orc-yto7v); run with --ignored"]
 fn healthy_rust_index_is_accepted() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -839,7 +838,6 @@ fn healthy_rust_index_is_accepted() {
 }
 
 #[test]
-#[ignore = "red until SI-8 lands in G3 (aae-orc-yto7v); run with --ignored"]
 fn rust_index_without_std_is_refused() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -855,7 +853,6 @@ fn rust_index_without_std_is_refused() {
 }
 
 #[test]
-#[ignore = "red until SI-8 lands in G3 (aae-orc-yto7v); run with --ignored"]
 fn go_index_missing_a_document_is_refused() {
     let w = World::new();
     let co = w.go_checkout("kos");
@@ -864,7 +861,6 @@ fn go_index_missing_a_document_is_refused() {
 }
 
 #[test]
-#[ignore = "red until SI-8 lands in G3 (aae-orc-yto7v); run with --ignored"]
 fn go_index_with_nonzero_exit_is_refused() {
     let w = World::new();
     let co = w.go_checkout("kos");
@@ -873,7 +869,6 @@ fn go_index_with_nonzero_exit_is_refused() {
 }
 
 #[test]
-#[ignore = "red until SI-8 lands in G3 (aae-orc-yto7v); run with --ignored"]
 fn refusal_loads_nothing() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
