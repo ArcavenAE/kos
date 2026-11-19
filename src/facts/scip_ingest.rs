@@ -56,6 +56,8 @@
 //!   parse;
 //! - `cannot read <path>: <error>` for the crate-name list and for a node file
 //!   or a node directory;
+//! - `--repo "<name>" must be non-empty and hold no ':' or '@', ...` for a repo
+//!   name that holds a delimiter;
 //! - `cannot run git in <checkout>: <error>` when `git` cannot start, and
 //!   `<checkout> is not a git checkout: <git's message>` when `git ls-files`
 //!   fails, since the tracked files are how the health check knows what the
