@@ -326,6 +326,11 @@ enum FactsAction {
         /// The repo checkout at that commit
         #[arg(long)]
         checkout: PathBuf,
+
+        /// `go list -json ./...` output for a Go repo: the files the module
+        /// builds. Without it, a path rule stands in for it
+        #[arg(long)]
+        golist: Option<PathBuf>,
     },
 
     /// Replay a JSONL export into an empty fact store
@@ -882,6 +887,7 @@ fn main() -> anyhow::Result<()> {
                 index,
                 log,
                 checkout,
+                golist,
             } => kos::facts::cli::ingest_scip(&kos::facts::cli::IngestScip {
                 db: &db,
                 at,
@@ -890,6 +896,7 @@ fn main() -> anyhow::Result<()> {
                 index: &index,
                 log: &log,
                 checkout: &checkout,
+                go_list: golist.as_deref(),
             })?,
             FactsAction::Import { db, file } => kos::facts::cli::import(&db, &file)?,
             FactsAction::Export { db, out } => kos::facts::cli::export(&db, out.as_deref())?,

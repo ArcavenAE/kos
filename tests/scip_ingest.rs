@@ -956,7 +956,6 @@ fn go_checkout_with_ignored_file(w: &World) -> PathBuf {
 }
 
 #[test]
-#[ignore = "red until --golist lands (aae-orc-yto7v); run with --ignored"]
 fn go_file_set_comes_from_go_list() {
     let w = World::new();
     let co = go_checkout_with_ignored_file(&w);
@@ -975,7 +974,6 @@ fn go_file_set_comes_from_go_list() {
 }
 
 #[test]
-#[ignore = "red until --golist lands (aae-orc-yto7v); run with --ignored"]
 fn a_file_go_list_names_must_have_a_document() {
     let w = World::new();
     let co = go_checkout_with_ignored_file(&w);
@@ -994,7 +992,6 @@ fn a_file_go_list_names_must_have_a_document() {
 }
 
 #[test]
-#[ignore = "red until --golist lands (aae-orc-yto7v); run with --ignored"]
 fn an_unreadable_go_list_is_refused() {
     let w = World::new();
     let co = w.go_checkout("kos");

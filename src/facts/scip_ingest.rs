@@ -249,6 +249,9 @@ pub struct Request<'a> {
     pub index: &'a Path,
     pub log: &'a Path,
     pub checkout: &'a Path,
+    /// `go list -json ./...` output for a Go repo. When given, it names the
+    /// files the module builds; when not, a path rule stands in for it.
+    pub go_list: Option<&'a Path>,
 }
 
 /// The provenance of one load, as the six values of `load/<repo>@<at>`.
@@ -403,6 +406,46 @@ fn is_go_source(path: &str) -> bool {
     path.ends_with(".go") && !path.ends_with("_test.go") && !ignored_dir
 }
 
+/// The files `go list -json ./...` says the module builds, as paths relative
+/// to the module root. The output is a stream of one JSON object per package.
+fn go_list_files(path: &Path) -> std::result::Result<BTreeSet<String>, String> {
+    let text = fs::read_to_string(path)
+        .map_err(|e| format!("cannot read the go list output {}: {e}", path.display()))?;
+    let bad = |why: &str| format!("the go list output {} is not usable: {why}", path.display());
+    let mut files = BTreeSet::new();
+    let mut packages = 0;
+    for value in serde_json::Deserializer::from_str(&text).into_iter::<serde_json::Value>() {
+        let value = value.map_err(|e| bad(&e.to_string()))?;
+        let text_of =
+            |v: Option<&serde_json::Value>| v.and_then(|v| v.as_str()).map(str::to_string);
+        let (Some(dir), Some(root)) = (
+            text_of(value.get("Dir")),
+            text_of(value.get("Module").and_then(|m| m.get("Dir"))),
+        ) else {
+            return Err(bad("a package has no Dir or Module.Dir"));
+        };
+        let Some(rel) = Path::new(&dir).strip_prefix(&root).ok() else {
+            continue;
+        };
+        packages += 1;
+        for key in ["GoFiles", "CgoFiles"] {
+            for name in value
+                .get(key)
+                .and_then(|v| v.as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|v| v.as_str())
+            {
+                files.insert(rel.join(name).to_string_lossy().into_owned());
+            }
+        }
+    }
+    if packages == 0 {
+        return Err(bad("it holds no package of the module"));
+    }
+    Ok(files)
+}
+
 fn is_rust_source(path: &str) -> bool {
     path.ends_with(".rs") && (path.starts_with("src/") || path.contains("/src/"))
 }
@@ -412,6 +455,7 @@ fn degraded_reasons(
     index: &Index,
     log: &str,
     tracked: &[String],
+    go_files: Option<&BTreeSet<String>>,
 ) -> std::result::Result<Vec<String>, String> {
     let documents: BTreeSet<&str> = index
         .documents
@@ -452,8 +496,16 @@ fn degraded_reasons(
                     reasons.push("the log does not end with scip-go's `exit: <n>` line".to_string())
                 }
             }
-            for path in missing(is_go_source) {
-                reasons.push(format!("the index has no document for tracked file {path}"));
+            if let Some(built) = go_files {
+                for path in built.iter().filter(|p| !documents.contains(p.as_str())) {
+                    reasons.push(format!(
+                        "the index has no document for {path}, which go list says the module builds"
+                    ));
+                }
+            } else {
+                for path in missing(is_go_source) {
+                    reasons.push(format!("the index has no document for tracked file {path}"));
+                }
             }
         }
         other => {
@@ -482,7 +534,11 @@ fn check_healthy(request: &Request<'_>, index: &Index) -> Result<()> {
     })?;
     let log = String::from_utf8_lossy(&log);
     let tracked = tracked_files(request.checkout)?;
-    match degraded_reasons(index, &log, &tracked) {
+    let go_files = match request.go_list {
+        Some(path) => Some(go_list_files(path).map_err(|e| gap(&e))?),
+        None => None,
+    };
+    match degraded_reasons(index, &log, &tracked, go_files.as_ref()) {
         Ok(reasons) if reasons.is_empty() => Ok(()),
         Ok(reasons) => Err(gap(&reasons.join("; "))),
         Err(reason) => Err(gap(&reason)),
