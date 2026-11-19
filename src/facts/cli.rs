@@ -105,6 +105,7 @@ pub struct IngestScip<'a> {
     pub index: &'a Path,
     pub log: &'a Path,
     pub checkout: &'a Path,
+    pub go_list: Option<&'a Path>,
 }
 
 /// Load the facts of a SCIP index for one repo at version `at`.
@@ -120,6 +121,7 @@ pub fn ingest_scip(args: &IngestScip<'_>) -> Result<()> {
         index: args.index,
         log: args.log,
         checkout: args.checkout,
+        go_list: args.go_list,
     }))?;
     println!(
         "loaded {} facts and ended {} for {}@{} at version {}",

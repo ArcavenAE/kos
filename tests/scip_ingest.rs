@@ -308,28 +308,52 @@ impl World {
         log: &str,
         checkout: &Path,
     ) -> Out {
+        self.ingest_with(repo, commit, at, idx, log, checkout, None)
+    }
+
+    /// As `ingest`, and with `go_list` written to a file and passed as
+    /// `--golist` when it is given.
+    #[allow(clippy::too_many_arguments)]
+    fn ingest_with(
+        &self,
+        repo: &str,
+        commit: &str,
+        at: i64,
+        idx: &Index,
+        log: &str,
+        checkout: &Path,
+        go_list: Option<&str>,
+    ) -> Out {
         let idx_path = self.dir.path().join(format!("{repo}-{at}.scip"));
         scip::write_message_to_file(&idx_path, idx.clone()).unwrap();
         let log_path = self.dir.path().join(format!("{repo}-{at}.log"));
         fs::write(&log_path, log).unwrap();
-        kos(&[
-            "facts",
-            "ingest-scip",
-            "--db",
-            &s(&self.db()),
-            "--at",
-            &at.to_string(),
-            "--repo",
-            repo,
-            "--commit",
-            commit,
-            "--index",
-            &s(&idx_path),
-            "--log",
-            &s(&log_path),
-            "--checkout",
-            &s(checkout),
-        ])
+        let mut args = vec![
+            "facts".to_string(),
+            "ingest-scip".to_string(),
+            "--db".to_string(),
+            s(&self.db()),
+            "--at".to_string(),
+            at.to_string(),
+            "--repo".to_string(),
+            repo.to_string(),
+            "--commit".to_string(),
+            commit.to_string(),
+            "--index".to_string(),
+            s(&idx_path),
+            "--log".to_string(),
+            s(&log_path),
+            "--checkout".to_string(),
+            s(checkout),
+        ];
+        if let Some(text) = go_list {
+            let path = self.dir.path().join(format!("{repo}-{at}.golist.json"));
+            fs::write(&path, text).unwrap();
+            args.push("--golist".to_string());
+            args.push(s(&path));
+        }
+        let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+        kos(&refs)
     }
 
     fn index_sha(&self, repo: &str, at: i64) -> String {
@@ -996,6 +1020,86 @@ fn go_index_missing_a_document_is_refused() {
     let co = w.go_checkout("kos");
     let out = w.ingest("kos", "c1", 1, &go_index("kos", false), GO_LOG_OK, &co);
     refused(&out, "pkg/a.go");
+}
+
+/// `go list -json ./...` output for a module whose root is `/work/kos`: one
+/// object per package, with the files the package builds.
+fn go_list(packages: &[(&str, &[&str])]) -> String {
+    packages
+        .iter()
+        .map(|(dir, files)| {
+            let files: Vec<String> = files.iter().map(|f| format!("{f:?}")).collect();
+            format!(
+                "{{\"Dir\": \"/work/kos{dir}\", \"ImportPath\": \"github.com/x/kos{dir}\", \"GoFiles\": [{}], \"Module\": {{\"Dir\": \"/work/kos\"}}}}\n",
+                files.join(", ")
+            )
+        })
+        .collect()
+}
+
+fn go_checkout_with_ignored_file(w: &World) -> PathBuf {
+    w.checkout(
+        "kos",
+        &[
+            ("go.mod", "module x\n"),
+            ("main.go", "package main\n"),
+            ("pkg/a.go", "package pkg\n"),
+            ("tools.go", "//go:build ignore\npackage main\n"),
+        ],
+    )
+}
+
+#[test]
+fn go_file_set_comes_from_go_list() {
+    let w = World::new();
+    let co = go_checkout_with_ignored_file(&w);
+    let idx = go_index("kos", true);
+
+    // Without the list, the path approximation requires a document for the
+    // build-ignored tools.go and refuses.
+    let out = w.ingest("kos", "c1", 1, &idx, GO_LOG_OK, &co);
+    refused(&out, "tools.go");
+
+    // With go list's own file set, tools.go is not a file the module builds.
+    let listed = go_list(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
+    let out = w.ingest_with("kos", "c1", 1, &idx, GO_LOG_OK, &co, Some(&listed));
+    accepted(&out);
+    assert!(!out.stderr.contains("GAP"), "stderr: {}", out.stderr);
+}
+
+#[test]
+fn a_file_go_list_names_must_have_a_document() {
+    let w = World::new();
+    let co = go_checkout_with_ignored_file(&w);
+    // The list names pkg/a.go, and the index has no document for it.
+    let listed = go_list(&[("", &["main.go"]), ("/pkg", &["a.go"])]);
+    let out = w.ingest_with(
+        "kos",
+        "c1",
+        1,
+        &go_index("kos", false),
+        GO_LOG_OK,
+        &co,
+        Some(&listed),
+    );
+    refused(&out, "pkg/a.go");
+}
+
+#[test]
+fn an_unreadable_go_list_is_refused() {
+    let w = World::new();
+    let co = w.go_checkout("kos");
+    let out = w.ingest_with(
+        "kos",
+        "c1",
+        1,
+        &go_index("kos", true),
+        GO_LOG_OK,
+        &co,
+        Some("this is not json"),
+    );
+    refused(&out, "go list");
+    assert!(!w.db().exists(), "a refusal creates no store");
 }
 
 #[test]

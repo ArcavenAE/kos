@@ -27,6 +27,19 @@ The last line of a scip-go log is `exit: <n>`, written by the recipe itself, so
 the ingest can see the indexer's exit status. A check that refuses a failed
 run reads it.
 
+For a Go repo, also write the file set the module builds, from the same
+checkout and with the same `GOCACHE`:
+
+```sh
+GOCACHE="$SCRATCH/gocache" go list -json ./... > "$SCRATCH/golist.json"
+```
+
+The ingest requires an index document for every file in that output (`GoFiles`
+and `CgoFiles`, relative to `Module.Dir`). Without it, a path rule stands in:
+every tracked `.go` file that is not a test, and not under `testdata`,
+`vendor`, or a directory starting with `_` or `.`. That rule wrongly requires a
+document for a file a build constraint excludes.
+
 ## Rust
 
 ```sh
@@ -44,3 +57,5 @@ standard-library symbols.
 kos facts ingest-scip --db facts.db --at 1 --repo kos --commit "$(git -C "$CHECKOUT" rev-parse HEAD)" \
   --index "$SCRATCH/index.scip" --log "$SCRATCH/index.log" --checkout "$CHECKOUT"
 ```
+
+For Go, add `--golist "$SCRATCH/golist.json"`.
