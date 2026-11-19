@@ -1572,6 +1572,86 @@ fn an_unreadable_node_file_is_refused_not_skipped() {
 }
 
 #[test]
+fn findings_in_yaml_and_markdown_name_crates_too() {
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[
+            (".kos/crate-names.txt", "serde_yaml\nserde-saphyr\n"),
+            (
+                "_kos/findings/finding-029-orient.yaml",
+                "id: finding-029\ncontent: the probe used serde_yaml to read nodes\n",
+            ),
+            (
+                "_kos/findings/finding-kos-wre7-baseline.md",
+                "---\nid: finding-kos-wre7\n---\n\nThe baseline parsed `serde_yaml` output.\n",
+            ),
+            (
+                "_kos/findings/finding-other.md",
+                "---\nid: finding-other\n---\n\nNames serde_yaml_ng, which is another crate.\n",
+            ),
+            (
+                "_kos/nodes/frontier/q-storage.yaml",
+                "id: q-storage\ntext: parsing moved to serde-saphyr\n",
+            ),
+        ],
+    );
+    accepted(&w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    ));
+    let names: BTreeSet<Triple> = w
+        .facts_at(&w.db(), 1)
+        .into_iter()
+        .filter(|(_, a, _)| a == "kos/names-dep")
+        .collect();
+    let want = BTreeSet::from([
+        t("kos:finding-029-orient", "kos/names-dep", "serde_yaml"),
+        t(
+            "kos:finding-kos-wre7-baseline",
+            "kos/names-dep",
+            "serde_yaml",
+        ),
+        t("kos:q-storage", "kos/names-dep", "serde-saphyr"),
+    ]);
+    assert_eq!(
+        names, want,
+        "findings and nodes make names facts; a longer name does not match"
+    );
+}
+
+#[test]
+fn an_unreadable_finding_is_refused_not_skipped() {
+    let w = World::new();
+    let co = w.rust_checkout("kos", &[(".kos/crate-names.txt", "serde_yaml\n")]);
+    fs::create_dir_all(co.join("_kos/findings")).unwrap();
+    fs::write(
+        co.join("_kos/findings/finding-bad.md"),
+        [0xff_u8, 0xfe, 0x00, 0x41],
+    )
+    .unwrap();
+    let out = w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    );
+    assert_ne!(out.code, 0, "an unreadable finding is refused");
+    assert!(
+        out.stderr.contains("finding-bad.md"),
+        "the refusal names the file; stderr: {}",
+        out.stderr
+    );
+    assert!(!w.db().exists(), "a refusal creates no store");
+}
+
+#[test]
 fn an_unreadable_node_tier_directory_is_refused_not_skipped() {
     use std::os::unix::fs::PermissionsExt;
     let w = World::new();
