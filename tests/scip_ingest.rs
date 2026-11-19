@@ -838,7 +838,6 @@ fn healthy_rust_index_is_accepted() {
 }
 
 #[test]
-#[ignore = "red until the Rust check reads only the root crate and its members (aae-orc-yto7v); run with --ignored"]
 fn a_nested_non_member_crate_is_not_required() {
     let w = World::new();
     // kos tracks probe crates like this one, and rust-analyzer loads only the
@@ -896,7 +895,6 @@ fn a_tracked_root_source_without_a_document_is_refused() {
 }
 
 #[test]
-#[ignore = "red until the Rust check reads only the root crate and its members (aae-orc-yto7v); run with --ignored"]
 fn a_workspace_members_sources_are_required() {
     let w = World::new();
     let co = w.rust_checkout(
