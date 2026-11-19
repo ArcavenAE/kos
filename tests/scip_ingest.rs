@@ -691,7 +691,6 @@ fn every_code_row_resolves_to_a_complete_load_entity() {
 // ------------------------------------------------------------------------ SI-7
 
 #[test]
-#[ignore = "red until the load runs through FactStore::apply (aae-orc-yto7v); run with --ignored"]
 fn a_failing_write_leaves_the_store_unchanged() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);

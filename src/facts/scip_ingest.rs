@@ -69,7 +69,8 @@ const DEFINITION_ROLE: i32 = 1;
 /// What one ingest wrote and what its filters dropped.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Report {
-    /// Facts newly asserted (a fact already live is not counted).
+    /// Facts newly asserted, the load entity's values included (a fact already
+    /// live is not counted).
     pub added: usize,
     /// Facts of this repo that the index no longer holds, whose interval ended.
     pub ended: usize,
@@ -512,9 +513,11 @@ pub fn ingest(request: &Request<'_>) -> Result<Report> {
         .filter(|f| belongs_to(f, request.repo, &packages) && !facts.contains(f))
         .collect();
 
-    report.ended = store.retract_facts(version, &stale)?;
-    let facts: Vec<Fact> = facts.into_iter().collect();
-    report.added = store.assert_facts(version, &facts)?;
-    store.assert_facts(version, &load_facts(request, &index, &sha256))?;
+    // One transaction: a failed write keeps none of the load.
+    let mut asserted: Vec<Fact> = facts.into_iter().collect();
+    asserted.extend(load_facts(request, &index, &sha256));
+    let done = store.apply(version, &stale, &asserted)?;
+    report.ended = done.retracted;
+    report.added = done.asserted;
     Ok(report)
 }
