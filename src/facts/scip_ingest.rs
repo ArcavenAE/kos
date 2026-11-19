@@ -44,7 +44,9 @@
 //!
 //! - Rust: the log has no `can't load standard library` line, the index names
 //!   at least one external symbol from `std`, and it has a document for every
-//!   tracked `.rs` file under a `src/` directory.
+//!   tracked `.rs` file under the root crate's `src/` and under the `src/` of each
+//!   workspace member the root `Cargo.toml` lists. A project tracked inside the
+//!   repo that is not a member is not the crate the index covers.
 //! - Go: the log's last line is `exit: 0` (scip-go's exit status, which the
 //!   indexing recipe appends to the log), and the index has a document for
 //!   every tracked non-test `.go` file outside `testdata`, `vendor` and
@@ -403,8 +405,67 @@ fn is_go_source(path: &str) -> bool {
     path.ends_with(".go") && !path.ends_with("_test.go") && !ignored_dir
 }
 
-fn is_rust_source(path: &str) -> bool {
-    path.ends_with(".rs") && (path.starts_with("src/") || path.contains("/src/"))
+/// The member patterns of the root `Cargo.toml`'s `[workspace]` table: the
+/// quoted strings of its `members` array. This is a line reader, not a TOML
+/// parser, so a `members` written some other way reads as no members, and the
+/// check then covers the root crate alone. `exclude` is not read.
+fn workspace_members(manifest: &str) -> Vec<String> {
+    let mut in_workspace = false;
+    let mut in_members = false;
+    let mut members = Vec::new();
+    for line in manifest.lines() {
+        let line = line.split('#').next().unwrap_or("").trim();
+        if line.starts_with('[') {
+            in_workspace = line == "[workspace]";
+            in_members = false;
+            continue;
+        }
+        if !in_workspace {
+            continue;
+        }
+        let mut rest = line;
+        if !in_members {
+            let Some(after) = line
+                .strip_prefix("members")
+                .map(str::trim_start)
+                .and_then(|r| r.strip_prefix('='))
+            else {
+                continue;
+            };
+            rest = after.trim_start();
+            if !rest.starts_with('[') {
+                continue;
+            }
+            in_members = true;
+        }
+        let mut quoted = rest.split('"');
+        quoted.next();
+        members.extend(quoted.step_by(2).map(str::to_string));
+        if rest.contains(']') {
+            in_members = false;
+        }
+    }
+    members
+}
+
+/// Whether `path` is a source file of the root crate or of a workspace member.
+/// A member is a plain directory, or `dir/*` for each directory under `dir`.
+fn is_rust_source(path: &str, members: &[String]) -> bool {
+    if !path.ends_with(".rs") {
+        return false;
+    }
+    path.starts_with("src/")
+        || members.iter().any(|m| match m.strip_suffix("/*") {
+            Some(dir) => path
+                .strip_prefix(dir)
+                .and_then(|p| p.strip_prefix('/'))
+                .and_then(|p| p.split_once('/'))
+                .is_some_and(|(_, rest)| rest.starts_with("src/")),
+            None => path
+                .strip_prefix(m.trim_end_matches('/'))
+                .and_then(|p| p.strip_prefix("/src/"))
+                .is_some(),
+        })
 }
 
 /// The reasons `index` is degraded, empty when it is healthy.
@@ -412,13 +473,14 @@ fn degraded_reasons(
     index: &Index,
     log: &str,
     tracked: &[String],
+    members: &[String],
 ) -> std::result::Result<Vec<String>, String> {
     let documents: BTreeSet<&str> = index
         .documents
         .iter()
         .map(|d| d.relative_path.as_str())
         .collect();
-    let missing = |wanted: fn(&str) -> bool| -> Vec<&str> {
+    let missing = |wanted: &dyn Fn(&str) -> bool| -> Vec<&str> {
         tracked
             .iter()
             .map(String::as_str)
@@ -437,7 +499,7 @@ fn degraded_reasons(
             if !names_std(index) {
                 reasons.push("the index names no external symbol from std".to_string());
             }
-            for path in missing(is_rust_source) {
+            for path in missing(&|p| is_rust_source(p, members)) {
                 reasons.push(format!("the index has no document for tracked file {path}"));
             }
         }
@@ -452,7 +514,7 @@ fn degraded_reasons(
                     reasons.push("the log does not end with scip-go's `exit: <n>` line".to_string())
                 }
             }
-            for path in missing(is_go_source) {
+            for path in missing(&is_go_source) {
                 reasons.push(format!("the index has no document for tracked file {path}"));
             }
         }
@@ -482,7 +544,8 @@ fn check_healthy(request: &Request<'_>, index: &Index) -> Result<()> {
     })?;
     let log = String::from_utf8_lossy(&log);
     let tracked = tracked_files(request.checkout)?;
-    match degraded_reasons(index, &log, &tracked) {
+    let manifest = fs::read_to_string(request.checkout.join("Cargo.toml")).unwrap_or_default();
+    match degraded_reasons(index, &log, &tracked, &workspace_members(&manifest)) {
         Ok(reasons) if reasons.is_empty() => Ok(()),
         Ok(reasons) => Err(gap(&reasons.join("; "))),
         Err(reason) => Err(gap(&reason)),
