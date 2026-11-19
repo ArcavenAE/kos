@@ -128,14 +128,31 @@ impl Harvest {
             .map(|(k, v)| (k, v.into_text()))
             .collect();
         require_provenance(&source)?;
-        Ok(Self {
-            source,
-            facts: raw
-                .facts
-                .into_iter()
-                .map(|f| Fact::new(f.e, f.a, f.v))
-                .collect(),
-        })
+        let facts: Vec<Fact> = raw
+            .facts
+            .into_iter()
+            .map(|f| Fact::new(f.e, f.a, f.v))
+            .collect();
+        refuse_code_facts(&facts)?;
+        Ok(Self { source, facts })
+    }
+}
+
+/// A fact of a SCIP load: a `code/` attribute, or an entity under `load/`.
+/// A harvest file carries a set of facts at one version and drops every
+/// interval and four of the six provenance values, so code facts move only as
+/// JSONL (SI-10).
+fn is_code_fact(fact: &Fact) -> bool {
+    fact.a.starts_with("code/") || fact.e.starts_with("load/")
+}
+
+fn refuse_code_facts(facts: &[Fact]) -> Result<()> {
+    match facts.iter().find(|f| is_code_fact(f)) {
+        Some(f) => Err(KosError::FactHarvestCodeFact {
+            e: f.e.clone(),
+            a: f.a.clone(),
+        }),
+        None => Ok(()),
     }
 }
 
@@ -235,6 +252,7 @@ impl FactStore {
         source: &BTreeMap<String, String>,
     ) -> Result<String> {
         require_provenance(source)?;
+        refuse_code_facts(picks)?;
         let mut facts: Vec<&Fact> = picks.iter().collect();
         facts.sort();
         facts.dedup();

@@ -987,7 +987,6 @@ fn loading_repo_a_never_retracts_repo_b() {
 // ----------------------------------------------------------------------- SI-10
 
 #[test]
-#[ignore = "red until SI-10 lands in G4 (aae-orc-yto7v); run with --ignored"]
 fn harvest_refuses_code_attributes() {
     let dir = TempDir::new().unwrap();
     let mut store = FactStore::open(&dir.path().join("facts.db")).unwrap();
@@ -1014,7 +1013,6 @@ fn harvest_refuses_code_attributes() {
 }
 
 #[test]
-#[ignore = "red until SI-10 lands in G4 (aae-orc-yto7v); run with --ignored"]
 fn jsonl_round_trip_keeps_code_facts_intervals_and_load_entities() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
