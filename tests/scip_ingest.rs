@@ -1318,6 +1318,42 @@ fn an_unreadable_node_file_is_refused_not_skipped() {
 }
 
 #[test]
+fn an_unreadable_node_tier_directory_is_refused_not_skipped() {
+    use std::os::unix::fs::PermissionsExt;
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[
+            (".kos/crate-names.txt", "serde-saphyr\n"),
+            (
+                "_kos/nodes/frontier/q-ok.yaml",
+                "id: q-ok\ntext: parsing moved to serde-saphyr\n",
+            ),
+        ],
+    );
+    let tier = co.join("_kos/nodes/frontier");
+    fs::set_permissions(&tier, fs::Permissions::from_mode(0o000)).unwrap();
+    let out = w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    );
+    // Put the mode back first, so the temp directory can be cleaned up even
+    // when an assertion below fails.
+    fs::set_permissions(&tier, fs::Permissions::from_mode(0o755)).unwrap();
+    assert_ne!(out.code, 0, "an unreadable tier directory is refused");
+    assert!(
+        out.stderr.contains("frontier"),
+        "the refusal names the directory; stderr: {}",
+        out.stderr
+    );
+    assert!(!w.db().exists(), "a refusal creates no store");
+}
+
+#[test]
 fn no_crate_list_means_no_names_facts() {
     let w = World::new();
     let co = w.rust_checkout(
