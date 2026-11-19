@@ -71,6 +71,11 @@ pub enum KosError {
     FactImportLine { line: usize, message: String },
 
     #[error(
+        "fact harvest: {e} {a} is a code or load fact, and a harvest file drops its provenance and intervals\n  hint: move code facts with `kos facts export` and `kos facts import` (JSONL), which keep every interval and load entity"
+    )]
+    FactHarvestCodeFact { e: String, a: String },
+
+    #[error(
         "fact harvest: {e} {a} {v} does not hold at version {version}\n  hint: a retraction must name a fact that holds at that version; check the version and the fact"
     )]
     FactHarvestNotLive {

@@ -963,6 +963,26 @@ fn go_index_with_nonzero_exit_is_refused() {
 }
 
 #[test]
+fn healthy_go_index_is_accepted() {
+    let w = World::new();
+    let co = w.go_checkout("kos");
+    let out = w.ingest("kos", "c1", 1, &go_index("kos", true), GO_LOG_OK, &co);
+    accepted(&out);
+    assert!(
+        !out.stderr.contains("GAP"),
+        "no GAP on a healthy Go index; stderr: {}",
+        out.stderr
+    );
+    let facts = w.code_facts_at(1);
+    assert!(
+        facts
+            .iter()
+            .any(|(e, a, _)| e == "kos:main.go" && a == "code/defines"),
+        "main.go defines a symbol; got {facts:?}"
+    );
+}
+
+#[test]
 fn refusal_loads_nothing() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -1061,7 +1081,6 @@ fn loading_repo_a_never_retracts_repo_b() {
 // ----------------------------------------------------------------------- SI-10
 
 #[test]
-#[ignore = "red until SI-10 lands in G4 (aae-orc-yto7v); run with --ignored"]
 fn harvest_refuses_code_attributes() {
     let dir = TempDir::new().unwrap();
     let mut store = FactStore::open(&dir.path().join("facts.db")).unwrap();
@@ -1088,7 +1107,6 @@ fn harvest_refuses_code_attributes() {
 }
 
 #[test]
-#[ignore = "red until SI-10 lands in G4 (aae-orc-yto7v); run with --ignored"]
 fn jsonl_round_trip_keeps_code_facts_intervals_and_load_entities() {
     let w = World::new();
     let co = w.rust_checkout("kos", &[]);
@@ -1126,6 +1144,32 @@ fn jsonl_round_trip_keeps_code_facts_intervals_and_load_entities() {
     }
     assert_eq!(w.diff(&w.db(), 1, 2), w.diff(&copy, 1, 2), "diff equal");
     assert_eq!(w.export(&w.db()), w.export(&copy), "intervals equal");
+
+    // Code facts enter a store only through JSONL: a harvest file that carries
+    // one is refused, names JSONL, and creates no store.
+    let yaml = w.dir.path().join("code-facts.yaml");
+    fs::write(
+        &yaml,
+        "kind: harvested-facts\nsource:\n  repo: kos\n  commit: c1\nfacts:\n- e: kos:src/a.rs\n  a: code/defines\n  v: some symbol\n",
+    )
+    .unwrap();
+    let yaml_db = w.dir.path().join("from-yaml.db");
+    let out = kos(&[
+        "facts",
+        "load",
+        "--db",
+        &s(&yaml_db),
+        "--at",
+        "1",
+        &s(&yaml),
+    ]);
+    assert_ne!(out.code, 0, "a harvest file with a code/ fact is refused");
+    assert!(
+        out.stderr.contains("JSONL"),
+        "the refusal names JSONL; stderr: {}",
+        out.stderr
+    );
+    assert!(!yaml_db.exists(), "a refused file creates no store");
 }
 
 // ----------------------------------------------------------------------- SI-11
