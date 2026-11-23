@@ -82,7 +82,6 @@
 use std::collections::BTreeSet;
 use std::fs;
 use std::path::Path;
-use std::process::Command;
 
 use protobuf::Message;
 use scip::symbol::is_local_symbol;
@@ -463,9 +462,7 @@ fn names_dep_facts(repo: &str, checkout: &Path) -> Result<BTreeSet<Fact>> {
 
 /// The paths of the files git tracks in `checkout`.
 fn tracked_files(checkout: &Path) -> Result<Vec<String>> {
-    let out = Command::new("git")
-        .arg("-C")
-        .arg(checkout)
+    let out = crate::gitenv::git_in(checkout)
         .args(["ls-files", "-z"])
         .output()
         .map_err(|e| refuse(format!("cannot run git in {}: {e}", checkout.display())))?;
