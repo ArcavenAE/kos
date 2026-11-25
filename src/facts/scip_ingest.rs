@@ -41,7 +41,10 @@
 //! facts to 0 when a dependency left. For each listed name that the text of a
 //! node under `_kos/nodes/*/<id>.yaml`, or a finding under
 //! `_kos/findings/<id>.yaml` or `<id>.md`, names as a whole word, the load
-//! asserts `kos/names-dep (<repo>:<id>, <name>)`. A name is matched as written: a Rust
+//! asserts `kos/names-dep (<repo>:<id>, <name>)`. A node and a finding share
+//! that `<id>` namespace, so a node and a finding with the same file stem are
+//! one entity there and their names merge; kos ids do not overlap today, and
+//! the load does not check it. A name is matched as written: a Rust
 //! path spells a crate with an underscore (`serde_saphyr::`) where the list may
 //! hold the hyphenated name (`serde-saphyr`), and the underscore form does not
 //! match the hyphenated one, so the list holds each spelling the text uses.
@@ -49,7 +52,9 @@
 //! An input the ingest cannot read is refused before anything is written, and
 //! so is an index it cannot parse. Only the index health check below refuses
 //! with a message that starts `GAP <repo>@<commit>:` and names every check
-//! that failed. The other refusals are plain errors, each in this form:
+//! that failed. The other refusals are plain errors, each in the form below.
+//! Every refusal, the GAP one too, prints after the `kos facts: ` prefix that
+//! `KosError::FactCommand` adds (`src/error.rs`), which the forms leave out:
 //!
 //! - `cannot read the index <path>: <error>` and `cannot read the indexer log
 //!   <path>: <error>`;
@@ -77,7 +82,10 @@
 //! - Go: the log's last line is `exit: 0` (scip-go's exit status, which the
 //!   indexing recipe appends to the log), and the index has a document for
 //!   every tracked non-test `.go` file outside `testdata`, `vendor` and
-//!   directories whose name starts with `_` or `.`.
+//!   directories whose name starts with `_` or `.`. With `--golist <file>`
+//!   (the output of `go list -json ./...`, then the recipe's `exit: <n>` line),
+//!   the files the module builds replace that path rule, and the flag is
+//!   refused for an index that scip-go did not write.
 
 use std::collections::BTreeSet;
 use std::fs;
@@ -555,18 +563,41 @@ fn go_list_files(path: &Path) -> std::result::Result<BTreeSet<String>, String> {
     Ok(files)
 }
 
+/// `line` up to a `#` that starts a comment: a `#` inside a double-quoted
+/// string is part of the string.
+fn without_comment(line: &str) -> &str {
+    let mut quoted = false;
+    for (at, c) in line.char_indices() {
+        match c {
+            '"' => quoted = !quoted,
+            '#' if !quoted => return &line[..at],
+            _ => {}
+        }
+    }
+    line
+}
+
+/// Whether `line` is the `[workspace]` table header, with or without spaces
+/// inside the brackets.
+fn is_workspace_header(line: &str) -> bool {
+    line.strip_prefix('[')
+        .and_then(|r| r.strip_suffix(']'))
+        .is_some_and(|name| name.trim() == "workspace")
+}
+
 /// The member patterns of the root `Cargo.toml`'s `[workspace]` table: the
-/// quoted strings of its `members` array. This is a line reader, not a TOML
-/// parser, so a `members` written some other way reads as no members, and the
-/// check then covers the root crate alone. `exclude` is not read.
+/// quoted strings of its `members` array, each without a leading `./`. This is
+/// a line reader, not a TOML parser, so a `members` written some other way
+/// reads as no members, and the check then covers the root crate alone.
+/// `exclude` is not read.
 fn workspace_members(manifest: &str) -> Vec<String> {
     let mut in_workspace = false;
     let mut in_members = false;
     let mut members = Vec::new();
     for line in manifest.lines() {
-        let line = line.split('#').next().unwrap_or("").trim();
+        let line = without_comment(line).trim();
         if line.starts_with('[') {
-            in_workspace = line == "[workspace]";
+            in_workspace = is_workspace_header(line);
             in_members = false;
             continue;
         }
@@ -590,12 +621,24 @@ fn workspace_members(manifest: &str) -> Vec<String> {
         }
         let mut quoted = rest.split('"');
         quoted.next();
-        members.extend(quoted.step_by(2).map(str::to_string));
+        members.extend(
+            quoted
+                .step_by(2)
+                .map(|m| m.strip_prefix("./").unwrap_or(m).to_string()),
+        );
         if rest.contains(']') {
             in_members = false;
         }
     }
     members
+}
+
+/// Whether a member pattern is one the check reads: a directory, or `dir/*`
+/// for each directory under `dir`. Any other glob would read as no member and
+/// leave the check covering less than the workspace, so it is refused.
+fn is_supported_member(pattern: &str) -> bool {
+    let dir = pattern.strip_suffix("/*").unwrap_or(pattern);
+    !dir.contains(['*', '?', '[', '{'])
 }
 
 /// Whether `path` is a source file of the root crate or of a workspace member.
@@ -652,6 +695,11 @@ fn degraded_reasons(
             }
             if !names_std(index) {
                 reasons.push("the index names no external symbol from std".to_string());
+            }
+            for pattern in members.iter().filter(|m| !is_supported_member(m)) {
+                reasons.push(format!(
+                    "the workspace member pattern `{pattern}` is not supported (only a directory or `dir/*`), so the check cannot tell which files it covers"
+                ));
             }
             for path in missing(&|p| is_rust_source(p, members)) {
                 reasons.push(format!("the index has no document for tracked file {path}"));
