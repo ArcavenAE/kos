@@ -1719,13 +1719,18 @@ fn no_crate_list_means_no_names_facts() {
 // ------------------------------------------- workspace member forms (aae-orc-ry25f, aae-orc-9nvbz)
 
 /// A Rust checkout whose root manifest is `manifest` and which tracks `file`,
-/// a source file of what the manifest lists as a member, that the healthy
-/// index has no document for.
+/// a source file of what the manifest lists as a member, and also
+/// `crates/other/src/lib.rs`, which no manifest here lists. The healthy index
+/// has a document for neither.
 fn ingest_with_manifest(manifest: &str, file: &str) -> Out {
     let w = World::new();
     let co = w.rust_checkout(
         "kos",
-        &[("Cargo.toml", manifest), (file, "pub struct M;\n")],
+        &[
+            ("Cargo.toml", manifest),
+            (file, "pub struct M;\n"),
+            ("crates/other/src/lib.rs", "pub struct O;\n"),
+        ],
     );
     w.ingest(
         "kos",
@@ -1738,10 +1743,10 @@ fn ingest_with_manifest(manifest: &str, file: &str) -> Out {
 }
 
 fn names_the_member(out: &Out, file: &str) {
-    assert_ne!(out.code, 0, "a member without a document is refused");
+    refused(out, file);
     assert!(
-        out.stderr.contains(file),
-        "the missing member source {file} is named, so the member was read; stderr: {}",
+        !out.stderr.contains("crates/other"),
+        "a tracked crate that is not a member is not required, so the check reads members and not every file; stderr: {}",
         out.stderr
     );
 }
@@ -1786,7 +1791,7 @@ fn a_comment_after_a_member_is_still_cut() {
 }
 
 #[test]
-fn a_member_glob_other_than_a_trailing_star_is_refused_by_name() {
+fn a_member_glob_other_than_a_trailing_slash_star_is_refused_by_name() {
     // The index covers every tracked file, so only the glob can refuse this load.
     let w = World::new();
     let co = w.rust_checkout(
