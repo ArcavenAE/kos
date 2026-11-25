@@ -1,6 +1,6 @@
 # Finding: probe R1, SCIP facts in the kos fact store (aae-orc-6fy1)
 
-Status: draft, revision 3, with the MDE tests run (brief note 5).
+Status: final. The operator approved the promotion out of draft (I-796, 2026-11-25). This is revision 3, with the MDE tests run (brief note 5).
 Date: 2026-11-16
 Host: mokuzai (Apple silicon, macOS), by the director's host ruling
 bd: aae-orc-6fy1
