@@ -201,3 +201,12 @@ notes: >
   subject is kos code-graph correspondence and every substantive edge targets
   a kos node. Every one of the sixteen arc tickets should reference this node
   (aj3c close condition).
+
+  Known limit of the SCIP ingest (aae-orc-eng9i, note 4; operator ruling
+  I-796, director 01M881SPSM, 2026-11-25). The ingest keys a node and a
+  finding by their file stem in one namespace, as the entity
+  `<repo>:<id>` of `kos/names-dep`, so a node and a finding with the same
+  stem would be one entity and their crate names would merge. No kos id
+  overlaps today and the load does not check it; the module doc of
+  src/facts/scip_ingest.rs says so. No ticket was filed. Revisit when a
+  collision appears or a second repo's graph is ingested.
