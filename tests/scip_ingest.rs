@@ -1092,7 +1092,7 @@ fn std_symbols_are_required_even_when_the_log_is_healthy() {
         HEALTHY_RUST_LOG,
         &co,
     );
-    refused(&out, "std");
+    refused(&out, "names no external symbol from std");
 }
 
 #[test]
@@ -1714,4 +1714,130 @@ fn no_crate_list_means_no_names_facts() {
         .filter(|(_, a, _)| a == "kos/names-dep")
         .collect();
     assert!(names.is_empty(), "no list, no names facts; got {names:?}");
+}
+
+// ------------------------------------------- workspace member forms (aae-orc-ry25f, aae-orc-9nvbz)
+
+/// A Rust checkout whose root manifest is `manifest` and which tracks `file`,
+/// a source file of what the manifest lists as a member, that the healthy
+/// index has no document for.
+fn ingest_with_manifest(manifest: &str, file: &str) -> Out {
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[("Cargo.toml", manifest), (file, "pub struct M;\n")],
+    );
+    w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    )
+}
+
+fn names_the_member(out: &Out, file: &str) {
+    assert_ne!(out.code, 0, "a member without a document is refused");
+    assert!(
+        out.stderr.contains(file),
+        "the missing member source {file} is named, so the member was read; stderr: {}",
+        out.stderr
+    );
+}
+
+#[test]
+fn a_workspace_header_with_spaces_is_still_the_workspace() {
+    let out = ingest_with_manifest(
+        "[ workspace ]\nmembers = [\"crates/a\"]\n",
+        "crates/a/src/lib.rs",
+    );
+    names_the_member(&out, "crates/a/src/lib.rs");
+}
+
+#[test]
+fn a_dot_slash_member_prefix_is_read_as_the_directory() {
+    let out = ingest_with_manifest(
+        "[workspace]\nmembers = [\"./crates/a\"]\n",
+        "crates/a/src/lib.rs",
+    );
+    names_the_member(&out, "crates/a/src/lib.rs");
+}
+
+#[test]
+fn a_hash_inside_a_quoted_member_is_part_of_the_member() {
+    let out = ingest_with_manifest("[workspace]\nmembers = [\"a#b\"]\n", "a#b/src/lib.rs");
+    names_the_member(&out, "a#b/src/lib.rs");
+}
+
+#[test]
+fn a_comment_after_a_member_is_still_cut() {
+    // Guard: the fix for a quoted hash must keep a real trailing comment out.
+    let out = ingest_with_manifest(
+        "[workspace]\nmembers = [\n  \"crates/a\", # the first one\n]\n",
+        "crates/a/src/lib.rs",
+    );
+    names_the_member(&out, "crates/a/src/lib.rs");
+    assert!(
+        !out.stderr.contains("the first one"),
+        "a comment is not a member; stderr: {}",
+        out.stderr
+    );
+}
+
+#[test]
+fn a_member_glob_other_than_a_trailing_star_is_refused_by_name() {
+    // The index covers every tracked file, so only the glob can refuse this load.
+    let w = World::new();
+    let co = w.rust_checkout(
+        "kos",
+        &[("Cargo.toml", "[workspace]\nmembers = [\"crates/x-*\"]\n")],
+    );
+    let out = w.ingest(
+        "kos",
+        "c1",
+        1,
+        &rust_index("kos", "0.1.0", true, true),
+        HEALTHY_RUST_LOG,
+        &co,
+    );
+    assert_ne!(
+        out.code, 0,
+        "an unsupported member pattern is refused, not skipped"
+    );
+    assert!(
+        out.stderr.contains("GAP kos@c1:")
+            && out.stderr.contains("crates/x-*")
+            && out.stderr.contains("not supported"),
+        "the refusal names the pattern and says it is not supported; stderr: {}",
+        out.stderr
+    );
+}
+
+// ---------------------------------------------- out_of_root_facts counts distinct facts (aae-orc-eng9i, note 3)
+
+#[test]
+fn one_implements_fact_seen_in_two_out_of_root_documents_is_counted_once() {
+    let w = World::new();
+    let co = w.rust_checkout("kos", &[]);
+    let mut idx = rust_index("kos", "0.1.0", true, true);
+    let target = rs("other", "1.0.0", "z/Z#");
+    let imp = rs("other", "1.0.0", "z/Impl#");
+    let outside = index(
+        "rust-analyzer",
+        "1.97.1",
+        vec![
+            doc("../cache/z.rs").implements(&imp, &target),
+            doc("../cache/y.rs").implements(&imp, &target),
+        ],
+    );
+    idx.documents.extend(outside.documents.iter().cloned());
+    let out = w.ingest("kos", "c1", 1, &idx, HEALTHY_RUST_LOG, &co);
+    accepted(&out);
+    assert!(
+        out.stdout
+            .contains("out_of_root_documents=2 out_of_root_facts=1"),
+        "two documents state one relationship, which is one distinct fact; stdout: {}",
+        out.stdout
+    );
 }
