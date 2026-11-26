@@ -413,8 +413,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release list --repo "${{ github.repository }}" \
-            --json tagName,isPrerelease \
-            --jq '[.[] | select(.isPrerelease)] | sort_by(.tagName) | reverse | .[30:] | .[].tagName' \
+            --limit 1000 --json tagName,isPrerelease,createdAt \
+            --jq '[.[] | select(.isPrerelease)] | sort_by(.createdAt) | reverse | .[30:] | .[].tagName' \
           | while read -r tag; do
               echo "Deleting old release: $tag"
               gh release delete "$tag" --repo "${{ github.repository }}" --yes --cleanup-tag
