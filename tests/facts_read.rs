@@ -513,6 +513,7 @@ fn without_limit_the_verb_shows_200_results_and_says_how_many_there_are() {
         out.stderr
     );
     let all = kos(&["facts", "refs", "--db", &s(&db), "--limit", "0", TRAV]);
+    assert_eq!(all.code, 0, "stderr: {}", all.stderr);
     assert_eq!(all.stdout.lines().count(), 201, "--limit 0 is no cap");
 }
 
