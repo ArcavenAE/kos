@@ -530,3 +530,39 @@ fn a_symbol_nobody_references_prints_nothing_and_a_header_saying_zero_in_text() 
         format!("symbol {UNREFERENCED} at version 2: 0 results")
     );
 }
+
+// 23: a whole name wins over the longer names it ends
+#[test]
+fn a_query_that_is_a_whole_name_resolves_to_it_though_a_longer_name_ends_with_it() {
+    let dir = tempfile::tempdir().unwrap();
+    let db = dir.path().join("exact.db");
+    let short = "cargo kos . facts/Twin#";
+    let long = "rust-analyzer cargo kos . facts/Twin#";
+    let mut store = FactStore::open(&db).unwrap();
+    store
+        .assert_facts(
+            v(1),
+            &[
+                f("kos:src/short.rs", "code/references", short),
+                f("kos:src/long.rs", "code/references", long),
+            ],
+        )
+        .unwrap();
+    drop(store);
+    // `short` is a suffix of `long` at a space, so both end the query.
+    let out = kos(&["facts", "refs", "--db", &s(&db), "--json", short]);
+    assert_eq!(out.code, 0, "stderr: {}", out.stderr);
+    let lines = json_lines(&out.stdout);
+    assert_eq!(lines.len(), 2, "one document and a trailer: {lines:?}");
+    assert_eq!(lines[0]["document"], "kos:src/short.rs");
+    assert_eq!(lines[1]["symbol"], short);
+    // A tail that is no stored name stays ambiguous.
+    let tail = kos(&["facts", "refs", "--db", &s(&db), "facts/Twin#"]);
+    assert_eq!(tail.code, 1);
+    assert_eq!(tail.stdout, "");
+    assert!(
+        tail.stderr.contains("matches 2 symbols"),
+        "{:?}",
+        tail.stderr
+    );
+}
