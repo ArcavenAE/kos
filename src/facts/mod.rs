@@ -60,6 +60,7 @@ macro_rules! live_at {
 
 pub mod cli;
 mod exchange;
+mod read;
 pub mod scip_ingest;
 mod traverse;
 
@@ -289,6 +290,50 @@ impl FactStore {
             ),
             params![a, v, version.0],
         )
+    }
+
+    /// The distinct live values of `attributes` at `version` that `query` names:
+    /// the symbol equal to it, or a symbol that ends with it where the character
+    /// before the match is a space or a `/` (a descriptor suffix). Sorted.
+    /// An empty query or an empty attribute list names nothing.
+    ///
+    /// # Errors
+    /// Fails on a SQLite error.
+    pub fn symbols_matching(
+        &self,
+        version: Version,
+        attributes: &[&str],
+        query: &str,
+    ) -> Result<Vec<String>> {
+        if query.is_empty() || attributes.is_empty() {
+            return Ok(Vec::new());
+        }
+        let marks = (0..attributes.len())
+            .map(|i| format!("?{}", i + 3))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let sql = format!(
+            "SELECT DISTINCT v FROM facts WHERE a IN ({marks}) AND {} AND (v = ?2 OR \
+             (length(v) > length(?2) AND substr(v, -length(?2)) = ?2 \
+              AND substr(v, length(v) - length(?2), 1) IN (' ', '/'))) ORDER BY v",
+            live_at!("1")
+        );
+        let mut args: Vec<&dyn rusqlite::ToSql> = vec![&version.0, &query];
+        for attribute in attributes {
+            args.push(attribute);
+        }
+        self.strings(&sql, rusqlite::params_from_iter(args))
+    }
+
+    /// The lowest version any fact holds from, or `None` for a store with no facts.
+    ///
+    /// # Errors
+    /// Fails on a SQLite error.
+    pub fn first_version(&self) -> Result<Option<Version>> {
+        let first: Option<i64> =
+            self.conn
+                .query_row("SELECT MIN(valid_from) FROM facts", [], |row| row.get(0))?;
+        Ok(first.map(Version))
     }
 
     /// The highest version written so far, or `None` for an empty store.

@@ -395,6 +395,75 @@ enum FactsAction {
         #[arg(long)]
         json: bool,
     },
+
+    /// Print the documents that reference a symbol, as the store holds at --at
+    Refs {
+        /// The fact store file
+        #[arg(long)]
+        db: PathBuf,
+
+        /// The version to read; the latest when left out
+        #[arg(long)]
+        at: Option<i64>,
+
+        /// Output JSONL: one object per result, then a trailer with the
+        /// resolved name, the version, the count and whether it was cut short
+        #[arg(long)]
+        json: bool,
+
+        /// Show at most this many results; 0 means no cap
+        #[arg(long, default_value_t = 200)]
+        limit: usize,
+
+        /// The symbol, whole or its tail after a space or `/` (for example `FactStore#traverse().`)
+        query: String,
+    },
+
+    /// Print the symbols that implement a symbol, as the store holds at --at
+    Impls {
+        /// The fact store file
+        #[arg(long)]
+        db: PathBuf,
+
+        /// The version to read; the latest when left out
+        #[arg(long)]
+        at: Option<i64>,
+
+        /// Output JSONL: one object per result, then a trailer with the
+        /// resolved name, the version, the count and whether it was cut short
+        #[arg(long)]
+        json: bool,
+
+        /// Show at most this many results; 0 means no cap
+        #[arg(long, default_value_t = 200)]
+        limit: usize,
+
+        /// The symbol, whole or its tail after a space or `/` (for example `Reader#`)
+        query: String,
+    },
+
+    /// Print the repos that depend on a package, as the store holds at --at
+    Dependents {
+        /// The fact store file
+        #[arg(long)]
+        db: PathBuf,
+
+        /// The version to read; the latest when left out
+        #[arg(long)]
+        at: Option<i64>,
+
+        /// Output JSONL: one object per result, then a trailer with the
+        /// resolved name, the version, the count and whether it was cut short
+        #[arg(long)]
+        json: bool,
+
+        /// Show at most this many results; 0 means no cap
+        #[arg(long, default_value_t = 200)]
+        limit: usize,
+
+        /// The package, whole or its tail after a space (for example `serde 1.0`)
+        query: String,
+    },
 }
 
 /// A section of `kos validate` that can run alone, with its own exit status.
@@ -910,6 +979,45 @@ fn main() -> anyhow::Result<()> {
             FactsAction::Diff { db, from, to, json } => {
                 kos::facts::cli::diff(&db, from, to, json)?;
             }
+            FactsAction::Refs {
+                db,
+                at,
+                json,
+                limit,
+                query,
+            } => kos::facts::cli::refs(&kos::facts::cli::ReadArgs {
+                db: &db,
+                query: &query,
+                at,
+                json,
+                limit,
+            })?,
+            FactsAction::Impls {
+                db,
+                at,
+                json,
+                limit,
+                query,
+            } => kos::facts::cli::impls(&kos::facts::cli::ReadArgs {
+                db: &db,
+                query: &query,
+                at,
+                json,
+                limit,
+            })?,
+            FactsAction::Dependents {
+                db,
+                at,
+                json,
+                limit,
+                query,
+            } => kos::facts::cli::dependents(&kos::facts::cli::ReadArgs {
+                db: &db,
+                query: &query,
+                at,
+                json,
+                limit,
+            })?,
         },
 
         Commands::Version => {
