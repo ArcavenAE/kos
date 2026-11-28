@@ -291,6 +291,23 @@ impl FactStore {
         )
     }
 
+    /// The distinct live values of `attributes` at `version` that `query` names:
+    /// the symbol equal to it, or a symbol that ends with it where the character
+    /// before the match is a space or a `/` (a descriptor suffix). Sorted.
+    ///
+    /// Red stub (aae-orc I-853): returns nothing until the green commit.
+    ///
+    /// # Errors
+    /// Fails on a SQLite error.
+    pub fn symbols_matching(
+        &self,
+        _version: Version,
+        _attributes: &[&str],
+        _query: &str,
+    ) -> Result<Vec<String>> {
+        Ok(Vec::new())
+    }
+
     /// The highest version written so far, or `None` for an empty store.
     ///
     /// # Errors
