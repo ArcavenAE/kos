@@ -63,6 +63,7 @@ fn code_store(dir: &Path) -> PathBuf {
                 f("kos:src/a.rs", "code/defines", STORE),
                 f("kos:src/a.rs", "code/defines", TRAV),
                 f("kos:src/a.rs", "code/references", TRAV),
+                f("kos:src/a.rs", "code/references", STORE),
                 f("kos:src/b.rs", "code/references", TRAV),
                 f(AWKWARD_DOC, "code/references", TRAV),
                 f("kos:src/r.rs", "code/defines", TRAIT),
@@ -208,7 +209,7 @@ fn without_at_the_verb_reads_the_latest_version() {
     assert_eq!(lines[1]["document"], "kos:src/c.rs");
 }
 
-// 7
+// 7: the '/' boundary
 #[test]
 fn a_descriptor_suffix_resolves_to_the_one_symbol_it_ends() {
     let dir = tempfile::tempdir().unwrap();
@@ -236,7 +237,7 @@ fn the_full_symbol_resolves_to_itself() {
     assert_eq!(got, vec![STORE.to_string()]);
 }
 
-// 9
+// 9: the space boundary, and no match in mid-word
 #[test]
 fn a_suffix_that_does_not_start_at_a_boundary_matches_nothing() {
     let dir = tempfile::tempdir().unwrap();
@@ -247,10 +248,10 @@ fn a_suffix_that_does_not_start_at_a_boundary_matches_nothing() {
         .symbols_matching(v(2), &attrs, "actStore#traverse().")
         .unwrap();
     assert_eq!(got, Vec::<String>::new(), "mid-word text is not a match");
-    let at_slash = store
-        .symbols_matching(v(2), &attrs, "facts/FactStore#traverse().")
+    let at_space = store
+        .symbols_matching(v(2), &attrs, "kos . facts/FactStore#traverse().")
         .unwrap();
-    assert_eq!(at_slash, vec![TRAV.to_string()], "a '/' is a boundary");
+    assert_eq!(at_space, vec![TRAV.to_string()], "a space is a boundary");
 }
 
 // 10
@@ -296,6 +297,7 @@ fn a_missing_store_is_refused_and_none_is_created() {
             "{verb}: {:?}",
             out.stderr
         );
+        assert_eq!(out.stdout, "", "{verb} printed on stdout");
         assert!(!db.exists(), "{verb} created a store");
     }
 }
@@ -396,7 +398,134 @@ fn text_escapes_a_tab_and_a_newline_and_json_keeps_them_exact() {
 fn one_repos_document_is_not_mixed_with_another_repos_at_the_same_path() {
     let dir = tempfile::tempdir().unwrap();
     let db = code_store(dir.path());
-    let out = kos(&["facts", "refs", "--db", &s(&db), "store/FactStore#"]);
+    // kos:src/a.rs and marvel:src/a.rs are one path in two repos, and each
+    // references its own repo's FactStore.
+    let marvel = kos(&["facts", "refs", "--db", &s(&db), "store/FactStore#"]);
+    assert_eq!(marvel.code, 0, "stderr: {}", marvel.stderr);
+    assert_eq!(marvel.stdout, "marvel:src/a.rs\n");
+    let own = kos(&["facts", "refs", "--db", &s(&db), "facts/FactStore#"]);
+    assert_eq!(own.code, 0, "stderr: {}", own.stderr);
+    assert_eq!(own.stdout, "kos:src/a.rs\n");
+}
+
+// 18: a literal backslash-t is not a tab
+#[test]
+fn text_escapes_a_backslash_so_a_literal_backslash_t_differs_from_a_tab() {
+    let dir = tempfile::tempdir().unwrap();
+    let db = dir.path().join("esc.db");
+    let mut store = FactStore::open(&db).unwrap();
+    store
+        .assert_facts(
+            v(1),
+            &[
+                f("kos:src/tab\there.rs", "code/references", TRAV),
+                f("kos:src/lit\\there.rs", "code/references", TRAV),
+            ],
+        )
+        .unwrap();
+    drop(store);
+    let text = kos(&["facts", "refs", "--db", &s(&db), TRAV]);
+    assert_eq!(text.code, 0, "stderr: {}", text.stderr);
+    assert_eq!(
+        text.stdout, "kos:src/lit\\\\there.rs\nkos:src/tab\\there.rs\n",
+        "a backslash is written \\\\ and a tab \\t, so the two are told apart"
+    );
+    let json = kos(&["facts", "refs", "--db", &s(&db), "--json", TRAV]);
+    let lines = json_lines(&json.stdout);
+    assert_eq!(lines[0]["document"], "kos:src/lit\\there.rs");
+    assert_eq!(lines[1]["document"], "kos:src/tab\there.rs");
+}
+
+// 19: an unknown package, as an unknown symbol
+#[test]
+fn dependents_of_an_unknown_package_is_refused_with_a_hint() {
+    let dir = tempfile::tempdir().unwrap();
+    let db = code_store(dir.path());
+    let out = kos(&["facts", "dependents", "--db", &s(&db), "cargo nosuch 9.9"]);
+    assert_eq!(out.code, 1);
+    assert_eq!(out.stdout, "");
+    assert!(
+        out.stderr
+            .contains("no package matches \"cargo nosuch 9.9\" at version 2"),
+        "{:?}",
+        out.stderr
+    );
+    assert!(out.stderr.contains("hint:"), "{:?}", out.stderr);
+}
+
+/// A store of `n` symbols that each end `Dup#` after a different directory,
+/// every one defined by one document.
+fn dup_store(dir: &Path, n: usize) -> PathBuf {
+    let db = dir.join("dup.db");
+    let mut store = FactStore::open(&db).unwrap();
+    let facts: Vec<Fact> = (0..n)
+        .map(|i| {
+            f(
+                "kos:src/d.rs",
+                "code/defines",
+                &format!("rust-analyzer cargo kos . m{i:02}/Dup#"),
+            )
+        })
+        .collect();
+    store.assert_facts(v(1), &facts).unwrap();
+    db
+}
+
+// 20: the candidate list is capped at ten
+#[test]
+fn an_ambiguous_query_lists_at_most_ten_candidates_and_counts_the_rest() {
+    let dir = tempfile::tempdir().unwrap();
+    let db = dup_store(dir.path(), 11);
+    let out = kos(&["facts", "refs", "--db", &s(&db), "Dup#"]);
+    assert_eq!(out.code, 1);
+    assert_eq!(out.stdout, "");
+    assert!(
+        out.stderr.contains("matches 11 symbols"),
+        "{:?}",
+        out.stderr
+    );
+    let listed = out
+        .stderr
+        .lines()
+        .filter(|l| l.contains("rust-analyzer cargo kos . m"))
+        .count();
+    assert_eq!(listed, 10, "{:?}", out.stderr);
+    assert!(out.stderr.contains("and 1 more"), "{:?}", out.stderr);
+}
+
+// 21: the default --limit is 200
+#[test]
+fn without_limit_the_verb_shows_200_results_and_says_how_many_there_are() {
+    let dir = tempfile::tempdir().unwrap();
+    let db = dir.path().join("many.db");
+    let mut store = FactStore::open(&db).unwrap();
+    let facts: Vec<Fact> = (0..201)
+        .map(|i| f(&format!("kos:src/f{i:03}.rs"), "code/references", TRAV))
+        .collect();
+    store.assert_facts(v(1), &facts).unwrap();
+    drop(store);
+    let out = kos(&["facts", "refs", "--db", &s(&db), TRAV]);
     assert_eq!(out.code, 0, "stderr: {}", out.stderr);
-    assert_eq!(out.stdout, "marvel:src/a.rs\n");
+    assert_eq!(out.stdout.lines().count(), 200);
+    assert!(
+        out.stderr.contains("showing 200 of 201"),
+        "{:?}",
+        out.stderr
+    );
+    let all = kos(&["facts", "refs", "--db", &s(&db), "--limit", "0", TRAV]);
+    assert_eq!(all.stdout.lines().count(), 201, "--limit 0 is no cap");
+}
+
+// 22: no references, text form
+#[test]
+fn a_symbol_nobody_references_prints_nothing_and_a_header_saying_zero_in_text() {
+    let dir = tempfile::tempdir().unwrap();
+    let db = code_store(dir.path());
+    let out = kos(&["facts", "refs", "--db", &s(&db), "Unused#"]);
+    assert_eq!(out.code, 0, "stderr: {}", out.stderr);
+    assert_eq!(out.stdout, "");
+    assert_eq!(
+        out.stderr.trim_end(),
+        format!("symbol {UNREFERENCED} at version 2: 0 results")
+    );
 }
