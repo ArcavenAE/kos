@@ -65,3 +65,25 @@ kos facts ingest-scip --db facts.db --at 1 --repo kos --commit "$(git -C "$CHECK
 ```
 
 For Go, add `--golist "$SCRATCH/golist.json"`.
+
+## Read
+
+Three verbs read the loaded graph. Each takes the store with `--db`, a query as
+the last argument, and an optional `--at <version>` (the latest version when
+left out; a version above the latest reads the latest).
+
+```sh
+kos facts refs --db facts.db 'FactStore#traverse().'    # documents that reference it
+kos facts impls --db facts.db 'Reader#'                 # symbols that implement it
+kos facts dependents --db facts.db 'serde 1.0'          # repos that depend on it
+```
+
+A query is a whole symbol or package, or its end where the character before it
+is a space or a `/`, so a descriptor is enough. A query that matches nothing, or
+more than one name, is refused with exit 1, and the refusal lists up to ten
+candidates. Results go to stdout, sorted, one per line, with a backslash, a tab
+and a newline escaped; the header (`symbol <name> at version <n>: <k> results`)
+goes to stderr. `--json` writes one object per result and a final trailer with
+the query, the resolved name, the version, the count and whether the list was
+cut short. `--limit <n>` caps the results (200 by default); `--limit 0` means no
+cap.

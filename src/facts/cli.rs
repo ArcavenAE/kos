@@ -15,7 +15,7 @@ use crate::error::{KosError, Result};
 
 /// A refusal of the command itself. The hint is a required argument, so no
 /// refusal built here can leave it out.
-fn refuse(message: impl AsRef<str>, hint: impl AsRef<str>) -> KosError {
+pub(super) fn refuse(message: impl AsRef<str>, hint: impl AsRef<str>) -> KosError {
     KosError::FactCommand {
         message: format!("{}\n  hint: {}", message.as_ref(), hint.as_ref()),
     }
@@ -23,7 +23,7 @@ fn refuse(message: impl AsRef<str>, hint: impl AsRef<str>) -> KosError {
 
 /// A SQLite or I/O error has no hint of its own (both are shared with the rest
 /// of kos), so each command's result passes through here and gains one.
-fn with_hint<T>(result: Result<T>) -> Result<T> {
+pub(super) fn with_hint<T>(result: Result<T>) -> Result<T> {
     result.map_err(|e| match e {
         KosError::Sqlite(_) | KosError::Io(_) => refuse(
             e.to_string(),
@@ -40,7 +40,7 @@ fn has_extension(path: &Path, wanted: &[&str]) -> bool {
 }
 
 /// Backslash, tab and newline, written as `\\`, `\t` and `\n`.
-fn escape(field: &str) -> String {
+pub(super) fn escape(field: &str) -> String {
     let mut out = String::with_capacity(field.len());
     for c in field.chars() {
         match c {
@@ -53,7 +53,7 @@ fn escape(field: &str) -> String {
     out
 }
 
-fn open_existing(db: &Path) -> Result<FactStore> {
+pub(super) fn open_existing(db: &Path) -> Result<FactStore> {
     if !db.exists() {
         return Err(refuse(
             format!("no fact store at {}", db.display()),
@@ -296,4 +296,37 @@ fn diff_inner(db: &Path, from: i64, to: i64, json: bool) -> Result<()> {
     }
     w.flush()?;
     Ok(())
+}
+
+/// What a read verb was given besides the store and the query.
+pub struct ReadArgs<'a> {
+    pub db: &'a Path,
+    pub query: &'a str,
+    pub at: Option<i64>,
+    pub json: bool,
+    pub limit: usize,
+}
+
+/// Print the documents that reference the symbol `args.query` names.
+///
+/// # Errors
+/// Fails on a missing store, an unresolved query, or a store error.
+pub fn refs(args: &ReadArgs<'_>) -> Result<()> {
+    with_hint(super::read::run(&super::read::REFS, args))
+}
+
+/// Print the symbols that implement the symbol `args.query` names.
+///
+/// # Errors
+/// Fails on a missing store, an unresolved query, or a store error.
+pub fn impls(args: &ReadArgs<'_>) -> Result<()> {
+    with_hint(super::read::run(&super::read::IMPLS, args))
+}
+
+/// Print the repos that depend on the package `args.query` names.
+///
+/// # Errors
+/// Fails on a missing store, an unresolved query, or a store error.
+pub fn dependents(args: &ReadArgs<'_>) -> Result<()> {
+    with_hint(super::read::run(&super::read::DEPENDENTS, args))
 }
