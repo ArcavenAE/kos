@@ -93,6 +93,7 @@ fn resolve(verb: &Verb, store: &FactStore, version: Version, query: &str) -> Res
             ),
         )),
         1 => Ok(found.remove(0)),
+        _ if found.iter().any(|name| name == query) => Ok(query.to_string()),
         n => {
             let mut message = format!(
                 "\"{}\" matches {n} {noun}s at version {}:",
