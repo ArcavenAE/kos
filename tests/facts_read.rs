@@ -559,6 +559,7 @@ fn a_query_that_is_a_whole_name_resolves_to_it_though_a_longer_name_ends_with_it
     // A tail that is no stored name stays ambiguous.
     let tail = kos(&["facts", "refs", "--db", &s(&db), "facts/Twin#"]);
     assert_eq!(tail.code, 1);
+    assert_eq!(tail.stdout, "");
     assert!(
         tail.stderr.contains("matches 2 symbols"),
         "{:?}",
